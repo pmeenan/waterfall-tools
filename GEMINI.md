@@ -35,3 +35,16 @@ When working on this codebase, you must adhere to the following strict architect
 7. **Sample Assets Organization:**
    - Store all sample files for respective data formats cleanly partitioned within the `Sample/Data/` root (e.g., `Sample/Data/HAR/sourceA`, `Sample/Data/ChromeTrace/site1`).
    - If writing or utilizing reference parsing implementations (like exploratory Python scripts decoding specific unmapped formats), place them explicitly in `Sample/Implementations/` mapped by format folders inherently.
+
+8. **Target Environments (Evergreen Browsers & Node):**
+   - The minimal baseline for Javascript execution and Web API usage are the **latest stable versions of Chrome, Firefox, Safari, and Node.js**. 
+   - You may freely use the newest ES syntax and native platform capabilities (e.g. modern `<canvas>` APIs, generic `fetch()`, latest `Intl` formats) without needing to transpile or polyfill for backward legacy compatibility.
+
+9. **Fault Tolerance & Streaming Execution:**
+   - The input processors should be strictly tolerant of malformed or truncated input files, degrading gracefully rather than hard-crashing.
+   - Where possible, the implementations should process input files one line or record at a time (e.g., using streaming parsers) rather than loading entire massive files into memory at once.
+
+10. **Implementation Notes & Current Conventions:**
+    - **Extended HAR Standard:** The complete schema definition of custom properties (e.g., `_load_ms`, `_ttfb_ms`, `_bytesIn`) derived from WebPageTest is documented definitively in `Docs/Extended-HAR-Schema.md`.
+    - **Type Definitions (JSDoc):** Though the project explicitly isolates to Vanilla JavaScript, zero-compilation type safety modeling is rigorously structured via JSDoc annotations. Always reference `src/core/har-types.js` when mutating payload definitions to preserve mapping without invoking TypeScript compilers.
+    - **Vite & ESM Framework:** The library defines natively as an ES Module (`"type": "module"`). Utilizing standard Vite in library mode builds ESM and UMD packages to `/dist`. Any executing context should properly process ES `import`/`export` keywords seamlessly.

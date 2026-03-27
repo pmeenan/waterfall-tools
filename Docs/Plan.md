@@ -4,10 +4,10 @@ This document breaks down the development of the Waterfall Tools library into in
 
 ## Phase 1: Core Setup & Schema Definition
 **Goal:** Establish the project structure and strictly define the Extended HAR schema.
-- [ ] Initialize the Node project configuration with Rollup/Vite.
-- [ ] Create the directory structure outlined in `Docs/Architecture.md`.
-- [ ] Establish `Sample/Data/` with format sub-folders and `Sample/Implementations/` for reference Python scripts.
-- [ ] Define the Extended HAR schema core typing in `src/core/har-types.js`. **Crucially**, base this extended schema on the specific HAR file format structure utilized by WebPageTest, referencing the examples located in `Sample/Data/HARs/WebPageTest/`.
+- [x] Initialize the Node project configuration with Rollup/Vite.
+- [x] Create the directory structure outlined in `Docs/Architecture.md`.
+- [x] Establish `Sample/Data/` with format sub-folders and `Sample/Implementations/` for reference Python scripts.
+- [x] Define the Extended HAR schema core typing in `src/core/har-types.js`. **Crucially**, base this extended schema on the specific HAR file format structure utilized by WebPageTest, referencing the examples located in `Sample/Data/HARs/WebPageTest/`.
 
 ## Phase 2: Standalone Input Processors (CLI First)
 **Goal:** Build independent, highly-testable parsers for each input type that generate the standardized HAR payload.
