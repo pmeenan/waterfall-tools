@@ -7,7 +7,7 @@ Welcome. You are working on the **Waterfall Tools** library, a powerful, robust,
 When working on this codebase, you must adhere to the following strict architectural principles:
 
 1. **Zero Bloat & Peak Performance:**
-   - **No Heavy Frameworks:** This library must remain exceptionally fast, lightweight, and entirely distributable. Rely explicitly upon **Vanilla JavaScript**. Do not introduce React, Vue, Svelte, or Angular under any circumstances within the core lib space.
+   - **No Heavy Frameworks:** This library must remain exceptionally fast, lightweight, and distributable. Prefer **Vanilla JavaScript** when it makes sense. Feel free to use external libraries as necessary if they significantly improve the architecture or functionality. Do not introduce React, Vue, Svelte, or Angular under any circumstances within the core lib space.
    - **DOM Performance:** Avoid generating thousands of DOM elements (e.g., specific divs for every network request). Network waterfalls frequently exceed 1,000+ requests globally. Rendering must leverage raw native `<canvas>` operations optimizing for seamless 60fps scrolling latency buffers.
 
 2. **The Intermediary Format (Extended HAR):**
@@ -42,8 +42,8 @@ When working on this codebase, you must adhere to the following strict architect
 
 9. **Fault Tolerance & Streaming Execution:**
    - The input processors should be strictly tolerant of malformed or truncated input files, degrading gracefully rather than hard-crashing.
-   - Where possible, the implementations should process input files one line or record at a time (e.g., using streaming parsers) rather than loading entire massive files into memory at once.
-   - Input files can be in gzip format. Input processors must implement automatic gzip detection and seamlessly uncompress the stream as it is processed.
+   - Processing massively large payloads MUST leverage stream-based architectures (prefer true streaming parsers like `stream-json` specifically) rather than lazily loading massive uncompressed strings entirely into V8 heap memory (`JSON.parse()`).
+   - Input files can frequently be supplied in gzip format organically. Input wrappers must automatically detect compressions by sniffing file magic byte headers (e.g., `1f 8b` for gzip) over blindly trusting `.gz` extensions, unzipping pipes natively on-the-fly (`zlib.createGunzip()`).
 
 10. **Implementation Notes & Current Conventions:**
     - **Extended HAR Standard:** The complete schema definition of custom properties (e.g., `_load_ms`, `_ttfb_ms`, `_bytesIn`) derived from WebPageTest is documented definitively in `Docs/Extended-HAR-Schema.md`.

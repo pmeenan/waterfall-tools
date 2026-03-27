@@ -11,9 +11,10 @@ This document breaks down the development of the Waterfall Tools library into in
 
 ## Phase 2: Standalone Input Processors (CLI First)
 **Goal:** Build independent, highly-testable parsers for each input type that generate the standardized HAR payload.
-- [ ] Implement `src/inputs/har.js` to accept raw standard HAR files and normalize them into the strictly structured Extended HAR format.
-- [ ] Build a stand-alone CLI mode wrapper for the HAR parser that takes an input file and generates the intermediary HAR file output.
-- [ ] Create automated tests validating the HAR parser against known-good sample outputs, explicitly testing HAR files from WebPageTest, Chrome, and Firefox.
+- [x] Implement `src/inputs/har.js` to accept raw standard HAR files and normalize them into the strictly structured Extended HAR format.
+- [x] Build a stand-alone CLI mode wrapper for the HAR parser that takes an input file and generates the intermediary HAR file output.
+- [x] Create automated tests validating the HAR parser against known-good sample outputs, explicitly testing HAR files from WebPageTest, Chrome, and Firefox.
+  *Note: Validation uses `node:test` against static pre-rendered `tests/fixtures/` snapshots generated natively by the CLI to enforce immutable verification of streaming decoders.*
 - [ ] Implement `src/inputs/chrome-trace.js` logic decoding complex Chromium trace event blocks into the Extended HAR format.
 - [ ] Provide a stand-alone CLI mode to process Chrome traces strictly into intermediary HAR output files.
 - [ ] Implement test suites validating trace mapping against known-good outputs.

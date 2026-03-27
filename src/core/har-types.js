@@ -14,9 +14,9 @@
  * @property {string} startedDateTime
  * @property {number} time
  * @property {Object} request
- * @property {Object} response
+ * @property {Object|ExtendedHARResponse} response
  * @property {Object} cache
- * @property {Object} timings
+ * @property {Object|ExtendedHARTimings} timings
  * @property {string} [serverIPAddress]
  * @property {string} [connection]
  * @property {string} [pageref]
@@ -28,6 +28,11 @@
  * @property {Object} [_dns_details]
  * @property {Object} [_cpuTimes]
  * @property {Object} [_js_timing]
+ * @property {Object} [_certificates]
+ * @property {Object} [_font_details]
+ * @property {Object} [_image_details]
+ * @property {Object} [_securityDetails]
+ * @property {Object} [_tls_cipher_suite]
  * 
  * -- Waterfall Tools Extended Request Scalars --
  * @property {string} [_id]
@@ -114,6 +119,35 @@
  * @property {number} [_image_total]
  * @property {number} [_image_save]
  * @property {number} [_cache_time]
+ * @property {string|number} [_connectionId]
+ * @property {string} [_fromCache]
+ * @property {string} [_initiator_function]
+ * @property {boolean} [_isLinkPreload]
+ * @property {boolean} [_preloadUnused]
+ * @property {boolean} [_renderBlocking]
+ * @property {string} [_resourceType]
+ * @property {string} [_securityState]
+ * @property {string|number} [_server_port]
+ * @property {string} [_socket_group]
+ * @property {number} [_http2_stream_id]
+ * @property {number} [_jpeg_scan_count]
+ * @property {number} [_score_progressive_jpeg]
+ */
+
+/**
+ * @typedef {Object} ExtendedHARResponse
+ * @property {string} [_error]
+ * @property {boolean} [_fetchedViaServiceWorker]
+ * @property {number} [_transferSize]
+ */
+
+/**
+ * @typedef {Object} ExtendedHARTimings
+ * @property {number} [_blocked_queueing]
+ * @property {number} [_workerFetchStart]
+ * @property {number} [_workerReady]
+ * @property {number} [_workerRespondWithSettled]
+ * @property {number} [_workerStart]
  */
 
 /**
@@ -170,6 +204,8 @@
  * @property {Object} [_domains]
  * @property {Object} [_breakdown]
  * @property {Object} [_consoleLog]
+ * @property {Object} [_wpt_bodies]
+ * @property {Object} [_usertiming]
  * 
  * -- Waterfall Tools Extended Page Scalars --
  * @property {string} [_URL]

@@ -19,14 +19,17 @@ Every request object in the `.log.entries` array maps tightly to standard HAR va
 - `_headers` (Object): Parsed request/response headers block.
 - `_dns_info`, `_dns_details` (Object): Detailed DNS resolution steps and host mappings.
 - `_cpuTimes`, `_js_timing` (Object): Script execution and CPU parsing metrics tied to specific payloads.
+- **Extended Resources:** `_certificates`, `_font_details`, `_image_details`, `_securityDetails`, `_tls_cipher_suite`
 
 ### Scalar Fields (Partial List)
-- **Identifiers:** `_id`, `_request_id`, `_raw_id`, `_netlog_id`, `_body_id`, `_body_file`
-- **Network Fields:** `_is_secure`, `_method`, `_host`, `_url`, `_ip_addr`, `_frame_id`, `_socket`, `_protocol`, `_request_type`, `_type`, `_responseCode`
+- **Identifiers:** `_id`, `_request_id`, `_raw_id`, `_netlog_id`, `_body_id`, `_body_file`, `_connectionId`, `_http2_stream_id`
+- **Network Fields:** `_is_secure`, `_method`, `_host`, `_url`, `_ip_addr`, `_frame_id`, `_socket`, `_socket_group`, `_server_port`, `_protocol`, `_request_type`, `_type`, `_responseCode`, `_resourceType`, `_securityState`, `_fromCache`
 - **Timings:** `_load_ms`, `_ttfb_ms`, `_load_start`, `_load_end`, `_dns_start`, `_dns_end`, `_connect_start`, `_connect_end`, `_ssl_start`, `_ssl_end`, `_download_start`, `_download_end`, `_all_start`, `_all_end`
 - **Sizing:** `_bytesIn`, `_bytesOut`, `_objectSize`, `_objectSizeUncompressed`
-- **Initiator:** `_initiator`, `_initiator_type`, `_initiator_line`, `_initiator_column`
-- **WebPageTest Scores:** `_score_cache`, `_score_cdn`, `_score_gzip`, `_score_keep-alive`, `_score_minify`, `_score_combine`, `_score_compress`
+- **Initiator:** `_initiator`, `_initiator_type`, `_initiator_line`, `_initiator_column`, `_initiator_function`, `_isLinkPreload`, `_preloadUnused`, `_renderBlocking`
+- **WebPageTest Scores:** `_score_cache`, `_score_cdn`, `_score_gzip`, `_score_keep-alive`, `_score_minify`, `_score_combine`, `_score_compress`, `_score_progressive_jpeg`
+- **Response Ext:** `_error`, `_fetchedViaServiceWorker`, `_transferSize`
+- **Timing Ext:** `_blocked_queueing`, `_workerFetchStart`, `_workerReady`, `_workerRespondWithSettled`, `_workerStart`
 
 ## Page Sub-object Extensions
 Global WebPageTest page-level timings and context records (such as performance milestones and audit data) are added directly onto the `.log.pages[0]` object with a leading underscore:
