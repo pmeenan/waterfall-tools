@@ -29,7 +29,7 @@ When working on this codebase, you must adhere to the following strict architect
    - Ensure the structure accommodates adopting powerful native WASM instances gracefully isolated internally exclusively for computationally heavy future requirements, for example massive Chrome Trace unzipping / reduction iterations or binary frame unpacking processes. Image compilation explicitly respects standardized Canvas APIs first natively across operations naturally.
 
 6. **CLI Modes & Testing Validation:**
-   - Each input format MUST feature a stand-alone CLI mode wrapper capable of ingesting an input file and exporting the normalized intermediary Extended HAR serialization. 
+   - Each input format MUST feature a stand-alone CLI mode wrapper capable of ingesting an input file and exporting the normalized intermediary Extended HAR serialization. This wrapper should be built as an individual standalone CLI script (e.g., `src/inputs/cli-[format].js`).
    - Write comprehensive tests asserting that parsing sample logic matches established "known-good" HAR output targets (generated during initial implementations) perfectly.
    - For alternative formats originating from the same tests as HAR files (e.g. Netlogs), explicitly include validation pipelines (like Node.js `scripts/`) ensuring the parsed requests map reliably back to their matching baseline WebPageTest HAR representations. Leverage file prefix naming conventions for robust automated matching (e.g. `www.google.com-netlog.json.gz` against `www.google.com.har.gz`).
 

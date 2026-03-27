@@ -17,7 +17,7 @@ This document breaks down the development of the Waterfall Tools library into in
   *Note: Validation uses `node:test` against static pre-rendered `tests/fixtures/` snapshots generated natively by the CLI to enforce immutable verification of streaming decoders.*
 - [x] Add decoding, processing, and validation for WebPageTest JSON formats (`src/inputs/wpt-json.js`).
 - [x] Add decoding, processing, and validation for Netlog formats (`src/inputs/netlog.js`).
-- [ ] Add decoding, processing, and validation for Chrome Dev Tools Protocol (CDP) formats (`src/inputs/cdp.js`).
+- [x] Add decoding, processing, and validation for Chrome Dev Tools Protocol (CDP) formats (`src/inputs/cdp.js`).
 - [ ] Add decoding, processing, and validation for tcpdump formats (`src/inputs/tcpdump.js`).
 - [ ] Add decoding, processing, and validation for Moz Logs formats (`src/inputs/moz-log.js`).
 - [ ] Add decoding, processing, and validation for Safari Inspector formats (`src/inputs/safari-inspector.js`).
