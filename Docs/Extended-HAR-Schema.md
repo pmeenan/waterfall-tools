@@ -12,39 +12,35 @@ Following standard HAR, the generated HAR MUST include a `creator` object:
 ```
 
 ## Entry Extensions (`_` prefixed)
-Every request object in the `.log.entries` array maps tightly to standard HAR values (request headers, timing, sizes). However, to fully represent exact waterfall characteristics without mutating native HAR structures, we embed custom fields onto each `entry` node:
+Every request object in the `.log.entries` array maps tightly to standard HAR values (request headers, timing, sizes). We augment this with robust request-level metrics mapping from tools like WebPageTest:
 
-### Network and Identifying Fields
-- `_id`, `_request_id` (string): Identifiers for tracing request references mappings.
-- `_full_url`, `_url`, `_host` (string): Resolution URLs.
-- `_ip_addr` (string): Target server IP.
-- `_protocol` (string): Negotiated protocol (h2, http/1.1, quic).
-- `_is_secure` (number/boolean): Whether connection is TLS encrypted.
-- `_method` (string): Request method.
-- `_responseCode` (number): Equivalent to response.status.
-- `_socket`, `_socket_group` (number/string): Connection pooling identifier.
-- `_request_type`, `_type` (string/number): High-level resource classification (Script, Image, Fetch, Document).
+### Dictionary & Array Fields
+- `_chunks` (Array): Streaming chunks representations.
+- `_headers` (Object): Parsed request/response headers block.
+- `_dns_info`, `_dns_details` (Object): Detailed DNS resolution steps and host mappings.
+- `_cpuTimes`, `_js_timing` (Object): Script execution and CPU parsing metrics tied to specific payloads.
 
-### Timing Characteristics (Overrides or supplements standard `time` & `timings`)
-- `_load_start`, `_load_end`, `_load_ms` (number): Absolute loading offsets/durations relative to test start.
-- `_dns_start`, `_dns_end`, `_connect_start`, `_connect_end`, `_ssl_start`, `_ssl_end`: Granular phase timestamps.
-- `_ttfb_ms`, `_download_ms`: Breakdown of time to first byte versus body streaming duration.
-
-### Sizing and Perf Characteristics
-- `_bytesIn`, `_objectSize`, `_objectSizeUncompressed` (number): Sizing of the wire stream.
-- `_priority`, `_initial_priority` (string): Render loading priority (Low, High, Highest, etc).
-- `_renderBlocking` (boolean): Whether resource strictly blocks DOM parsing.
-- `_is_base_page`, `_final_base_page` (boolean): Flags representing the root navigational HTML elements.
-
-### Initiator Information
-- `_initiator`, `_initiator_type`, `_initiator_line`, `_initiator_column`, `_initiator_function` (string/number): Information identifying which script or DOM operation triggered the network call originally.
+### Scalar Fields (Partial List)
+- **Identifiers:** `_id`, `_request_id`, `_raw_id`, `_netlog_id`, `_body_id`, `_body_file`
+- **Network Fields:** `_is_secure`, `_method`, `_host`, `_url`, `_ip_addr`, `_frame_id`, `_socket`, `_protocol`, `_request_type`, `_type`, `_responseCode`
+- **Timings:** `_load_ms`, `_ttfb_ms`, `_load_start`, `_load_end`, `_dns_start`, `_dns_end`, `_connect_start`, `_connect_end`, `_ssl_start`, `_ssl_end`, `_download_start`, `_download_end`, `_all_start`, `_all_end`
+- **Sizing:** `_bytesIn`, `_bytesOut`, `_objectSize`, `_objectSizeUncompressed`
+- **Initiator:** `_initiator`, `_initiator_type`, `_initiator_line`, `_initiator_column`
+- **WebPageTest Scores:** `_score_cache`, `_score_cdn`, `_score_gzip`, `_score_keep-alive`, `_score_minify`, `_score_combine`, `_score_compress`
 
 ## Page Sub-object Extensions
-Global WebPageTest page-level timings like First Contentful Paint, Time to Interactive, etc. are added on the `.log.pages[0]` object natively as custom keys.
+Global WebPageTest page-level timings and context records (such as performance milestones and audit data) are added directly onto the `.log.pages[0]` object with a leading underscore:
 
-- `_firstContentfulPaint` (number)
-- `_firstPaint` (number)
-- `_firstMeaningfulPaint` (number)
-- `_domComplete` (number)
-- `_fullyLoaded` (number)
-- `_visualComplete` (number)
+### Dictionary & Array Fields
+- **Process & CPU:** `_cpuTimes`, `_cpuTimesDoc`, `_v8Stats`, `_execution_contexts`, `_utilization`
+- **Environment & App:** `_detected`, `_detected_apps`, `_detected_technologies`, `_webdx_features`, `_viewport`, `_aurora`, `_cms`, `_pwa`
+- **Network:** `_origin_dns`, `_cookies`, `_domains`, `_breakdown`, `_requests`, `_pages`
+- **Audits & SEO:** `_audit_issues`, `_axe`, `_parsed_css`, `_performance`, `_privacy-sandbox`, `_robots_meta`, `_valid-head`, `_ecommerce`, `_fugu-apis`, `_generated-content`, `_origin-trials`
+- **Timings & Visuals:** `_userTimes`, `_userTimingMeasures`, `_interactivePeriods`, `_longTasks`, `_largestPaints`, `_chromeUserTiming`, `_blinkFeatureFirstUsed`, `_consoleLog`, `_usertiming`, `_thumbnails`, `_images`, `_videoFrames`
+
+### Scalar Fields (Partial List)
+- **Loading metrics:** `_loadTime`, `_docTime`, `_fullyLoaded`, `_TTFB`, `_SpeedIndex`, `_LastInteractive`, `_TotalBlockingTime`, `_maxFID`
+- **Resource totals:** `_bytesOut`, `_bytesOutDoc`, `_bytesIn`, `_bytesInDoc`, `_requestsFull`, `_requestsDoc`
+- **Paint timings:** `_firstContentfulPaint`, `_firstPaint`, `_firstImagePaint`, `_firstMeaningfulPaint`, `_LastInteractive`
+- **Visual Completion milestones:** `_lastVisualChange`, `_render`, `_visualComplete85`, `_visualComplete90`, `_visualComplete95`, `_visualComplete99`, `_visualComplete`
+- **Environment config:** `_browser_name`, `_browser_version`, `_osPlatform`, `_osVersion`, `_testUrl`, `_testID`
