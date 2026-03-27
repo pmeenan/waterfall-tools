@@ -51,3 +51,11 @@ When working on this codebase, you must adhere to the following strict architect
     - **Extended HAR Standard:** The complete schema definition of custom properties (e.g., `_load_ms`, `_ttfb_ms`, `_bytesIn`) derived from WebPageTest is documented definitively in `Docs/Extended-HAR-Schema.md`.
     - **Type Definitions (JSDoc):** Though the project explicitly isolates to Vanilla JavaScript, zero-compilation type safety modeling is rigorously structured via JSDoc annotations. Always reference `src/core/har-types.js` when mutating payload definitions to preserve mapping without invoking TypeScript compilers.
     - **Vite & ESM Framework:** The library defines natively as an ES Module (`"type": "module"`). Utilizing standard Vite in library mode builds ESM and UMD packages to `/dist`. Any executing context should properly process ES `import`/`export` keywords seamlessly.
+
+11. **Testing & Golden Fixtures:**
+    - Comparing massive object payloads (such as thousands of network requests parsed from Traces) with `assert.deepStrictEqual` can hang `node:test` execution indefinitely if there are `undefined` property mismatches. Always sanitize results via `JSON.parse(JSON.stringify(result))` before asserting against disk-saved JSON fixtures.
+    - Always scrub dynamically generated keys (e.g., fallback `startedDateTime` values using `Date.now()`) from both the parsed object and the reference golden fixture prior to running deep comparisons.
+
+12. **Streaming Nuances (`stream-json` & `stream-chain`):**
+    - When parsing JSON objects or massive arrays incrementally via `stream-array`, avoid explicitly piping streams loosely (`readStream.pipe(streamJson()).pipe(asStream())`) as Node's multiplexing can occasionally drop streaming tokens or hang the event loop on tests.
+    - Always strictly bundle stream-json steps linearly using `stream-chain` architectures: `const pipeline = chain([readStream, parser(), streamArray()]);` to safely preserve token pipelines synchronously.
