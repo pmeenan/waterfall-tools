@@ -38,8 +38,9 @@ Global WebPageTest page-level timings and context records (such as performance m
 - **Process & CPU:** `_cpuTimes`, `_cpuTimesDoc`, `_v8Stats`, `_execution_contexts`, `_utilization`
 - **Environment & App:** `_detected`, `_detected_apps`, `_detected_technologies`, `_webdx_features`, `_viewport`, `_aurora`, `_cms`, `_pwa`
 - **Network:** `_origin_dns`, `_cookies`, `_domains`, `_breakdown`, `_requests`, `_pages`
-- **Audits & SEO:** `_audit_issues`, `_axe`, `_parsed_css`, `_performance`, `_privacy-sandbox`, `_robots_meta`, `_valid-head`, `_ecommerce`, `_fugu-apis`, `_generated-content`, `_origin-trials`
+- **Audits & SEO:** `_audit_issues`, `_axe`, `_parsed_css`, `_performance`, `_privacy-sandbox`, `_robots_meta`, `_valid-head`, `_ecommerce`, `_fugu-apis`, `_generated-content`, `_origin-trials`, `_lighthouse`
 - **Timings & Visuals:** `_userTimes`, `_userTimingMeasures`, `_interactivePeriods`, `_longTasks`, `_largestPaints`, `_chromeUserTiming`, `_blinkFeatureFirstUsed`, `_consoleLog`, `_usertiming`, `_thumbnails`, `_images`, `_videoFrames`
+- **External Data (Often Dropped):** `_almanac`, `_CrUX`
 
 ### Scalar Fields (Partial List)
 - **Loading metrics:** `_loadTime`, `_docTime`, `_fullyLoaded`, `_TTFB`, `_SpeedIndex`, `_LastInteractive`, `_TotalBlockingTime`, `_maxFID`

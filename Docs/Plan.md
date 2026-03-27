@@ -15,15 +15,15 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Build a stand-alone CLI mode wrapper for the HAR parser that takes an input file and generates the intermediary HAR file output.
 - [x] Create automated tests validating the HAR parser against known-good sample outputs, explicitly testing HAR files from WebPageTest, Chrome, and Firefox.
   *Note: Validation uses `node:test` against static pre-rendered `tests/fixtures/` snapshots generated natively by the CLI to enforce immutable verification of streaming decoders.*
-- [ ] Implement `src/inputs/chrome-trace.js` logic decoding complex Chromium trace event blocks into the Extended HAR format.
-- [ ] Provide a stand-alone CLI mode to process Chrome traces strictly into intermediary HAR output files.
-- [ ] Implement test suites validating trace mapping against known-good outputs.
+- [x] Add decoding, processing, and validation for WebPageTest JSON formats (`src/inputs/wpt-json.js`).
 - [ ] Add decoding, processing, and validation for Netlog formats (`src/inputs/netlog.js`).
 - [ ] Add decoding, processing, and validation for Chrome Dev Tools Protocol (CDP) formats (`src/inputs/cdp.js`).
 - [ ] Add decoding, processing, and validation for tcpdump formats (`src/inputs/tcpdump.js`).
-- [ ] Add decoding, processing, and validation for WebPageTest JSON formats (`src/inputs/wpt-json.js`).
 - [ ] Add decoding, processing, and validation for Moz Logs formats (`src/inputs/moz-log.js`).
 - [ ] Add decoding, processing, and validation for Safari Inspector formats (`src/inputs/safari-inspector.js`).
+- [ ] Implement `src/inputs/chrome-trace.js` logic decoding complex Chromium trace event blocks into the Extended HAR format.
+- [ ] Provide a stand-alone CLI mode to process Chrome traces strictly into intermediary HAR output files.
+- [ ] Implement test suites validating trace mapping against known-good outputs.
 
 ## Phase 3: The Orchestrator & API
 **Goal:** Build the central `conductor` that intelligently manages inputs and acts as the developer API.

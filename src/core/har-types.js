@@ -206,6 +206,9 @@
  * @property {Object} [_consoleLog]
  * @property {Object} [_wpt_bodies]
  * @property {Object} [_usertiming]
+ * @property {Object} [_lighthouse]
+ * @property {Object} [_CrUX]
+ * @property {string|Object} [_almanac]
  * 
  * -- Waterfall Tools Extended Page Scalars --
  * @property {string} [_URL]

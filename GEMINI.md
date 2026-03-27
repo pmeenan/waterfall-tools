@@ -43,6 +43,7 @@ When working on this codebase, you must adhere to the following strict architect
 9. **Fault Tolerance & Streaming Execution:**
    - The input processors should be strictly tolerant of malformed or truncated input files, degrading gracefully rather than hard-crashing.
    - Processing massively large payloads MUST leverage stream-based architectures (prefer true streaming parsers like `stream-json` specifically) rather than lazily loading massive uncompressed strings entirely into V8 heap memory (`JSON.parse()`).
+   - **Crucially:** Input processors dealing with extremely bloated inputs (e.g. Chrome Traces or WebPageTest JSON files) SHOULD utilize primitive Transform streams before the JSON Assembler to aggressively discard massive extraneous fields (like `generated-html` or `almanac`) natively at the token level safely preventing V8 memory exhaustion.
    - Input files can frequently be supplied in gzip format organically. Input wrappers must automatically detect compressions by sniffing file magic byte headers (e.g., `1f 8b` for gzip) over blindly trusting `.gz` extensions, unzipping pipes natively on-the-fly (`zlib.createGunzip()`).
 
 10. **Implementation Notes & Current Conventions:**
