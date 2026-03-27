@@ -209,6 +209,8 @@
  * @property {Object} [_lighthouse]
  * @property {Object} [_CrUX]
  * @property {string|Object} [_almanac]
+ * @property {Object[]} [_unlinked_connections]
+ * @property {Object[]} [_unlinked_dns_lookups]
  * 
  * -- Waterfall Tools Extended Page Scalars --
  * @property {string} [_URL]

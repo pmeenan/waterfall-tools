@@ -36,3 +36,5 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+Sample/Implementations/webpagetest
+Sample/Implementations/wptagent
