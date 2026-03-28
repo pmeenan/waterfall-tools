@@ -31,7 +31,7 @@ function finishSniffing(text, resolve) {
     resolve('unknown');
 }
 
-export async function identifyFormat(filePath) {
+export async function identifyFormat(filePath, options = {}) {
     if (typeof filePath !== 'string') {
         throw new Error('identifyFormat currently only supports file paths. For streams, pass the format explicitly via options.format.');
     }
@@ -51,11 +51,12 @@ export async function identifyFormat(filePath) {
     }
     
     const buf = buffer.subarray(0, bytesRead);
-    const result = await identifyFormatFromBuffer(buf);
+    const result = await identifyFormatFromBuffer(buf, options);
+    if (options.debug) console.log(`[orchestrator.js] Identified format '${result.format}' from ${filePath}`);
     return result.format;
 }
 
-export async function identifyFormatFromBuffer(buffer) {
+export async function identifyFormatFromBuffer(buffer, options = {}) {
     const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
     const isGz = isGzip(buf);
     
@@ -98,6 +99,9 @@ export async function identifyFormatFromBuffer(buffer) {
 
     return new Promise((resolve) => {
         const textToSniff = textBuf.subarray(0, 4000).toString('utf-8');
-        finishSniffing(textToSniff, (format) => resolve({ format, isGz }));
+        finishSniffing(textToSniff, (format) => {
+            if (options.debug) console.log(`[orchestrator.js] Sniffed buffer and determined format: '${format}'`);
+            resolve({ format, isGz });
+        });
     });
 }

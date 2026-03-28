@@ -22,7 +22,7 @@ test('HAR Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/WebPageTest/amazon.har.gz');
         const refPath = path.resolve(__dirname, '../fixtures/amazon.har.json');
         
-        const result = await processHARFileNode(inputPath);
+        const result = await processHARFileNode(inputPath, { debug: true });
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
         assert.deepStrictEqual(result, ref, 'Parsed WPT HAR does not match reference output');
@@ -38,7 +38,7 @@ test('HAR Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/Chrome/www.google.com.har');
         const refPath = path.resolve(__dirname, '../fixtures/chrome-google.har.json');
         
-        const result = await processHARFileNode(inputPath);
+        const result = await processHARFileNode(inputPath, { debug: true });
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
         assert.deepStrictEqual(result, ref, 'Parsed Chrome HAR does not match reference output');
@@ -53,7 +53,7 @@ test('HAR Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/Firefox/www.google.com_Archive [26-03-27 17-36-46].har');
         const refPath = path.resolve(__dirname, '../fixtures/firefox-google.har.json');
         
-        const result = await processHARFileNode(inputPath);
+        const result = await processHARFileNode(inputPath, { debug: true });
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
         assert.deepStrictEqual(result, ref, 'Parsed Firefox HAR does not match reference output');
@@ -67,7 +67,7 @@ test('HAR Input Processor', async (t) => {
     await t.test('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/DOES_NOT_EXIST.har');
         await assert.rejects(
-            async () => await processHARFileNode(inputPath),
+            async () => await processHARFileNode(inputPath, { debug: true }),
             { code: 'ENOENT' },
             'Should reject with ENOENT when file is missing'
         );

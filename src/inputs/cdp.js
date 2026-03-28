@@ -727,6 +727,7 @@ export async function processCDPFileNode(input, options = {}) {
             parser.write(value);
         }
 
+        if (options.debug) console.log(`[cdp.js] Successfully parsed ${events.length} CDP events.`);
         const devToolsParser = new DevToolsParser();
         const wptData = devToolsParser.process(events);
         
@@ -742,6 +743,7 @@ export async function processCDPFileNode(input, options = {}) {
         };
         
         const har = normalizeWPT(wptFormat);
+        if (options.debug) console.log(`[cdp.js] Successfully normalized CDP to HAR.`);
         har.log.creator.name = "waterfall-tools (devtools)";
         
         // As with stream parsing pipelines, ensure we correctly evaluate output structurally!

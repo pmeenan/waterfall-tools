@@ -13,7 +13,7 @@ test('Chrome DevTools Protocol (CDP) Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Chrome Devtools Protocol/www.google.com-devtools.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/cdp-google.har.json');
         
-        const result = await processCDPFileNode(inputPath);
+        const result = await processCDPFileNode(inputPath, { debug: true });
         
         // Auto-generate golden reference file if absent
         if (!fs.existsSync(refPath)) {
@@ -43,7 +43,7 @@ test('Chrome DevTools Protocol (CDP) Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Chrome Devtools Protocol/www.cnn.com-devtools.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/cdp-cnn.har.json');
         
-        const result = await processCDPFileNode(inputPath);
+        const result = await processCDPFileNode(inputPath, { debug: true });
         
         if (!fs.existsSync(refPath)) {
             console.log("Generating golden fixture for cdp-cnn.har.json...");
@@ -66,7 +66,7 @@ test('Chrome DevTools Protocol (CDP) Input Processor', async (t) => {
     await t.test('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Chrome Devtools Protocol/DOES_NOT_EXIST.json');
         await assert.rejects(
-            async () => await processCDPFileNode(inputPath),
+            async () => await processCDPFileNode(inputPath, { debug: true }),
             { code: 'ENOENT' },
             'Should reject with ENOENT when file is missing'
         );

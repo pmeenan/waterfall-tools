@@ -13,7 +13,7 @@ export class Conductor {
         let format = options.format;
         
         if (!format) {
-            format = await identifyFormat(filePath);
+            format = await identifyFormat(filePath, options);
         }
         
         if (format === 'unknown') {
@@ -66,7 +66,7 @@ export class Conductor {
         let isGz = options.isGz;
 
         if (!format) {
-            const detected = await identifyFormatFromBuffer(buf);
+            const detected = await identifyFormatFromBuffer(buf, options);
             format = detected.format;
             if (isGz === undefined) {
                 isGz = detected.isGz;

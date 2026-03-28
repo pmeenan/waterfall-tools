@@ -148,7 +148,7 @@ export async function processTcpdumpNode(input, options = {}) {
                     decodeProtocol(conn);
                 }
             } catch (e) {
-                console.error("Protocol Decoded Error:", e);
+                if (options.debug) console.error("Protocol Decoded Error:", e);
             }
         }
         
@@ -156,24 +156,24 @@ export async function processTcpdumpNode(input, options = {}) {
         try {
             extractDohRequests(tcpConnections, dnsRegistry);
         } catch(e) {
-            console.error("DoH Extraction Error:", e);
+            if (options.debug) console.error("DoH Extraction Error:", e);
         }
         
         const udpConnections = udpReconstructor.getConnections();
-        console.log(`[tcpdump.js] Start routing ${udpConnections.length} UDP connections`);
+        if (options.debug) console.log(`[tcpdump.js] Start routing ${udpConnections.length} UDP connections`);
         let udpCount = 0;
         for (let i = 0; i < udpConnections.length; i++) {
             const conn = udpConnections[i];
             try {
-                console.log(`[tcpdump.js] Processing UDP ${i}/${udpConnections.length}...`);
+                if (options.debug) console.log(`[tcpdump.js] Processing UDP ${i}/${udpConnections.length}...`);
                 await decodeUdpProtocol(conn, keyLogMap, dnsRegistry);
-                console.log(`[tcpdump.js] Processed UDP ${i}.`);
+                if (options.debug) console.log(`[tcpdump.js] Processed UDP ${i}.`);
                 udpCount++;
             } catch (e) {
-                 console.error("UDP Decode Error:", e);
+                 if (options.debug) console.error("UDP Decode Error:", e);
             }
         }
-        console.log(`[tcpdump.js] Successfully verified ${udpCount} UDP connections`);
+        if (options.debug) console.log(`[tcpdump.js] Successfully verified ${udpCount} UDP connections`);
 
         const harResult = generateHarFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups());
         return harResult;

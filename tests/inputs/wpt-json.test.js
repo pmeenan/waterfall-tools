@@ -13,7 +13,7 @@ test('WebPageTest JSON Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/WebPageTest JSON/www.google.com-wpt.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/wpt-google.har.json');
         
-        const result = await processWPTFileNode(inputPath);
+        const result = await processWPTFileNode(inputPath, { debug: true });
         
         // Auto-generate golden reference file if absent
         if (!fs.existsSync(refPath)) {
@@ -47,7 +47,7 @@ test('WebPageTest JSON Input Processor', async (t) => {
         
         // This execution naturally exercises the custom PRUNING Token Filter. 
         // If it was just Assembler, Node would likely OutOfMemory / choke on a 13MB gzipped string buffer organically.
-        const result = await processWPTFileNode(inputPath);
+        const result = await processWPTFileNode(inputPath, { debug: true });
         
         if (!fs.existsSync(refPath)) {
             console.log("Generating golden fixture for wpt-cnn.har.json...");
@@ -73,7 +73,7 @@ test('WebPageTest JSON Input Processor', async (t) => {
     await t.test('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/WebPageTest JSON/DOES_NOT_EXIST.json');
         await assert.rejects(
-            async () => await processWPTFileNode(inputPath),
+            async () => await processWPTFileNode(inputPath, { debug: true }),
             { code: 'ENOENT' },
             'Should reject with ENOENT when file is missing'
         );

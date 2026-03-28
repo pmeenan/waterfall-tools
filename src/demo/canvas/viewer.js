@@ -39,7 +39,7 @@ async function processFiles(files) {
         }
 
         const arrayBuffer = await mainFile.arrayBuffer();
-        const options = {};
+        const options = { debug: true };
         
         if (keylogFile) {
             options.keyLogInput = await fileToReadable(keylogFile);

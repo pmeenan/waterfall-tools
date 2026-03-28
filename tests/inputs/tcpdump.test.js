@@ -14,7 +14,7 @@ test('Tcpdump Processor Generates Valid HAR', async (t) => {
     const fixturePath = path.join(__dirname, '../fixtures/tcpdump-google-har.json');
 
     // Run processor natively loading keylogs dynamically configured per naming rules internally
-    const har = await processTcpdumpNode(inputPath);
+    const har = await processTcpdumpNode(inputPath, { debug: true });
 
     // Dynamic assertions verifying parser integrity
     assert.strictEqual(har.log.version, "1.2");

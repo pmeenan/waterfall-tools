@@ -2,7 +2,7 @@
 
 /**
  * Waterfall Tools Root CLI Wrapper
- * Usage: waterfall-tools <input-file> [output-file] [--keylog <keylog-file>]
+ * Usage: waterfall-tools <input-file> [output-file] [--keylog <keylog-file>] [--debug]
  */
 
 import fs from 'node:fs';
@@ -13,19 +13,22 @@ async function main() {
     const args = process.argv.slice(2);
     
     if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
-        console.error('Usage: waterfall-tools <input-file> [output-file] [--keylog <keylog-file>]');
+        console.error('Usage: waterfall-tools <input-file> [output-file] [--keylog <keylog-file>] [--debug]');
         process.exit(1);
     }
     
     let inputFile = args[0];
     let outputFile = null;
     let keyLogPath = null;
+    const options = { debug: false };
     
     // Parse arguments
     for (let i = 1; i < args.length; i++) {
         if (args[i] === '--keylog') {
             keyLogPath = args[i + 1];
             i++; // skip next
+        } else if (args[i] === '--debug') {
+            options.debug = true;
         } else if (!outputFile && !args[i].startsWith('--')) {
             outputFile = args[i];
         }
@@ -43,7 +46,6 @@ async function main() {
         process.exit(1);
     }
     
-    const options = {};
     if (keyLogPath) {
         options.keyLogInput = keyLogPath;
     }

@@ -1208,6 +1208,7 @@ export async function processNetlogFileNode(input, options = {}) {
             }
         }
 
+        if (options.debug) console.log(`[netlog.js] Finished reading stream data.`);
         const results = netlog.postProcessEvents();
         let requests = [];
         let unlinked_sockets = [];
@@ -1221,6 +1222,7 @@ export async function processNetlogFileNode(input, options = {}) {
             start_time = results.start_time || 0;
         }
 
+        if (options.debug) console.log(`[netlog.js] Successfully normalized Netlog data. Evaluated ${requests.length} valid requests.`);
         const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, start_time);
         return har;
 

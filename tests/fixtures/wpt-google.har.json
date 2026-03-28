@@ -35850,7 +35850,8 @@
             "requests": 7
           }
         },
-        "_consoleLog": []
+        "_consoleLog": [],
+        "_bwDown": 5000
       }
     ],
     "entries": [
@@ -55200,6 +55201,7 @@
         "_body_id": "2821.46",
         "_body_url": "/response_body.php?test=260326_67_5&run=1&bodyid=2821.46"
       }
-    ]
+    ],
+    "_bwDown": 5000
   }
 }

@@ -180,6 +180,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
             if (done) break;
             parser.write(value);
         }
+        if (options.debug) console.log(`[chrome-trace.js] Finished reading stream stream.`);
 
         const results = netlog.postProcessEvents();
         let requests = results ? (results.requests || []) : [];
@@ -269,6 +270,8 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 }
             }
         }
+        
+        if (options.debug) console.log(`[chrome-trace.js] Successfully normalized Netlog data. Synthesized ${requests.length} requests.`);
 
         const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, final_start_time);
         

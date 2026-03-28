@@ -41,6 +41,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Implement `src/inputs/orchestrator.js` to manage registered source parsers.
 - [x] Implement auto-detection logic to identify if a raw input payload is a HAR, Chrome Trace, WPT, or other supported format based on the payload, not the file name (and automatically handle gzipped versions of each).
 - [x] Create the `src/core/conductor.js` main class export that coordinates between the auto-detected parser and the intermediary output format. It should support streaming input, raw data and files as input. It should also support the caller providing a key log for TLS decryption and should support a cli for passing in any of the supported file formats and outputting the HAR file (with a `--keylog` option for TLS decryption and a simple, descriptive, short file name).
+- [x] Integrate standard `--debug` flag logic and dynamic `options.debug` support across all pipeline parsing execution and viewers ensuring rich telemetry visibility natively.
 
 ## Phase 4: Headless Outputs
 **Goal:** Generate raw data exports directly from the proven Orchestrator state.

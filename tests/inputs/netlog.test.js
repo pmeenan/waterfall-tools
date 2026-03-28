@@ -13,7 +13,7 @@ test('Netlog JSON Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Netlog/www.google.com-netlog.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/netlog-google.har.json');
         
-        const result = await processNetlogFileNode(inputPath);
+        const result = await processNetlogFileNode(inputPath, { debug: true });
         
         // Auto-generate golden reference file if absent
         if (!fs.existsSync(refPath)) {
@@ -40,7 +40,7 @@ test('Netlog JSON Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Netlog/amazon1_netlog.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/netlog-amazon1.har.json');
         
-        const result = await processNetlogFileNode(inputPath);
+        const result = await processNetlogFileNode(inputPath, { debug: true });
         
         if (!fs.existsSync(refPath)) {
             console.log("Generating golden fixture for netlog-amazon1.har.json...");
@@ -60,7 +60,7 @@ test('Netlog JSON Input Processor', async (t) => {
     await t.test('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Netlog/DOES_NOT_EXIST.json.gz');
         await assert.rejects(
-            async () => await processNetlogFileNode(inputPath),
+            async () => await processNetlogFileNode(inputPath, { debug: true }),
             { code: 'ENOENT' },
             'Should reject with ENOENT when file is missing'
         );

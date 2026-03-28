@@ -19,7 +19,7 @@ test('Chrome Trace Input Processing', async (t) => {
             const fixturePath = path.resolve(`tests/fixtures/chrome-trace/${filename}.json`);
             const inputPath = path.resolve(`Sample/Data/Chrome Traces/${filename}.json.gz`);
 
-            const har = await processChromeTraceFileNode(inputPath);
+            const har = await processChromeTraceFileNode(inputPath, { debug: true });
             
             // Scrub dynamic Dates
             if (har.log && har.log.pages) {

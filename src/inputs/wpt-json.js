@@ -294,14 +294,14 @@ export async function processWPTFileNode(input, options = {}) {
     while (true) {
         const { done, value } = await reader.read();
         chunkCount++;
-        if (chunkCount % 1000 === 0) console.log("Read chunks:", chunkCount);
+        if (options.debug && chunkCount % 1000 === 0) console.log("Read chunks:", chunkCount);
         if (done) {
-            console.log("Stream Done!");
+            if (options.debug) console.log("Stream Done!");
             break;
         }
         parser.write(value);
     }
-    console.log("Finished WPT loop.");
+    if (options.debug) console.log("Finished WPT loop.");
     
     } catch (e) {
         throw e;

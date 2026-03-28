@@ -106,6 +106,8 @@ export async function processHARFileNode(input, options = {}) {
         parser.write(value);
     }
     
+    if (options.debug) console.log(`[har.js] Finished parsing HAR string structure. Returning extracted items.`);
+
     } catch (e) {
         throw e;
     } finally {
