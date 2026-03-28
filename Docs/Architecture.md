@@ -16,9 +16,10 @@ graph TD
     %% Inputs
     subgraph Inputs ["Input Processors (inputs/)"]
         HARv1[HAR format]
-        ChromeTrace[Chrome Trace]
-        WPT[WPT Format]
+        ChromeTrace[Chrome Trace & CDP]
+        WPT[WPT Format & Netlog]
         Custom[Custom JSON]
+        Tcpdump[PCAP / PCAPNG Captures]
     end
 
     %% Orchestrator

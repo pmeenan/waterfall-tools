@@ -64,3 +64,11 @@ When working on this codebase, you must adhere to the following strict architect
 13. **Parallel Fallback Architecture & O(n) Mitigations:**
     - Fallback strategies natively parsing alternative execution paths (e.g. Chrome trace `devtools.timeline` elements substituting explicitly to form arrays matching missing `netlog` configurations) must continuously buffer `id` constraints carefully.
     - When bridging buffered entities across multiple distinct event paths against massive baseline arrays (15,000+ entries linearly), always aggressively index payloads utilizing explicit `Map` structures preventing catastrophic O(N^2) memory loop stalls internally.
+
+14. **Isomorphic Binary Streams (PCAP/PCAPNG):**
+    - Raw binary ingestion pipelines (e.g. `PcapParser`) MUST operate strictly on native `Uint8Array` slicing and `DataView` abstractions rather than Node.js specific `Buffer` classes. This guarantees zero-copy native browser parsing against massive payloads without triggering Node polyfill imports.
+    - **Note on PCAPNG Requirements:** The initial parser framework supports sniffing PCAPNG magics and extracting `Enhanced Packet Blocks` (EPB). However, timestamp precision explicitly assumes microsecond intervals. Proper timestamp mapping requires tracking `Interface Description Block` (IDB) options, which should be finalized when actual `.pcapng` capture files are included for complete test coverage.
+    - The raw `PcapParser` natively handles decoding `Ethernet`, `IPv4`, `IPv6`, `TCP`, and `UDP` directly alongside the container unwrapping to prevent deep loop regressions across independent processor domains.
+
+15. **Continuous Documentation Maintenance:**
+    - Whenever a task in the `Docs/Plan.md` is checked as completed, you MUST update `GEMINI.md`, `Docs/Architecture.md`, and `Docs/Plan.md` with any relevant architectural changes, technical decisions, or new information discovered during the execution of that task. This ensures all future autonomous agent steps maintain the latest context without relying on past chat history.
