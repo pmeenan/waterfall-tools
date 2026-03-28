@@ -678,21 +678,28 @@ function isGzip(buffer) {
  * @param {string} filePath - Path to .json or .json.gz file
  * @returns {Promise<import('../core/har-types.js').ExtendedHAR>}
  */
-export async function processCDPFileNode(filePath) {
+export async function processCDPFileNode(input, options = {}) {
     return new Promise((resolve, reject) => {
-        const header = Buffer.alloc(2);
-        let fd;
-        try {
-            fd = fs.openSync(filePath, 'r');
-            fs.readSync(fd, header, 0, 2, 0);
-            fs.closeSync(fd);
-        } catch (e) {
-            return reject(e);
+        let isGz = false;
+        let fileStream;
+
+        if (typeof input === 'string') {
+            const header = Buffer.alloc(2);
+            let fd;
+            try {
+                fd = fs.openSync(input, 'r');
+                fs.readSync(fd, header, 0, 2, 0);
+                fs.closeSync(fd);
+            } catch (e) {
+                return reject(e);
+            }
+            isGz = isGzip(header);
+            fileStream = fs.createReadStream(input);
+        } else {
+            fileStream = input;
+            isGz = options.isGz === true;
         }
 
-        const isGz = isGzip(header);
-        const fileStream = fs.createReadStream(filePath);
-        
         let readStream = fileStream;
         if (isGz) {
             readStream = fileStream.pipe(zlib.createGunzip());
@@ -735,6 +742,9 @@ export async function processCDPFileNode(filePath) {
                 const har = normalizeWPT(wptFormat);
                 har.log.creator.name = "waterfall-tools (devtools)";
                 resolve(har);
+                if (typeof input === 'string') {
+                    fileStream.destroy();
+                }
             } catch (err) {
                 reject(err);
             }

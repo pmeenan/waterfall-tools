@@ -6,7 +6,7 @@ import { UdpReconstructor } from './utilities/tcpdump/udp-reconstructor.js';
 import { decodeProtocol } from './utilities/tcpdump/protocol-sniffer.js';
 import { decodeUdpProtocol } from './utilities/tcpdump/udp-sniffer.js';
 
-export async function processTcpdumpNode(filePath, options = {}) {
+export async function processTcpdumpNode(input, options = {}) {
     return new Promise((resolve, reject) => {
         const packets = [];
         const tcpReconstructor = new TcpReconstructor();
@@ -18,54 +18,68 @@ export async function processTcpdumpNode(filePath, options = {}) {
             udpReconstructor.push(packet);
         });
 
-        let inputStream = fs.createReadStream(filePath);
-        let sniffing = true;
+        let inputStream;
+        let isGz = options.isGz === true;
         
-        // Peek at first 2 bytes to check for gzip magic number (1f 8b)
-        inputStream.once('data', (chunk) => {
-            let stream = inputStream;
-            if (chunk.length >= 2 && chunk[0] === 0x1f && chunk[1] === 0x8b) {
-                // It's gzipped, we need to restart the stream and pipe it
-                inputStream.destroy();
-                inputStream = fs.createReadStream(filePath);
-                stream = inputStream.pipe(zlib.createGunzip());
-                
-                stream.on('error', (err) => {
-                    inputStream.destroy();
-                    reject(err);
-                });
-            } else {
-                // It's not gzipped, pass the chunk to the parser immediately because we just consumed it
-                try {
-                    parser.push(chunk);
-                } catch (err) {
-                    inputStream.destroy();
-                    return reject(err);
-                }
+        if (typeof input === 'string') {
+            const header = Buffer.alloc(2);
+            let fd;
+            try {
+                fd = fs.openSync(input, 'r');
+                fs.readSync(fd, header, 0, 2, 0);
+                fs.closeSync(fd);
+            } catch (e) {
+                return reject(e);
             }
-
-            stream.on('data', (dataChunk) => {
-                try {
-                    parser.push(dataChunk);
-                } catch (err) {
-                    stream.destroy();
-                    if (stream !== inputStream) inputStream.destroy();
-                    reject(err);
-                }
+            isGz = (header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b);
+            inputStream = fs.createReadStream(input);
+        } else {
+            inputStream = input;
+        }
+        
+        let stream = inputStream;
+        if (isGz) {
+            stream = inputStream.pipe(zlib.createGunzip());
+            stream.on('error', (err) => {
+                if (typeof input === 'string') inputStream.destroy();
+                reject(err);
             });
+        }
 
-            stream.on('end', async () => {
-                let keyLogContents = null;
-                const pathParts = filePath.split('.');
-                // Simple heuristic to find corresponding keylog: .cap.gz -> .key_log.txt.gz
-                // E.g. amazon1.cap.gz -> amazon1.key_log.txt.gz
-                const keyLogPath = filePath.replace('.cap.gz', '.key_log.txt.gz');
-                
+        stream.on('data', (dataChunk) => {
+            try {
+                parser.push(dataChunk);
+            } catch (err) {
+                stream.destroy();
+                if (typeof input === 'string' && stream !== inputStream) inputStream.destroy();
+                reject(err);
+            }
+        });
+
+        stream.on('end', async () => {
+            let keyLogContents = null;
+            let keyLogInput = options.keyLogInput;
+            if (!keyLogInput && typeof input === 'string') {
+                keyLogInput = input.replace('.cap.gz', '.key_log.txt.gz');
+                keyLogInput = keyLogInput.replace('.pcapng', '.key_log.txt');
+                keyLogInput = keyLogInput.replace('.pcap', '.key_log.txt');
+            }
+            
+            if (keyLogInput) {
                 try {
-                    let keyLogStream = fs.createReadStream(keyLogPath);
-                    if (keyLogPath.endsWith('.gz')) {
-                        keyLogStream = keyLogStream.pipe(zlib.createGunzip());
+                    let keyLogStream;
+                    if (typeof keyLogInput === 'string') {
+                        keyLogStream = fs.createReadStream(keyLogInput);
+                        if (keyLogInput.endsWith('.gz')) {
+                            keyLogStream = keyLogStream.pipe(zlib.createGunzip());
+                        }
+                    } else {
+                        keyLogStream = keyLogInput;
+                        if (options.keyLogIsGz) {
+                            keyLogStream = keyLogStream.pipe(zlib.createGunzip());
+                        }
                     }
+                    
                     const chunks = [];
                     for await (const chunk of keyLogStream) {
                         chunks.push(chunk);
@@ -74,6 +88,7 @@ export async function processTcpdumpNode(filePath, options = {}) {
                 } catch (e) {
                     // It is completely valid for a keylog to not exist.
                 }
+            }
 
                 let keyLogMap = null;
                 if (keyLogContents) {
@@ -164,14 +179,16 @@ export async function processTcpdumpNode(filePath, options = {}) {
             });
 
             stream.on('error', (err) => {
-                if (stream !== inputStream) inputStream.destroy();
+                if (typeof input === 'string' && stream !== inputStream) inputStream.destroy();
                 reject(err);
             });
-        });
 
-        inputStream.on('error', (err) => {
-            reject(err);
-        });
+            if (typeof input === 'string') {
+                inputStream.on('error', (err) => {
+                    reject(err);
+                });
+            }
+        // No extra }); here because we removed once('data')
     });
 }
 

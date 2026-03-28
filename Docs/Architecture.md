@@ -72,6 +72,8 @@ graph TD
 
 ```text
 /
+├── bin/                # CLI entry points and binary wrappers
+│   └── waterfall-tools.js # Main CLI executable pulling from Core
 ├── src/
 │   ├── inputs/             # Self-contained modules for processing specific input formats
 │   │   ├── cli/            # Standalone CLI tools testing & generating Extended HARs

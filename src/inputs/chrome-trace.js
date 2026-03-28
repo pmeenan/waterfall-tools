@@ -20,46 +20,54 @@ function isGzip(buffer) {
     return buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
 }
 
-export async function processChromeTraceFileNode(filePath) {
+export async function processChromeTraceFileNode(input, options = {}) {
     return new Promise(async (resolve, reject) => {
-        let rs = fs.createReadStream(filePath, { start: 0, end: 1024 });
-        
-        const header = Buffer.alloc(2);
-        let fd;
-        try {
-            fd = fs.openSync(filePath, 'r');
-            fs.readSync(fd, header, 0, 2, 0);
-            fs.closeSync(fd);
-        } catch (e) {
-            return reject(e);
-        }
-        
-        const isGz = isGzip(header);
-        
-        let peekSource = fs.createReadStream(filePath);
-        let peekStream = peekSource;
-        if (isGz) peekStream = peekSource.pipe(zlib.createGunzip());
-        
-        let prefix = await new Promise((resolve) => {
-            let result = '';
-            peekStream.on('error', () => {});
-            peekStream.on('data', (d) => {
-                result += d.toString('utf-8');
-                if (result.length > 20) {
-                    peekStream.destroy();
+        let isGz = false;
+        let fileStream;
+        let hasTraceEventsWrapper = false;
+
+        if (typeof input === 'string') {
+            const header = Buffer.alloc(2);
+            let fd;
+            try {
+                fd = fs.openSync(input, 'r');
+                fs.readSync(fd, header, 0, 2, 0);
+                fs.closeSync(fd);
+            } catch (e) {
+                return reject(e);
+            }
+            
+            isGz = isGzip(header);
+            
+            let peekSource = fs.createReadStream(input);
+            let peekStream = peekSource;
+            if (isGz) peekStream = peekSource.pipe(zlib.createGunzip());
+            
+            let prefix = await new Promise((res) => {
+                let result = '';
+                peekStream.on('error', () => {});
+                peekStream.on('data', (d) => {
+                    result += d.toString('utf-8');
+                    if (result.length > 20) {
+                        peekStream.destroy();
+                        peekSource.destroy();
+                        res(result);
+                    }
+                });
+                peekStream.on('end', () => {
                     peekSource.destroy();
-                    resolve(result);
-                }
+                    res(result);
+                });
             });
-            peekStream.on('end', () => {
-                peekSource.destroy();
-                resolve(result);
-            });
-        });
-        
-        let hasTraceEventsWrapper = prefix.replace(/\s/g, '').startsWith('{"traceEvents":');
-        
-        const fileStream = fs.createReadStream(filePath);
+            
+            hasTraceEventsWrapper = prefix.replace(/\s/g, '').startsWith('{"traceEvents":');
+            fileStream = fs.createReadStream(input);
+        } else {
+            fileStream = input;
+            isGz = options.isGz === true;
+            hasTraceEventsWrapper = options.hasTraceEventsWrapper === true;
+        }
+
         let readStream = fileStream;
         if (isGz) {
             readStream = fileStream.pipe(zlib.createGunzip());
@@ -274,6 +282,9 @@ export async function processChromeTraceFileNode(filePath) {
                 }
                 
                 resolve(har);
+                if (typeof input === 'string') {
+                    fileStream.destroy();
+                }
             } catch (err) {
                 reject(err);
             }

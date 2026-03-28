@@ -82,3 +82,9 @@ When working on this codebase, you must adhere to the following strict architect
 
 17. **TCPDump HAR Assembler:**
     - The `tcpdump.js` processor natively flattens the multidimensional array of reconstructed flows (TCP connections with HTTP/1 & 2 objects, UDP blocks with HTTP/3, explicit DoH unlinked pipelines) mapping chronologically aligned structures tightly against resolved DNS tables. It guarantees standard Extended HAR payload generations directly matching downstream CLI endpoints.
+
+18. **Orchestrator & API Conventions:**
+    - The library handles automatic format detection via `src/inputs/orchestrator.js` utilizing file peeking and magic-byte/token sniffing natively so the caller does not need to define input formats strictly.
+    - All format processors accept `input` generic signatures (`processXNode(input, options)`) uniformly supporting either file paths or raw `Readable` streams gracefully.
+    - The main `Conductor` artifact represents the central class and exposes `processFile` and `processStream` methods bridging inputs systematically.
+    - The root unified CLI resides at `bin/waterfall-tools.js` wrapping the `Conductor` logic securely for global terminal access across formats natively while automatically discovering matching `keylog` inputs implicitly.

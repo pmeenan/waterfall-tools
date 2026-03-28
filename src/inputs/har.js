@@ -54,27 +54,32 @@ function isGzip(buffer) {
  * @param {string} filePath - Path to the HAR file (.har or .har.gz)
  * @returns {Promise<import('../core/har-types.js').ExtendedHAR>}
  */
-export async function processHARFileNode(filePath) {
+export async function processHARFileNode(input, options = {}) {
     const fs = await import('node:fs');
     const zlib = await import('node:zlib');
     const streamJson = (await import('stream-json')).default;
     const Assembler = (await import('stream-json/assembler.js')).default;
 
     return new Promise((resolve, reject) => {
-        // First peek at the file to detect gzip magic bytes.
-        // This is more robust than relying firmly on file extensions.
-        const header = Buffer.alloc(2);
-        let fd;
-        try {
-            fd = fs.openSync(filePath, 'r');
-            fs.readSync(fd, header, 0, 2, 0);
-            fs.closeSync(fd);
-        } catch (e) {
-            return reject(e);
-        }
+        let isGz = false;
+        let fileStream;
 
-        const isGz = isGzip(header);
-        const fileStream = fs.createReadStream(filePath);
+        if (typeof input === 'string') {
+            const header = Buffer.alloc(2);
+            let fd;
+            try {
+                fd = fs.openSync(input, 'r');
+                fs.readSync(fd, header, 0, 2, 0);
+                fs.closeSync(fd);
+            } catch (e) {
+                return reject(e);
+            }
+            isGz = isGzip(header);
+            fileStream = fs.createReadStream(input);
+        } else {
+            fileStream = input;
+            isGz = options.isGz === true;
+        }
         
         let readStream = fileStream;
         if (isGz) {
@@ -91,6 +96,9 @@ export async function processHARFileNode(filePath) {
 
         assembler.on('done', asm => {
             resolve(normalizeHAR(asm.current));
+            if (typeof input === 'string') {
+                fileStream.destroy();
+            }
         });
 
         jsonStream.on('error', reject);

@@ -10,6 +10,9 @@
       "require": "./dist/waterfall-tools.umd.js"
     }
   },
+  "bin": {
+    "waterfall-tools": "./bin/waterfall-tools.js"
+  },
   "scripts": {
     "test": "vitest",
     "build": "vite build"
