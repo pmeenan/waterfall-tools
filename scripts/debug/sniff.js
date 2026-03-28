@@ -19,4 +19,4 @@ function sniffGzip(filePath) {
         });
     });
 }
-sniffGzip('Sample/Data/Chrome Traces/trace_www.google.com.json.gz').then(console.log);
+sniffGzip('../../Sample/Data/Chrome Traces/trace_www.google.com.json.gz').then(console.log);

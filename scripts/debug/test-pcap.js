@@ -1,11 +1,12 @@
-import { processTcpdumpNode } from './src/inputs/tcpdump.js';
+import { processTcpdumpNode } from '../../src/inputs/tcpdump.js';
 
 async function main() {
     console.log("Processing pcap...");
-    const { packets, tcpConnections, udpConnections } = await processTcpdumpNode('Sample/Data/tcpdump/www.google.com-tcpdump.cap.gz');
+    const { packets, tcpConnections, udpConnections, dnsLookups } = await processTcpdumpNode('../../Sample/Data/tcpdump/www.google.com-tcpdump.cap.gz');
     console.log(`Parsed ${packets.length} packets.`);
     console.log(`Tracked ${tcpConnections.length} TCP connections.`);
     console.log(`Tracked ${udpConnections.length} UDP connections.`);
+    console.log(`Registered ${dnsLookups ? dnsLookups.length : 0} DNS lookups across all transports.`);
 
     let streamsWithData = 0;
     tcpConnections.forEach(conn => {
@@ -31,6 +32,8 @@ async function main() {
         if (conn.protocol === 'http2') {
             console.log(`Connection ${idx} [HTTP/2]: ${conn.http2.streams.size} active streams tracked.`);
             for (const [id, stream] of conn.http2.streams.entries()) {
+                // Ignore empty streams without client request data
+                if (stream.headers.client.length === 0) continue;
                 console.log(`  Stream ${id}: ${stream.headers.client.length} client headers, ${stream.data.server.length} server DATA frames.`);
                 // Print some pseudo-headers if available
                 const method = stream.headers.client.find(h => h.name === ':method');
@@ -56,17 +59,7 @@ async function main() {
 
     console.log("\nDecrypted UDP Protocols:");
     udpWithDataConnections.forEach((conn, idx) => {
-        if (conn.protocol === 'dns') {
-            const reqs = conn.dns.filter(d => d.direction === 'request');
-            const resps = conn.dns.filter(d => d.direction === 'response');
-            console.log(`UDP Conn ${idx} [DNS]: ${reqs.length} reqs, ${resps.length} resps.`);
-            if (reqs.length > 0 && reqs[0].queries.length > 0) {
-                console.log(`  Query 0: ${reqs[0].queries[0].name}`);
-            }
-            if (resps.length > 0 && resps[0].answers.length > 0) {
-                console.log(`  Answer 0: ${resps[0].answers[0].name} -> ${resps[0].answers[0].address}`);
-            }
-        } else if (conn.protocol === 'quic') {
+        if (conn.protocol === 'quic') {
             console.log(`UDP Conn ${idx} [QUIC/HTTP3]: ${conn.quic.length} tracked frames.`);
             const successful1RTT = conn.quic.filter(q => q.type === '1-RTT' && q.http3);
             if (successful1RTT.length > 0) {
@@ -82,7 +75,17 @@ async function main() {
                     console.log(`  Decryption failed... (${errs.length} fragments unreadable)`);
                 }
             }
+            if (conn.quicParams && conn.quicParams.streams) {
+                console.log(`  Reassembled QUIC Streams: ${conn.quicParams.streams.size}`);
+            }
         }
     });
+
+    console.log("\nUnified DNS Resolution Map:");
+    if (dnsLookups) {
+        dnsLookups.forEach((lookup, idx) => {
+            console.log(`Lookup ${idx} [${lookup.transport}]: ${lookup.domain} -> [${lookup.ips.join(', ')}] (${lookup.duration.toFixed(2)} ms)`);
+        });
+    }
 }
 main().catch(console.error);

@@ -19,7 +19,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Add decoding, processing, and validation for Netlog formats (`src/inputs/netlog.js`).
 - [x] Add decoding, processing, and validation for Chrome Dev Tools Protocol (CDP) formats (`src/inputs/cdp.js`).
 - [x] Add decoding, processing, and validation for Chromium trace formats (`src/inputs/chrome-trace.js`).
-- [ ] Add decoding, processing, and validation for tcpdump formats (`src/inputs/tcpdump.js`), executed in the following sub-steps:
+- [x] Add decoding, processing, and validation for tcpdump formats (`src/inputs/tcpdump.js`), executed in the following sub-steps:
   *(Note: The underlying binary streamer `PcapParser` processes `Uint8Array` chunks natively. PCAPNG support is implemented based on the spec but contains TODOs marking missing IDB timestamp mappings pending `pcapng` file-based tests. The parser itself handles initial structural decoding out to `Ethernet, IPv4/6, TCP, UDP` fields.)*
   - [x] **Capture Parsing:** Parse the capture file into packets.
   - [x] **TLS Key Log Loading:** Load the TLS key log that matches the given tcpdump capture file (or extract embedded key logs from cap file bundles).
@@ -29,11 +29,11 @@ This document breaks down the development of the Waterfall Tools library into in
   - [x] **TCP TLS Decryption:** Decrypt TLS-encrypted TCP streams using the key log, keeping per-chunk timestamps that match packet timings. (Reference RFC specs or utilize/build stand-alone utility libraries for TLS decoding).
   - [x] **TCP Protocol Decoding:** Detect and decode HTTP/1.x, HTTP/2, and DNS over HTTP from unencrypted TCP streams into extractable individual requests (including connection setup and affinity info).
   - [x] **UDP Protocol Detection & QUIC Decryption:** Detect DNS and QUIC formats on UDP. For TLS-encrypted QUIC, decrypt the stream using the keylog.
-  - [ ] **DNS Decoding:** Decode DNS traffic (from both UDP and TCP/DoH) and store the lookups to add to request timings.
-  - [ ] **QUIC Decoding:** Decode unencrypted QUIC traffic to extract streams and parse the relevant requests.
-  - [ ] **Page Entry Creation:** Create a virtual "page" entry. Use the first HTTP request with `Sec-Fetch-Dest: document` as the page URL, defaulting to the first HTTP request if none is found.
-  - [ ] **HAR Generation & Validation:** Turn the decoded protocols from the tcpdump processing into requests and page data that can be used for generating the HAR format and then the creation and validation of the resulting HAR from the tcpdump input.
-- [ ] Restructure the `src/inputs` directory so that the core libraries are separated from the cli interfaces and utility functions (in a logical grouping in separate folders) so it's not a flat, giant collection of files.
+  - [x] **DNS Decoding:** Decode DNS traffic (from both UDP and TCP/DoH) and store the lookups to add to request timings.
+  - [x] **QUIC Decoding:** Decode unencrypted QUIC traffic to extract streams and parse the relevant requests.
+  - [x] **Page Entry Creation:** Create a virtual "page" entry. Use the first HTTP request with `Sec-Fetch-Dest: document` as the page URL, defaulting to the first HTTP request if none is found.
+  - [x] **HAR Generation & Validation:** Turn the decoded protocols from the tcpdump processing into requests and page data that can be used for generating the HAR format and then the creation and validation of the resulting HAR from the tcpdump input.
+- [x] Restructure the `src/inputs` directory so that the core libraries are separated from the cli interfaces and utility functions (in a logical grouping in separate folders) so it's not a flat, giant collection of files. If it makes sense, the core libraries can be at the root.
 
 ## Phase 3: The Orchestrator & API
 **Goal:** Build the central `conductor` that intelligently manages inputs and acts as the developer API.

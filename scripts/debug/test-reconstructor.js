@@ -1,4 +1,4 @@
-import { TcpReconstructor } from './src/inputs/tcp-reconstructor.js';
+import { TcpReconstructor } from '../../src/inputs/tcp-reconstructor.js';
 
 function makePacket(srcPort, dstPort, seq, payloadStr, flags = {}) {
     return {

@@ -1,7 +1,9 @@
 /**
  * Basic DNS packet parser extracting transaction info, queries, and answers.
  */
-export function decodeDns(buffer) {
+export function decodeDns(rawBuffer) {
+    if (!rawBuffer) return null;
+    const buffer = Buffer.isBuffer(rawBuffer) ? rawBuffer : Buffer.from(rawBuffer);
     if (buffer.length < 12) return null;
 
     let offset = 0;

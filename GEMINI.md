@@ -21,8 +21,10 @@ When working on this codebase, you must adhere to the following strict architect
    - The primary orchestrator object operates uniquely by transporting verified Extended HAR data uniformly across specific decoupled systems cleanly without implicit mutation states.
    - Modules must export structurally permitting granular bundler operations like Webpack, Vite or Rollup safely tree-shaking specific elements entirely out of arbitrary compilation phases natively. (A consumer integrating browser-only HAR generation shouldn't package unused Node libraries).
 
-4. **Environment Nuances:**
-   - Code residing fundamentally inside `src/core/`, `src/inputs/`, and `src/outputs/` strictly stays conditionally isomorphic. Ensure runtime viability targeting concurrently Node.js and Browser JS endpoints safely.
+4. **Environment Nuances & File Modularity:**
+   - Code residing fundamentally inside `src/core/` and the root interface level of `src/inputs/` strictly stays conditionally isomorphic (e.g., `src/inputs/tcpdump.js`). Ensure runtime viability targeting concurrently Node.js and Browser JS endpoints safely.
+   - Separate CLI Wrappers exclusively into `src/inputs/cli/` (e.g., `src/inputs/cli/tcpdump.js`) so that generic bundlers evaluating APIs won't accidentally traverse `process.stdout` hooks indiscriminately.
+   - Segment format-specific logic gracefully. Standalone decoders natively reside in `src/inputs/utilities/[format]/` avoiding monopolizing top-level directories natively.
    - Interaction demanding Web APIs like (`fetch()`, `HTMLCanvasElement`, browser `window`) isolate explicitly into segmented folders encompassing respectively `src/platforms/browser/`, `src/renderer/`, or `src/embed/`. Node native tools (`fs` integration pipelines) deploy cleanly only into `src/platforms/node/`.
 
 5. **Future-Proofing Hardware Considerations:**
@@ -72,3 +74,10 @@ When working on this codebase, you must adhere to the following strict architect
 
 15. **Continuous Documentation Maintenance:**
     - Whenever a task in the `Docs/Plan.md` is checked as completed, you MUST update `GEMINI.md`, `Docs/Architecture.md`, and `Docs/Plan.md` with any relevant architectural changes, technical decisions, or new information discovered during the execution of that task. This ensures all future autonomous agent steps maintain the latest context without relying on past chat history.
+
+16. **Offline QUIC & HTTP/3 Decoding:**
+    - Because `waterfall-tools` reassembles QUIC streams offline from `.cap.gz` captures, the `decodeQuic` logic fully unwraps `1-RTT` AEAD payloads and gracefully tracks all `RFC-9000` frame types without breaking on non-stream frames natively.
+    - When unpacking HTTP/3 fragments mapping to proper Request streams natively, the `QpackDecoder` strictly maintains a stateful tracking mechanism parsing the relative bounds of encoder dynamic table instructions linearly. This guarantees the highest reconstruction fidelity without employing massive client memory leaks safely.
+
+17. **TCPDump HAR Assembler:**
+    - The `tcpdump.js` processor natively flattens the multidimensional array of reconstructed flows (TCP connections with HTTP/1 & 2 objects, UDP blocks with HTTP/3, explicit DoH unlinked pipelines) mapping chronologically aligned structures tightly against resolved DNS tables. It guarantees standard Extended HAR payload generations directly matching downstream CLI endpoints.

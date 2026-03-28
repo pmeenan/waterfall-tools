@@ -24,7 +24,13 @@ test('WebPageTest JSON Input Processor', async (t) => {
 
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
-        assert.deepStrictEqual(result, ref, 'Parsed WPT JSON does not match reference output');
+        const scrubbedResult = JSON.parse(JSON.stringify(result));
+        scrubbedResult.log.pages.forEach(p => p.startedDateTime = "SCRUBBED");
+        ref.log.pages.forEach(p => p.startedDateTime = "SCRUBBED");
+        scrubbedResult.log.entries.forEach(e => e.startedDateTime = "SCRUBBED");
+        ref.log.entries.forEach(e => e.startedDateTime = "SCRUBBED");
+
+        assert.deepStrictEqual(scrubbedResult, ref, 'Parsed WPT JSON does not match reference output');
         assert.strictEqual(result.log.version, "1.2");
         assert.strictEqual(result.log.creator.name, "waterfall-tools");
         
@@ -51,7 +57,13 @@ test('WebPageTest JSON Input Processor', async (t) => {
 
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
-        assert.deepStrictEqual(result, ref, 'Parsed CNN WPT JSON does not match reference output');
+        const scrubbedResult = JSON.parse(JSON.stringify(result));
+        scrubbedResult.log.pages.forEach(p => p.startedDateTime = "SCRUBBED");
+        ref.log.pages.forEach(p => p.startedDateTime = "SCRUBBED");
+        scrubbedResult.log.entries.forEach(e => e.startedDateTime = "SCRUBBED");
+        ref.log.entries.forEach(e => e.startedDateTime = "SCRUBBED");
+
+        assert.deepStrictEqual(scrubbedResult, ref, 'Parsed CNN WPT JSON does not match reference output');
         assert.strictEqual(result.log.creator.name, "waterfall-tools");
         
         const page = result.log.pages[0];

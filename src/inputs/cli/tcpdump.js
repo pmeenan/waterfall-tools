@@ -1,4 +1,4 @@
-import { normalizeWPT, processWPTFileNode } from './wpt-json.js';
+import { processTcpdumpNode } from '../tcpdump.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -6,6 +6,7 @@ async function run() {
     const args = process.argv.slice(2);
     let inputPath = '';
     let outputPath = '';
+    let keyLogPath = '';
 
     for (let i = 0; i < args.length; i++) {
         if (args[i] === '--input' && args[i + 1]) {
@@ -14,18 +15,23 @@ async function run() {
         } else if (args[i] === '--output' && args[i + 1]) {
             outputPath = args[i + 1];
             i++;
+        } else if (args[i] === '--keylog' && args[i + 1]) {
+            keyLogPath = args[i + 1];
+            i++;
         }
     }
 
     if (!inputPath || !outputPath) {
-        console.error('Usage: node cli-wpt.js --input <path/to/input-wpt.json[.gz]> --output <path/to/output.json>');
+        console.error('Usage: node cli-tcpdump.js --input <path/to/capture.cap[.gz]> --output <path/to/output.har> [--keylog <path/to/keys>]');
         process.exit(1);
     }
 
-    console.log(`Processing WebPageTest JSON file: ${inputPath}...`);
+    console.log(`Processing PCAP/PCAPNG file: ${inputPath}...`);
     try {
         const startTime = Date.now();
-        const extendedHar = await processWPTFileNode(inputPath);
+        const options = keyLogPath ? { keyLogPath } : {};
+        
+        const extendedHar = await processTcpdumpNode(inputPath, options);
         
         const outputDir = path.dirname(outputPath);
         if (!fs.existsSync(outputDir)) {
@@ -36,7 +42,7 @@ async function run() {
         fs.writeFileSync(outputPath, JSON.stringify(extendedHar, null, 2), 'utf-8');
         console.log(`Successfully generated Extended HAR: ${outputPath} in ${Date.now() - startTime}ms`);
     } catch (err) {
-        console.error('Failed to process WebPageTest JSON file:', err);
+        console.error('Failed to process PCAP file:', err);
         process.exit(1);
     }
 }

@@ -6,7 +6,7 @@ import { streamArray } from 'stream-json/streamers/stream-array.js';
 import { pick } from 'stream-json/filters/pick.js';
 
 const stream = chain([
-  fs.createReadStream('Sample/Data/Chrome Traces/trace_www.google.com.json.gz').pipe(zlib.createGunzip()),
+  fs.createReadStream('../../Sample/Data/Chrome Traces/trace_www.google.com.json.gz').pipe(zlib.createGunzip()),
   parser(),
   pick({filter: 'traceEvents'}),
   streamArray()

@@ -1,4 +1,4 @@
-import { processNetlogFileNode } from './netlog.js';
+import { processNetlogFileNode } from '../netlog.js';
 import fs from 'node:fs';
 import path from 'node:path';
 

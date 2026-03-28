@@ -26,8 +26,10 @@ test('Chrome DevTools Protocol (CDP) Input Processor', async (t) => {
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
         // Delete dynamic fields before comparison
-        normalizedResult.log.pages.forEach(p => delete p.startedDateTime);
-        ref.log.pages.forEach(p => delete p.startedDateTime);
+        normalizedResult.log.pages.forEach(p => p.startedDateTime = "SCRUBBED");
+        ref.log.pages.forEach(p => p.startedDateTime = "SCRUBBED");
+        normalizedResult.log.entries.forEach(e => e.startedDateTime = "SCRUBBED");
+        ref.log.entries.forEach(e => e.startedDateTime = "SCRUBBED");
 
         assert.deepStrictEqual(normalizedResult, ref, 'Parsed CDP JSON does not match reference output');
         assert.strictEqual(normalizedResult.log.version, "1.2");
@@ -52,8 +54,10 @@ test('Chrome DevTools Protocol (CDP) Input Processor', async (t) => {
         const normalizedResult = JSON.parse(JSON.stringify(result));
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
-        normalizedResult.log.pages.forEach(p => delete p.startedDateTime);
-        ref.log.pages.forEach(p => delete p.startedDateTime);
+        normalizedResult.log.pages.forEach(p => p.startedDateTime = "SCRUBBED");
+        ref.log.pages.forEach(p => p.startedDateTime = "SCRUBBED");
+        normalizedResult.log.entries.forEach(e => e.startedDateTime = "SCRUBBED");
+        ref.log.entries.forEach(e => e.startedDateTime = "SCRUBBED");
 
         assert.deepStrictEqual(normalizedResult, ref, 'Parsed CNN CDP JSON does not match reference output');
         assert.strictEqual(normalizedResult.log.creator.name, "waterfall-tools (devtools)");

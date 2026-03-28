@@ -1,4 +1,4 @@
-import { processCDPFileNode } from './cdp.js';
+import { normalizeHAR, processHARFileNode } from '../har.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -18,14 +18,14 @@ async function run() {
     }
 
     if (!inputPath || !outputPath) {
-        console.error('Usage: node cli-cdp.js --input <path/to/input-devtools.json[.gz]> --output <path/to/output.json>');
+        console.error('Usage: node cli-har.js --input <path/to/input.har[.gz]> --output <path/to/output.json>');
         process.exit(1);
     }
 
-    console.log(`Processing CDP JSON file: ${inputPath}...`);
+    console.log(`Processing HAR file: ${inputPath}...`);
     try {
         const startTime = Date.now();
-        const extendedHar = await processCDPFileNode(inputPath);
+        const extendedHar = await processHARFileNode(inputPath);
         
         const outputDir = path.dirname(outputPath);
         if (!fs.existsSync(outputDir)) {
@@ -36,7 +36,7 @@ async function run() {
         fs.writeFileSync(outputPath, JSON.stringify(extendedHar, null, 2), 'utf-8');
         console.log(`Successfully generated Extended HAR: ${outputPath} in ${Date.now() - startTime}ms`);
     } catch (err) {
-        console.error('Failed to process CDP JSON file:', err);
+        console.error('Failed to process HAR file:', err);
         process.exit(1);
     }
 }

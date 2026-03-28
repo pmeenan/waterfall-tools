@@ -1,4 +1,4 @@
-import { normalizeHAR, processHARFileNode } from './har.js';
+import { processChromeTraceFileNode } from '../chrome-trace.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -18,30 +18,28 @@ async function run() {
     }
 
     if (!inputPath || !outputPath) {
-        console.error('Usage: node cli-har.js --input <path/to/input.har[.gz]> --output <path/to/output.json>');
+        console.error('Usage: node cli-chrome-trace.js --input <path/to/input.trace[.gz]> --output <path/to/output.json>');
         process.exit(1);
     }
 
-    console.log(`Processing HAR file: ${inputPath}...`);
+    console.log(`Processing Chrome Trace file: ${inputPath}...`);
     try {
         const startTime = Date.now();
-        const extendedHar = await processHARFileNode(inputPath);
+        const extendedHar = await processChromeTraceFileNode(inputPath);
         
         const outputDir = path.dirname(outputPath);
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });
         }
 
-        // Write the normalized result to the output path
         fs.writeFileSync(outputPath, JSON.stringify(extendedHar, null, 2), 'utf-8');
         console.log(`Successfully generated Extended HAR: ${outputPath} in ${Date.now() - startTime}ms`);
     } catch (err) {
-        console.error('Failed to process HAR file:', err);
+        console.error('Failed to process Chrome Trace file:', err);
         process.exit(1);
     }
 }
 
-// Ensure it only runs if it is the main module
 if (import.meta.url === `file://${process.argv[1]}`) {
     run();
 }
