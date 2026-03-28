@@ -22,7 +22,7 @@ function finishSniffing(text, resolve) {
     const minText = text.replace(/\s/g, '');
     
     if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) return resolve('netlog');
-    if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":'))) return resolve('wpt');
+    if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":') || minText.includes('"testRuns":') || minText.includes('"average":'))) return resolve('wpt');
     if (minText.startsWith('{"traceEvents":') || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) return resolve('chrome-trace');
     if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":')) return resolve('chrome-trace');
     if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) return resolve('cdp');

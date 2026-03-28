@@ -1,12 +1,11 @@
 import { Conductor } from '../../core/conductor.js';
-import { Layout } from '../../renderer/layout.js';
 import { WaterfallCanvas } from '../../renderer/canvas.js';
 
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const uploadBtn = document.getElementById('upload-btn');
 const canvasContainer = document.getElementById('canvas-container');
-const canvas = document.getElementById('waterfall-canvas');
+
 let rendererCanvas = null;
 
 // Use native Web Stream directly
@@ -53,19 +52,21 @@ async function processFiles(files) {
         dropZone.classList.add('hidden');
         canvasContainer.style.display = 'block';
 
-        const canvasWidth = canvasContainer.clientWidth || window.innerWidth - 40;
-        
-        // Prepare layout rows
-        const { rows, dimensions, pageEvents } = Layout.calculateRows(resultHar.log.entries, canvasWidth, {
-            showLegend: true,
-            page: resultHar.log.pages && resultHar.log.pages.length > 0 ? resultHar.log.pages[0] : null
-        });
-        
-        // Render rows on Canvas
         if (!rendererCanvas) {
-            rendererCanvas = new WaterfallCanvas(canvas);
+            rendererCanvas = new WaterfallCanvas(canvasContainer, {
+                showLegend: true
+            });
         }
-        rendererCanvas.render(rows, dimensions, resultHar.log.entries, pageEvents);
+        
+        const pageObj = resultHar.log.pages && resultHar.log.pages.length > 0 ? resultHar.log.pages[0] : null;
+        
+        // Ensure we only render network requests that belong to the selected page
+        let entriesToRender = resultHar.log.entries || [];
+        if (pageObj && pageObj.id) {
+            entriesToRender = entriesToRender.filter(e => e.pageref === pageObj.id);
+        }
+        
+        rendererCanvas.render(entriesToRender, pageObj);
 
     } catch (e) {
         dropZone.innerHTML = `<h2>Error</h2><p>${e.message}</p><button id="retry-btn">Try Again</button>`;

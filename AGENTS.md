@@ -107,6 +107,7 @@ When working on this codebase, you must adhere to the following strict architect
     - Global Page Metric lines (like Start Render, LCP) explicitly draw **over** the time grid but **behind** the network request block layouts inherently.
     - `TTFB` represents the underlying gradient base of a request layer when detailed download properties are present, mapping fully to `downloadEnd` time lengths, whereas specific downloaded `Chunks` overlay the TTFB base opaquely natively reflecting byte progression streams carefully.
     - Connection initiation phases (`Wait`, `DNS`, `Connect`, `SSL`) strictly leverage solid WPT standardized colors rather than scaling the `baseColor` derived from content types seamlessly preventing confusion across the timeline natively.
+    - Row backgrounds explicitly highlight redirects (HTTP 300-399, excluding 304) with an opaque warning yellow and highlight errors (HTTP >= 400, or 0) with an opaque error red natively matching WPT visibility parameters (painted at 100% opacity prior to rendering request blocks).
 
 23. **Code Documentation & Analysis (Train-of-Thought):**
     - Ensure all source code logic, especially dense mathematical and coordinate-bound mapping segments (like Canvas rendering or input byte-parsing), is extremely well commented.
@@ -127,3 +128,13 @@ When working on this codebase, you must adhere to the following strict architect
 26. **Diagnostic Logging (Debug Flags):**
     - All API entry points (`Conductor`, CLI wrappers, Viewers) and inner input/output processors MUST implement and respect an `options.debug` boolean flag uniformly to preserve zero-bloat high-performance pathways in production default states.
     - When `options.debug === true`, parsers MUST selectively output key operational telemetry via `console.log` and `console.error` (e.g. streaming chunks processed, routing completions, protocol deviations) establishing a robust breadcrumb trace specifically assisting local debugging iterations elegantly across node and browser contexts securely. All tests executing natively implicitly set `{ debug: true }`.
+
+27. **Canvas Responsiveness:**
+    - The viewer implementations (e.g. `src/demo/canvas/viewer.js`) must preserve the core `ExtendedHAR` state globally upon parsing completion. This ensures debounced `window.addEventListener('resize')` closures can recalculate Layout bounds (`Layout.calculateRows`) securely, pushing non-destructive structural updates cleanly into existing Canvas Renderers continuously matching active viewport dimensions natively.
+
+28. **Multi-Page HAR Rendering:**
+    - Standard HAR files, particularly those generated from WebPageTest JSON processors, natively encapsulate multiple independent testing runs (e.g. `First View`, `Repeat View`) as strictly discrete `pages` within the same `log` payload.
+    - Renderers MUST rigorously filter global `log.entries` arrays precisely matching the desired active `pageObj.id` string before executing visual layout mappings. Failing to filter cross-page entries natively collapses disjointed execution timelines (separated by hundreds of seconds) onto single overlapping scales instantly destroying local time grid bounds.
+
+29. **Format Sniffing Resiliency:**
+    - When automatically detecting input formats (like WebPageTest JSON), avoid relying on keys that could appear arbitrarily deep within the JSON payload. For instance, WebPageTest traces might not immediately expose `"runs"` or `"median"` in the initial buffer window; sniffing logic in `orchestrator.js` must safely evaluate a broader union of indicator keys (e.g., `"testRuns"`, `"average"`) to successfully identify valid format structures without reading massive files entirely into memory up front.

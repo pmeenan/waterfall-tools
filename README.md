@@ -80,17 +80,17 @@ const waterfallHar = await Conductor.processURL('https://example.com/trace.json.
 ### Visualizing using the View Engine (Browser Context)
 
 ```javascript
-import { Layout } from 'waterfall-tools/renderer/layout.js';
 import { WaterfallCanvas } from 'waterfall-tools/renderer/canvas.js';
 
-// Convert HAR requests strictly into calculated spatial bounding box structures
-const { rows, dimensions } = Layout.calculateRows(waterfallHar.log.entries);
+// The engine targets a parent container div and natively generates & manages its own internal `<canvas>`
+const containerElement = document.getElementById('waterfall-container');
 
-// Render directly into an existing literal <canvas> element securely mapping DOM dimensions
-const boundingDimensionsCanvas = document.getElementById('waterfall-canvas');
-const renderEngine = new WaterfallCanvas(boundingDimensionsCanvas);
+// Instantiate the renderer (automatically binds ResizeObservers for responsive scaling)
+const renderEngine = new WaterfallCanvas(containerElement, { minWidth: 800 });
 
-renderEngine.render(rows, dimensions, waterfallHar.log.entries);
+// Provide the raw HAR entries and it autonomously calculates layouts and draws
+const page = waterfallHar.log.pages ? waterfallHar.log.pages[0] : null;
+renderEngine.render(waterfallHar.log.entries, page);
 ```
 
 ## CLI Interface
@@ -132,3 +132,6 @@ npm run dev:demo
 # Hard compile frontend standalone viewers fully targeting `bin/demo/` distributions
 npm run build:demo
 ```
+
+---
+*Note: This repository is actively iterated with strict multi-page layout rendering architectures mapping native WPT JSON runs seamlessly offline without framework bloat.*

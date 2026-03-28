@@ -1,9 +1,62 @@
 // src/renderer/canvas.js
 
+import { Layout } from './layout.js';
+
 export class WaterfallCanvas {
-    constructor(canvasElement) {
-        this.canvas = canvasElement;
-        this.ctx = canvasElement.getContext('2d', { alpha: false }); // Opaque for speed
+    constructor(parentContainer, options = {}) {
+        this.container = typeof parentContainer === 'string' ? document.getElementById(parentContainer) : parentContainer;
+        this.options = Object.assign({
+            minWidth: 800,
+            showLegend: true
+        }, options);
+        
+        // Remove existing canvas children natively if reloading dynamically
+        while(this.container.firstChild) {
+            this.container.removeChild(this.container.firstChild);
+        }
+
+        this.canvas = document.createElement('canvas');
+        this.container.appendChild(this.canvas);
+        this.ctx = this.canvas.getContext('2d', { alpha: false }); // Opaque for speed
+        
+        this.rawEntries = [];
+        this.pageObj = null;
+        this.pendingRender = null;
+        
+        this.resizeObserver = new ResizeObserver(() => {
+            this._requestRender();
+        });
+        this.resizeObserver.observe(this.container);
+    }
+    
+    destroy() {
+        this.resizeObserver.disconnect();
+        if (this.canvas.parentNode) {
+            this.canvas.parentNode.removeChild(this.canvas);
+        }
+    }
+
+    render(entries, pageObj = null) {
+        this.rawEntries = entries || [];
+        this.pageObj = pageObj;
+        this._requestRender();
+    }
+    
+    _requestRender() {
+        if (this.pendingRender) cancelAnimationFrame(this.pendingRender);
+        this.pendingRender = requestAnimationFrame(() => {
+            if (!this.rawEntries || this.rawEntries.length === 0) return;
+            
+            const clientWidth = this.container.clientWidth;
+            const canvasWidth = Math.max(this.options.minWidth, clientWidth);
+            
+            const { rows, dimensions, pageEvents } = Layout.calculateRows(this.rawEntries, canvasWidth, {
+                showLegend: this.options.showLegend,
+                page: this.pageObj
+            });
+            
+            this.draw(rows, dimensions, pageEvents);
+        });
     }
 
     scaleRgb(rgb, factor) {
@@ -150,28 +203,30 @@ export class WaterfallCanvas {
         }
     }
 
-    render(rows, dimensions, rawEntries, pageEvents = {}) {
-        requestAnimationFrame(() => {
-            const dpr = window.devicePixelRatio || 1;
-            this.canvas.style.width = dimensions.canvasWidth + 'px';
-            this.canvas.style.height = dimensions.canvasHeight + 'px';
-            this.canvas.width = dimensions.canvasWidth * dpr;
-            this.canvas.height = dimensions.canvasHeight * dpr;
-            
-            this.ctx.scale(dpr, dpr);
+    draw(rows, dimensions, pageEvents = {}) {
+        const rawEntries = this.rawEntries;
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.style.width = dimensions.canvasWidth + 'px';
+        this.canvas.style.height = dimensions.canvasHeight + 'px';
+        this.canvas.width = dimensions.canvasWidth * dpr;
+        this.canvas.height = dimensions.canvasHeight * dpr;
+        
+        this.ctx.scale(dpr, dpr);
 
-            // 1. Clear background
-            this.ctx.fillStyle = "#ffffff";
-            this.ctx.fillRect(0, 0, dimensions.canvasWidth, dimensions.canvasHeight);
+        // 1. Clear background
+        this.ctx.fillStyle = "#ffffff";
+        this.ctx.fillRect(0, 0, dimensions.canvasWidth, dimensions.canvasHeight);
 
             // 2. Draw row backgrounds
             rows.forEach((row, index) => {
-                if (index % 2 === 1) {
-                    this.ctx.fillStyle = "#f0f0f0";
-                    this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, row.y2 - row.y1 + 1);
-                }
                 if (row.status >= 400 || row.status === 0) {
-                    this.ctx.fillStyle = `rgba(${row.colors.error.join(',')}, 0.2)`;
+                    this.ctx.fillStyle = `rgb(${row.colors.error.join(',')})`;
+                    this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, row.y2 - row.y1 + 1);
+                } else if (row.status >= 300 && row.status < 400 && row.status !== 304) {
+                    this.ctx.fillStyle = `rgb(${row.colors.warning.join(',')})`;
+                    this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, row.y2 - row.y1 + 1);
+                } else if (index % 2 === 1) {
+                    this.ctx.fillStyle = "#f0f0f0";
                     this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, row.y2 - row.y1 + 1);
                 }
             });
@@ -396,12 +451,16 @@ export class WaterfallCanvas {
                 
                 if (labelX >= dimensions.labelsWidth) {
                     // Opaque background layer perfectly blocking vertical grid lines
-                    this.ctx.fillStyle = index % 2 === 1 ? "#f0f0f0" : "#ffffff";
                     const rectHeight = row.y2 - row.y1 + 1;
-                    this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
                     
                     if (row.status >= 400 || row.status === 0) {
-                        this.ctx.fillStyle = `rgba(${row.colors.error.join(',')}, 0.2)`;
+                        this.ctx.fillStyle = `rgb(${row.colors.error.join(',')})`;
+                        this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
+                    } else if (row.status >= 300 && row.status < 400 && row.status !== 304) {
+                        this.ctx.fillStyle = `rgb(${row.colors.warning.join(',')})`;
+                        this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
+                    } else {
+                        this.ctx.fillStyle = index % 2 === 1 ? "#f0f0f0" : "#ffffff";
                         this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
                     }
                     
@@ -459,7 +518,36 @@ export class WaterfallCanvas {
                 }
 
                 this.ctx.fillStyle = textColor;
-                const labelText = `${index + 1}. ${row.url || ''}`;
+                const prefix = `${index + 1}. `;
+                let urlText = row.url || '';
+                
+                const prefixWidth = this.ctx.measureText(prefix).width;
+                const maxUrlWidth = dimensions.labelsWidth - textX - prefixWidth - 6; // 6px padding from line
+                
+                let currentUrlWidth = this.ctx.measureText(urlText).width;
+                if (currentUrlWidth > maxUrlWidth && urlText.length > 5 && maxUrlWidth > 10) {
+                    const avgCharWidth = currentUrlWidth / urlText.length;
+                    let targetLen = Math.floor(maxUrlWidth / avgCharWidth);
+                    
+                    if (targetLen > 3) targetLen -= 3;
+                    
+                    while (targetLen > 4) {
+                        const half = Math.floor((targetLen - 3) / 2);
+                        const testUrlText = urlText.substring(0, half) + '...' + urlText.substring(urlText.length - half);
+                        if (this.ctx.measureText(testUrlText).width <= maxUrlWidth) {
+                            urlText = testUrlText;
+                            break;
+                        }
+                        targetLen--;
+                    }
+                    if (targetLen <= 4 && urlText.length > 0) {
+                        let shortText = urlText.substring(0, Math.max(1, Math.floor(maxUrlWidth / avgCharWidth))) + '..';
+                        if (this.ctx.measureText(shortText).width > maxUrlWidth) shortText = '';
+                        urlText = shortText;
+                    }
+                }
+                
+                const labelText = prefix + urlText;
                 this.ctx.fillText(labelText, textX, row.y2 - 2);
             });
 
@@ -467,6 +555,5 @@ export class WaterfallCanvas {
             if (rows.length > 0 && rows[0].y1 > 30) {
                 this.drawLegend(dimensions);
             }
-        });
     }
 }

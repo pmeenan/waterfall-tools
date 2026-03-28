@@ -145,7 +145,7 @@ Example:
 ```
 
 ## Rendering Engine
-The renderer uses the native HTML5 `<canvas>` API rather than the DOM (e.g., creating hundreds of `<div>` tags) to ensure that rendering thousands of requests doesn't cause browser layout trashing. Interaction is handled by maintaining a spatial index of drawn elements and mapping mouse coordinates to data entries. Application logic overrides can be supplied via robust hook events system injected into the render core.
+The renderer uses the native HTML5 `<canvas>` API rather than the DOM (e.g., creating hundreds of `<div>` tags) to ensure that rendering thousands of requests doesn't cause browser layout trashing. The canvas engine is completely autonomous, instantiated against a parent container div where it utilizes native `ResizeObserver` instances to self-recalculate structural geometric bounds responsive to viewport changes perfectly. Interaction is handled by maintaining a spatial index of drawn elements and mapping mouse coordinates to data entries. Application logic overrides can be supplied via robust hook events system injected into the render core. Since HAR files can natively contain multiple pages (such as First View and Repeat View runs from WebPageTest), the rendering engine assumes callers actively filter the global pool of request entries to specifically match only the single active page ID before passing them to the rendering loop natively.
 
 ## Embeddable Components
 The architecture natively accommodates integration directly securely into web apps. Input properties such as DIV identifiers or base URLs are injected smoothly to instantiate full viewers. IFrame configurations rely on structured message passing or parsed query parameters for headless integration with data resources. 

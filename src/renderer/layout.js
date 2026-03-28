@@ -77,7 +77,7 @@ export class Layout {
         };
     }
 
-    static formatUrl(fullUrl, maxLength = 50) {
+    static formatUrl(fullUrl, maxLength = 500) {
         if (!fullUrl) return '';
         try {
             const u = new URL(fullUrl);
