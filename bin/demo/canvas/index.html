@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waterfall Tools - Canvas Viewer</title>
+  <script type="module" crossorigin src="/assets/canvas-kXx49Rr3.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/chunk-Dy9vhvp_.js">
+  <link rel="modulepreload" crossorigin href="/assets/stream-browserify-8kpMgAWG.js">
+  <link rel="modulepreload" crossorigin href="/assets/src-vw1ZBQF9.js">
+  <link rel="modulepreload" crossorigin href="/assets/dist-BEa3x-Yi.js">
+  <link rel="stylesheet" crossorigin href="/assets/canvas-BSG1AG2I.css">
+</head>
+<body>
+    <div id="drop-zone">
+        <h2>Waterfall Tools Canvas Viewer</h2>
+        <p>Drag and drop supported network files here (e.g. HAR, WPT json, Chrome traces, .cap.gz tcpdump).</p>
+        <p>For tcpdump with TLS Decryption, select both the capture file and keylog from the dialog below, or drop them together.</p>
+        <input type="file" id="file-input" multiple>
+        <button id="upload-btn">Select File(s)</button>
+    </div>
+    <div id="canvas-container">
+        <canvas id="waterfall-canvas"></canvas>
+    </div>
+</body>
+</html>

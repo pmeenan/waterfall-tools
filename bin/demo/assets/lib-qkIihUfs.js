@@ -1,0 +1,1 @@
+import{c as e}from"./canvas-kXx49Rr3.js";export default e();

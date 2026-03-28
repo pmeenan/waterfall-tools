@@ -152,3 +152,30 @@ We have reached the part of the tcpdump implementation in phase 2 where we load 
 Also clean up any temporary utility scripts at the top level of the project that are no longer needed (or any that are needed, move into an appropriate folder so they don't pollute the project top-level folder).
 ```
 
+# Canvas Rendering
+
+```
+Move on to phase 5 of the plan. As part of the work, create a HTML page that uses the input API with uploaded files (including keylog for tcpdump) and renders the result to a canvas filling most of the browser window width and as tall as necessary to show the full waterfall. It should also support drag/drop for dropping any of the supported input formats and rendering the relevant waterfall.
+
+The entry point for WebPageTest's waterfall generation in PHP that takes the WebPageTest json and creates an image (thumbnail or full image) is in waterfall.php (with core logic included from there). Use the same colors are used by WebPageTest, including the gradients for each bar and the mime-specific coloring. Also include the support for rendering chunks of data and script execution.
+
+Please ask if you have any questions about the implementation.
+```
+
+```
+Update the project build to create a index.html at the root of the demos (`src/demo` and `bin/demo`) that links to individual demo pages (only the canvas demo for now). That way the main project build can build all of the demos and load a main landing page for interacting with all of them.
+```
+
+```
+Replace the current placeholder README.md with appropriate user and developer-facing documentation, pointing to Architecture.md as needed but with all API documentation and build/test instructions.
+
+Update the first instruction in AGENTS.md to instruct agents to update README.md as necessary as changes to the project are made.
+```
+
+```
+Add an example to the API usage for providing a non-streaming buffer and add an API (and sample) to the conductor to allow loading from an external URL.
+```
+
+```
+Why does processBuffer need the format to be explicitly provided? It should support autodetect like the rest of the API surfaces.
+```

@@ -43,14 +43,14 @@ This document breaks down the development of the Waterfall Tools library into in
 
 ## Phase 4: Headless Outputs
 **Goal:** Generate raw data exports directly from the proven Orchestrator state.
-- [ ] Implement `src/outputs/simple-json.js` to boil down HAR data to an array of strictly simplified request objects suitable for generic JS usage.
-- [ ] Create basic unit tests for the HAR input -> Simple JSON output pipeline.
+- [x] Implement `src/outputs/simple-json.js` to boil down HAR data to an array of strictly simplified request objects suitable for generic JS usage.
+- [x] Create basic unit tests for the HAR input -> Simple JSON output pipeline.
 
 ## Phase 5: Core Canvas Renderer (Browser Platform)
 **Goal:** Render a static waterfall chart to a canvas element utilizing the verified data fixtures from Phase 2.
-- [ ] Implement `src/renderer/layout.js` to calculate row heights, X-axis timestamps, scale distributions and standard WebPageTest color coding.
-- [ ] Implement `src/renderer/canvas.js` to draw requests as cascading blocks on a provided `<canvas>`.
-- [ ] Implement logic to leverage `requestAnimationFrame` ensuring efficient updates and redraws. 
+- [x] Implement `src/renderer/layout.js` to calculate row heights, X-axis timestamps, scale distributions and standard WebPageTest color coding.
+- [x] Implement `src/renderer/canvas.js` to draw requests as cascading blocks on a provided `<canvas>`.
+- [x] Implement logic to leverage `requestAnimationFrame` ensuring efficient updates and redraws. 
 
 ## Phase 6: Client Interactions
 **Goal:** Make the canvas waterfall interactive without using individual DOM elements.

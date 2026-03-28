@@ -101,10 +101,14 @@ graph TD
 │   ├── core/               # Shared logic, schemas, and main library conductor
 │   │   ├── har-types.js    # Extended HAR conventions
 │   │   └── conductor.js    # Main API interface
+│   ├── demo/               # Showcase frontend applications
+│   │   └── canvas/         # Drag-and-drop interactive viewer
 │   ├── platforms/          # Environment-specific implementations (e.g., File I/O vs Fetch)
 │   │   ├── browser/
 │   │   └── node/
 │   └── filmstrip/          # (Future) Filmstrip and screenshot processing
+├── vite.config.js          # Library build configuration
+├── vite.demo.config.js     # Standalone viewer frontend configuration
 ├── Sample/                 # Sample files and reference implementations
 │   ├── Data/               # Sample input files grouped by format (e.g., HAR/source1)
 │   └── Implementations/    # Sample python parsing implementations by format

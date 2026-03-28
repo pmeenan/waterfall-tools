@@ -8,7 +8,7 @@ When working on this codebase, you must adhere to the following strict architect
 
 1. **Mandatory Project Context & Workflow:**
    - **Initial Step:** At the beginning of any task, you must read `Docs/Architecture.md` to understand the project architecture and `Docs/Plan.md` for the project implementation plan.
-   - **Closing Step:** At the end of each conversation, you must update `Docs/Plan.md` and `Docs/Architecture.md` with any respective changes. Furthermore, update `AGENTS.md` with any information that would benefit future agents either as a result of the current conversation or as discovered while working on the current conversation (it is the long-term memory for the project).
+   - **Closing Step:** At the end of each conversation, you must update `README.md`, `Docs/Plan.md`, and `Docs/Architecture.md` with any respective changes. Furthermore, update `AGENTS.md` with any information that would benefit future agents either as a result of the current conversation or as discovered while working on the current conversation (it is the long-term memory for the project).
 
 2. **Zero Bloat & Peak Performance:**
    - **No Heavy Frameworks:** This library must remain exceptionally fast, lightweight, and distributable. Prefer **Vanilla JavaScript** when it makes sense. Feel free to use external libraries as necessary if they significantly improve the architecture or functionality. Do not introduce React, Vue, Svelte, or Angular under any circumstances within the core lib space.
@@ -88,3 +88,10 @@ When working on this codebase, you must adhere to the following strict architect
     - All format processors accept `input` generic signatures (`processXNode(input, options)`) uniformly supporting either file paths or raw `Readable` streams gracefully.
     - The main `Conductor` artifact represents the central class and exposes `processFile` and `processStream` methods bridging inputs systematically.
     - The root unified CLI resides at `bin/waterfall-tools.js` wrapping the `Conductor` logic securely for global terminal access across formats natively while automatically discovering matching `keylog` inputs implicitly.
+
+19. **Output Processors (Headless):**
+    - The `simple-json` output processor (`src/outputs/simple-json.js`) provides a strictly 1D array mapping of `ExtendedHAR` request entries. It collapses deep `request` and `response` object trees into simple top-level properties (e.g. `url`, `method`, `status`, `ttfb_ms`) natively suitable for generic JavaScript iterators.
+
+20. **Browser Support via Node Polyfills:**
+    - While the core library is strictly isomorphic where possible, the underlying token stream dependencies (like `stream-json` and complex TCP/TLS modules) fundamentally rely on native NodeJS classes (`fs`, `stream`, `zlib`, `crypto`).
+    - To deploy these inputs via a front-end UI (`src/demo/canvas`), the project relies on **`vite-plugin-node-polyfills`** internally configured in `vite.demo.config.js`. You should actively map local browser `File` objects back to compatible fake Node streams (`Readable.from()`) prior to bridging the gap toward the inputs.

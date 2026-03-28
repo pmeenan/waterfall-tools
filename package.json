@@ -15,7 +15,9 @@
   },
   "scripts": {
     "test": "vitest",
-    "build": "vite build"
+    "build": "vite build",
+    "dev:demo": "vite --config vite.demo.config.js",
+    "build:demo": "vite build --config vite.demo.config.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +33,7 @@
   "homepage": "https://github.com/pmeenan/waterfall-tools#readme",
   "devDependencies": {
     "vite": "^8.0.3",
+    "vite-plugin-node-polyfills": "^0.25.0",
     "vitest": "^4.1.2"
   },
   "dependencies": {

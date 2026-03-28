@@ -112,3 +112,30 @@ export async function identifyFormat(filePath) {
         });
     });
 }
+
+export async function identifyFormatFromBuffer(buffer) {
+    const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
+    const isGz = isGzip(buf);
+    
+    let textBuf = buf;
+    if (isGz) {
+        try {
+            textBuf = zlib.gunzipSync(buf);
+        } catch (e) {
+            // Ignore if gunzip fails, we try our best.
+        }
+    }
+    
+    if (textBuf.length >= 4) {
+        const magic = textBuf.readUInt32BE(0);
+        const magicLE = textBuf.readUInt32LE(0);
+        if ([0xa1b2c3d4, 0xd4c3b2a1, 0x0a0d0d0a].includes(magic) || [0xa1b2c3d4, 0xd4c3b2a1, 0x0a0d0d0a].includes(magicLE)) {
+            return { format: 'tcpdump', isGz };
+        }
+    }
+
+    return new Promise((resolve) => {
+        const textToSniff = textBuf.slice(0, 4000).toString('utf-8');
+        finishSniffing(textToSniff, (format) => resolve({ format, isGz }));
+    });
+}
