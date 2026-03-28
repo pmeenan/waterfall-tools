@@ -76,6 +76,20 @@ graph TD
 │   ├── inputs/             # Self-contained modules for processing specific input formats
 │   │   ├── har.js          # Standard HAR passthrough
 │   │   ├── chrome-trace.js
+│   │   ├── tcpdump.js      # Processes PCAP/PCAPNG packets
+│   │   ├── tcp-reconstructor.js # TCP bidirectional stream reconstruction 
+│   │   ├── udp-reconstructor.js # UDP virtual connection processing
+│   │   ├── tls-keylog.js   # NSS SSLKEYLOGFILE parser
+│   │   ├── tls-crypto.js   # Native PRF and HKDF routines
+│   │   ├── tls-decoder.js  # TLS 1.2/1.3 Handshake & Application Data Decoder
+│   │   ├── protocol-sniffer.js # Dual HTTP1/HTTP2 routing sniffer over chunks
+│   │   ├── http1-decoder.js    # Linear parsing of HTTP1 Request/Responses
+│   │   ├── http2-decoder.js    # HPACK contextual demuxing for HTTP2 sessions
+│   │   ├── udp-sniffer.js      # Dual DNS/QUIC offline datagram routing maps
+│   │   ├── quic-decoder.js     # Native 0-dependency QUIC frame unpacking states
+│   │   ├── quic-crypto.js      # AES AEAD/Protection hooks for `quic-decoder`
+│   │   ├── qpack-decoder.js    # Native HTTP/3 Pseudo-header plaintexts
+│   │   ├── dns-decoder.js      # Minimal DNS standard request buffer parser
 │   │   └── orchestrator.js # API for converting chosen input to intermediary HAR
 │   ├── outputs/            # Modules for generating various output formats
 │   │   ├── image.js        # Waterfall image generation

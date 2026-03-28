@@ -22,21 +22,24 @@ This document breaks down the development of the Waterfall Tools library into in
 - [ ] Add decoding, processing, and validation for tcpdump formats (`src/inputs/tcpdump.js`), executed in the following sub-steps:
   *(Note: The underlying binary streamer `PcapParser` processes `Uint8Array` chunks natively. PCAPNG support is implemented based on the spec but contains TODOs marking missing IDB timestamp mappings pending `pcapng` file-based tests. The parser itself handles initial structural decoding out to `Ethernet, IPv4/6, TCP, UDP` fields.)*
   - [x] **Capture Parsing:** Parse the capture file into packets.
-  - [ ] **TLS Key Log Loading:** Load the TLS key log that matches the given tcpdump capture file (or extract embedded key logs from cap file bundles).
-  - [ ] **TCP Stream Reconstruction:** Build raw data streams for TCP (with timestamps for each segment) based on src/dest IP/port and SYN/FIN packets. Handle retransmits, overlapping windows, and out-of-order packets.
-  - [ ] **UDP Stream Reconstruction:** Build virtual connection "streams" for UDP based on packet numbers and src/dest IP/ports.
-  - [ ] **TCP TLS Decryption:** Decrypt TLS-encrypted TCP streams using the key log, keeping per-chunk timestamps that match packet timings. (Reference RFC specs or utilize/build stand-alone utility libraries for TLS decoding).
-  - [ ] **TCP Protocol Decoding:** Detect and decode HTTP/1.x, HTTP/2, and DNS over HTTP from unencrypted TCP streams into extractable individual requests (including connection setup and affinity info).
-  - [ ] **UDP Protocol Detection & QUIC Decryption:** Detect DNS and QUIC formats on UDP. For TLS-encrypted QUIC, decrypt the stream using the keylog.
+  - [x] **TLS Key Log Loading:** Load the TLS key log that matches the given tcpdump capture file (or extract embedded key logs from cap file bundles).
+    *(Note: Sample key logs are located in `Sample/Data/tcpdump/` alongside the PCAPs. The key log files have the exact same base file name as their corresponding `.cap.gz` captures, but end in `.key_log.txt.gz`.)*
+  - [x] **TCP Stream Reconstruction:** Build raw data streams for TCP (with timestamps for each segment) based on src/dest IP/port and SYN/FIN packets. Handle retransmits, overlapping windows, and out-of-order packets.
+  - [x] **UDP Stream Reconstruction:** Build virtual connection "streams" for UDP based on packet numbers and src/dest IP/ports.
+  - [x] **TCP TLS Decryption:** Decrypt TLS-encrypted TCP streams using the key log, keeping per-chunk timestamps that match packet timings. (Reference RFC specs or utilize/build stand-alone utility libraries for TLS decoding).
+  - [x] **TCP Protocol Decoding:** Detect and decode HTTP/1.x, HTTP/2, and DNS over HTTP from unencrypted TCP streams into extractable individual requests (including connection setup and affinity info).
+  - [x] **UDP Protocol Detection & QUIC Decryption:** Detect DNS and QUIC formats on UDP. For TLS-encrypted QUIC, decrypt the stream using the keylog.
   - [ ] **DNS Decoding:** Decode DNS traffic (from both UDP and TCP/DoH) and store the lookups to add to request timings.
   - [ ] **QUIC Decoding:** Decode unencrypted QUIC traffic to extract streams and parse the relevant requests.
   - [ ] **Page Entry Creation:** Create a virtual "page" entry. Use the first HTTP request with `Sec-Fetch-Dest: document` as the page URL, defaulting to the first HTTP request if none is found.
+  - [ ] **HAR Generation & Validation:** Turn the decoded protocols from the tcpdump processing into requests and page data that can be used for generating the HAR format and then the creation and validation of the resulting HAR from the tcpdump input.
+- [ ] Restructure the `src/inputs` directory so that the core libraries are separated from the cli interfaces and utility functions (in a logical grouping in separate folders) so it's not a flat, giant collection of files.
 
 ## Phase 3: The Orchestrator & API
 **Goal:** Build the central `conductor` that intelligently manages inputs and acts as the developer API.
 - [ ] Implement `src/inputs/orchestrator.js` to manage registered source parsers.
-- [ ] Implement auto-detection logic to identify if a raw input payload is a HAR, Chrome Trace, or WPT format.
-- [ ] Create the `src/core/conductor.js` main class export that coordinates between the auto-detected parser and the intermediary output format.
+- [ ] Implement auto-detection logic to identify if a raw input payload is a HAR, Chrome Trace, WPT, or other supported format based on the payload, not the file name (and automatically handle gzipped versions of each).
+- [ ] Create the `src/core/conductor.js` main class export that coordinates between the auto-detected parser and the intermediary output format. It should support streaming input, raw data and files as input. It should also support the caller providing a key log for TLS decryption and should support a cli for passing in any of the supported file formats and outputting the HAR file (with a `--keylog` option for TLS decryption and a simple, descriptive, short file name).
 
 ## Phase 4: Headless Outputs
 **Goal:** Generate raw data exports directly from the proven Orchestrator state.
