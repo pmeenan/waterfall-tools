@@ -1,8 +1,6 @@
 import { Conductor } from '../../core/conductor.js';
-import { Readable } from 'stream';
 import { Layout } from '../../renderer/layout.js';
 import { WaterfallCanvas } from '../../renderer/canvas.js';
-import zlib from 'zlib';
 
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
@@ -11,16 +9,9 @@ const canvasContainer = document.getElementById('canvas-container');
 const canvas = document.getElementById('waterfall-canvas');
 let rendererCanvas = null;
 
-// Convert browser File to Node.js Readable stream (polyfill)
+// Use native Web Stream directly
 async function fileToReadable(file) {
-    const arrayBuffer = await file.arrayBuffer();
-    const buf = Buffer.from(arrayBuffer);
-    return new Readable({
-        read() {
-            this.push(buf);
-            this.push(null);
-        }
-    });
+    return file.stream();
 }
 
 
@@ -62,14 +53,19 @@ async function processFiles(files) {
         dropZone.classList.add('hidden');
         canvasContainer.style.display = 'block';
 
+        const canvasWidth = canvasContainer.clientWidth || window.innerWidth - 40;
+        
         // Prepare layout rows
-        const { rows, dimensions } = Layout.calculateRows(resultHar.log.entries);
+        const { rows, dimensions, pageEvents } = Layout.calculateRows(resultHar.log.entries, canvasWidth, {
+            showLegend: true,
+            page: resultHar.log.pages && resultHar.log.pages.length > 0 ? resultHar.log.pages[0] : null
+        });
         
         // Render rows on Canvas
         if (!rendererCanvas) {
             rendererCanvas = new WaterfallCanvas(canvas);
         }
-        rendererCanvas.render(rows, dimensions, resultHar.log.entries);
+        rendererCanvas.render(rows, dimensions, resultHar.log.entries, pageEvents);
 
     } catch (e) {
         dropZone.innerHTML = `<h2>Error</h2><p>${e.message}</p><button id="retry-btn">Try Again</button>`;
@@ -79,8 +75,6 @@ async function processFiles(files) {
 }
 
 // Event Listeners
-uploadBtn.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', (e) => processFiles(e.target.files));
 
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropZone.addEventListener(eventName, preventDefaults, false);

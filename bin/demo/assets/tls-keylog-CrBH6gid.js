@@ -1,2 +1,0 @@
-import{n as e,t}from"./dist-BEa3x-Yi.js";e();var n=class{constructor(){this.keys=new Map}parseString(e){let n=e.split(`
-`);for(let e of n){if(e=e.trim(),!e||e.startsWith(`#`))continue;let n=e.split(` `);if(n.length<3)continue;let r=n[0],i=n[1].toLowerCase(),a=n[2].toLowerCase(),o=this.keys.get(i);o||(o={},this.keys.set(i,o)),o[r]=t.from(a,`hex`)}}getSessionKeys(e){let n=t.isBuffer(e)||e instanceof Uint8Array?t.from(e).toString(`hex`).toLowerCase():e.toLowerCase();return this.keys.get(n)||null}};export{n as TlsKeyLog};

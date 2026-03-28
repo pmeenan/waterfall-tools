@@ -239,7 +239,8 @@ export async function processWPTFileNode(input, options = {}) {
             '$.data.runs.*.firstView', 
             '$.data.runs.*.repeatView', 
             '$.data.median.firstView', 
-            '$.data.median.repeatView'
+            '$.data.median.repeatView',
+            '$.data.bwDown'
         ], 
         keepStack: false // Safely disabled preventing massive V8 allocation cascades, preserving only index mappings dynamically natively.
     });
@@ -257,6 +258,11 @@ export async function processWPTFileNode(input, options = {}) {
 
     parser.onValue = ({ value, key, parent, stack }) => {
         if (bloatNames.has(key)) return undefined; // Strips heavy blobs entirely during AST population cleanly
+
+        if (key === 'bwDown') {
+            output.log._bwDown = value;
+            return undefined;
+        }
 
         // Intercept completed views accurately preventing parent AST accumulation correctly natively
         if ((key === 'firstView' || key === 'repeatView') && value && value.requests) {
@@ -310,6 +316,11 @@ export async function processWPTFileNode(input, options = {}) {
     if (hasRuns) {
         output.log.pages = output.log.pages.filter(p => !p.id.includes('_median_'));
         output.log.entries = output.log.entries.filter(e => !e.pageref.includes('_median_'));
+    }
+
+    // Assign globally captured bandwidth bounds directly to all remaining valid pages securely natively
+    if (output.log._bwDown && output.log._bwDown > 0) {
+        output.log.pages.forEach(p => p._bwDown = output.log._bwDown);
     }
 
     return output;

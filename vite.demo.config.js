@@ -5,7 +5,7 @@ export default defineConfig({
   root: 'src/demo',
   plugins: [
     nodePolyfills({
-      include: ['buffer'],
+      include: ['buffer', 'util'],
       globals: {
         Buffer: true,
         global: true,

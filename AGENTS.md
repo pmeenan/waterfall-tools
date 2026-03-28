@@ -97,3 +97,29 @@ When working on this codebase, you must adhere to the following strict architect
     - The core input parsers are strictly entirely isomorphic mapping exclusively across the exact Web APIs shipped comprehensively natively natively (`window.crypto.subtle`, `DecompressionStream`, `Uint8Array`, `TextDecoderStream`).
     - Standard Node modules (`fs`, `zlib`, `crypto`) are securely dynamically imported matching isolated backend targets effectively avoiding breaking native browser rollup configurations intrinsically inherently.
     - The frontend integration natively converts standard Browser `File` objects securely matching `Blob.stream()` cleanly immediately skipping any heavy Vite polyfill requirements previously needed natively.
+
+21. **Renderer Timestamp Mapping:**
+    - The Extended HAR standard explicitly leverages absolute ISO strings for `startedDateTime`. However, internal renderer states (like `canvas.js` drawing timelines) must strictly normalize all entry timings to **relative millisecond offsets** calculated off the earliest absolute `startedDateTime` in the entire collection. Failing to normalize to a zero-point relative index will cause `requestAnimationFrame` canvas loops calculating timestamp grids to iterate trillions of times, instantly crashing the browser tab.
+
+22. **Canvas Rendering Rules (WPT Parity):**
+    - High DPI displays require `window.devicePixelRatio` multiplication against `canvas.width`/`height` and a scaled context (`ctx.scale(dpr, dpr)`) internally so logic coordinates remain absolute CSS logical measurements natively.
+    - Vertical timeline grids draw **underneath** request bar blocks, but **over** the alternating row-background highlighted bands natively.
+    - Global Page Metric lines (like Start Render, LCP) explicitly draw **over** the time grid but **behind** the network request block layouts inherently.
+    - `TTFB` represents the underlying gradient base of a request layer when detailed download properties are present, mapping fully to `downloadEnd` time lengths, whereas specific downloaded `Chunks` overlay the TTFB base opaquely natively reflecting byte progression streams carefully.
+    - Connection initiation phases (`Wait`, `DNS`, `Connect`, `SSL`) strictly leverage solid WPT standardized colors rather than scaling the `baseColor` derived from content types seamlessly preventing confusion across the timeline natively.
+
+23. **Code Documentation & Analysis (Train-of-Thought):**
+    - Ensure all source code logic, especially dense mathematical and coordinate-bound mapping segments (like Canvas rendering or input byte-parsing), is extremely well commented.
+    - Write robust "train-of-thought" inline documentation that explicitly explains *why* a calculation operates in a specific boundary order, rather than just what the syntax does.
+    - Extensive comments serve as a critical analytical breadcrumb trail for future AI Agents to efficiently follow complex execution scopes without executing brute-force reverse engineering.
+    - The build pipeline natively utilizes Vite/Rollup tools out-of-the-box which aggressively minify and automatically strip source comments dynamically before final generation; thus, heavily prioritizing inline clarity yields zero bloat impacts in production outputs.
+
+24. **HTML5 Canvas vs PHP GD Geometry (Bounds & Inclusivity):**
+    - The legacy WebPageTest PHP renderer uses GD functions (like `imagefilledrectangle`) explicitly treating geometric coordinates as **inclusive**. For example, drawing a rectangle from `x1 = 10` to `x2 = 10` logically targets the pixel itself, but legacy loop incrementing often forces `x2 = x1 + 1` executing a `2px` footprint intrinsically. 
+    - When translating logic to HTML5 `<canvas>`, `fillRect(x, y, w, h)` utilizes raw deltas (`w = x2 - x1`). A delta of identically snapped coordinates mapped to `x2 = x1 + 1` mathematically computes to `1px`, wiping the span from visibility over top-level layers. 
+    - Always strictly append `+ 1` to HTML5 `fillRect` width logic translated from PHP boundaries (`width = (x2 - x1) + 1`) to ensure critical 2px-minimum visibility for identical-timestamp events natively (e.g., `_domContentLoadedEventStart` identical to `_domContentLoadedEventEnd`).
+
+25. **Renderer Edge Cases & UI Behaviors:**
+    - **Label Layering:** Metric labels mapped geometrically against the timeline grid must forcefully paint an opaque background layout exactly matching the respective underlying row stripe (`#ffffff` or `#f0f0f0`). This strictly sits *behind* the font text to prevent vertical time grids bleeding through typography natively.
+    - **Cross-Domain Contexts:** Request URL labels evaluate their `_documentURL` iteratively against the base document URL (inherited from `rawEntries[0]`). Mismatched origins natively format text into blue (`#0000ff`) indicating secure iframe execution environments mimicking WPT.
+    - **Render Blocking Indicators:** When `_renderBlocking` validates to exactly `blocking`, legacy WPT injects `render-block-icon.png`. Zero-asset web rendering securely recreates this natively using standard DOM canvas shapes (deploying a perfectly aligned 14px orange `#ff9900` circle holding a 1.5px white stroked geometric `X`).
