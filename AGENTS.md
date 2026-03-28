@@ -76,12 +76,9 @@ When working on this codebase, you must adhere to the following strict architect
     - **Note on PCAPNG Requirements:** The initial parser framework supports sniffing PCAPNG magics and extracting `Enhanced Packet Blocks` (EPB). However, timestamp precision explicitly assumes microsecond intervals. Proper timestamp mapping requires tracking `Interface Description Block` (IDB) options, which should be finalized when actual `.pcapng` capture files are included for complete test coverage.
     - The raw `PcapParser` natively handles decoding `Ethernet`, `IPv4`, `IPv6`, `TCP`, and `UDP` directly alongside the container unwrapping to prevent deep loop regressions across independent processor domains.
 
-16. **Continuous Documentation Maintenance:**
-    - Whenever a task in the `Docs/Plan.md` is checked as completed, you MUST update `AGENTS.md`, `Docs/Architecture.md`, and `Docs/Plan.md` with any relevant architectural changes, technical decisions, or new information discovered during the execution of that task. This ensures all future autonomous agent steps maintain the latest context without relying on past chat history.
-
-17. **Offline QUIC & HTTP/3 Decoding:**
+16. **Offline QUIC & HTTP/3 Decoding:**
     - Because `waterfall-tools` reassembles QUIC streams offline from `.cap.gz` captures, the `decodeQuic` logic fully unwraps `1-RTT` AEAD payloads and gracefully tracks all `RFC-9000` frame types without breaking on non-stream frames natively.
     - When unpacking HTTP/3 fragments mapping to proper Request streams natively, the `QpackDecoder` strictly maintains a stateful tracking mechanism parsing the relative bounds of encoder dynamic table instructions linearly. This guarantees the highest reconstruction fidelity without employing massive client memory leaks safely.
 
-18. **TCPDump HAR Assembler:**
+17. **TCPDump HAR Assembler:**
     - The `tcpdump.js` processor natively flattens the multidimensional array of reconstructed flows (TCP connections with HTTP/1 & 2 objects, UDP blocks with HTTP/3, explicit DoH unlinked pipelines) mapping chronologically aligned structures tightly against resolved DNS tables. It guarantees standard Extended HAR payload generations directly matching downstream CLI endpoints.
