@@ -48,7 +48,7 @@ export async function decodeUdpProtocol(conn, keyLog, dnsRegistry) {
                     ...chunk,
                     isClient: conn.clientFlow.frames.includes(chunk)
                 }));
-                const quicRes = decodeQuic(processedFrames, conn.clientPort, keyLog);
+                const quicRes = await decodeQuic(processedFrames, conn.clientPort, keyLog);
                 conn.quic = quicRes.summaries;
                 conn.quicParams = quicRes.params;
 

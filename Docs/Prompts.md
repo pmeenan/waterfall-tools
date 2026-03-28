@@ -179,3 +179,25 @@ Add an example to the API usage for providing a non-streaming buffer and add an 
 ```
 Why does processBuffer need the format to be explicitly provided? It should support autodetect like the rest of the API surfaces.
 ```
+
+At this point, the code had been built on top of Node's readable streams (to support streaming JSON parsing) which required polyfills on the browser and made things more complex. I tasked Antigravity with refactoring it on browser-native API's.
+
+```
+When using the demo, it is returning an error "Could not identify file format automatically" when I drag/drop www.google.com-wpt.json.gz  on it. Does the auto-detection support detecting gzip-compressed payloads and automatically decompressing before detecting the underlying format (and processing it)?
+```
+
+```
+Now I am getting "Readable.from" is not available in the browser.
+```
+
+```
+Are there other APIs that the project depends on that are node-specific (for any code that is not cli-specific) where it relies on the polyfill? If so, is it possible to move as many of them as possible to native browser implementations?
+```
+
+```
+Are there any streaming SAX token processors that work with native browser API's and don't rely on node?
+```
+
+```
+yes, please make the change to the zero-polyfill approach as the browser is our primary deployment target. Make all of the necessary changes and run all of the relevant tests to make sure the various processing is working as expected
+```

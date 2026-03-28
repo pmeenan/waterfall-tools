@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import zlib from 'node:zlib';
 import { PcapParser } from './utilities/tcpdump/pcap-parser.js';
 import { TcpReconstructor } from './utilities/tcpdump/tcp-reconstructor.js';
 import { UdpReconstructor } from './utilities/tcpdump/udp-reconstructor.js';
@@ -7,7 +5,37 @@ import { decodeProtocol } from './utilities/tcpdump/protocol-sniffer.js';
 import { decodeUdpProtocol } from './utilities/tcpdump/udp-sniffer.js';
 
 export async function processTcpdumpNode(input, options = {}) {
-    return new Promise((resolve, reject) => {
+    let stream = input;
+    let isGz = options.isGz === true;
+    let nodeFsStream = null;
+
+    const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
+
+    try {
+        if (typeof input === 'string') {
+            const fs = await import('node:fs');
+            
+            const header = Buffer.alloc(2);
+            let fd;
+            try {
+                fd = fs.openSync(input, 'r');
+                fs.readSync(fd, header, 0, 2, 0);
+                fs.closeSync(fd);
+            } catch (e) {
+                throw e;
+            }
+            
+            isGz = header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b;
+            
+            const { Readable } = await import('node:stream');
+            nodeFsStream = fs.createReadStream(input);
+            stream = Readable.toWeb(nodeFsStream);
+        }
+
+        if (isGz) {
+            stream = stream.pipeThrough(new DecompressionStream('gzip'));
+        }
+
         const packets = [];
         const tcpReconstructor = new TcpReconstructor();
         const udpReconstructor = new UdpReconstructor();
@@ -18,178 +46,145 @@ export async function processTcpdumpNode(input, options = {}) {
             udpReconstructor.push(packet);
         });
 
-        let inputStream;
-        let isGz = options.isGz === true;
+        const reader = stream.getReader();
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            parser.push(value);
+        }
+
+        let keyLogContents = null;
+        let keyLogInput = options.keyLogInput;
+        if (!keyLogInput && typeof input === 'string') {
+            keyLogInput = input.replace('.cap.gz', '.key_log.txt.gz');
+            keyLogInput = keyLogInput.replace('.pcapng', '.key_log.txt');
+            keyLogInput = keyLogInput.replace('.pcap', '.key_log.txt');
+        }
         
-        if (typeof input === 'string') {
-            const header = Buffer.alloc(2);
-            let fd;
+        if (keyLogInput) {
             try {
-                fd = fs.openSync(input, 'r');
-                fs.readSync(fd, header, 0, 2, 0);
-                fs.closeSync(fd);
+                let klIsGz = false;
+                let klStream = keyLogInput;
+                let klFsStream = null;
+                
+                if (typeof keyLogInput === 'string') {
+                    const fs = await import('node:fs');
+                    klIsGz = keyLogInput.endsWith('.gz');
+                    const { Readable } = await import('node:stream');
+                    klFsStream = fs.createReadStream(keyLogInput);
+                    klStream = Readable.toWeb(klFsStream);
+                } else {
+                    klIsGz = options.keyLogIsGz === true;
+                }
+                
+                if (klIsGz) {
+                    klStream = klStream.pipeThrough(new DecompressionStream('gzip'));
+                }
+                
+                const decoder = new TextDecoderStream();
+                const klPipeline = klStream.pipeThrough(decoder);
+                const klReader = klPipeline.getReader();
+                let klStr = '';
+                while (true) {
+                    const { done, value } = await klReader.read();
+                    if (done) break;
+                    klStr += value;
+                }
+                keyLogContents = klStr;
             } catch (e) {
-                return reject(e);
+                // It is completely valid for a keylog to not exist.
             }
-            isGz = (header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b);
-            inputStream = fs.createReadStream(input);
-        } else {
-            inputStream = input;
+        }
+
+        let keyLogMap = null;
+        if (keyLogContents) {
+            const { TlsKeyLog } = await import('./utilities/tcpdump/tls-keylog.js');
+            keyLogMap = new TlsKeyLog();
+            keyLogMap.parseString(keyLogContents);
+        }
+
+        const tcpConnections = tcpReconstructor.getConnections();
+        
+        if (keyLogMap) {
+            const { TlsDecoder } = await import('./utilities/tcpdump/tls-decoder.js');
+            
+            for (const conn of tcpConnections) {
+                const decoder = new TlsDecoder(keyLogMap);
+                
+                // Feed client packets
+                for (let chunk of conn.clientFlow.contiguousChunks) {
+                    await decoder.push(0, chunk.bytes, chunk.time);
+                }
+                // Feed server packets
+                for (let chunk of conn.serverFlow.contiguousChunks) {
+                    await decoder.push(1, chunk.bytes, chunk.time);
+                }
+
+                // If decryption succeeded (or produced anything), we replace the payload chunks
+                const decClient = decoder.getDecryptedChunks(0);
+                if (decClient.length > 0) {
+                    conn.clientFlow.contiguousChunks = decClient;
+                }
+                
+                const decServer = decoder.getDecryptedChunks(1);
+                if (decServer.length > 0) {
+                    conn.serverFlow.contiguousChunks = decServer;
+                }
+            }
         }
         
-        let stream = inputStream;
-        if (isGz) {
-            stream = inputStream.pipe(zlib.createGunzip());
-            stream.on('error', (err) => {
-                if (typeof input === 'string') inputStream.destroy();
-                reject(err);
-            });
-        }
+        const { DnsRegistry } = await import('./utilities/tcpdump/dns-registry.js');
+        const { decodeTcpDns } = await import('./utilities/tcpdump/tcp-dns.js');
+        const { extractDohRequests } = await import('./utilities/tcpdump/doh-decoder.js');
+        
+        let dnsRegistry = new DnsRegistry();
 
-        stream.on('data', (dataChunk) => {
+        // Decode protocols
+        for (const conn of tcpConnections) {
             try {
-                parser.push(dataChunk);
-            } catch (err) {
-                stream.destroy();
-                if (typeof input === 'string' && stream !== inputStream) inputStream.destroy();
-                reject(err);
+                if (conn.serverPort === 53 || conn.clientPort === 53) {
+                    decodeTcpDns(conn, dnsRegistry);
+                } else {
+                    decodeProtocol(conn);
+                }
+            } catch (e) {
+                console.error("Protocol Decoded Error:", e);
             }
-        });
-
-        stream.on('end', async () => {
-            let keyLogContents = null;
-            let keyLogInput = options.keyLogInput;
-            if (!keyLogInput && typeof input === 'string') {
-                keyLogInput = input.replace('.cap.gz', '.key_log.txt.gz');
-                keyLogInput = keyLogInput.replace('.pcapng', '.key_log.txt');
-                keyLogInput = keyLogInput.replace('.pcap', '.key_log.txt');
+        }
+        
+        // Identify DNS over HTTPS (DoH) mapped onto HTTP connections
+        try {
+            extractDohRequests(tcpConnections, dnsRegistry);
+        } catch(e) {
+            console.error("DoH Extraction Error:", e);
+        }
+        
+        const udpConnections = udpReconstructor.getConnections();
+        console.log(`[tcpdump.js] Start routing ${udpConnections.length} UDP connections`);
+        let udpCount = 0;
+        for (let i = 0; i < udpConnections.length; i++) {
+            const conn = udpConnections[i];
+            try {
+                console.log(`[tcpdump.js] Processing UDP ${i}/${udpConnections.length}...`);
+                await decodeUdpProtocol(conn, keyLogMap, dnsRegistry);
+                console.log(`[tcpdump.js] Processed UDP ${i}.`);
+                udpCount++;
+            } catch (e) {
+                 console.error("UDP Decode Error:", e);
             }
-            
-            if (keyLogInput) {
-                try {
-                    let keyLogStream;
-                    if (typeof keyLogInput === 'string') {
-                        keyLogStream = fs.createReadStream(keyLogInput);
-                        if (keyLogInput.endsWith('.gz')) {
-                            keyLogStream = keyLogStream.pipe(zlib.createGunzip());
-                        }
-                    } else {
-                        keyLogStream = keyLogInput;
-                        if (options.keyLogIsGz) {
-                            keyLogStream = keyLogStream.pipe(zlib.createGunzip());
-                        }
-                    }
-                    
-                    const chunks = [];
-                    for await (const chunk of keyLogStream) {
-                        chunks.push(chunk);
-                    }
-                    keyLogContents = Buffer.concat(chunks).toString('utf8');
-                } catch (e) {
-                    // It is completely valid for a keylog to not exist.
-                }
-            }
+        }
+        console.log(`[tcpdump.js] Successfully verified ${udpCount} UDP connections`);
 
-                let keyLogMap = null;
-                if (keyLogContents) {
-                    const { TlsKeyLog } = await import('./utilities/tcpdump/tls-keylog.js');
-                    keyLogMap = new TlsKeyLog();
-                    keyLogMap.parseString(keyLogContents);
-                }
+        const harResult = generateHarFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups());
+        return harResult;
 
-                const tcpConnections = tcpReconstructor.getConnections();
-                
-                if (keyLogMap) {
-                    const { TlsDecoder } = await import('./utilities/tcpdump/tls-decoder.js');
-                    
-                    for (const conn of tcpConnections) {
-                        const decoder = new TlsDecoder(keyLogMap);
-                        
-                        // Feed client packets
-                        for (let chunk of conn.clientFlow.contiguousChunks) {
-                            decoder.push(0, chunk.bytes, chunk.time);
-                        }
-                        // Feed server packets
-                        for (let chunk of conn.serverFlow.contiguousChunks) {
-                            decoder.push(1, chunk.bytes, chunk.time);
-                        }
-
-                        // If decryption succeeded (or produced anything), we replace the payload chunks
-                        const decClient = decoder.getDecryptedChunks(0);
-                        if (decClient.length > 0) {
-                            conn.clientFlow.contiguousChunks = decClient;
-                        }
-                        
-                        const decServer = decoder.getDecryptedChunks(1);
-                        if (decServer.length > 0) {
-                            conn.serverFlow.contiguousChunks = decServer;
-                        }
-                    }
-                }
-                
-                const { DnsRegistry } = await import('./utilities/tcpdump/dns-registry.js');
-                const { decodeTcpDns } = await import('./utilities/tcpdump/tcp-dns.js');
-                const { extractDohRequests } = await import('./utilities/tcpdump/doh-decoder.js');
-                
-                let dnsRegistry = new DnsRegistry();
-
-                // Decode protocols
-                for (const conn of tcpConnections) {
-                    try {
-                        if (conn.serverPort === 53 || conn.clientPort === 53) {
-                            decodeTcpDns(conn, dnsRegistry);
-                        } else {
-                            decodeProtocol(conn);
-                        }
-                    } catch (e) {
-                        console.error("Protocol Decoded Error:", e);
-                    }
-                }
-                
-                // Identify DNS over HTTPS (DoH) mapped onto HTTP connections
-                try {
-                    extractDohRequests(tcpConnections, dnsRegistry);
-                } catch(e) {
-                    console.error("DoH Extraction Error:", e);
-                }
-                
-                const udpConnections = udpReconstructor.getConnections();
-                console.log(`[tcpdump.js] Start routing ${udpConnections.length} UDP connections`);
-                let udpCount = 0;
-                for (let i = 0; i < udpConnections.length; i++) {
-                    const conn = udpConnections[i];
-                    try {
-                        console.log(`[tcpdump.js] Processing UDP ${i}/${udpConnections.length}...`);
-                        await decodeUdpProtocol(conn, keyLogMap, dnsRegistry);
-                        console.log(`[tcpdump.js] Processed UDP ${i}.`);
-                        udpCount++;
-                    } catch (e) {
-                         console.error("UDP Decode Error:", e);
-                    }
-                }
-                console.log(`[tcpdump.js] Successfully verified ${udpCount} UDP connections`);
-
-                try {
-                    const harResult = generateHarFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups());
-                    resolve(harResult);
-                } catch (e) {
-                    console.error("HAR Generation Error:", e);
-                    reject(e);
-                }
-            });
-
-            stream.on('error', (err) => {
-                if (typeof input === 'string' && stream !== inputStream) inputStream.destroy();
-                reject(err);
-            });
-
-            if (typeof input === 'string') {
-                inputStream.on('error', (err) => {
-                    reject(err);
-                });
-            }
-        // No extra }); here because we removed once('data')
-    });
+    } catch (e) {
+        console.error("Execution Error:", e);
+        throw e;
+    } finally {
+        if (keepAlive) globalThis.clearInterval(keepAlive);
+        if (nodeFsStream) nodeFsStream.destroy();
+    }
 }
 
 function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {

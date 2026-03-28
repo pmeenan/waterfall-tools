@@ -1,10 +1,3 @@
-import fs from 'node:fs';
-import zlib from 'node:zlib';
-import { parser } from 'stream-json';
-import streamArrayPkg from 'stream-json/streamers/stream-array.js';
-import streamChainPkg from 'stream-chain';
-const { streamArray } = streamArrayPkg;
-const chain = streamChainPkg;
 import { normalizeWPT } from './wpt-json.js';
 
 const PRIORITY_MAP = {
@@ -667,9 +660,7 @@ class DevToolsParser {
     }
 }
 
-function isGzip(buffer) {
-    return buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
-}
+// isGzip native helper removed in favor of orchestration natively
 
 /**
  * Node.js processor for Chrome DevTools Protocol JSON captures.
@@ -679,11 +670,18 @@ function isGzip(buffer) {
  * @returns {Promise<import('../core/har-types.js').ExtendedHAR>}
  */
 export async function processCDPFileNode(input, options = {}) {
-    return new Promise((resolve, reject) => {
-        let isGz = false;
-        let fileStream;
+    const { JSONParser } = await import('@streamparser/json');
 
+    let stream = input;
+    let isGz = options.isGz === true;
+    let nodeFsStream = null;
+
+    const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
+
+    try {
         if (typeof input === 'string') {
+            const fs = await import('node:fs');
+            
             const header = Buffer.alloc(2);
             let fd;
             try {
@@ -691,68 +689,74 @@ export async function processCDPFileNode(input, options = {}) {
                 fs.readSync(fd, header, 0, 2, 0);
                 fs.closeSync(fd);
             } catch (e) {
-                return reject(e);
+                throw e;
             }
-            isGz = isGzip(header);
-            fileStream = fs.createReadStream(input);
-        } else {
-            fileStream = input;
-            isGz = options.isGz === true;
+            
+            isGz = header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b;
+            
+            const { Readable } = await import('node:stream');
+            nodeFsStream = fs.createReadStream(input);
+            stream = Readable.toWeb(nodeFsStream);
         }
 
-        let readStream = fileStream;
         if (isGz) {
-            readStream = fileStream.pipe(zlib.createGunzip());
+            stream = stream.pipeThrough(new DecompressionStream('gzip'));
         }
 
-        const pipeline = chain([
-            readStream,
-            parser(),
-            streamArray()
-        ]);
-        
         const validPrefixes = ['Network.', 'Page.', 'Debugger.scriptParsed'];
         const events = [];
 
-        pipeline.on('data', ({value}) => {
+        const parser = new JSONParser({ paths: ['$.*'], keepStack: false });
+
+        parser.onValue = ({ value }) => {
             if (value && value.method) {
                 const isRelevant = validPrefixes.some(prefix => value.method.startsWith(prefix));
                 if (isRelevant) {
                     events.push(value);
                 }
             }
-        });
+            return undefined; // flush natively
+        };
+        
+        const pipeline = stream.pipeThrough(new TextDecoderStream());
+        const reader = pipeline.getReader();
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            parser.write(value);
+        }
 
-        pipeline.on('end', () => {
-            try {
-                const parser = new DevToolsParser();
-                const wptData = parser.process(events);
-                
-                const wptFormat = {
-                    data: {
-                        median: {
-                            firstView: {
-                                ...wptData.pageData,
-                                requests: wptData.requests
-                            }
-                        }
+        const devToolsParser = new DevToolsParser();
+        const wptData = devToolsParser.process(events);
+        
+        const wptFormat = {
+            data: {
+                median: {
+                    firstView: {
+                        ...wptData.pageData,
+                        requests: wptData.requests
                     }
-                };
-                
-                const har = normalizeWPT(wptFormat);
-                har.log.creator.name = "waterfall-tools (devtools)";
-                resolve(har);
-                if (typeof input === 'string') {
-                    fileStream.destroy();
                 }
-            } catch (err) {
-                reject(err);
             }
-        });
+        };
+        
+        const har = normalizeWPT(wptFormat);
+        har.log.creator.name = "waterfall-tools (devtools)";
+        
+        // As with stream parsing pipelines, ensure we correctly evaluate output structurally!
+        const hasRuns = har.log.pages.some(p => !p.id.includes('_median_'));
+        if (hasRuns) {
+            har.log.pages = har.log.pages.filter(p => !p.id.includes('_median_'));
+            har.log.entries = har.log.entries.filter(e => !e.pageref.includes('_median_'));
+        }
+                
+        return har;
 
-        pipeline.on('error', reject);
-
-        readStream.on('error', reject);
-        fileStream.on('error', reject);
-    });
+    } catch (e) {
+        throw e;
+    } finally {
+        if (keepAlive) globalThis.clearInterval(keepAlive);
+        if (nodeFsStream) nodeFsStream.destroy();
+    }
 }

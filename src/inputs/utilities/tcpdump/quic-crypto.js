@@ -1,91 +1,123 @@
-import crypto from 'node:crypto';
 import { hkdfExpandLabel, hkdfExpand } from './tls-crypto.js';
 
+// Convert hex string to Uint8Array directly natively
+function hexToBytes(hex) {
+    let bytes = new Uint8Array(Math.ceil(hex.length / 2));
+    for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+    return bytes;
+}
+
 // QUIC v1 Salt (RFC 9001 - 5.2)
-const QUIC_V1_SALT = Buffer.from('38762cf7f55934b34d179ae6a4c80cadccbb7f0a', 'hex');
+const QUIC_V1_SALT = hexToBytes('38762cf7f55934b34d179ae6a4c80cadccbb7f0a');
+
+function getWebCryptoHashName(alg) {
+    if (alg.toLowerCase() === 'sha384') return 'SHA-384';
+    if (alg.toLowerCase() === 'sha256') return 'SHA-256';
+    if (alg.toLowerCase() === 'sha512') return 'SHA-512';
+    if (alg.toLowerCase() === 'sha1') return 'SHA-1';
+    return alg.toUpperCase().replace('SHA', 'SHA-');
+}
 
 /**
  * HKDF-Extract as per RFC 5869: extract = HMAC-Hash(salt, IKM)
+ * Replicated using native WebCrypto HMAC
  */
-function hkdfExtract(hashAlg, salt, ikm) {
+async function hkdfExtract(hashAlg, salt, ikm) {
+    const webAlg = getWebCryptoHashName(hashAlg);
     if (!salt || salt.length === 0) {
-        salt = Buffer.alloc(crypto.createHash(hashAlg).digest().length);
+        const hashDump = await globalThis.crypto.subtle.digest(webAlg, new Uint8Array(0));
+        salt = new Uint8Array(hashDump.byteLength);
     }
-    return crypto.createHmac(hashAlg, salt).update(ikm).digest();
+    const key = await globalThis.crypto.subtle.importKey('raw', salt, { name: 'HMAC', hash: webAlg }, false, ['sign']);
+    const signature = await globalThis.crypto.subtle.sign('HMAC', key, ikm);
+    return new Uint8Array(signature);
 }
 
 /**
  * Given the initial Destination Connection ID, derives the initial client and server secrets.
  */
-export function deriveInitialSecrets(dcid) {
+export async function deriveInitialSecrets(dcid) {
     // QUIC Initial packets ALWAYS use SHA-256 for key derivation
-    const initialSecret = hkdfExtract('sha256', QUIC_V1_SALT, dcid);
+    const initialSecret = await hkdfExtract('sha256', QUIC_V1_SALT, dcid);
     
     // Hash length for SHA-256 is 32 bytes
-    const clientInitialSecret = hkdfExpandLabel(initialSecret, 'client in', Buffer.alloc(0), 'sha256', 32);
-    const serverInitialSecret = hkdfExpandLabel(initialSecret, 'server in', Buffer.alloc(0), 'sha256', 32);
+    const clientInitialSecret = await hkdfExpandLabel(initialSecret, 'client in', new Uint8Array(0), 'sha256', 32);
+    const serverInitialSecret = await hkdfExpandLabel(initialSecret, 'server in', new Uint8Array(0), 'sha256', 32);
 
     return {
-        client: deriveTrafficKeys(clientInitialSecret, 'sha256'),
-        server: deriveTrafficKeys(serverInitialSecret, 'sha256')
+        client: await deriveTrafficKeys(clientInitialSecret, 'sha256'),
+        server: await deriveTrafficKeys(serverInitialSecret, 'sha256')
     };
 }
 
 /**
  * Given a Traffic Secret (Initial or 1-RTT), derive the AEAD Key, IV, and Header Protection (HP) Key.
  */
-export function deriveTrafficKeys(secret, hashAlg = 'sha256') {
-    // AEAD Key length for AES-128-GCM is 16 bytes.
-    // IV length is ALWAYS 12 bytes for QUIC payloads.
-    // HP Key length is 16 bytes for AES-128-ECB.
-    
-    const key = hkdfExpandLabel(secret, 'quic key', Buffer.alloc(0), hashAlg, 16);
-    const iv = hkdfExpandLabel(secret, 'quic iv', Buffer.alloc(0), hashAlg, 12);
-    const hp = hkdfExpandLabel(secret, 'quic hp', Buffer.alloc(0), hashAlg, 16);
+export async function deriveTrafficKeys(secret, hashAlg = 'sha256') {
+    const key = await hkdfExpandLabel(secret, 'quic key', new Uint8Array(0), hashAlg, 16);
+    const iv = await hkdfExpandLabel(secret, 'quic iv', new Uint8Array(0), hashAlg, 12);
+    const hp = await hkdfExpandLabel(secret, 'quic hp', new Uint8Array(0), hashAlg, 16);
     
     return { key, iv, hp };
 }
 
 /**
- * Apply header protection mask.
- * QUIC uses AES-128-ECB to generate a mask from the sample.
+ * Apply header protection mask using WebCrypto AES-CBC workaround for ECB.
  */
-export function generateHeaderProtectionMask(hpKey, sample) {
-    // Use AES-ECB for header protection mask generation
-    // crypto.createCipheriv expects an IV, but ECB doesn't use one, so pass empty Buffer or strictly null
-    const cipher = crypto.createCipheriv('aes-128-ecb', hpKey, null);
+export async function generateHeaderProtectionMask(hpKey, sample) {
+    // WebCrypto does not expose AES-ECB. Since the QUIC sample is precisely 16 bytes (1 block),
+    // AES-CBC with a zeroed validation IV provides identical single-block ciphertext natively!
+    const key = await globalThis.crypto.subtle.importKey('raw', hpKey, { name: 'AES-CBC' }, false, ['encrypt']);
     
-    // Ensure padding is disabled to match spec exact block sizes
-    cipher.setAutoPadding(false);
-    return cipher.update(sample);
+    // Zeroed 16-byte initialization vector natively maps ECB
+    const iv = new Uint8Array(16); 
+    
+    const ciphertextBuffer = await globalThis.crypto.subtle.encrypt(
+        { name: "AES-CBC", iv: iv },
+        key,
+        sample
+    );
+    
+    // Slice only the first 16 bytes natively excluding standard AES PKCS#7 padding seamlessly!
+    return new Uint8Array(ciphertextBuffer).subarray(0, 16);
 }
 
 /**
- * Decrypts a QUIC AEAD block.
+ * Decrypts a QUIC AEAD block using asynchronous WebCrypto AES-GCM natively.
  */
-export function decryptQuicPayload(key, iv, packetNumber, header, payload) {
+export async function decryptQuicPayload(keyBytes, ivBytes, packetNumber, header, payload) {
     // Reconstruct the Nonce: IV XOR extended packet number
-    const nonce = Buffer.from(iv);
-    // Packet numbers are written at the end of the IV array limit
+    const nonce = new Uint8Array(ivBytes.length);
+    nonce.set(ivBytes);
+    
     for (let i = 0; i < 8; i++) {
-        // Shift PN to fit bottom bytes
         const pnByte = Number((BigInt(packetNumber) >> BigInt(8 * (7 - i))) & 0xFFn);
-        // The packet number is padded with 0s to 64 bytes (8 bytes) 
-        nonce[iv.length - 8 + i] ^= pnByte;
+        nonce[nonce.length - 8 + i] ^= pnByte;
     }
 
-    const decipher = crypto.createDecipheriv('aes-128-gcm', key, nonce);
-    decipher.setAuthTag(payload.subarray(-16)); // Standard 16 byte tag
-    
-    decipher.setAAD(header); // Context AAD is the entire complete QUIC unmasked header
-    
-    const ciphertext = payload.subarray(0, -16);
-    
-    const decrypted = decipher.update(ciphertext);
     try {
-        const final = decipher.final();
-        return Buffer.concat([decrypted, final]);
+        const key = await globalThis.crypto.subtle.importKey(
+            'raw', 
+            keyBytes, 
+            { name: 'AES-GCM' }, 
+            false, 
+            ['decrypt']
+        );
+        
+        // In native WebCrypto AES-GCM, the ciphertext properly contains the auth tag securely implicitly at the end!
+        const decryptedBuffer = await globalThis.crypto.subtle.decrypt(
+            {
+                name: "AES-GCM",
+                iv: nonce,
+                additionalData: header,
+                tagLength: 128
+            },
+            key,
+            payload
+        );
+        
+        return new Uint8Array(decryptedBuffer);
     } catch (e) {
-        return null; // Auth failed
+        return null; // Auth failed transparently
     }
 }

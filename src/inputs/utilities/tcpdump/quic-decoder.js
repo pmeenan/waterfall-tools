@@ -1,7 +1,14 @@
 import { deriveTrafficKeys, generateHeaderProtectionMask, decryptQuicPayload } from './quic-crypto.js';
 import { QuicBuffer } from './quic-buffer.js';
 
-export function decodeQuic(chunks, clientPort, keyLog) {
+// Convert hex string to Uint8Array directly natively
+function hexToBytes(hex) {
+    let bytes = new Uint8Array(Math.ceil(hex.length / 2));
+    for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+    return bytes;
+}
+
+export async function decodeQuic(chunks, clientPort, keyLog) {
     let clientCidLength = 0;
     let serverCidLength = 0;
     const streams = [];
@@ -20,8 +27,8 @@ export function decodeQuic(chunks, clientPort, keyLog) {
         }
     }
 
-    const clientKeys = clientSecretStr ? deriveTrafficKeys(Buffer.from(clientSecretStr, 'hex')) : null;
-    const serverKeys = serverSecretStr ? deriveTrafficKeys(Buffer.from(serverSecretStr, 'hex')) : null;
+    const clientKeys = clientSecretStr ? await deriveTrafficKeys(hexToBytes(clientSecretStr)) : null;
+    const serverKeys = serverSecretStr ? await deriveTrafficKeys(hexToBytes(serverSecretStr)) : null;
 
     for (const chunk of chunks) {
         const qb = new QuicBuffer(chunk.bytes);
@@ -51,7 +58,6 @@ export function decodeQuic(chunks, clientPort, keyLog) {
                 if (headerForm === 0x00 || headerForm === 0x02 || headerForm === 0x01) {
                     const payloadLen = qb.readVarInt();
                     if (payloadLen === null) continue;
-                    // We can attempt Native Header Protection removal here for 'Initial' keys (omitted for brevity)
                     streams.push({ time: chunk.time, type: 'long', length: payloadLen });
                 }
             } else {
@@ -76,7 +82,7 @@ export function decodeQuic(chunks, clientPort, keyLog) {
                 }
 
                 const sample = qb.buffer.subarray(sampleOffset, sampleOffset + 16);
-                const mask = generateHeaderProtectionMask(keys.hp, sample);
+                const mask = await generateHeaderProtectionMask(keys.hp, sample);
 
                 // Unmask the first byte
                 const unmaskedHeaderByte = firstByte ^ (mask[0] & 0x1F); // 0x1F mask for short headers
@@ -94,22 +100,23 @@ export function decodeQuic(chunks, clientPort, keyLog) {
                 const headerLength = protectedOffset + pnLength;
 
                 // Reconstruct the exact unmasked header byte sequence to use as AAD context for AEAD decryption natively
-                const aadHeader = Buffer.from(qb.buffer.subarray(0, headerLength));
+                const aadHeader = new Uint8Array(headerLength);
+                aadHeader.set(qb.buffer.subarray(0, headerLength));
                 aadHeader[0] = unmaskedHeaderByte;
+                
                 for (let i = 0; i < pnLength; i++) {
                     aadHeader[protectedOffset + i] ^= mask[1 + i]; // Undo mask to store plaintext
                 }
 
                 const payloadBuf = qb.buffer.subarray(headerLength); // Ends naturally with 16-byte Auth Tag
 
-                const decrypted = decryptQuicPayload(keys.key, keys.iv, packetNumber, aadHeader, payloadBuf);
+                const decrypted = await decryptQuicPayload(keys.key, keys.iv, packetNumber, aadHeader, payloadBuf);
 
                 if (decrypted) {
                     const qBuffer = new QuicBuffer(decrypted);
                     while (qBuffer.remaining > 0) {
                         const frameType = qBuffer.readVarInt();
                         if (frameType === null) break;
-                        console.log("Parsed Frame:", frameType);
 
                         if (frameType === 0x00) {
                             // PADDING
@@ -211,7 +218,7 @@ export function decodeQuic(chunks, clientPort, keyLog) {
                             qBuffer.readVarInt();
                         } else {
                             // Unknown Frame Type, aborting rest of packet to prevent misalignment
-                            console.warn(`Unknown frame type ${frameType} at offset ${qBuffer.offset}`);
+                            // No need to continuously log warning across unknown frames uniformly
                             break;
                         }
                     }
@@ -223,7 +230,6 @@ export function decodeQuic(chunks, clientPort, keyLog) {
             }
         } catch (e) {
             // Unparsable packet fragment
-            console.error(`QUIC parsing error: ${e.message}`);
         }
     }
 

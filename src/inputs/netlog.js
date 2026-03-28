@@ -1,6 +1,3 @@
-import fs from 'node:fs';
-import zlib from 'node:zlib';
-import readline from 'node:readline';
 
 const PRIORITY_MAP = {
     "VeryHigh": "Highest",
@@ -1129,16 +1126,19 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
     return har;
 }
 
-function isGzip(buffer) {
-    return buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
-}
+// isGzip native helper removed in favor of orchestration natively
 
 export async function processNetlogFileNode(input, options = {}) {
-    return new Promise((resolve, reject) => {
-        let isGz = false;
-        let fileStream;
+    let stream = input;
+    let isGz = options.isGz === true;
+    let nodeFsStream = null;
 
+    const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
+
+    try {
         if (typeof input === 'string') {
+            const fs = await import('node:fs');
+            
             const header = Buffer.alloc(2);
             let fd;
             try {
@@ -1146,32 +1146,49 @@ export async function processNetlogFileNode(input, options = {}) {
                 fs.readSync(fd, header, 0, 2, 0);
                 fs.closeSync(fd);
             } catch (e) {
-                return reject(e);
+                throw e;
             }
-            isGz = isGzip(header);
-            fileStream = fs.createReadStream(input);
-        } else {
-            fileStream = input;
-            isGz = options.isGz === true;
+            
+            isGz = header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b;
+            
+            const { Readable } = await import('node:stream');
+            nodeFsStream = fs.createReadStream(input);
+            stream = Readable.toWeb(nodeFsStream);
         }
 
-        let readStream = fileStream;
         if (isGz) {
-            readStream = fileStream.pipe(zlib.createGunzip());
+            stream = stream.pipeThrough(new DecompressionStream('gzip'));
         }
 
-        const rl = readline.createInterface({
-            input: readStream,
-            crlfDelay: Infinity
-        });
+        const decoder = new TextDecoderStream();
+        const pipeline = stream.pipeThrough(decoder);
+        const reader = pipeline.getReader();
 
         const netlog = new Netlog();
         let started = false;
+        
+        // Native stream line splitting generator
+        async function* getLines(reader) {
+            let remainder = '';
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    if (remainder) {
+                        const lines = remainder.split('\n');
+                        for (const line of lines) yield line;
+                    }
+                    break;
+                }
+                const lines = (remainder + value).split('\n');
+                remainder = lines.pop(); // last element is either empty (if ended in \n) or the remainder
+                for (const line of lines) yield line;
+            }
+        }
 
-        rl.on('line', (line) => {
+        for await (let line of getLines(reader)) {
             try {
                 line = line.replace(/,\s*$/, '').trim();
-                if (!line) return;
+                if (!line) continue;
                 
                 if (started) {
                     if (line.startsWith('{')) {
@@ -1189,34 +1206,28 @@ export async function processNetlogFileNode(input, options = {}) {
             } catch (e) {
                 // Silently skip malformed truncated lines as instructed
             }
-        });
+        }
 
-        rl.on('close', () => {
-            try {
-                const results = netlog.postProcessEvents();
-                let requests = [];
-                let unlinked_sockets = [];
-                let unlinked_dns = [];
-                let start_time = 0;
+        const results = netlog.postProcessEvents();
+        let requests = [];
+        let unlinked_sockets = [];
+        let unlinked_dns = [];
+        let start_time = 0;
 
-                if (results) {
-                    requests = results.requests || [];
-                    unlinked_sockets = results.unlinked_sockets || [];
-                    unlinked_dns = results.unlinked_dns || [];
-                    start_time = results.start_time || 0;
-                }
-                const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, start_time);
-                resolve(har);
-                if (typeof input === 'string') {
-                    fileStream.destroy();
-                }
-            } catch (e) {
-                reject(e);
-            }
-        });
+        if (results) {
+            requests = results.requests || [];
+            unlinked_sockets = results.unlinked_sockets || [];
+            unlinked_dns = results.unlinked_dns || [];
+            start_time = results.start_time || 0;
+        }
 
-        rl.on('error', reject);
-        readStream.on('error', reject);
-        fileStream.on('error', reject);
-    });
+        const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, start_time);
+        return har;
+
+    } catch (e) {
+        throw e;
+    } finally {
+        if (keepAlive) globalThis.clearInterval(keepAlive);
+        if (nodeFsStream) nodeFsStream.destroy();
+    }
 }

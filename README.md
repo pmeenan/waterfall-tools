@@ -39,8 +39,16 @@ import { Conductor } from 'waterfall-tools/core/conductor.js';
 import { Readable } from 'stream'; // Handled globally via NodeJS, polyfilled natively targeting browsers
 
 // Note: You must explicitly specify `options.format` when piping a streaming target.
-const fileStream = Readable.from(Buffer.from(await uploadedFile.arrayBuffer()));
+const arrayBuffer = await uploadedFile.arrayBuffer();
+const bufferData = Buffer.from(arrayBuffer);
 
+// Manually wrap the payload inside a backward-compatible instance protecting browser polyfills
+const fileStream = new Readable({
+    read() {
+        this.push(bufferData);
+        this.push(null);
+    }
+});
 const waterfallHar = await Conductor.processStream(fileStream, { 
     format: 'tcpdump', 
     isGz: true, 

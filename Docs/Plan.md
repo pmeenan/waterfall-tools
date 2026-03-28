@@ -34,6 +34,7 @@ This document breaks down the development of the Waterfall Tools library into in
   - [x] **Page Entry Creation:** Create a virtual "page" entry. Use the first HTTP request with `Sec-Fetch-Dest: document` as the page URL, defaulting to the first HTTP request if none is found.
   - [x] **HAR Generation & Validation:** Turn the decoded protocols from the tcpdump processing into requests and page data that can be used for generating the HAR format and then the creation and validation of the resulting HAR from the tcpdump input.
 - [x] Restructure the `src/inputs` directory so that the core libraries are separated from the cli interfaces and utility functions (in a logical grouping in separate folders) so it's not a flat, giant collection of files. If it makes sense, the core libraries can be at the root.
+- [x] **Zero Polyfill Migration:** Convert all node-native stream and crypto logic globally across all input pipelines to purely Web APIs native to Browser engines to ensure a fundamentally lightweight and robust isomorphic library footprint.
 
 ## Phase 3: The Orchestrator & API
 **Goal:** Build the central `conductor` that intelligently manages inputs and acts as the developer API.

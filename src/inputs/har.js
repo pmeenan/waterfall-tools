@@ -46,63 +46,72 @@ function isGzip(buffer) {
     return buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
 }
 
-/**
- * Node.js optimized streaming parser for massive HAR payloads.
- * Utilizes `stream-json` to selectively assemble the object without
- * buffering the entire uncompressed string in V8 heap memory.
- * 
- * @param {string} filePath - Path to the HAR file (.har or .har.gz)
- * @returns {Promise<import('../core/har-types.js').ExtendedHAR>}
- */
 export async function processHARFileNode(input, options = {}) {
-    const fs = await import('node:fs');
-    const zlib = await import('node:zlib');
-    const streamJson = (await import('stream-json')).default;
-    const Assembler = (await import('stream-json/assembler.js')).default;
+    const { JSONParser } = await import('@streamparser/json');
 
-    return new Promise((resolve, reject) => {
-        let isGz = false;
-        let fileStream;
+    let stream = input;
+    let isGz = options.isGz === true;
+    let nodeFsStream = null;
+    let output = null;
 
+    // Isomorphic workaround for Node 22 Web Stream premature event loop exit bug
+    const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
+
+    try {
         if (typeof input === 'string') {
+            const fs = await import('node:fs');
+            
             const header = Buffer.alloc(2);
-            let fd;
             try {
-                fd = fs.openSync(input, 'r');
+                const fd = fs.openSync(input, 'r');
                 fs.readSync(fd, header, 0, 2, 0);
                 fs.closeSync(fd);
             } catch (e) {
-                return reject(e);
+                throw e;
             }
             isGz = isGzip(header);
-            fileStream = fs.createReadStream(input);
-        } else {
-            fileStream = input;
-            isGz = options.isGz === true;
-        }
-        
-        let readStream = fileStream;
-        if (isGz) {
-            readStream = fileStream.pipe(zlib.createGunzip());
+            
+            const { Readable } = await import('node:stream');
+            nodeFsStream = fs.createReadStream(input);
+            stream = Readable.toWeb(nodeFsStream);
         }
 
-        // Initialize the streaming JSON parser
-        const jsonStream = readStream.pipe(streamJson());
-        
-        // Connect the Assembler to construct the object cleanly.
-        // Because it avoids allocating massive strings prior to parsing,
-        // this keeps peak memory utilization vastly lower than JSON.parse().
-        const assembler = Assembler.connectTo(jsonStream);
+    if (isGz) {
+        stream = stream.pipeThrough(new DecompressionStream('gzip'));
+    }
 
-        assembler.on('done', asm => {
-            resolve(normalizeHAR(asm.current));
-            if (typeof input === 'string') {
-                fileStream.destroy();
-            }
-        });
+    output = normalizeHAR(); // Provides generic fallback shell
 
-        jsonStream.on('error', reject);
-        readStream.on('error', reject);
-        fileStream.on('error', reject);
+    const parser = new JSONParser({ 
+        paths: ['$.log.pages.*', '$.log.entries.*'], 
+        keepStack: false 
     });
+
+    parser.onValue = ({ value }) => {
+        if (value && typeof value === 'object') {
+            if ('request' in value || 'response' in value || 'time' in value) {
+                output.log.entries.push(value);
+            } else if ('pageTimings' in value || 'title' in value || 'id' in value) {
+                output.log.pages.push(value);
+            }
+        }
+    };
+    
+    const pipeline = stream.pipeThrough(new TextDecoderStream());
+    const reader = pipeline.getReader();
+    
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        parser.write(value);
+    }
+    
+    } catch (e) {
+        throw e;
+    } finally {
+        if (keepAlive) globalThis.clearInterval(keepAlive);
+        if (nodeFsStream) nodeFsStream.destroy();
+    }
+
+    return output;
 }

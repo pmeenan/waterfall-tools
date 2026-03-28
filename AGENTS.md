@@ -62,10 +62,10 @@ When working on this codebase, you must adhere to the following strict architect
     - Comparing massive object payloads (such as thousands of network requests parsed from Traces) with `assert.deepStrictEqual` can hang `node:test` execution indefinitely if there are `undefined` property mismatches. Always sanitize results via `JSON.parse(JSON.stringify(result))` before asserting against disk-saved JSON fixtures.
     - Always scrub dynamically generated keys (e.g., fallback `startedDateTime` values using `Date.now()`) from both the parsed object and the reference golden fixture prior to running deep comparisons.
 
-13. **Streaming Nuances (`stream-json` & `stream-chain`):**
-    - When parsing JSON objects or massive arrays incrementally via `stream-array`, avoid explicitly piping streams loosely (`readStream.pipe(streamJson()).pipe(asStream())`) as Node's multiplexing can occasionally drop streaming tokens or hang the event loop on tests.
-    - Always strictly bundle stream-json steps linearly using `stream-chain` architectures: `const pipeline = chain([readStream, parser(), streamArray()]);` to safely preserve token pipelines synchronously.
-    - **Piped Stream Destruction:** When "sniffing" raw headers identically using read streams piped into Transform interfaces (like `zlib.createGunzip()`), aggressively `.destroy()` the foundational underlying raw `fs.createReadStream` explicit target. Calling `.destroy()` or `.pause()` on the terminal `zlib` stream uniquely leaves the file read stream permanently hanging blocking event loop completions!
+13. **Streaming Nuances (Web Streams & Async Iterators):**
+    - The core library natively utilizes **Web Streams API** (`ReadableStream`, `DecompressionStream`, `TextDecoderStream`) across all standard inputs preventing any requirement for Node native pipelines.
+    - JSON processing seamlessly leverages `@streamparser/json` matching native iterable pipelines natively natively cleanly dropping legacy `stream-json` bottlenecks.
+    - **Piped Stream Destruction**: Native web streams do not natively auto-close connected file handles in Node bridging layers organically; `finally` blocks must manually invoke `.destroy()` on generated `fs.ReadStream` instances immediately upon `getReader().read()` completions.
 
 14. **Parallel Fallback Architecture & O(n) Mitigations:**
     - Fallback strategies natively parsing alternative execution paths (e.g. Chrome trace `devtools.timeline` elements substituting explicitly to form arrays matching missing `netlog` configurations) must continuously buffer `id` constraints carefully.
@@ -78,6 +78,7 @@ When working on this codebase, you must adhere to the following strict architect
 
 16. **Offline QUIC & HTTP/3 Decoding:**
     - Because `waterfall-tools` reassembles QUIC streams offline from `.cap.gz` captures, the `decodeQuic` logic fully unwraps `1-RTT` AEAD payloads and gracefully tracks all `RFC-9000` frame types without breaking on non-stream frames natively.
+    - QUIC Header Protection natively utilizes `AES-ECB` directly; however, WebCrypto organically rejects native ECB mapping organically globally. Consequently, `quic-crypto.js` maps a 16-byte raw `AES-CBC` initialization exclusively employing a fully zeroed IV perfectly mirroring identical single-block ECB states matching WebCrypto constraints smoothly.
     - When unpacking HTTP/3 fragments mapping to proper Request streams natively, the `QpackDecoder` strictly maintains a stateful tracking mechanism parsing the relative bounds of encoder dynamic table instructions linearly. This guarantees the highest reconstruction fidelity without employing massive client memory leaks safely.
 
 17. **TCPDump HAR Assembler:**
@@ -92,6 +93,7 @@ When working on this codebase, you must adhere to the following strict architect
 19. **Output Processors (Headless):**
     - The `simple-json` output processor (`src/outputs/simple-json.js`) provides a strictly 1D array mapping of `ExtendedHAR` request entries. It collapses deep `request` and `response` object trees into simple top-level properties (e.g. `url`, `method`, `status`, `ttfb_ms`) natively suitable for generic JavaScript iterators.
 
-20. **Browser Support via Node Polyfills:**
-    - While the core library is strictly isomorphic where possible, the underlying token stream dependencies (like `stream-json` and complex TCP/TLS modules) fundamentally rely on native NodeJS classes (`fs`, `stream`, `zlib`, `crypto`).
-    - To deploy these inputs via a front-end UI (`src/demo/canvas`), the project relies on **`vite-plugin-node-polyfills`** internally configured in `vite.demo.config.js`. You should actively map local browser `File` objects back to compatible fake Node streams (`Readable.from()`) prior to bridging the gap toward the inputs.
+20. **Zero Polyfill Browser Architecture:**
+    - The core input parsers are strictly entirely isomorphic mapping exclusively across the exact Web APIs shipped comprehensively natively natively (`window.crypto.subtle`, `DecompressionStream`, `Uint8Array`, `TextDecoderStream`).
+    - Standard Node modules (`fs`, `zlib`, `crypto`) are securely dynamically imported matching isolated backend targets effectively avoiding breaking native browser rollup configurations intrinsically inherently.
+    - The frontend integration natively converts standard Browser `File` objects securely matching `Blob.stream()` cleanly immediately skipping any heavy Vite polyfill requirements previously needed natively.

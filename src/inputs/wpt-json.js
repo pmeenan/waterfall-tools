@@ -1,9 +1,5 @@
-import fs from 'node:fs';
-import zlib from 'node:zlib';
-import streamJson from 'stream-json';
-import Assembler from 'stream-json/assembler.js';
-import { Transform } from 'node:stream';
-
+// WebPageTest JSON Input Processor
+// Processes natively without node polyfills using purely Web Streams mapping seamlessly
 /**
  * Normalizes a processed WebPageTest JSON object into the Extended HAR format.
  * This function translates the WPT format to standard HAR strictly.
@@ -65,9 +61,20 @@ function processWPTView(viewData, runStr, cachedNum, har) {
         }
     };
     
+    const bloatNames = new Set([
+        'generated-html', 
+        'almanac', 
+        'bodies', 
+        'response_body', 
+        'response_body_almanac', 
+        'thumbnails', 
+        'images', 
+        'videoFrames'
+    ]);
+
     // Copy all metadata natively mapped into Extended Page object
     for (const key of Object.keys(viewData)) {
-        if (key !== 'requests') {
+        if (key !== 'requests' && !bloatNames.has(key)) {
             page['_' + key] = viewData[key];
         }
     }
@@ -175,7 +182,9 @@ function processWPTView(viewData, runStr, cachedNum, har) {
             
             // Map custom properties natively
             for (const key of Object.keys(req)) {
-                entry['_' + key] = req[key];
+                if (!bloatNames.has(key)) {
+                    entry['_' + key] = req[key];
+                }
             }
             
             har.log.entries.push(entry);
@@ -183,129 +192,125 @@ function processWPTView(viewData, runStr, cachedNum, har) {
     }
 }
 
-/**
- * Custom Transform Stream to strip massively bloated telemetry and payloads explicitly at token layer,
- * preventing V8 from running out of heap memory prior to Object assembly operations functionally.
- */
-class PruneBloatFilter extends Transform {
-    constructor(options) {
-        super({ objectMode: true, ...options });
-        // The list of payload keys that we discard blindly to preserve memory constraints
-        this.ignoreKeys = new Set([
-            'generated-html', 
-            'almanac', 
-            'bodies', 
-            'response_body', 
-            'response_body_almanac', 
-            'thumbnails', 
-            'images', 
-            'videoFrames'
-        ]);
-        this.ignoreDepth = 0;
-        this.ignoreKey = false;
-        this.ignoreNesting = 0;
-    }
-
-    _transform(chunk, encoding, callback) {
-        if (this.ignoreDepth === 0) {
-            if (chunk.name === 'keyValue' && this.ignoreKeys.has(chunk.value)) {
-                this.ignoreDepth = 1;
-                this.ignoreKey = true; // Wait for the subsequent value token natively
-                return callback();
-            }
-            this.push(chunk);
-            return callback();
-        }
-
-        // Inside ignored boundary evaluation
-        if (this.ignoreKey) {
-            this.ignoreKey = false;
-            // Intercept compound arrays or string blobs
-            if (chunk.name === 'startObject' || chunk.name === 'startArray' || chunk.name === 'startString') {
-                this.ignoreNesting = 1;
-            } else {
-                // Scalar primitive drops out automatically cleanly 
-                this.ignoreDepth = 0;
-            }
-            return callback();
-        }
-
-        // Track balanced token levels seamlessly
-        if (chunk.name === 'startObject' || chunk.name === 'startArray' || chunk.name === 'startString') {
-            this.ignoreNesting++;
-        } else if (chunk.name === 'endObject' || chunk.name === 'endArray' || chunk.name === 'endString') {
-            this.ignoreNesting--;
-            if (this.ignoreNesting === 0) {
-                this.ignoreDepth = 0; // End of ignored chunk
-            }
-        }
-        
-        callback();
-    }
-}
 
 function isGzip(buffer) {
     return buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
 }
 
-/**
- * Processes a massive WebPageTest JSON file iteratively converting natively.
- * Wraps custom tokens keeping RAM low seamlessly before constructing memory map.
- * 
- * @param {string} filePath - Path to WPT json file
- * @returns {Promise<import('../core/har-types.js').ExtendedHAR>}
- */
 export async function processWPTFileNode(input, options = {}) {
-    return new Promise((resolve, reject) => {
-        let isGz = false;
-        let fileStream;
+    const { JSONParser } = await import('@streamparser/json');
 
+    let stream = input;
+    let isGz = options.isGz === true;
+    let nodeFsStream = null;
+    let output = null;
+
+    // Isomorphic workaround for Node 22 Web Stream premature event loop exit bug
+    const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
+
+    try {
         if (typeof input === 'string') {
+            const fs = await import('node:fs');
+            
             const header = Buffer.alloc(2);
-            let fd;
             try {
-                fd = fs.openSync(input, 'r');
+                const fd = fs.openSync(input, 'r');
                 fs.readSync(fd, header, 0, 2, 0);
                 fs.closeSync(fd);
             } catch (e) {
-                return reject(e);
+                throw e;
             }
             isGz = isGzip(header);
-            fileStream = fs.createReadStream(input);
-        } else {
-            fileStream = input;
-            isGz = options.isGz === true;
+            
+            const { Readable } = await import('node:stream');
+            nodeFsStream = fs.createReadStream(input);
+            stream = Readable.toWeb(nodeFsStream);
         }
 
-        let readStream = fileStream;
-        if (isGz) {
-            readStream = fileStream.pipe(zlib.createGunzip());
-        }
+    if (isGz) {
+        stream = stream.pipeThrough(new DecompressionStream('gzip'));
+    }
 
-        // Tokenize inherently
-        const jsonStream = readStream.pipe(streamJson());
-        
-        // Scrub massively heavy WPT attributes
-        const pruner = jsonStream.pipe(new PruneBloatFilter());
-        
-        // Assemble cleansed JSON cleanly 
-        const assembler = Assembler.connectTo(pruner);
+    output = normalizeWPT({ data: { runs: {}, median: {} } }); // Safe fallback shell
 
-        assembler.on('done', asm => {
-            try {
-                const har = normalizeWPT(asm.current);
-                resolve(har);
-                if (typeof input === 'string') {
-                    fileStream.destroy();
-                }
-            } catch (err) {
-                reject(err);
-            }
-        });
-
-        jsonStream.on('error', reject);
-        pruner.on('error', reject);
-        readStream.on('error', reject);
-        fileStream.on('error', reject);
+    // Utilize native AST interception avoiding massive object stacks reliably traversing manually dropping subsets dynamically natively
+    const parser = new JSONParser({ 
+        paths: [
+            '$.data.runs.*.firstView', 
+            '$.data.runs.*.repeatView', 
+            '$.data.median.firstView', 
+            '$.data.median.repeatView'
+        ], 
+        keepStack: false // Safely disabled preventing massive V8 allocation cascades, preserving only index mappings dynamically natively.
     });
+
+    const bloatNames = new Set([
+        'generated-html', 
+        'almanac', 
+        'bodies', 
+        'response_body', 
+        'response_body_almanac', 
+        'thumbnails', 
+        'images', 
+        'videoFrames'
+    ]);
+
+    parser.onValue = ({ value, key, parent, stack }) => {
+        if (bloatNames.has(key)) return undefined; // Strips heavy blobs entirely during AST population cleanly
+
+        // Intercept completed views accurately preventing parent AST accumulation correctly natively
+        if ((key === 'firstView' || key === 'repeatView') && value && value.requests) {
+            let runStr = '1';
+            let cachedNum = key === 'repeatView' ? 1 : 0;
+            
+            // stack: [ { key: "data", ... }, { key: "runs", ... }, { key: "1", ... } ]
+            if (stack.length >= 3) {
+                const parentType = stack[stack.length - 2].key; // "runs" vs "median"
+                if (parentType !== 'median') {
+                    // The direct parent is the run index natively 
+                    runStr = stack[stack.length - 1].key; 
+                } else {
+                    runStr = 'median';
+                }
+            }
+            
+            processWPTView(value, runStr, cachedNum, output);
+            return undefined; // Flushes processed view releasing parent RAM natively
+        }
+        
+        return value;
+    };
+    
+    const pipeline = stream.pipeThrough(new TextDecoderStream());
+    const reader = pipeline.getReader();
+    
+    let chunkCount = 0;
+    while (true) {
+        const { done, value } = await reader.read();
+        chunkCount++;
+        if (chunkCount % 1000 === 0) console.log("Read chunks:", chunkCount);
+        if (done) {
+            console.log("Stream Done!");
+            break;
+        }
+        parser.write(value);
+    }
+    console.log("Finished WPT loop.");
+    
+    } catch (e) {
+        throw e;
+    } finally {
+        if (keepAlive) globalThis.clearInterval(keepAlive);
+        if (nodeFsStream) nodeFsStream.destroy();
+    }
+
+    // Since streaming parses elements inherently in document order (median can precede runs theoretically),
+    // we drop median representations explicitly identically aligning perfectly matching legacy WPT parsing.
+    const hasRuns = output.log.pages.some(p => !p.id.includes('_median_'));
+    if (hasRuns) {
+        output.log.pages = output.log.pages.filter(p => !p.id.includes('_median_'));
+        output.log.entries = output.log.entries.filter(e => !e.pageref.includes('_median_'));
+    }
+
+    return output;
 }

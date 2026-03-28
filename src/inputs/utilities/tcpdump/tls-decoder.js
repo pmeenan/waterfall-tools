@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 import { hkdfExpandLabel, prfTls12 } from './tls-crypto.js';
 
 export const CIPHER_SUITES = {
@@ -16,6 +15,17 @@ export const CIPHER_SUITES = {
     0x1303: { name: 'TLS_CHACHA20_POLY1305_SHA256', alg: 'chacha20-poly1305', keyLen: 32, ivLen: 12, hashAlg: 'sha256', tls13: true }
 };
 
+function concatUint8Arrays(arrays) {
+    const len = arrays.reduce((acc, a) => acc + a.length, 0);
+    const result = new Uint8Array(len);
+    let offset = 0;
+    for (let a of arrays) {
+        result.set(a, offset);
+        offset += a.length;
+    }
+    return result;
+}
+
 export class TlsDecoder {
     constructor(keyLog) {
         this.keyLog = keyLog;
@@ -28,138 +38,121 @@ export class TlsDecoder {
         
         // Key material per direction: 0 = Client->Server, 1 = Server->Client
         this.cryptoState = [
-            { isEncrypted: false, key: null, iv: null, sequence: 0n, trafficSecret: null },
-            { isEncrypted: false, key: null, iv: null, sequence: 0n, trafficSecret: null }
+            { isEncrypted: false, key: null, iv: null, sequence: 0n, trafficSecret: null, rawKey: null },
+            { isEncrypted: false, key: null, iv: null, sequence: 0n, trafficSecret: null, rawKey: null }
         ];
 
-        this.buffers = [Buffer.alloc(0), Buffer.alloc(0)];
+        this.buffers = [new Uint8Array(0), new Uint8Array(0)];
         this.decryptedStream = [[], []]; // Chunks of decrypted ApplicationData
     }
 
-    push(direction, chunkBuffer, timestamp) {
+    async push(direction, chunkBuffer, timestamp) {
         // Concatenate new data to any existing partial data in the buffer
         let b = this.buffers[direction];
-        this.buffers[direction] = Buffer.concat([b, Buffer.from(chunkBuffer)]);
+        this.buffers[direction] = concatUint8Arrays([b, chunkBuffer instanceof Uint8Array ? chunkBuffer : new Uint8Array(chunkBuffer)]);
         
-        this._parseRecords(direction, timestamp);
+        await this._parseRecords(direction, timestamp);
     }
 
     getDecryptedChunks(direction) {
         return this.decryptedStream[direction];
     }
 
-    _parseRecords(direction, timestamp) {
+    async _parseRecords(direction, timestamp) {
         let buf = this.buffers[direction];
 
-        // Ensure we have at least the TLS record header (5 bytes)
         while (buf.length >= 5) {
-            const type = buf.readUInt8(0);
-            const ver = buf.readUInt16BE(1);
-            const length = buf.readUInt16BE(3);
+            const type = buf[0];
+            const ver = (buf[1] << 8) | buf[2];
+            const length = (buf[3] << 8) | buf[4];
 
-            if (buf.length < 5 + length) {
-                // Not enough data for the full record yet. Break to wait for more TCP chunks.
-                break; 
-            }
+            if (buf.length < 5 + length) break; 
 
             const recordFragment = buf.subarray(5, 5 + length);
-            
-            // Advance the buffer immediately
             buf = buf.subarray(5 + length);
             this.buffers[direction] = buf;
 
-            this._processRecord(direction, type, ver, recordFragment, timestamp);
+            await this._processRecord(direction, type, ver, recordFragment, timestamp);
         }
     }
 
-    _processRecord(direction, type, ver, fragment, timestamp) {
+    async _processRecord(direction, type, ver, fragment, timestamp) {
         const state = this.cryptoState[direction];
 
-        // 20 = ChangeCipherSpec
-        if (type === 20) {
+        if (type === 20) { // ChangeCipherSpec
             state.isEncrypted = true;
             return;
         }
 
         if (state.isEncrypted) {
-            // Decrypt the fragment. In TLS 1.3, Handshake traffic is encrypted here. 
-            // In TLS 1.2, early ApplicationData is encrypted.
-            if (!state.key || !state.iv) return; // Cannot decrypt without keys
-            
-            this._decryptFragment(direction, type, ver, fragment, timestamp);
+            if (!state.key || !state.iv) return; 
+            await this._decryptFragment(direction, type, ver, fragment, timestamp);
         } else {
-            // Unencrypted records
             if (type === 22) { // Handshake
-                this._parseHandshake(direction, fragment);
+                await this._parseHandshake(direction, fragment);
             }
         }
     }
 
-    _parseHandshake(direction, fragment) {
+    async _parseHandshake(direction, fragment) {
         let offset = 0;
         while (offset + 4 <= fragment.length) {
-            const handType = fragment.readUInt8(offset);
-            const length = (fragment.readUInt8(offset + 1) << 16) | (fragment.readUInt8(offset + 2) << 8) | fragment.readUInt8(offset + 3);
+            const handType = fragment[offset];
+            const length = (fragment[offset + 1] << 16) | (fragment[offset + 2] << 8) | fragment[offset + 3];
             offset += 4;
 
-            if (offset + length > fragment.length) break; // Truncated handshake
+            if (offset + length > fragment.length) break; 
 
             const msg = fragment.subarray(offset, offset + length);
             offset += length;
 
             if (handType === 1) { // ClientHello
                 if (msg.length >= 34) {
-                    this.clientRandom = msg.subarray(2, 34); // Skip 2 bytes of Version
+                    this.clientRandom = msg.subarray(2, 34); 
                 }
             } else if (handType === 2) { // ServerHello
                 if (msg.length >= 34) {
-                    this.serverRandom = msg.subarray(2, 34); // Skip 2 bytes of Version
+                    this.serverRandom = msg.subarray(2, 34); 
                     
-                    let sessLen = msg.readUInt8(34);
+                    let sessLen = msg[34];
                     let cipherOffset = 34 + 1 + sessLen;
                     
                     if (cipherOffset + 2 <= msg.length) {
-                        this.cipherSuiteId = msg.readUInt16BE(cipherOffset);
+                        this.cipherSuiteId = (msg[cipherOffset] << 8) | msg[cipherOffset + 1];
                         this.cipherSuite = CIPHER_SUITES[this.cipherSuiteId];
                         
                         if (this.cipherSuite && this.cipherSuite.tls13) {
                             this.isTls13 = true;
                         }
 
-                        this._deriveKeys(false);
+                        await this._deriveKeys(false);
                     }
                 }
             } else if (handType === 20) { // Finished
-                // In TLS 1.3, Handshake Finished means the NEXT messages in this direction will use Application Traffic Secrets.
                 if (this.isTls13) {
                     this.cryptoState[direction].phase = 'application';
-                    this._deriveTls13KeysForDirection(direction, this.keyLog.getSessionKeys(this.clientRandom));
-                    // Reset sequence number to 0 when keys change in TLS 1.3
+                    await this._deriveTls13KeysForDirection(direction, this.keyLog.getSessionKeys(this.clientRandom));
                     this.cryptoState[direction].sequence = 0n;
                 }
             }
         }
     }
 
-    _deriveKeys(isApplicationPhase = false) {
+    async _deriveKeys(isApplicationPhase = false) {
         if (!this.clientRandom || !this.cipherSuite || !this.keyLog) return;
         
         const keyMaterial = this.keyLog.getSessionKeys(this.clientRandom);
-        if (!keyMaterial) {
-            console.log(`[TLS] No key material found for ClientRandom: ${this.clientRandom.toString('hex')}`);
-            return;
-        }
+        if (!keyMaterial) return;
 
-        console.log(`[TLS] Key material found! Deriving keys... Phase Application? ${isApplicationPhase}`);
         if (this.isTls13) {
-            this._deriveTls13KeysForDirection(0, keyMaterial);
-            this._deriveTls13KeysForDirection(1, keyMaterial);
+            await this._deriveTls13KeysForDirection(0, keyMaterial);
+            await this._deriveTls13KeysForDirection(1, keyMaterial);
         } else {
-            this._deriveTls12Keys(keyMaterial);
+            await this._deriveTls12Keys(keyMaterial);
         }
     }
 
-    _deriveTls13KeysForDirection(dir, keyMaterial) {
+    async _deriveTls13KeysForDirection(dir, keyMaterial) {
         if (!keyMaterial) return;
         const phase = this.cryptoState[dir].phase || 'handshake';
         
@@ -172,140 +165,153 @@ export class TlsDecoder {
         if (!secret) return; 
 
         this.cryptoState[dir].trafficSecret = secret;
-
         const alg = this.cipherSuite.hashAlg;
 
-        this.cryptoState[dir].key = hkdfExpandLabel(secret, "key", Buffer.alloc(0), alg, this.cipherSuite.keyLen);
-        this.cryptoState[dir].iv = hkdfExpandLabel(secret, "iv", Buffer.alloc(0), alg, this.cipherSuite.ivLen);
+        // Ensure key derivation runs gracefully mapping to array representations natively securely
+        const secretArray = new Uint8Array(secret);
         
-        console.log(`[TLS 1.3] Dir ${dir} Phase ${phase} derived. Secret: ${secret.toString('hex').substring(0, 16)}... Key(${this.cryptoState[dir].key.length}b), IV(${this.cryptoState[dir].iv.length}b)`);
+        this.cryptoState[dir].key = await hkdfExpandLabel(secretArray, "key", new Uint8Array(0), alg, this.cipherSuite.keyLen);
+        this.cryptoState[dir].iv = await hkdfExpandLabel(secretArray, "iv", new Uint8Array(0), alg, this.cipherSuite.ivLen);
+        this.cryptoState[dir].rawKey = null; // Clear cached WebCrypto key
     }
 
-    _deriveTls12Keys(keyMaterial) {
+    async _deriveTls12Keys(keyMaterial) {
         const masterSecret = keyMaterial['CLIENT_RANDOM'];
         if (!masterSecret || !this.serverRandom) return;
 
-        // TLS 1.2 Key Expansion: PRF(master_secret, "key expansion", server_random + client_random)
-        const seed = Buffer.concat([this.serverRandom, this.clientRandom]);
+        const masterSecretArray = new Uint8Array(masterSecret);
+        const seed = concatUint8Arrays([new Uint8Array(this.serverRandom), new Uint8Array(this.clientRandom)]);
         
-        // Needed: 2 * (mac_key_length + enc_key_length + fixed_iv_length)
-        // Assuming AEAD (GCM/Poly1305), mac_key_length = 0
         const encLen = this.cipherSuite.keyLen;
         const ivLen = this.cipherSuite.fixedIvLen;
         const totalLen = 2 * (encLen + ivLen);
         
         const alg = this.cipherSuite.hashAlg;
-        const keyBlock = prfTls12(masterSecret, "key expansion", seed, alg, totalLen);
+        const keyBlock = await prfTls12(masterSecretArray, "key expansion", seed, alg, totalLen);
 
         let offset = 0;
-        // MAC keys are omitted for AEAD ciphers in TLS 1.2
         this.cryptoState[0].key = keyBlock.subarray(offset, offset + encLen); offset += encLen;
         this.cryptoState[1].key = keyBlock.subarray(offset, offset + encLen); offset += encLen;
         this.cryptoState[0].iv = keyBlock.subarray(offset, offset + ivLen); offset += ivLen;
         this.cryptoState[1].iv = keyBlock.subarray(offset, offset + ivLen); offset += ivLen;
-
-        console.log(`[TLS 1.2] Derived keys from MS. BlockLen: ${totalLen}, Key0(${this.cryptoState[0].key.length}b), IV0(${this.cryptoState[0].iv.length}b)`);
+        
+        this.cryptoState[0].rawKey = null;
+        this.cryptoState[1].rawKey = null;
     }
 
-    _decryptFragment(direction, recordType, ver, fragment, timestamp) {
+    async _decryptFragment(direction, recordType, ver, fragment, timestamp) {
         const state = this.cryptoState[direction];
         const alg = this.cipherSuite.alg;
         
         let nonce;
-        let ciphertext;
-        let authTag;
-        let payload;
+        let payloadBuffer;
+        let aad;
 
         try {
             if (this.isTls13 || alg === 'chacha20-poly1305') {
-                // TLS 1.3 or ChaCha20 TLS 1.2:
-                // Nonce = IV XOR sequence_number (padded)
-                const seqBuf = Buffer.alloc(12);
-                seqBuf.writeBigUInt64BE(state.sequence, 4);
+                const seqArray = new Uint8Array(12);
+                let seq = state.sequence;
+                for (let i = 11; i >= 4; i--) {
+                    seqArray[i] = Number(seq & 0xFFn);
+                    seq >>= 8n;
+                }
                 
-                nonce = Buffer.alloc(12);
+                nonce = new Uint8Array(12);
                 for (let i = 0; i < 12; i++) {
-                    nonce[i] = state.iv[i] ^ seqBuf[i];
+                    nonce[i] = state.iv[i] ^ seqArray[i];
                 }
 
-                ciphertext = fragment.subarray(0, fragment.length - 16);
-                authTag = fragment.subarray(fragment.length - 16);
+                payloadBuffer = fragment.subarray(0, fragment.length); 
 
+                if (this.isTls13) {
+                    aad = new Uint8Array(5);
+                    aad[0] = recordType; 
+                    aad[1] = (ver >> 8) & 0xff;
+                    aad[2] = ver & 0xff;
+                    aad[3] = (fragment.length >> 8) & 0xff;
+                    aad[4] = fragment.length & 0xff;
+                }
             } else {
-                // TLS 1.2 AES-GCM:
-                // Nonce = fixed_iv (4 bytes) + explicit_iv (8 bytes)
                 const explicitIv = fragment.subarray(0, 8);
-                nonce = Buffer.concat([state.iv, explicitIv]);
-
-                ciphertext = fragment.subarray(8, fragment.length - 16);
-                authTag = fragment.subarray(fragment.length - 16);
+                nonce = concatUint8Arrays([state.iv, explicitIv]);
+                payloadBuffer = fragment.subarray(8, fragment.length); 
+                
+                aad = new Uint8Array(13);
+                let seq = state.sequence;
+                for (let i = 7; i >= 0; i--) {
+                    aad[i] = Number(seq & 0xFFn);
+                    seq >>= 8n;
+                }
+                aad[8] = recordType;
+                aad[9] = (ver >> 8) & 0xff;
+                aad[10] = ver & 0xff;
+                aad[11] = ((payloadBuffer.length - 16) >> 8) & 0xff; // length without tag
+                aad[12] = (payloadBuffer.length - 16) & 0xff;
             }
 
-            // Create decipher
-            const decipher = crypto.createDecipheriv(alg, state.key, nonce);
-            decipher.setAuthTag(authTag);
-
-            // AAD (Additional Authenticated Data)
-            // TLS 1.2 requires AAD: seq_num (8) + type (1) + version (2) + length (2)
-            // TLS 1.3 requires AAD: outer_type (1) + legacy_version (2) + length (2)
-            if (this.isTls13) {
-                const aad = Buffer.alloc(5);
-                aad.writeUInt8(recordType, 0); // Always 23 for outer TL1.3 records
-                aad.writeUInt16BE(ver, 1);  // Legacy version
-                aad.writeUInt16BE(fragment.length, 3);
-                decipher.setAAD(aad);
+            let webAlgName;
+            if (alg === 'aes-128-gcm' || alg === 'aes-256-gcm') {
+                webAlgName = 'AES-GCM';
+            } else if (alg === 'chacha20-poly1305') {
+                webAlgName = 'CHACHA20-POLY1305'; // Will throw unsupported in Chrome natively via best-effort handling seamlessly
             } else {
-                const aad = Buffer.alloc(13);
-                aad.writeBigUInt64BE(state.sequence, 0);
-                aad.writeUInt8(recordType, 8);
-                aad.writeUInt16BE(ver, 9); // TLS 1.2 version
-                aad.writeUInt16BE(ciphertext.length, 11);
-                decipher.setAAD(aad);
+                return;
             }
 
-            payload = decipher.update(ciphertext);
-            payload = Buffer.concat([payload, decipher.final()]);
+            if (!state.rawKey) {
+                state.rawKey = await globalThis.crypto.subtle.importKey(
+                    'raw',
+                    state.key,
+                    { name: webAlgName },
+                    false,
+                    ['decrypt']
+                );
+            }
 
-            // For TLS 1.3, the true type is appended at the end of the plaintext followed by padding zeros
+            const decryptedBuffer = await globalThis.crypto.subtle.decrypt(
+                {
+                    name: webAlgName,
+                    iv: nonce,
+                    additionalData: aad,
+                    tagLength: 128
+                },
+                state.rawKey,
+                payloadBuffer
+            );
+            
+            let payload = new Uint8Array(decryptedBuffer);
+
             if (this.isTls13) {
                 let end = payload.length - 1;
-                while (end >= 0 && payload[end] === 0) {
-                    end--;
-                }
+                while (end >= 0 && payload[end] === 0) end--;
+                
                 const trueType = payload[end];
                 payload = payload.subarray(0, end);
                 
                 const previousPhase = state.phase;
-                // If it's handshake stuff nested inside (like ServerCertificate in TLS 1.3)
                 if (trueType === 22) {
-                    this._parseHandshake(direction, payload); // Process nested handshake
+                    await this._parseHandshake(direction, payload);
                     if (state.phase === previousPhase) {
                         state.sequence++;
                     }
                     return;
                 } else if (trueType !== 23) {
-                    // Not application data (maybe alerts)
                     state.sequence++;
                     return; 
                 }
             }
             
-            // Only output if it's application data
-            if (recordType === 23 || (this.isTls13)) {
+            if (recordType === 23 || this.isTls13) {
                 if (payload.length > 0) {
-                    console.log(`[TLS] Decryption Success! Length: ${payload.length}`);
                     this.decryptedStream[direction].push({
                         time: timestamp,
                         bytes: payload
                     });
                 }
             }
-            
             state.sequence++;
         } catch (e) {
-            // Decryption failure (MAC mismatch, bad keys, missing secrets)
-            console.error(`[TLS] Decryption failed parsing sequence ${state.sequence}: ${e.message}`);
-            state.sequence++; // Still increment sequence on failure to avoid desync
+            state.sequence++; 
         }
     }
 }

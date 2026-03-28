@@ -14,45 +14,16 @@ let rendererCanvas = null;
 // Convert browser File to Node.js Readable stream (polyfill)
 async function fileToReadable(file) {
     const arrayBuffer = await file.arrayBuffer();
-    return Readable.from(Buffer.from(arrayBuffer));
-}
-
-// Sniff file contents to determine format
-async function guessFormat(file) {
-    const arrayBuffer = await file.slice(0, 4096).arrayBuffer();
     const buf = Buffer.from(arrayBuffer);
-    
-    // Check for gzip
-    const isGz = buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
-    
-    let textBuf = buf;
-    if (isGz) {
-        try {
-            // Unzip the first chunk synchronously just to sniff
-            textBuf = zlib.gunzipSync(buf);
-        } catch (e) {
-            // ignore partial unzip error
+    return new Readable({
+        read() {
+            this.push(buf);
+            this.push(null);
         }
-    }
-    
-    if (textBuf.length >= 4) {
-        const magic = textBuf.readUInt32BE(0);
-        const magicLE = textBuf.readUInt32LE(0);
-        if ([0xa1b2c3d4, 0xd4c3b2a1, 0x0a0d0d0a].includes(magic) || [0xa1b2c3d4, 0xd4c3b2a1, 0x0a0d0d0a].includes(magicLE)) {
-            return { format: 'tcpdump', isGz };
-        }
-    }
-
-    const minText = textBuf.toString('utf-8').replace(/\s/g, '');
-    
-    if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) return { format: 'netlog', isGz };
-    if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":'))) return { format: 'wpt', isGz };
-    if (minText.startsWith('{"traceEvents":') || minText.includes('{"pid":') || minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":')) return { format: 'chrome-trace', isGz };
-    if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) return { format: 'cdp', isGz };
-    if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":')) return { format: 'har', isGz };
-
-    throw new Error('Could not identify file format automatically.');
+    });
 }
+
+
 
 async function processFiles(files) {
     if (files.length === 0) return;
@@ -76,16 +47,15 @@ async function processFiles(files) {
             }
         }
 
-        const { format, isGz } = await guessFormat(mainFile);
-        const stream = await fileToReadable(mainFile);
+        const arrayBuffer = await mainFile.arrayBuffer();
+        const options = {};
         
-        const options = { format, isGz };
         if (keylogFile) {
             options.keyLogInput = await fileToReadable(keylogFile);
         }
 
-        console.log(`Processing file: ${mainFile.name} as ${format} (GZIP: ${isGz})`);
-        const resultHar = await Conductor.processStream(stream, options);
+        console.log(`Processing file internally: ${mainFile.name}`);
+        const resultHar = await Conductor.processBuffer(arrayBuffer, options);
         console.log('Processed HAR', resultHar);
 
         // Hide drop zone & show canvas container

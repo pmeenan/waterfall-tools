@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import zlib from 'node:zlib';
 import { processHARFileNode } from './har.js';
 import { processWPTFileNode } from './wpt-json.js';
 import { processCDPFileNode } from './cdp.js';
@@ -23,35 +21,13 @@ function isGzip(buffer) {
 function finishSniffing(text, resolve) {
     const minText = text.replace(/\s/g, '');
     
-    // Netlog
-    if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) {
-        return resolve('netlog');
-    }
+    if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) return resolve('netlog');
+    if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":'))) return resolve('wpt');
+    if (minText.startsWith('{"traceEvents":') || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) return resolve('chrome-trace');
+    if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":')) return resolve('chrome-trace');
+    if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) return resolve('cdp');
+    if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) return resolve('har');
     
-    // WebPageTest
-    if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":'))) {
-        return resolve('wpt');
-    }
-    
-    // Chrome Trace
-    if (minText.startsWith('{"traceEvents":') || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) {
-        return resolve('chrome-trace');
-    }
-    if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":')) {
-        return resolve('chrome-trace');
-    }
-    
-    // CDP
-    if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) {
-        return resolve('cdp');
-    }
-    
-    // HAR (HTTP Archive)
-    if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) {
-        return resolve('har');
-    }
-    
-    // Default or unknown
     resolve('unknown');
 }
 
@@ -60,57 +36,23 @@ export async function identifyFormat(filePath) {
         throw new Error('identifyFormat currently only supports file paths. For streams, pass the format explicitly via options.format.');
     }
     
-    return new Promise((resolve, reject) => {
-        const header = Buffer.alloc(2);
-        try {
-            const fd = fs.openSync(filePath, 'r');
-            fs.readSync(fd, header, 0, 2, 0);
-            fs.closeSync(fd);
-        } catch (e) {
-            return reject(e);
-        }
-        
-        const isGz = isGzip(header);
-        
-        let peekSource = fs.createReadStream(filePath);
-        let peekStream = peekSource;
-        if (isGz) peekStream = peekSource.pipe(zlib.createGunzip());
-        
-        let result = '';
-        peekStream.on('error', (err) => {
-            peekSource.destroy();
-            reject(err);
-        });
-        
-        peekStream.on('data', (d) => {
-            // Check magic bytes for PCAP and PCAPNG
-            const buf = typeof d === 'string' ? Buffer.from(d) : d;
-            
-            if (result.length === 0 && buf.length >= 4) {
-                const magic = buf.readUInt32BE(0);
-                const magicLE = buf.readUInt32LE(0);
-                if (magic === 0xa1b2c3d4 || magic === 0xd4c3b2a1 || magicLE === 0xa1b2c3d4 || magicLE === 0xd4c3b2a1 || magic === 0x0a0d0d0a || magicLE === 0x0a0d0d0a) {
-                    peekStream.destroy();
-                    peekSource.destroy();
-                    return resolve('tcpdump');
-                }
-            }
-
-            result += buf.toString('utf-8');
-            
-            // We just need enough characters to sniff the format of JSON files
-            if (result.length > 2000) {
-                peekStream.destroy();
-                peekSource.destroy();
-                finishSniffing(result, resolve);
-            }
-        });
-        
-        peekStream.on('end', () => {
-            peekSource.destroy();
-            finishSniffing(result, resolve);
-        });
-    });
+    // Dynamically import node modules so browser bundle doesn't crash if explicitly bypassing node paths
+    const fs = await import('node:fs');
+    
+    // Read up to 64KB for format sniffing
+    const buffer = Buffer.alloc(65536);
+    let fd, bytesRead;
+    try {
+        fd = fs.openSync(filePath, 'r');
+        bytesRead = fs.readSync(fd, buffer, 0, 65536, 0);
+        fs.closeSync(fd);
+    } catch (e) {
+        throw e;
+    }
+    
+    const buf = buffer.subarray(0, bytesRead);
+    const result = await identifyFormatFromBuffer(buf);
+    return result.format;
 }
 
 export async function identifyFormatFromBuffer(buffer) {
@@ -119,11 +61,31 @@ export async function identifyFormatFromBuffer(buffer) {
     
     let textBuf = buf;
     if (isGz) {
-        try {
-            textBuf = zlib.gunzipSync(buf);
-        } catch (e) {
-            // Ignore if gunzip fails, we try our best.
-        }
+        textBuf = await new Promise(async (resolve) => {
+            try {
+                const ds = new DecompressionStream('gzip');
+                const writer = ds.writable.getWriter();
+                writer.write(buf.subarray(0, Math.min(buf.length, 65536))).catch(() => {});
+                writer.close().catch(() => {});
+                
+                const reader = ds.readable.getReader();
+                let sniffed = Buffer.alloc(0);
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    sniffed = Buffer.concat([sniffed, Buffer.from(value)]);
+                    if (sniffed.length >= 4000) {
+                        try { await reader.cancel(); } catch (e) {}
+                        break;
+                    }
+                }
+                resolve(sniffed.length > 0 ? sniffed : buf);
+            } catch (err) {
+                // Return gracefully if stream aborts randomly
+                resolve(buf);
+            }
+        });
     }
     
     if (textBuf.length >= 4) {
@@ -135,7 +97,7 @@ export async function identifyFormatFromBuffer(buffer) {
     }
 
     return new Promise((resolve) => {
-        const textToSniff = textBuf.slice(0, 4000).toString('utf-8');
+        const textToSniff = textBuf.subarray(0, 4000).toString('utf-8');
         finishSniffing(textToSniff, (format) => resolve({ format, isGz }));
     });
 }
