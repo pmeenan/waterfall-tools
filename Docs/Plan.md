@@ -18,12 +18,8 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Add decoding, processing, and validation for WebPageTest JSON formats (`src/inputs/wpt-json.js`).
 - [x] Add decoding, processing, and validation for Netlog formats (`src/inputs/netlog.js`).
 - [x] Add decoding, processing, and validation for Chrome Dev Tools Protocol (CDP) formats (`src/inputs/cdp.js`).
+- [x] Add decoding, processing, and validation for Chromium trace formats (`src/inputs/chrome-trace.js`).
 - [ ] Add decoding, processing, and validation for tcpdump formats (`src/inputs/tcpdump.js`).
-- [ ] Add decoding, processing, and validation for Moz Logs formats (`src/inputs/moz-log.js`).
-- [ ] Add decoding, processing, and validation for Safari Inspector formats (`src/inputs/safari-inspector.js`).
-- [ ] Implement `src/inputs/chrome-trace.js` logic decoding complex Chromium trace event blocks into the Extended HAR format.
-- [ ] Provide a stand-alone CLI mode to process Chrome traces strictly into intermediary HAR output files.
-- [ ] Implement test suites validating trace mapping against known-good outputs.
 
 ## Phase 3: The Orchestrator & API
 **Goal:** Build the central `conductor` that intelligently manages inputs and acts as the developer API.

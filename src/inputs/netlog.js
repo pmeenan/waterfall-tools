@@ -12,7 +12,7 @@ const PRIORITY_MAP = {
     "VeryLow": "Lowest"
 };
 
-class Netlog {
+export class Netlog {
     constructor() {
         this.netlog = { bytes_in: 0, bytes_out: 0, next_request_id: 1000000 };
         this.netlog_requests = null;
@@ -30,6 +30,7 @@ class Netlog {
         this.netlog.quic_session = {};
         this.netlog.dns_info = {};
         this.netlog.urls = {};
+        this.netlog_event_types = {};
     }
 
     setConstants(constants) {
@@ -52,6 +53,52 @@ class Netlog {
             this.processEvent(event);
         } catch (e) {
             // Silently ignore individual event processing errors
+        }
+    }
+
+    addTraceEvent(trace_event) {
+        if (trace_event && trace_event.args && trace_event.name) {
+            try {
+                let id = trace_event.id;
+                if (id === undefined && trace_event.id2) {
+                    id = trace_event.id2.local !== undefined ? trace_event.id2.local : trace_event.id2.global;
+                }
+                if (id === undefined) return;
+                
+                if (typeof id === 'string') {
+                    if (id.startsWith('0x')) id = parseInt(id, 16);
+                    else id = parseInt(id, 10);
+                }
+                
+                let event_type = null;
+                const name = trace_event.name;
+                if (trace_event.args.source_type) {
+                    event_type = trace_event.args.source_type;
+                    this.netlog_event_types[name] = event_type;
+                } else if (this.netlog_event_types[name]) {
+                    event_type = this.netlog_event_types[name];
+                }
+
+                if (event_type !== null) {
+                    const event = {
+                        time: trace_event.ts,
+                        type: name,
+                        phase: 'PHASE_NONE',
+                        source: {
+                            id: id,
+                            type: event_type
+                        },
+                        params: trace_event.args.params || trace_event.args || {}
+                    };
+                    
+                    if (trace_event.ph === 'b' || trace_event.ph === 'B') event.phase = 'PHASE_BEGIN';
+                    else if (trace_event.ph === 'e' || trace_event.ph === 'E') event.phase = 'PHASE_END';
+                    
+                    this.addEvent(event);
+                }
+            } catch (e) {
+                // Silently ignore tracing mapping errors
+            }
         }
     }
 
