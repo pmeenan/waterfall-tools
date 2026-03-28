@@ -59,3 +59,8 @@ When working on this codebase, you must adhere to the following strict architect
 12. **Streaming Nuances (`stream-json` & `stream-chain`):**
     - When parsing JSON objects or massive arrays incrementally via `stream-array`, avoid explicitly piping streams loosely (`readStream.pipe(streamJson()).pipe(asStream())`) as Node's multiplexing can occasionally drop streaming tokens or hang the event loop on tests.
     - Always strictly bundle stream-json steps linearly using `stream-chain` architectures: `const pipeline = chain([readStream, parser(), streamArray()]);` to safely preserve token pipelines synchronously.
+    - **Piped Stream Destruction:** When "sniffing" raw headers identically using read streams piped into Transform interfaces (like `zlib.createGunzip()`), aggressively `.destroy()` the foundational underlying raw `fs.createReadStream` explicit target. Calling `.destroy()` or `.pause()` on the terminal `zlib` stream uniquely leaves the file read stream permanently hanging blocking event loop completions!
+
+13. **Parallel Fallback Architecture & O(n) Mitigations:**
+    - Fallback strategies natively parsing alternative execution paths (e.g. Chrome trace `devtools.timeline` elements substituting explicitly to form arrays matching missing `netlog` configurations) must continuously buffer `id` constraints carefully.
+    - When bridging buffered entities across multiple distinct event paths against massive baseline arrays (15,000+ entries linearly), always aggressively index payloads utilizing explicit `Map` structures preventing catastrophic O(N^2) memory loop stalls internally.
