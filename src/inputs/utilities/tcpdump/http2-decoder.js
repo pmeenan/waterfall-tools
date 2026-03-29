@@ -23,7 +23,7 @@ class Http2FrameReader {
         let cIdx = this.chunkIdx;
         let cOffset = this.offset;
         
-        let buf = Buffer.alloc(bytesToRead);
+        let buf = new Uint8Array(bytesToRead);
         let bytesCopied = 0;
 
         while (needed > 0 && cIdx < this.chunks.length) {
@@ -31,7 +31,7 @@ class Http2FrameReader {
             const avail = c.length - cOffset;
             const take = Math.min(avail, needed);
             
-            c.copy(buf, bytesCopied, cOffset, cOffset + take);
+            buf.set(c.subarray(cOffset, cOffset + take), bytesCopied);
             bytesCopied += take;
             needed -= take;
             
@@ -77,7 +77,8 @@ class Http2FrameReader {
         const lengthPayload = (headerBuf[0] << 16) | (headerBuf[1] << 8) | headerBuf[2];
         const type = headerBuf[3];
         const flags = headerBuf[4];
-        const streamId = headerBuf.readUInt32BE(5) & 0x7FFFFFFF;
+        const view = new DataView(headerBuf.buffer, headerBuf.byteOffset, headerBuf.byteLength);
+        const streamId = view.getUint32(5, false) & 0x7FFFFFFF;
 
         const fullLength = 9 + lengthPayload;
         

@@ -118,6 +118,7 @@ export async function decryptQuicPayload(keyBytes, ivBytes, packetNumber, header
         
         return new Uint8Array(decryptedBuffer);
     } catch (e) {
-        return null; // Auth failed transparently
+        if (globalThis.waterfallDebug) console.log(`[QUIC Crypto] Decrypt DOMException: [${e.name}] ${e.message}`, e);
+        return null;
     }
 }

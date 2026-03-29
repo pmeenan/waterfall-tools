@@ -125,6 +125,7 @@ npm run build
 
 ### Utilizing Local Demos (Canvas Viewers)
 An interactive Drag-and-Drop frontend showcase wrapper directly maps `src/demo` pipelines naturally testing your active core adjustments graphically.
+- **Tip**: You can drop two files consecutively (like a `.pcap` and `.key_log`) to seamlessly combine packet tracing with embedded TLS decryption visually on-the-fly.
 ```bash
 # Launch Dev Server locally to quickly validate interface updates
 npm run dev:demo

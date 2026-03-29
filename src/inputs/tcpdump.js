@@ -63,18 +63,40 @@ export async function processTcpdumpNode(input, options = {}) {
         
         if (keyLogInput) {
             try {
-                let klIsGz = false;
                 let klStream = keyLogInput;
-                let klFsStream = null;
-                
                 if (typeof keyLogInput === 'string') {
                     const fs = await import('node:fs');
-                    klIsGz = keyLogInput.endsWith('.gz');
                     const { Readable } = await import('node:stream');
-                    klFsStream = fs.createReadStream(keyLogInput);
-                    klStream = Readable.toWeb(klFsStream);
+                    klStream = Readable.toWeb(fs.createReadStream(keyLogInput));
+                }
+                
+                let klIsGz = false;
+                const peekReader = klStream.getReader();
+                const { done, value } = await peekReader.read();
+                
+                if (!done && value) {
+                    klIsGz = value.length >= 2 && value[0] === 0x1f && value[1] === 0x8b;
+                    
+                    klStream = new ReadableStream({
+                        start(controller) {
+                            controller.enqueue(value);
+                        },
+                        async pull(controller) {
+                            const { done: innerDone, value: innerValue } = await peekReader.read();
+                            if (innerDone) {
+                                controller.close();
+                            } else {
+                                controller.enqueue(innerValue);
+                            }
+                        },
+                        cancel(reason) {
+                            peekReader.cancel(reason);
+                        }
+                    });
                 } else {
-                    klIsGz = options.keyLogIsGz === true;
+                    klStream = new ReadableStream({
+                        start(controller) { controller.close(); }
+                    });
                 }
                 
                 if (klIsGz) {
@@ -90,8 +112,10 @@ export async function processTcpdumpNode(input, options = {}) {
                     if (done) break;
                     klStr += value;
                 }
-                keyLogContents = klStr;
+                keyLogContents = klStr; 
+                if (options.debug) console.log("KeyLog Length:", klStr.length);
             } catch (e) {
+                if (options.debug || globalThis.waterfallDebug) console.error("KeyLog Stream Processing Error:", e);
                 // It is completely valid for a keylog to not exist.
             }
         }
@@ -166,7 +190,7 @@ export async function processTcpdumpNode(input, options = {}) {
             const conn = udpConnections[i];
             try {
                 if (options.debug) console.log(`[tcpdump.js] Processing UDP ${i}/${udpConnections.length}...`);
-                await decodeUdpProtocol(conn, keyLogMap, dnsRegistry);
+                await decodeUdpProtocol(conn, keyLogMap, dnsRegistry, options);
                 if (options.debug) console.log(`[tcpdump.js] Processed UDP ${i}.`);
                 udpCount++;
             } catch (e) {
@@ -189,6 +213,16 @@ export async function processTcpdumpNode(input, options = {}) {
 
 function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
     const entries = [];
+    
+    // Helper to resolve IP
+    const resolveHostname = (ip) => {
+        for (const lookup of dnsLookups) {
+            if (lookup.ips && lookup.ips.includes(ip)) {
+                return lookup.domain;
+            }
+        }
+        return ip;
+    };
     
     // Map connections helper
     const mapConnection = (conn, isUdp, getRequestsFunc) => {
@@ -251,7 +285,11 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
             let lastDataTimeMs = -1;
             let bytesIn = 0;
             
-            if (req.data && req.data.length > 0) {
+            if (req._firstServerTimeMs !== undefined && req._firstServerTimeMs !== null) {
+                 firstDataTimeMs = req._firstServerTimeMs * 1000;
+                 lastDataTimeMs = (req._lastServerTimeMs !== null ? req._lastServerTimeMs : req._firstServerTimeMs) * 1000;
+                 bytesIn = req.data ? req.data.reduce((acc, obj) => acc + (obj.length || 0), 0) : 0;
+            } else if (req.data && req.data.length > 0) {
                  firstDataTimeMs = req.data[0].time * 1000;
                  lastDataTimeMs = req.data[req.data.length - 1].time * 1000;
                  bytesIn = req.data.reduce((acc, obj) => acc + (obj.length || 0), 0);
@@ -271,6 +309,7 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
             }
             
             let resHeaders = [];
+            let contentType = "";
             if (req.responseHeaders) {
                 if (Array.isArray(req.responseHeaders)) {
                     resHeaders = req.responseHeaders;
@@ -279,6 +318,8 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
                         resHeaders.push({name, value: val.toString()});
                     }
                 }
+                const ctHeader = resHeaders.find(h => h.name.toLowerCase() === 'content-type');
+                if (ctHeader) contentType = ctHeader.value.split(';')[0].trim();
             }
             
             // Standard Time mappings
@@ -314,7 +355,7 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
                     headers: resHeaders,
                     content: {
                         size: bytesIn,
-                        mimeType: "",
+                        mimeType: contentType,
                         compression: 0
                     },
                     redirectURL: "",
@@ -382,25 +423,63 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
                 statusCode: status,
                 statusText: statusText,
                 data: resMsg.data || [],
-                httpVersion: "HTTP/1.1"
+                httpVersion: "HTTP/1.1",
+                _firstServerTimeMs: resMsg.time,
+                _lastServerTimeMs: resMsg.data && resMsg.data.length > 0 ? resMsg.data[resMsg.data.length - 1].time : resMsg.time
             });
         }
         return reqs;
     };
     
-    // HTTP/2 & 3 Map Extractor
-    const extractHttp23 = (conn) => {
-        let streams = conn.http2 ? conn.http2.streams : (conn.http3 ? conn.http3 : null);
+    // HTTP/2 Extractor
+    const extractHttp2 = (conn) => {
+        let streams = conn.http2 ? conn.http2.streams : null;
         if (!streams) return null;
         
         let reqs = [];
         for (const [id, stream] of streams.entries()) {
-            if (!stream.headers || stream.headers.length === 0) continue; // Not a fully formed request stream
+            if (!stream.headers || !stream.headers.client || stream.headers.client.length === 0) continue;
             
-            let method = stream.headers.find(h => h.name === ':method')?.value || 'GET';
-            let path = stream.headers.find(h => h.name === ':path')?.value || '/';
-            let auth = stream.headers.find(h => h.name === ':authority')?.value || conn.serverIp;
-            let scheme = stream.headers.find(h => h.name === ':scheme')?.value || 'https';
+            let method = stream.headers.client.find(h => h.name === ':method')?.value || 'GET';
+            let path = stream.headers.client.find(h => h.name === ':path')?.value || '/';
+            let auth = stream.headers.client.find(h => h.name === ':authority')?.value || resolveHostname(conn.serverIp);
+            let scheme = stream.headers.client.find(h => h.name === ':scheme')?.value || 'https';
+            let status = stream.headers.server ? (parseInt(stream.headers.server.find(h => h.name === ':status')?.value) || 200) : 200;
+            
+            let reqTime = stream.headers.clientTime || 0;
+            
+            reqs.push({
+                time: reqTime,
+                method: method,
+                url: `${scheme}://${auth}${path}`,
+                headers: stream.headers.client.filter(h => !h.name.startsWith(':')),
+                responseHeaders: stream.headers.server ? stream.headers.server.filter(h => !h.name.startsWith(':')) : [],
+                statusCode: status,
+                data: stream.data.server || [],
+                httpVersion: "HTTP/2",
+                _firstServerTimeMs: stream.headers.serverTime || null,
+                _lastServerTimeMs: stream.data.server && stream.data.server.length > 0 ? stream.data.server[stream.data.server.length - 1].time : (stream.headers.serverTime || null)
+            });
+        }
+        return reqs;
+    };
+
+    // HTTP/3 Extractor
+    const extractHttp3 = (conn) => {
+        let streams = conn.http3;
+        if (!streams) return null;
+        
+        let reqs = [];
+        for (const [id, stream] of streams.entries()) {
+            if ((!stream.headers || stream.headers.length === 0) && (!stream.responses || stream.responses.length === 0)) {
+                console.log(`[tcpdump.js] Dropping incomplete stream ${id}`);
+                continue; // Not a fully formed request stream
+            }
+            
+            let method = stream.headers?.find(h => h.name === ':method')?.value || 'GET';
+            let path = stream.headers?.find(h => h.name === ':path')?.value || '/';
+            let auth = stream.headers?.find(h => h.name === ':authority')?.value || resolveHostname(conn.serverIp);
+            let scheme = stream.headers?.find(h => h.name === ':scheme')?.value || 'https';
             let status = 200;
             
             let resHeaders = [];
@@ -416,15 +495,19 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
                  }
             }
             
+            let reqTime = stream.firstClientTime || stream.time;
+            
             reqs.push({
-                time: stream.time,
+                time: reqTime,
                 method: method,
                 url: `${scheme}://${auth}${path}`,
                 headers: stream.headers.filter(h => !h.name.startsWith(':')),
                 responseHeaders: resHeaders.filter(h => !h.name.startsWith(':')),
                 statusCode: status,
                 data: dataBlocks,
-                httpVersion: conn.http2 ? "HTTP/2" : "HTTP/3"
+                httpVersion: "HTTP/3",
+                _firstServerTimeMs: stream.firstServerTime,
+                _lastServerTimeMs: stream.lastServerTime
             });
         }
         return reqs;
@@ -435,14 +518,14 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
         if (conn.protocol === 'http/1.1') {
              mapConnection(conn, false, extractHttp1);
         } else if (conn.protocol === 'http2') {
-             mapConnection(conn, false, extractHttp23);
+             mapConnection(conn, false, extractHttp2);
         }
     }
     
     // Process UDP Connections
     for (const conn of udpConnections) {
         if (conn.http3 && conn.http3.size > 0) {
-            mapConnection(conn, true, extractHttp23);
+            mapConnection(conn, true, extractHttp3);
         }
     }
     

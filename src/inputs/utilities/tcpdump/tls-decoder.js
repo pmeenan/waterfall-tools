@@ -131,8 +131,10 @@ export class TlsDecoder {
             } else if (handType === 20) { // Finished
                 if (this.isTls13) {
                     this.cryptoState[direction].phase = 'application';
-                    await this._deriveTls13KeysForDirection(direction, this.keyLog.getSessionKeys(this.clientRandom));
-                    this.cryptoState[direction].sequence = 0n;
+                    try {
+                        await this._deriveTls13KeysForDirection(direction, this.keyLog.getSessionKeys(this.clientRandom));
+                        this.cryptoState[direction].sequence = 0n;
+                    } catch (e) {}
                 }
             }
         }
@@ -144,11 +146,15 @@ export class TlsDecoder {
         const keyMaterial = this.keyLog.getSessionKeys(this.clientRandom);
         if (!keyMaterial) return;
 
-        if (this.isTls13) {
-            await this._deriveTls13KeysForDirection(0, keyMaterial);
-            await this._deriveTls13KeysForDirection(1, keyMaterial);
-        } else {
-            await this._deriveTls12Keys(keyMaterial);
+        try {
+            if (this.isTls13) {
+                await this._deriveTls13KeysForDirection(0, keyMaterial);
+                await this._deriveTls13KeysForDirection(1, keyMaterial);
+            } else {
+                await this._deriveTls12Keys(keyMaterial);
+            }
+        } catch (e) {
+            // WebCrypto unavailable
         }
     }
 

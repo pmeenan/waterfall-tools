@@ -13,13 +13,15 @@ export function decodeProtocol(conn) {
 
     // Inspect the very first client chunk
     const firstChunk = conn.clientFlow.contiguousChunks[0].bytes;
-    const dbgStr = Buffer.from(firstChunk.subarray(0, 24)).toString('utf8').replace(/\r?\n|\r/g, ' ');
+    const decoder = new TextDecoder('utf8');
+    const dbgStr = decoder.decode(firstChunk.subarray(0, 24)).replace(/\r?\n|\r/g, ' ');
 
     console.log(`[Sniffer] Checking connection... First bytes: ${dbgStr}... Length: ${firstChunk.length}`);
     
     // Minimum bytes needed to sniff HTTP/2 Magic (24 bytes)
     if (firstChunk.length >= 24) {
-        const magicStr = firstChunk.subarray(0, 24).toString('utf8');
+        // Decode magic bytes for sniffing
+        const magicStr = decoder.decode(firstChunk.subarray(0, 24));
         if (magicStr === 'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n') {
             console.log("[Sniffer] Matched HTTP/2");
             conn.protocol = 'http2';
@@ -30,7 +32,7 @@ export function decodeProtocol(conn) {
     
     // Sniff for HTTP/1.x methods
     if (firstChunk.length >= 4) {
-        const methodSniff = Buffer.from(firstChunk.subarray(0, 4)).toString('utf8');
+        const methodSniff = decoder.decode(firstChunk.subarray(0, 4));
         console.log(`[Sniffer] Extracting 4 byte method: '${methodSniff}'`);
         if (methodSniff === 'GET ' || methodSniff === 'POST' || methodSniff === 'HEAD' || methodSniff === 'PUT ' || methodSniff === 'OPTI' || methodSniff === 'HTTP') {
             console.log(`[Sniffer] Matched HTTP/1.1 using method ${methodSniff}`);

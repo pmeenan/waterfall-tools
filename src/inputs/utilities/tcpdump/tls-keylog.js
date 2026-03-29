@@ -3,6 +3,16 @@ export class TlsKeyLog {
         this.keys = new Map();
     }
 
+    _hexToBytes(hex) {
+        let bytes = new Uint8Array(Math.ceil(hex.length / 2));
+        for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+        return bytes;
+    }
+
+    _bytesToHex(bytes) {
+        return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
     /**
      * Parse the raw contents of a key log file.
      * @param {string} contents 
@@ -25,7 +35,7 @@ export class TlsKeyLog {
                 sessionKeys = {};
                 this.keys.set(clientRandom, sessionKeys);
             }
-            sessionKeys[label] = Buffer.from(secret, 'hex');
+            sessionKeys[label] = this._hexToBytes(secret);
         }
     }
 
@@ -35,8 +45,8 @@ export class TlsKeyLog {
      * @returns {Object|null}
      */
     getSessionKeys(clientRandom) {
-        const hex = Buffer.isBuffer(clientRandom) || clientRandom instanceof Uint8Array ? 
-                    Buffer.from(clientRandom).toString('hex').toLowerCase() : 
+        const hex = clientRandom instanceof Uint8Array ? 
+                    this._bytesToHex(clientRandom).toLowerCase() : 
                     clientRandom.toLowerCase();
         return this.keys.get(hex) || null;
     }

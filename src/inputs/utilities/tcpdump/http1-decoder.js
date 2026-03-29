@@ -1,3 +1,28 @@
+const concatUint8Arrays = (arrays) => {
+    let totalLen = 0;
+    for (const arr of arrays) totalLen += arr.length;
+    const res = new Uint8Array(totalLen);
+    let offset = 0;
+    for (const arr of arrays) {
+        res.set(arr, offset);
+        offset += arr.length;
+    }
+    return res;
+};
+
+function indexOfSequence(buffer, seq) {
+    if (seq.length === 0) return 0;
+    outer: for (let i = 0; i <= buffer.length - seq.length; i++) {
+        for (let j = 0; j < seq.length; j++) {
+            if (buffer[i + j] !== seq[j]) continue outer;
+        }
+        return i;
+    }
+    return -1;
+}
+
+const CRLF2 = new Uint8Array([13, 10, 13, 10]);
+
 class Http1Parser {
     constructor(chunks) {
         this.chunks = chunks; // Array of { time, bytes }
@@ -54,8 +79,8 @@ class Http1Parser {
             totalLen += avail;
             
             // Check if we have \r\n\r\n
-            const concatBuf = Buffer.concat(accumulator);
-            let idx = concatBuf.indexOf('\r\n\r\n');
+            const concatBuf = concatUint8Arrays(accumulator);
+            let idx = indexOfSequence(concatBuf, CRLF2);
             if (idx !== -1) {
                 // Found boundaries
                 const headersRaw = concatBuf.subarray(0, idx + 4);
@@ -96,7 +121,7 @@ class Http1Parser {
 
     // Parses the textual headers to identify body mechanism
     _parseHeaders(headerBuf) {
-        const text = headerBuf.toString('ascii');
+        const text = new TextDecoder('ascii').decode(headerBuf);
         const lines = text.split('\r\n');
         const firstLine = lines.shift() || "";
         

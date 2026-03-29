@@ -11,13 +11,13 @@ export function decodeTcpDns(conn, dnsRegistry) {
         const totalLength = flow.contiguousChunks.reduce((acc, c) => acc + c.bytes.length, 0);
         if (totalLength < 2) return;
 
-        const fullBuffer = Buffer.alloc(totalLength);
+        const fullBuffer = new Uint8Array(totalLength);
         let offset = 0;
         
         // Build an index map mapping absolute byte offsets to originating PCAP packet timestamps
         const timeMap = [];
         flow.contiguousChunks.forEach(c => {
-            c.bytes.copy(fullBuffer, offset);
+            fullBuffer.set(c.bytes, offset);
             timeMap.push({ start: offset, end: offset + c.bytes.length, time: c.time });
             offset += c.bytes.length;
         });
@@ -31,7 +31,8 @@ export function decodeTcpDns(conn, dnsRegistry) {
         let p = 0;
         while (p + 2 <= fullBuffer.length) {
             // Standard TCP DNS injects a 2 byte length parameter directly prior to normal RFC 1035 payloads
-            const msgLength = fullBuffer.readUInt16BE(p);
+            const view = new DataView(fullBuffer.buffer, fullBuffer.byteOffset, fullBuffer.byteLength);
+            const msgLength = view.getUint16(p, false);
             
             // Reassembly fracture protection bounds
             if (p + 2 + msgLength > fullBuffer.length) {

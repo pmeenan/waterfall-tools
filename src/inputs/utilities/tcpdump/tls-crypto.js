@@ -76,6 +76,10 @@ export async function hkdfExpandLabel(secret, labelStr, contextBuf, hashAlg, len
  * HKDF-Expand implementation (RFC 5869) mapped to async WebCrypto primitives
  */
 export async function hkdfExpand(hashAlg, prk, info, length) {
+    if (!globalThis.crypto || !globalThis.crypto.subtle) {
+        throw new Error("WebCrypto Subtle API is unavailable. Execution requires a Secure Context (HTTPS or localhost).");
+    }
+
     // Determine hash length directly from WebCrypto by hashing an empty string
     const webAlg = getWebCryptoHashName(hashAlg);
     const hashDump = await globalThis.crypto.subtle.digest(webAlg, new Uint8Array(0));
@@ -92,13 +96,17 @@ export async function hkdfExpand(hashAlg, prk, info, length) {
         blockList.push(t);
     }
     
-    return concatUint8Arrays(blockList).subarray(0, length);
+    return concatUint8Arrays(blockList).slice(0, length);
 }
 
 /**
  * TLS 1.2 PRF implementation (RFC 5246)
  */
 async function pHash(hashAlg, secret, seed, length) {
+    if (!globalThis.crypto || !globalThis.crypto.subtle) {
+        throw new Error("WebCrypto Subtle API is unavailable. Execution requires a Secure Context (HTTPS or localhost).");
+    }
+
     const webAlg = getWebCryptoHashName(hashAlg);
     const hashDump = await globalThis.crypto.subtle.digest(webAlg, new Uint8Array(0));
     const hashLen = hashDump.byteLength;

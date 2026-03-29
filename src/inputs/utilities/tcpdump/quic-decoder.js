@@ -8,60 +8,217 @@ function hexToBytes(hex) {
     return bytes;
 }
 
-export async function decodeQuic(chunks, clientPort, keyLog) {
+export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
     let clientCidLength = 0;
     let serverCidLength = 0;
     const streams = [];
     const connQuicParams = { streams: new Map() };
 
-    let clientSecretStr = null;
-    let serverSecretStr = null;
-
+    let keyPairs = [];
     if (keyLog && keyLog.keys) {
         for (const [key, value] of keyLog.keys.entries()) {
-            if (value && value['QUIC_CLIENT_TRAFFIC_SECRET_0']) {
-                clientSecretStr = value['QUIC_CLIENT_TRAFFIC_SECRET_0'].toString('hex');
-                serverSecretStr = value['QUIC_SERVER_TRAFFIC_SECRET_0'].toString('hex');
-                break;
+            const clientLabel = value['QUIC_CLIENT_TRAFFIC_SECRET_0'] ? 'QUIC_CLIENT_TRAFFIC_SECRET_0' : (value['CLIENT_TRAFFIC_SECRET_0'] ? 'CLIENT_TRAFFIC_SECRET_0' : null);
+            const serverLabel = value['QUIC_SERVER_TRAFFIC_SECRET_0'] ? 'QUIC_SERVER_TRAFFIC_SECRET_0' : (value['SERVER_TRAFFIC_SECRET_0'] ? 'SERVER_TRAFFIC_SECRET_0' : null);
+            const earlyLabel = value['QUIC_CLIENT_EARLY_TRAFFIC_SECRET'] ? 'QUIC_CLIENT_EARLY_TRAFFIC_SECRET' : (value['CLIENT_EARLY_TRAFFIC_SECRET'] ? 'CLIENT_EARLY_TRAFFIC_SECRET' : null);
+
+            if (clientLabel && serverLabel) {
+                 keyPairs.push({ 
+                     earlySecretBytes: earlyLabel ? value[earlyLabel] : null,
+                     clientSecretBytes: value[clientLabel],
+                     serverSecretBytes: value[serverLabel]
+                 });
             }
         }
     }
 
-    const clientKeys = clientSecretStr ? await deriveTrafficKeys(hexToBytes(clientSecretStr)) : null;
-    const serverKeys = serverSecretStr ? await deriveTrafficKeys(hexToBytes(serverSecretStr)) : null;
+    let derivedKeyPairs = [];
+    for (const kp of keyPairs) {
+        try {
+            const earlyKeys = kp.earlySecretBytes ? await deriveTrafficKeys(kp.earlySecretBytes) : null;
+            const clientKeys = await deriveTrafficKeys(kp.clientSecretBytes);
+            const serverKeys = await deriveTrafficKeys(kp.serverSecretBytes);
+            derivedKeyPairs.push({ earlyKeys, clientKeys, serverKeys });
+        } catch (e) {
+            console.error("WebCrypto Key Derivation Error: ", e);
+            break;
+        }
+    }
+    console.log(`[QUIC Decoder] Valid Key Pairs extracted: ${keyPairs.length}. Derived Key Pairs constructed: ${derivedKeyPairs.length}`);
+
+    let forwardKeys = null;
+    let reverseKeys = null;
+    let baselineIsClient = null;
+    let forwardIsClient = null;
+
+    async function attemptUnmask(keys, firstByte, sample, protectedOffset, fullBuffer) {
+        if (!keys) return null;
+        try {
+            const mask = await generateHeaderProtectionMask(keys.hp, sample);
+            const isLongHeader = (firstByte & 0x80) !== 0;
+            const unmaskedHeaderByte = firstByte ^ (mask[0] & (isLongHeader ? 0x0F : 0x1F));
+            const pnLength = (unmaskedHeaderByte & 0x03) + 1;
+            
+            let packetNumber = 0;
+            for (let i = 0; i < pnLength; i++) {
+                const pnByte = fullBuffer[protectedOffset + i] ^ mask[1 + i];
+                packetNumber = (packetNumber << 8) | pnByte;
+            }
+            const headerLength = protectedOffset + pnLength;
+            const aadHeader = new Uint8Array(headerLength);
+            aadHeader.set(fullBuffer.subarray(0, headerLength));
+            aadHeader[0] = unmaskedHeaderByte;
+            for (let i = 0; i < pnLength; i++) {
+                aadHeader[protectedOffset + i] ^= mask[1 + i];
+            }
+            const payloadBuf = fullBuffer.slice(headerLength);
+            return { packetNumber, aadHeader, payloadBuf };
+        } catch (e) { console.error("DECODE ERROR", e);
+            return null;
+        }
+    }
 
     for (const chunk of chunks) {
-        const qb = new QuicBuffer(chunk.bytes);
+        const chunkBytes = chunk.bytes;
         const isClient = chunk.isClient;
+        let chunkOffset = 0;
 
-        try {
-            const firstByte = qb.buffer[0];
-            const isLongHeader = (firstByte & 0x80) !== 0;
+        while (chunkOffset < chunkBytes.length) {
+            try {
+                const firstByte = chunkBytes[chunkOffset];
+                
+                // RFC 9000 Section 17: Fixed Bit (0x40) must be 1. Note: STUN packets have 0x00.
+                if ((firstByte & 0x40) === 0) {
+                    break; // Not a QUIC packet or a version we support, discard rest of UDP payload
+                }
+                
+                const isLongHeader = (firstByte & 0x80) !== 0;
 
-            if (isLongHeader) {
-                const headerForm = (firstByte & 0x30) >> 4;
-                qb.offset = 5; // Skip Type and Version
+                let packetLength = chunkBytes.length - chunkOffset; // Default for Short Header
+                let qbSlice = null;
 
-                const dcidLen = qb.readUInt8();
-                qb.readBytes(dcidLen); // Skip DCID
-                const scidLen = qb.readUInt8();
-                qb.readBytes(scidLen); // Skip SCID
-
-                if (isClient && clientCidLength === 0) clientCidLength = scidLen;
-                if (!isClient && serverCidLength === 0) serverCidLength = scidLen;
-
-                if (headerForm === 0x00) { // Initial
-                    const tokenLen = qb.readVarInt();
-                    if (tokenLen !== null && tokenLen > 0) qb.readBytes(tokenLen);
+                if (isLongHeader) {
+                    const tempQb = new QuicBuffer(chunkBytes);
+                    tempQb.offset = chunkOffset + 5; // Skip Type and Version
+                    const dcidLen = tempQb.readUInt8();
+                    tempQb.readBytes(dcidLen); // Skip DCID
+                    const scidLen = tempQb.readUInt8();
+                    tempQb.readBytes(scidLen); // Skip SCID
+                    const headerForm = (firstByte & 0x30) >> 4;
+                    if (headerForm === 0x00) { // Initial
+                        const tokenLen = tempQb.readVarInt();
+                        if (tokenLen !== null && tokenLen > 0) tempQb.readBytes(tokenLen);
+                    }
+                    if (headerForm === 0x00 || headerForm === 0x02 || headerForm === 0x01) {
+                        const payloadLen = tempQb.readVarInt();
+                        if (payloadLen !== null) {
+                             packetLength = (tempQb.offset - chunkOffset) + payloadLen;
+                        } else {
+                             packetLength = chunkBytes.length - chunkOffset; // Malformed Length, assume remainder
+                        }
+                    }
                 }
 
-                if (headerForm === 0x00 || headerForm === 0x02 || headerForm === 0x01) {
-                    const payloadLen = qb.readVarInt();
-                    if (payloadLen === null) continue;
-                    streams.push({ time: chunk.time, type: 'long', length: payloadLen });
+                if (chunkOffset + packetLength > chunkBytes.length) {
+                    packetLength = chunkBytes.length - chunkOffset; // Truncated gracefully
                 }
-            } else {
-                // Short Header (1-RTT)
+                
+                qbSlice = chunkBytes.subarray(chunkOffset, chunkOffset + packetLength);
+                chunkOffset += packetLength; // Advance outer parser to next coalesced packet
+
+                const qb = new QuicBuffer(qbSlice);
+                
+                if (isLongHeader) {
+                    const headerForm = (firstByte & 0x30) >> 4;
+                    qb.offset = 5; // Skip Type and Version
+
+                    const dcidLen = qb.readUInt8();
+                    qb.readBytes(dcidLen); // Skip DCID
+                    const scidLen = qb.readUInt8();
+                    qb.readBytes(scidLen); // Skip SCID
+
+                    if (isClient) {
+                        clientCidLength = scidLen;
+                        // Always trust server's own scidLen over client's temporary dcidLen
+                        if (serverCidLength === 0) serverCidLength = dcidLen;
+                    } else {
+                        serverCidLength = scidLen;
+                        clientCidLength = dcidLen;
+                    }
+
+                    if (headerForm === 0x00) { // Initial
+                        const tokenLen = qb.readVarInt();
+                        if (tokenLen !== null && tokenLen > 0) qb.readBytes(tokenLen);
+                    }
+
+                    if (headerForm === 0x00 || headerForm === 0x02 || headerForm === 0x01) {
+                        const payloadLen = qb.readVarInt();
+                        if (payloadLen === null) continue;
+                        
+                        if (headerForm === 0x01) { // 0-RTT
+                            const protectedOffset = qb.offset;
+                            const sampleOffset = protectedOffset + 4;
+                            if (sampleOffset + 16 > qb.buffer.length) continue;
+                            
+                            const sample = qb.buffer.slice(sampleOffset, sampleOffset + 16);
+                            let decrypted = null;
+                            
+                            if (globalThis.waterfallDebug) console.log(`[QUIC Decoder] Found 0-RTT Packet! Length: ${qb.buffer.length}, Sample Offset: ${sampleOffset}`);
+                            for (const kp of derivedKeyPairs) {
+                                if (!kp.earlyKeys) {
+                                     continue;
+                                }
+                                const unmasked = await attemptUnmask(kp.earlyKeys, firstByte, sample, protectedOffset, qb.buffer);
+                                if (unmasked) {
+                                    decrypted = await decryptQuicPayload(kp.earlyKeys.key, kp.earlyKeys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
+                                    if (decrypted) {
+                                         if (globalThis.waterfallDebug) console.log(`[QUIC Decoder] DECRYPTED 0-RTT SUCCESSFULLY with earlyKeys!`);
+                                         break;
+                                    } else {
+                                         if (globalThis.waterfallDebug) console.log(`[QUIC Decoder] 0-RTT UNMASKED but AEAD MAC FAILED!`);
+                                    }
+                                }
+                            }
+                            
+                            if (decrypted) {
+                                const decQb = new QuicBuffer(decrypted);
+                                while (decQb.remaining > 0) {
+                                    const frameType = decQb.readVarInt();
+                                    if (frameType === null) break;
+                                    
+                                    if (frameType >= 0x08 && frameType <= 0x0f) {
+                                        const offBit = (frameType & 0x04) !== 0;
+                                        const lenBit = (frameType & 0x02) !== 0;
+                                        const finBit = (frameType & 0x01) !== 0;
+
+                                        const streamId = decQb.readVarInt();
+                                        const offset = offBit ? decQb.readVarInt() : 0;
+                                        const length = lenBit ? decQb.readVarInt() : decQb.remaining;
+
+                                        if (streamId !== null && length !== null) {
+                                            const data = decQb.readBytes(length);
+                                            if (data) {
+                                                if (!connQuicParams.streams.has(streamId)) {
+                                                    connQuicParams.streams.set(streamId, []);
+                                                }
+                                                connQuicParams.streams.get(streamId).push({
+                                                    time: chunk.time,
+                                                    offset: Number(offset),
+                                                    data,
+                                                    fin: finBit,
+                                                    isClient: true
+                                                });
+                                            }
+                                        }
+                                    } else {
+                                        // Skip unknown frames
+                                        break; 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Short Header (1-RTT)
                 // Read implicit DCID
                 const expectedDcidLen = isClient ? serverCidLength : clientCidLength;
                 qb.offset = 1;
@@ -74,45 +231,55 @@ export async function decodeQuic(chunks, clientPort, keyLog) {
 
                 if (sampleOffset + 16 > qb.buffer.length) continue; // Too short for AEAD sample mask
 
-                // We need the HP Key mapping
-                const keys = isClient ? clientKeys : serverKeys;
-                if (!keys) {
-                    streams.push({ time: chunk.time, type: 'short', error: 'No Traffic Secret' });
-                    continue; // Missing secrets
-                }
-
-                const sample = qb.buffer.subarray(sampleOffset, sampleOffset + 16);
-                const mask = await generateHeaderProtectionMask(keys.hp, sample);
-
-                // Unmask the first byte
-                const unmaskedHeaderByte = firstByte ^ (mask[0] & 0x1F); // 0x1F mask for short headers
-                const pnLength = (unmaskedHeaderByte & 0x03) + 1;
-
-                // Unmask the packet number
-                let packetNumber = 0;
-                for (let i = 0; i < pnLength; i++) {
-                    const pnByte = qb.buffer[protectedOffset + i] ^ mask[1 + i];
-                    packetNumber = (packetNumber << 8) | pnByte;
-                }
-
-                // We have successfully removed Header protection!
-                // Extract AEAD payload
-                const headerLength = protectedOffset + pnLength;
-
-                // Reconstruct the exact unmasked header byte sequence to use as AAD context for AEAD decryption natively
-                const aadHeader = new Uint8Array(headerLength);
-                aadHeader.set(qb.buffer.subarray(0, headerLength));
-                aadHeader[0] = unmaskedHeaderByte;
+                const sample = qb.buffer.slice(sampleOffset, sampleOffset + 16);
+                let decrypted = null;
                 
-                for (let i = 0; i < pnLength; i++) {
-                    aadHeader[protectedOffset + i] ^= mask[1 + i]; // Undo mask to store plaintext
+                if (forwardKeys) {
+                    const keys = (chunk.isClient === baselineIsClient) ? forwardKeys : reverseKeys;
+                    const unmasked = await attemptUnmask(keys, firstByte, sample, protectedOffset, qb.buffer);
+                    if (unmasked) {
+                        decrypted = await decryptQuicPayload(keys.key, keys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
+                    }
+                } else {
+                    for (const kp of derivedKeyPairs) {
+                        // Try clientKeys mapping forward
+                        let unmasked = await attemptUnmask(kp.clientKeys, firstByte, sample, protectedOffset, qb.buffer);
+                        if (unmasked) {
+                            decrypted = await decryptQuicPayload(kp.clientKeys.key, kp.clientKeys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
+                            if (decrypted) {
+                                forwardKeys = kp.clientKeys;
+                                reverseKeys = kp.serverKeys;
+                                baselineIsClient = chunk.isClient;
+                                forwardIsClient = true;
+                                break;
+                            } else {
+                                const keyPhase = (firstByte & 0x04) !== 0;
+                                if (chunk.isClient && globalThis.waterfallDebug) console.log("CLIENT KEY UNMASKED 1-RTT BUT MAC FAILED!", { dcidLen: expectedDcidLen, pn: unmasked.packetNumber, bufferSliceLength: qb.buffer.length, keyPhase });
+                            }
+                        }
+                        
+                        // Try serverKeys mapping forward
+                        unmasked = await attemptUnmask(kp.serverKeys, firstByte, sample, protectedOffset, qb.buffer);
+                        if (unmasked) {
+                            decrypted = await decryptQuicPayload(kp.serverKeys.key, kp.serverKeys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
+                            if (decrypted) {
+                                forwardKeys = kp.serverKeys;
+                                reverseKeys = kp.clientKeys;
+                                baselineIsClient = chunk.isClient;
+                                forwardIsClient = false;
+                                break;
+                            } else {
+                                const keyPhase = (firstByte & 0x04) !== 0;
+                                if (!chunk.isClient && globalThis.waterfallDebug) console.log("SERVER KEY UNMASKED 1-RTT BUT MAC FAILED!", { dcidLen: expectedDcidLen, pn: unmasked.packetNumber, bufferSliceLength: qb.buffer.length, keyPhase });
+                            }
+                        }
+                    }
                 }
-
-                const payloadBuf = qb.buffer.subarray(headerLength); // Ends naturally with 16-byte Auth Tag
-
-                const decrypted = await decryptQuicPayload(keys.key, keys.iv, packetNumber, aadHeader, payloadBuf);
 
                 if (decrypted) {
+                    const usedForwardKeys = (chunk.isClient === baselineIsClient);
+                    const activeIsClientAuth = usedForwardKeys ? forwardIsClient : !forwardIsClient;
+                    
                     const qBuffer = new QuicBuffer(decrypted);
                     while (qBuffer.remaining > 0) {
                         const frameType = qBuffer.readVarInt();
@@ -171,7 +338,7 @@ export async function decodeQuic(chunks, clientPort, keyLog) {
                                         offset: Number(offset),
                                         data,
                                         fin: finBit,
-                                        isClient
+                                        isClient: activeIsClientAuth
                                     });
                                 }
                             }
@@ -223,13 +390,16 @@ export async function decodeQuic(chunks, clientPort, keyLog) {
                         }
                     }
 
-                    streams.push({ time: chunk.time, type: '1-RTT', packetNumber, decryptedLength: decrypted.length });
+                    streams.push({ time: chunk.time, type: '1-RTT', decryptedLength: decrypted.length });
                 } else {
+                    if (globalThis.waterfallDebug) console.log(`[QUIC Decoder] AEAD Failed mapping 1-RTT for target packet (likely missing key or wrong connection).`);
                     streams.push({ time: chunk.time, type: '1-RTT', error: 'AEAD Failed' });
                 }
             }
-        } catch (e) {
-            // Unparsable packet fragment
+        } catch (e) { 
+            console.error("DECODE ERROR", e);
+            break; // Break the while loop if packet is malformed
+        }
         }
     }
 

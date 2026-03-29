@@ -10,12 +10,29 @@ export function extractDohRequests(tcpConnections, dnsRegistry) {
     }
 }
 
+const concatUint8Arrays = (arrays) => {
+    let totalLen = 0;
+    for (const arr of arrays) totalLen += arr.length;
+    const res = new Uint8Array(totalLen);
+    let offset = 0;
+    for (const arr of arrays) {
+        res.set(arr, offset);
+        offset += arr.length;
+    }
+    return res;
+};
+
 function decodeBase64Url(base64UrlStr) {
     let base64 = base64UrlStr.replace(/-/g, '+').replace(/_/, '/');
     while (base64.length % 4) {
         base64 += '=';
     }
-    return Buffer.from(base64, 'base64');
+    const binString = globalThis.atob(base64);
+    const bytes = new Uint8Array(binString.length);
+    for (let i = 0; i < binString.length; i++) {
+        bytes[i] = binString.charCodeAt(i);
+    }
+    return bytes;
 }
 
 function processHttp1(httpData, dnsRegistry) {
@@ -44,7 +61,7 @@ function processHttp1(httpData, dnsRegistry) {
         } else if (req.firstLine.startsWith('POST ') && req.headers) {
             const reqCt = req.headers.find(h => h.name.toLowerCase() === 'content-type');
             if (reqCt && reqCt.value.includes('application/dns-message')) {
-                dnsQueryPayload = Buffer.concat(req.data.map(d => d.bytes));
+                dnsQueryPayload = concatUint8Arrays(req.data.map(d => d.bytes));
             }
         }
         
@@ -58,7 +75,7 @@ function processHttp1(httpData, dnsRegistry) {
             }
             
             if (res && isValidContentType && res.data && res.data.length > 0) {
-                const resBuf = Buffer.concat(res.data.map(d => d.bytes));
+                const resBuf = concatUint8Arrays(res.data.map(d => d.bytes));
                 const parsedRes = decodeDns(resBuf);
                 if (parsedRes) answers = parsedRes.answers;
             }
@@ -98,7 +115,7 @@ function processHttp2(http2Data, dnsRegistry) {
                 } catch(e) {}
             }
         } else if (method === 'POST' && reqCt && reqCt.includes('application/dns-message')) {
-            dnsQueryPayload = Buffer.concat(stream.data.client.map(c => c.bytes));
+            dnsQueryPayload = concatUint8Arrays(stream.data.client.map(c => c.bytes));
         }
         
         const isResDns = resCt && resCt.includes('application/dns-message');
@@ -114,7 +131,7 @@ function processHttp2(http2Data, dnsRegistry) {
             }
             
             if (isResDns && stream.data.server && stream.data.server.length > 0) {
-                const resBuf = Buffer.concat(stream.data.server.map(s => s.bytes));
+                const resBuf = concatUint8Arrays(stream.data.server.map(s => s.bytes));
                 const parsedRes = decodeDns(resBuf);
                 if (parsedRes) answers = parsedRes.answers;
             }

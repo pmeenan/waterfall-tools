@@ -1,7 +1,7 @@
 import { decodeDns } from './dns-decoder.js';
 import { decodeQuic } from './quic-decoder.js';
 
-export async function decodeUdpProtocol(conn, keyLog, dnsRegistry) {
+export async function decodeUdpProtocol(conn, keyLog, dnsRegistry, options = {}) {
     // Collect and order all 2-way UDP frames chronologically
     const allFrames = conn.clientFlow.frames.concat(conn.serverFlow.frames).sort((a,b) => a.time - b.time);
 
@@ -41,22 +41,21 @@ export async function decodeUdpProtocol(conn, keyLog, dnsRegistry) {
         // Note: 0x80 = Long header, 0x40 = Short header.
         if ((firstByte & 0xC0) === 0xC0 || (firstByte & 0x40) === 0x40) {
             conn.protocol = 'quic';
+            if (options.debug || globalThis.waterfallDebug) console.log(`[UDP Sniffer] Detected QUIC pattern for link ${conn.id}. First byte: 0x${firstByte.toString(16)}`);
             
             // Execute the highly complex native parser
             try {
-                const processedFrames = allFrames.map(chunk => ({
-                    ...chunk,
-                    isClient: conn.clientFlow.frames.includes(chunk)
-                }));
-                const quicRes = await decodeQuic(processedFrames, conn.clientPort, keyLog);
+                const quicRes = await decodeQuic(allFrames, conn.clientPort, keyLog);
                 conn.quic = quicRes.summaries;
                 conn.quicParams = quicRes.params;
+                if (options.debug || globalThis.waterfallDebug) console.log(`[UDP Sniffer] decodeQuic completed for ${conn.id}. Summaries: ${conn.quic.length}, Streams size: ${conn.quicParams.streams ? conn.quicParams.streams.size : 0}`);
 
                 // Fire full HTTP/3 + QPACK Extraction natively targeting reassembled streams mapped
                 if (conn.quicParams && conn.quicParams.streams && conn.quicParams.streams.size > 0) {
                     try {
                         const { decodeHttp3 } = await import('./http3-decoder.js');
                         conn.http3 = decodeHttp3(conn.quicParams.streams);
+                        if (options.debug || globalThis.waterfallDebug) console.log(`[UDP Sniffer] HTTP/3 decoder produced: ${conn.http3 ? conn.http3.size : 0} streams for link ${conn.id}`);
                     } catch (err) {
                         console.error(`[UDP Sniffer] Qpack decode failed for QUIC link ${conn.id}:`, err);
                     }

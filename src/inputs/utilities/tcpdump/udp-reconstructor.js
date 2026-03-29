@@ -5,14 +5,15 @@ export class UdpFlow {
         this.frames = []; 
     }
 
-    processPacket(packet) {
+    processPacket(packet, isClient) {
         if (!packet.payload || packet.payload.length === 0) {
             return;
         }
 
         this.frames.push({
             time: packet.time,
-            bytes: packet.payload
+            bytes: packet.payload,
+            isClient: isClient
         });
     }
 }
@@ -31,7 +32,7 @@ export class UdpConnection {
 
     processPacket(packet, isClient) {
         const flow = isClient ? this.clientFlow : this.serverFlow;
-        flow.processPacket(packet);
+        flow.processPacket(packet, isClient);
     }
 }
 
