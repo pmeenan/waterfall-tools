@@ -280,6 +280,10 @@ export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
                     const usedForwardKeys = (chunk.isClient === baselineIsClient);
                     const activeIsClientAuth = usedForwardKeys ? forwardIsClient : !forwardIsClient;
                     
+                    if (!activeIsClientAuth && !connQuicParams.handshakeTime) {
+                        connQuicParams.handshakeTime = chunk.time;
+                    }
+                    
                     const qBuffer = new QuicBuffer(decrypted);
                     while (qBuffer.remaining > 0) {
                         const frameType = qBuffer.readVarInt();
@@ -317,6 +321,10 @@ export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
                             qBuffer.readVarInt(); // Offset
                             const cLen = qBuffer.readVarInt();
                             if (cLen !== null) qBuffer.readBytes(cLen);
+                        } else if (frameType === 0x07) {
+                            // NEW_TOKEN
+                            const tLen = qBuffer.readVarInt();
+                            if (tLen !== null) qBuffer.readBytes(tLen);
                         } else if (frameType >= 0x08 && frameType <= 0x0f) {
                             // STREAM
                             const offBit = (frameType & 0x04) !== 0;
@@ -342,47 +350,44 @@ export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
                                     });
                                 }
                             }
+                        } else if (frameType === 0x10) {
+                            // MAX_DATA
+                            qBuffer.readVarInt();
                         } else if (frameType === 0x11) {
-                            // STREAM_DATA_BLOCKED
+                            // MAX_STREAM_DATA
                             qBuffer.readVarInt(); qBuffer.readVarInt();
                         } else if (frameType === 0x12 || frameType === 0x13) {
-                            // STREAMS_BLOCKED
+                            // MAX_STREAMS
                             qBuffer.readVarInt();
                         } else if (frameType === 0x14) {
+                            // DATA_BLOCKED
+                            qBuffer.readVarInt();
+                        } else if (frameType === 0x15) {
+                            // STREAM_DATA_BLOCKED
+                            qBuffer.readVarInt(); qBuffer.readVarInt();
+                        } else if (frameType === 0x16 || frameType === 0x17) {
+                            // STREAMS_BLOCKED
+                            qBuffer.readVarInt();
+                        } else if (frameType === 0x18) {
                             // NEW_CONNECTION_ID
                             qBuffer.readVarInt(); qBuffer.readVarInt();
                             const len = qBuffer.readUInt8();
                             qBuffer.readBytes(len + 16); // Connection ID + Stateless Reset Token
-                        } else if (frameType === 0x15) {
+                        } else if (frameType === 0x19) {
                             // RETIRE_CONNECTION_ID
                             qBuffer.readVarInt();
-                        } else if (frameType === 0x16 || frameType === 0x17) {
+                        } else if (frameType === 0x1a || frameType === 0x1b) {
                             // PATH_CHALLENGE / PATH_RESPONSE
                             qBuffer.readBytes(8);
-                        } else if (frameType === 0x18 || frameType === 0x19) {
+                        } else if (frameType === 0x1c || frameType === 0x1d) {
                             // CONNECTION_CLOSE
                             qBuffer.readVarInt();
-                            if (frameType === 0x18) qBuffer.readVarInt(); // frame type
+                            if (frameType === 0x1c) qBuffer.readVarInt(); // frame type
                             const rLen = qBuffer.readVarInt();
                             if (rLen !== null) qBuffer.readBytes(rLen);
-                        } else if (frameType === 0x1a) {
+                        } else if (frameType === 0x1e) {
                             // HANDSHAKE_DONE
                             // 0 bytes payload
-                        } else if (frameType === 0x1c || frameType === 0x1d) {
-                            // ACK_FREQUENCY (draft extension typically mapped)
-                            qBuffer.readVarInt(); qBuffer.readVarInt(); qBuffer.readVarInt();
-                        } else if (frameType === 0x0b) {
-                            // MAX_DATA
-                            qBuffer.readVarInt();
-                        } else if (frameType === 0x0c || frameType === 0x0d) {
-                            // MAX_STREAM_DATA
-                            qBuffer.readVarInt(); qBuffer.readVarInt();
-                        } else if (frameType === 0x0e || frameType === 0x0f) {
-                            // MAX_STREAMS
-                            qBuffer.readVarInt();
-                        } else if (frameType === 0x10) {
-                            // DATA_BLOCKED
-                            qBuffer.readVarInt();
                         } else {
                             // Unknown Frame Type, aborting rest of packet to prevent misalignment
                             // No need to continuously log warning across unknown frames uniformly

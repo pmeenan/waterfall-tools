@@ -186,20 +186,23 @@ export class WaterfallCanvas {
         
         let startX = dimensions.labelsWidth + 10;
         const legendY = 15;
-        const boxSize = 12;
 
         for (const item of legendItems) {
-            const h = item.narrow ? 6 : boxSize;
+            const h = item.narrow ? 8 : 14;
             const yOff = item.narrow ? 3 : 0;
+            const itemBoxSize = item.narrow ? 14 : 20;
             
-            this.ctx.fillStyle = `rgb(${item.color.join(',')})`;
-            this.ctx.fillRect(startX, legendY + yOff, boxSize, h);
-            this.ctx.strokeStyle = '#000';
-            this.ctx.strokeRect(startX, legendY + yOff, boxSize, h);
+            if (item.narrow) {
+                this.drawBar(startX, startX + itemBoxSize, legendY + yOff, legendY + yOff + h - 1, item.color, true);
+            } else {
+                const ttfbColor = this.scaleRgb(item.color, 0.65);
+                this.drawBar(startX, startX + itemBoxSize / 2, legendY, legendY + h - 1, ttfbColor, true);
+                this.drawBar(startX + itemBoxSize / 2, startX + itemBoxSize, legendY, legendY + h - 1, item.color, true);
+            }
 
             this.ctx.fillStyle = '#000';
-            this.ctx.fillText(item.label, startX + boxSize + 6, legendY + 10);
-            startX += boxSize + this.ctx.measureText(item.label).width + 16;
+            this.ctx.fillText(item.label, startX + itemBoxSize + 6, legendY + 11);
+            startX += itemBoxSize + this.ctx.measureText(item.label).width + 16;
         }
     }
 
@@ -399,27 +402,43 @@ export class WaterfallCanvas {
                     else if (rawEntry._ttfb_start !== undefined) minMs = rawEntry._ttfb_start;
                     else minMs = row.downloadStart - baseStartMs;
                     
-                    // Overlay chunks
-                    rawEntry._chunks.forEach(chunk => {
-                        if (chunk.ts !== undefined) {
-                            let startMs = chunk.ts;
-                            let maxBw = dimensions.maxBw || 0;
-                            
-                            if (maxBw > 0 && chunk.bytes !== undefined) {
-                                const chunkTime = chunk.bytes / (maxBw / 8.0);
-                                if (chunkTime > 0) {
-                                    startMs -= chunkTime;
+                    let maxBw = dimensions.maxBw || 0;
+                    
+                    if (maxBw > 0) {
+                        // Overlay chunks
+                        rawEntry._chunks.forEach(chunk => {
+                            if (chunk.ts !== undefined) {
+                                let startMs = chunk.ts;
+                                
+                                if (chunk.bytes !== undefined) {
+                                    const chunkTime = chunk.bytes / (maxBw / 8.0);
+                                    if (chunkTime > 0) {
+                                        startMs -= chunkTime;
+                                    }
                                 }
+                                
+                                startMs = Math.max(minMs, startMs);
+                                
+                                const chunkStartX = xScaler(startMs);
+                                const chunkEndX = xScaler(chunk.ts);
+                                
+                                this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
                             }
-                            
-                            startMs = Math.max(minMs, startMs);
-                            
-                            const chunkStartX = xScaler(startMs);
-                            const chunkEndX = xScaler(chunk.ts);
-                            
-                            this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
+                        });
+                    } else {
+                        // When max bandwidth is not available, draw a solid download block
+                        // from the end of ttfb (time of the first chunk) to the end of the request
+                        let firstChunkTs = minMs;
+                        if (rawEntry._chunks.length > 0 && rawEntry._chunks[0].ts !== undefined) {
+                            firstChunkTs = Math.max(minMs, rawEntry._chunks[0].ts);
                         }
-                    });
+                        
+                        const chunkStartX = xScaler(firstChunkTs);
+                        const chunkEndX = xScaler(bgEndMs);
+                        
+                        // Enforce minimum visibility by deferring to drawBar's x2 <= x1 check implicitly
+                        this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
+                    }
                 } else {
                     if (sTtfb < sTtfbEnd) {
                         this.drawBar(sTtfb, sTtfbEnd, barY1, barY2, row.colors.ttfb, true);

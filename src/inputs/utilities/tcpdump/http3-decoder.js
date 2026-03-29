@@ -107,6 +107,7 @@ export function decodeHttp3(quicStreams) {
         if (isBidirectional) {
             const httpStream = {
                 time: stream.time,
+                firstClientTime: stream.firstClientTime,
                 firstServerTime: stream.firstServerTime,
                 lastServerTime: stream.lastServerTime,
                 headers: [],

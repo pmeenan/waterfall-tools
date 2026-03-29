@@ -100,10 +100,15 @@ export class Layout {
 
         let maxTime = 0;
         let baseMs = Number.MAX_SAFE_INTEGER;
-        for (let i = 0; i < entries.length; i++) {
-            const temp = new Date(entries[i].startedDateTime).getTime();
-            if (temp < baseMs) {
-                baseMs = temp;
+        
+        if (options.page && options.page.startedDateTime) {
+            baseMs = new Date(options.page.startedDateTime).getTime();
+        } else {
+            for (let i = 0; i < entries.length; i++) {
+                const temp = new Date(entries[i].startedDateTime).getTime();
+                if (temp < baseMs) {
+                    baseMs = temp;
+                }
             }
         }
         

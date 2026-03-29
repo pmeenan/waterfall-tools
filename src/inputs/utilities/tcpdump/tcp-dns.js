@@ -44,7 +44,7 @@ export function decodeTcpDns(conn, dnsRegistry) {
             
             if (parsed) {
                 const packetTime = resolveTime(p);
-                const metadata = { type: 'TCP', ip: isClient ? conn.clientIp : conn.serverIp };
+                const metadata = { type: 'TCP', ip: conn.serverIp }; // Universally track against the target DNS server
                 
                 if (!parsed.isResponse) {
                     dnsRegistry.addRequest(parsed.transactionId, packetTime, parsed.queries, metadata);

@@ -18,7 +18,7 @@ export async function decodeUdpProtocol(conn, keyLog, dnsRegistry, options = {})
                 // To determine direction, check if the frame originally belonged to the client flow
                 const isClient = conn.clientFlow.frames.includes(chunk);
                 const isRequest = !parsed.isResponse;
-                const metadata = { type: 'UDP', ip: isClient ? conn.clientIp : conn.serverIp };
+                const metadata = { type: 'UDP', ip: conn.serverIp }; // Universally track against the target DNS server
                 
                 if (isRequest) {
                     dnsRegistry.addRequest(parsed.transactionId, chunk.time, parsed.queries, metadata);

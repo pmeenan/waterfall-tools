@@ -135,13 +135,17 @@ export async function processTcpdumpNode(input, options = {}) {
             for (const conn of tcpConnections) {
                 const decoder = new TlsDecoder(keyLogMap);
                 
-                // Feed client packets
+                const interleavedChunks = [];
                 for (let chunk of conn.clientFlow.contiguousChunks) {
-                    await decoder.push(0, chunk.bytes, chunk.time);
+                    interleavedChunks.push({ dir: 0, chunk: chunk });
                 }
-                // Feed server packets
                 for (let chunk of conn.serverFlow.contiguousChunks) {
-                    await decoder.push(1, chunk.bytes, chunk.time);
+                    interleavedChunks.push({ dir: 1, chunk: chunk });
+                }
+                interleavedChunks.sort((a, b) => a.chunk.time - b.chunk.time);
+
+                for (const item of interleavedChunks) {
+                    await decoder.push(item.dir, item.chunk.bytes, item.chunk.time);
                 }
 
                 // If decryption succeeded (or produced anything), we replace the payload chunks
@@ -276,8 +280,8 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
             if (hostname) {
                  const dnsRecord = dnsLookups.find(l => l.domain === hostname && (l.ips.includes(conn.serverIp) || l.cname)); // simplified match
                  if (dnsRecord) {
-                      dnsTimeMs = dnsRecord.reqTime * 1000;
-                      dnsEndTimeMs = dnsRecord.resTime * 1000;
+                      dnsTimeMs = dnsRecord.requestTime * 1000;
+                      dnsEndTimeMs = dnsRecord.responseTime * 1000;
                  }
             }
             
@@ -326,7 +330,14 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
             let send = 0; // Upload time
             let dns = (dnsTimeMs > 0 && dnsEndTimeMs > 0) ? Math.max(0, dnsEndTimeMs - dnsTimeMs) : -1;
             let connect = (connectTimeMs > 0 && connectEndTimeMs > 0) ? Math.max(0, connectEndTimeMs - connectTimeMs) : -1;
-            let ssl = (sslStartTimeMs > 0 && connectEndTimeMs > 0) ? Math.max(0, connectEndTimeMs - sslStartTimeMs) : -1; 
+            let ssl = -1; 
+            if (reqUrl.startsWith('https:') || isUdp) {
+                if (isUdp) {
+                    ssl = (sslStartTimeMs > 0 && connectEndTimeMs > 0) ? Math.max(0, connectEndTimeMs - sslStartTimeMs) : -1;
+                } else {
+                    ssl = (sslStartTimeMs > 0 && timeMs > 0) ? Math.max(0, timeMs - sslStartTimeMs) : -1;
+                }
+            }
             
             let totalTime = 0;
             if (lastDataTimeMs > 0) totalTime = Math.max(0, lastDataTimeMs - timeMs);
@@ -375,6 +386,14 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
                 connection: conn.id.toString(),
                 _protocol: isUdp ? "QUIC" : "TCP",
                 _bytesIn: bytesIn,
+                _timeMs: timeMs,
+                _dnsTimeMs: dnsTimeMs,
+                _dnsEndTimeMs: dnsEndTimeMs,
+                _connectTimeMs: connectTimeMs,
+                _connectEndTimeMs: connectEndTimeMs,
+                _sslStartTimeMs: sslStartTimeMs,
+                _firstDataTimeMs: firstDataTimeMs,
+                _lastDataTimeMs: lastDataTimeMs
             };
             entries.push(reqObj);
         }
@@ -487,11 +506,14 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
             
             if (stream.responses) {
                  for (const res of stream.responses) {
-                      if (res.headers) {
-                           resHeaders = res.headers;
-                           status = parseInt(resHeaders.find(h => h.name === ':status')?.value) || 200;
+                      if (res.headers && res.headers.length > 0) {
+                           resHeaders = resHeaders.concat(res.headers);
+                           status = parseInt(resHeaders.find(h => h.name === ':status')?.value) || status;
                       }
-                      if (res.data) dataBlocks.push({ time: res.time || stream.time, length: res.data.length, bytes: res.data });
+                      if (res.data) {
+                           const byteLen = res.data.reduce((acc, b) => acc + (b.byteLength || b.length || 0), 0);
+                           dataBlocks.push({ time: res.time || stream.time, length: byteLen, bytes: res.data });
+                      }
                  }
             }
             
@@ -532,8 +554,84 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
     // Chronological Sort
     entries.sort((a, b) => new Date(a.startedDateTime) - new Date(b.startedDateTime));
     
+    // Deduplicate DNS and Connection Timelines
+    const seenDnsHosts = new Set();
+    const seenConnections = new Set();
+    
+    // 0-Anchor Bounding Setup
+    let globalEarliestMs = Number.MAX_SAFE_INTEGER;
+    for (const entry of entries) {
+        if (entry._timeMs > 0 && entry._timeMs < globalEarliestMs) globalEarliestMs = entry._timeMs;
+        if (entry._dnsTimeMs > 0 && entry._dnsTimeMs < globalEarliestMs) globalEarliestMs = entry._dnsTimeMs;
+        if (entry._connectTimeMs > 0 && entry._connectTimeMs < globalEarliestMs) globalEarliestMs = entry._connectTimeMs;
+    }
+    
+    for (const entry of entries) {
+        let hostname = '';
+        try {
+            hostname = new URL(entry.request.url).hostname;
+        } catch(e) {}
+        
+        if (hostname && entry.timings.dns > -1) {
+            if (seenDnsHosts.has(hostname)) {
+                entry.timings.dns = -1;
+                entry._dnsTimeMs = -1;
+                entry._dnsEndTimeMs = -1;
+            } else {
+                seenDnsHosts.add(hostname);
+            }
+        }
+        
+        const connId = entry.connection;
+        if (connId && (entry.timings.connect > -1 || entry.timings.ssl > -1)) {
+            if (seenConnections.has(connId)) {
+                entry.timings.connect = -1;
+                entry.timings.ssl = -1;
+                entry._connectTimeMs = -1;
+                entry._connectEndTimeMs = -1;
+                entry._sslStartTimeMs = -1;
+            } else {
+                seenConnections.add(connId);
+            }
+        }
+        
+        // Map native WebPageTest properties natively tracking off the exact globalEarliestMs anchor unconditionally
+        if (entry._timeMs > 0) entry._load_start = Math.floor(entry._timeMs - globalEarliestMs);
+        if (entry._dnsTimeMs > 0) entry._dns_start = Math.floor(entry._dnsTimeMs - globalEarliestMs);
+        if (entry._dnsEndTimeMs > 0) entry._dns_end = Math.floor(entry._dnsEndTimeMs - globalEarliestMs);
+        if (entry._connectTimeMs > 0) entry._connect_start = Math.floor(entry._connectTimeMs - globalEarliestMs);
+        if (entry._connectEndTimeMs > 0) entry._connect_end = Math.floor(entry._connectEndTimeMs - globalEarliestMs);
+        if (entry._sslStartTimeMs > 0) entry._ssl_start = Math.floor(entry._sslStartTimeMs - globalEarliestMs);
+        if (entry._timeMs > 0 && entry.timings.ssl > 0) entry._ssl_end = entry._load_start;
+        if (entry._timeMs > 0) entry._ttfb_start = entry._load_start;
+        if (entry._firstDataTimeMs > 0) entry._ttfb_end = Math.floor(entry._firstDataTimeMs - globalEarliestMs);
+        if (entry._firstDataTimeMs > 0) entry._download_start = entry._ttfb_end;
+        if (entry._lastDataTimeMs > 0) {
+            entry._download_end = Math.floor(entry._lastDataTimeMs - globalEarliestMs);
+            entry._all_end = entry._download_end;
+        }
+
+        // Strict HAR 1.2 time enforcement directly summing non-negative active phases (avoids cross-idle stretching)
+        let exactTime = 0;
+        if (entry.timings.dns > 0) exactTime += entry.timings.dns;
+        if (entry.timings.connect > 0) exactTime += entry.timings.connect;
+        exactTime += entry.timings.wait;
+        exactTime += entry.timings.receive;
+        entry.time = exactTime;
+
+        // Clean private tracking metrics implicitly
+        delete entry._timeMs;
+        delete entry._dnsTimeMs;
+        delete entry._dnsEndTimeMs;
+        delete entry._connectTimeMs;
+        delete entry._connectEndTimeMs;
+        delete entry._sslStartTimeMs;
+        delete entry._firstDataTimeMs;
+        delete entry._lastDataTimeMs;
+    }
+    
     // Assign proper references and Page Entry
-    let pageStartedDateTime = new Date().toISOString();
+    let pageStartedDateTime = (globalEarliestMs !== Number.MAX_SAFE_INTEGER) ? new Date(globalEarliestMs).toISOString() : new Date().toISOString();
     let pageId = 'page_0';
     let url = 'http://unknown/';
     

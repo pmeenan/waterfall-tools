@@ -116,8 +116,8 @@ export function decodeHttp2(clientChunks, serverChunks) {
     const serverReader = new Http2FrameReader(serverChunks);
     
     // Decompressor context
-    const clientDecompressor = hpack.decompressor.create();
-    const serverDecompressor = hpack.decompressor.create();
+    const clientDecompressor = hpack.decompressor.create({ table: { maxSize: 65536, size: 4096 } });
+    const serverDecompressor = hpack.decompressor.create({ table: { maxSize: 65536, size: 4096 } });
 
     const result = {
         streams: new Map(),
@@ -184,18 +184,18 @@ export function decodeHttp2(clientChunks, serverChunks) {
                 }
                 
                 try {
-                    const headers = decompressor.execute(headerBlockFragment);
+                    const buf = Buffer.from(headerBlockFragment.buffer, headerBlockFragment.byteOffset, headerBlockFragment.byteLength);
+                    decompressor.write(buf);
+                    decompressor.execute((err) => {
+                        if (err) console.error(`[HTTP/2] HPACK Async Error on Stream ${streamId}:`, err.message);
+                    });
                     if (stream.headers[direction + 'Time'] === 0) {
                         stream.headers[direction + 'Time'] = time;
                     }
-                    // hpack.js execute returns an object where keys are header names and values are strings
-                    // or arrays of strings
-                    for (const [name, value] of Object.entries(headers)) {
-                        if (Array.isArray(value)) {
-                            value.forEach(v => stream.headers[direction].push({ name, value: v }));
-                        } else {
-                            stream.headers[direction].push({ name, value });
-                        }
+                    
+                    let headersObj;
+                    while ((headersObj = decompressor.read()) !== null) {
+                        stream.headers[direction].push({ name: headersObj.name, value: headersObj.value });
                     }
                 } catch (e) {
                     console.error(`[HTTP/2] HPACK Decompression Error on Stream ${streamId}:`, e.message);
