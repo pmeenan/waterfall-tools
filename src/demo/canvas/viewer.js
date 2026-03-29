@@ -1,5 +1,4 @@
-import { Conductor } from '../../core/conductor.js';
-import { WaterfallCanvas } from '../../renderer/canvas.js';
+import { WaterfallTools } from '../../core/waterfall-tools.js';
 import { identifyFormatFromBuffer } from '../../inputs/orchestrator.js';
 
 const dropZone = document.getElementById('drop-zone');
@@ -60,28 +59,20 @@ async function processFiles(files) {
         }
 
         console.log(`Processing file internally: ${mainFile.name}`);
-        const resultHar = await Conductor.processBuffer(arrayBuffer, options);
-        console.log('Processed HAR', resultHar);
+        const tool = new WaterfallTools();
+        await tool.loadBuffer(arrayBuffer, options);
+        console.log('Processed Tool Mapping Successfully');
 
         // Hide drop zone & show canvas container
         dropZone.classList.add('hidden');
         canvasContainer.style.display = 'block';
 
-        if (!rendererCanvas) {
-            rendererCanvas = new WaterfallCanvas(canvasContainer, {
-                showLegend: true
-            });
+        if (rendererCanvas) {
+            rendererCanvas.destroy(); // Safely clean up previous rendering bounds natively
         }
         
-        const pageObj = resultHar.log.pages && resultHar.log.pages.length > 0 ? resultHar.log.pages[0] : null;
-        
-        // Ensure we only render network requests that belong to the selected page
-        let entriesToRender = resultHar.log.entries || [];
-        if (pageObj && pageObj.id) {
-            entriesToRender = entriesToRender.filter(e => e.pageref === pageObj.id);
-        }
-        
-        rendererCanvas.render(entriesToRender, pageObj);
+        // Pass parent container binding explicitly utilizing standard architectural map cleanly
+        rendererCanvas = await tool.renderTo(canvasContainer, { showLegend: true });
 
     } catch (e) {
         dropZone.innerHTML = `<h2>Error</h2><p>${e.message}</p><button id="retry-btn">Try Again</button>`;

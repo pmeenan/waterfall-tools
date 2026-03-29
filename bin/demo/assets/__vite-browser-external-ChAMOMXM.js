@@ -1,0 +1,1 @@
+import{o as e}from"./canvas-BwD4rYX2.js";var t=e(((e,t)=>{t.exports={}}));export default t();

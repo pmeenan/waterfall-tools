@@ -1,3 +1,4 @@
+import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 
 const PRIORITY_MAP = {
     "VeryHigh": "Highest",
@@ -1224,7 +1225,9 @@ export async function processNetlogFileNode(input, options = {}) {
 
         if (options.debug) console.log(`[netlog.js] Successfully normalized Netlog data. Evaluated ${requests.length} valid requests.`);
         const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, start_time);
-        return har;
+        
+        const { buildWaterfallDataFromHar } = await import('../core/har-converter.js');
+        return buildWaterfallDataFromHar(har.log, 'netlog');
 
     } catch (e) {
         throw e;

@@ -7,7 +7,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { Conductor } from '../src/core/conductor.js';
+import { WaterfallTools } from '../src/core/waterfall-tools.js';
 
 async function main() {
     const args = process.argv.slice(2);
@@ -52,7 +52,10 @@ async function main() {
     
     try {
         console.log(`Processing file: ${inputFile}`);
-        const har = await Conductor.processFile(inputFile, options);
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputFile, options);
+        const har = tool.getHar(options);
+        
         fs.writeFileSync(outputFile, JSON.stringify(har, null, 2));
         console.log(`Successfully parsed network data.`);
         console.log(`Saved Extended HAR to ${outputFile}`);

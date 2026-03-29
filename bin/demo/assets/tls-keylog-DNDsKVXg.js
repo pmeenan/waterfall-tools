@@ -1,2 +1,0 @@
-import{t as e}from"./dist-BF9fjQSG.js";var t=class{constructor(){this.keys=new Map}parseString(t){let n=t.split(`
-`);for(let t of n){if(t=t.trim(),!t||t.startsWith(`#`))continue;let n=t.split(` `);if(n.length<3)continue;let r=n[0],i=n[1].toLowerCase(),a=n[2].toLowerCase(),o=this.keys.get(i);o||(o={},this.keys.set(i,o)),o[r]=e.from(a,`hex`)}}getSessionKeys(t){let n=e.isBuffer(t)||t instanceof Uint8Array?e.from(t).toString(`hex`).toLowerCase():t.toLowerCase();return this.keys.get(n)||null}};export{t as TlsKeyLog};

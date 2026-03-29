@@ -3,7 +3,7 @@
     "version": "1.2",
     "creator": {
       "name": "waterfall-tools",
-      "version": "1.0.0"
+      "version": "0.2.0"
     },
     "pages": [
       {
@@ -14,6 +14,15 @@
           "onContentLoad": 317.501,
           "_startRender": 169.213
         },
+        "_render": -1,
+        "_domContentLoadedEventStart": -1,
+        "_domContentLoadedEventEnd": -1,
+        "_loadEventStart": -1,
+        "_loadEventEnd": -1,
+        "_firstContentfulPaint": -1,
+        "_LargestContentfulPaint": -1,
+        "_domInteractive": -1,
+        "_bwDown": -1,
         "_unlinked_connections": [
           {
             "_id": "404",
@@ -5383,14 +5392,12 @@
     ],
     "entries": [
       {
-        "pageref": "page_1_0_1",
         "time": 8029816.999572754,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
           "url": "https://clients4.google.com/chrome-sync/command/?client=Google+Chrome&client_id=jFadKHLnYtW5e9XBdrH0SA%3D%3D",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -5450,14 +5457,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 101272,
+          "cookies": [],
           "headers": [
             {
               "name": "content-type",
@@ -5516,16 +5524,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 101272,
-            "mimeType": "application/vnd.google.octet-stream-compressible"
+            "mimeType": "application/vnd.google.octet-stream-compressible",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 101272
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -5533,6 +5542,8 @@
           "wait": 82600.9995727539,
           "receive": 7947216
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 101272,
         "_chunks": [
           {
@@ -5798,17 +5809,21 @@
         "_has_raw_bytes": true,
         "_uncompressed_bytes_in": 273116,
         "_netlog_id": "421",
-        "_fromNet": true
+        "_fromNet": true,
+        "_load_start": 0,
+        "_ttfb_start": 0,
+        "_ttfb_end": 82600,
+        "_download_start": 82600,
+        "_download_end": 8029816,
+        "_all_end": 8029816
       },
       {
-        "pageref": "page_1_0_1",
         "time": 3986079.9995422363,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
           "url": "https://play.google.com/log?hasfast=true&auth=SAPISIDHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID1PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID3PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb&authuser=0&format=json",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -5896,14 +5911,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 10743,
+          "cookies": [],
           "headers": [
             {
               "name": "access-control-allow-origin",
@@ -5966,16 +5982,17 @@
               "value": "private"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 10743,
-            "mimeType": "text/plain; charset=UTF-8"
+            "size": 131,
+            "mimeType": "text/plain; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 131
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -5983,6 +6000,8 @@
           "wait": 62692.99954223633,
           "receive": 3923387
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 10743,
         "_chunks": [
           {
@@ -6124,17 +6143,21 @@
         },
         "_type": "Other",
         "_bytesIn": 131,
-        "_mimeType": "text/plain"
+        "_mimeType": "text/plain",
+        "_load_start": 756830,
+        "_ttfb_start": 756830,
+        "_ttfb_end": 819522,
+        "_download_start": 819522,
+        "_download_end": 4742909,
+        "_all_end": 4742909
       },
       {
+        "time": 381245.99951171875,
         "pageref": "page_1_0_1",
-        "time": 381245.99952697754,
         "request": {
           "method": "POST",
           "url": "https://play.google.com/log?hasfast=true&auth=SAPISIDHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID1PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID3PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb&authuser=0&format=json",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -6222,14 +6245,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 2831,
+          "cookies": [],
           "headers": [
             {
               "name": "access-control-allow-origin",
@@ -6292,23 +6316,26 @@
               "value": "private"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 2831,
-            "mimeType": "text/plain; charset=UTF-8"
+            "size": 131,
+            "mimeType": "text/plain; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 131
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 16106.999526977539,
+          "wait": 16106.99951171875,
           "receive": 365139
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 2831,
         "_chunks": [
           {
@@ -6428,17 +6455,21 @@
         },
         "_type": "Other",
         "_bytesIn": 131,
-        "_mimeType": "text/plain"
+        "_mimeType": "text/plain",
+        "_load_start": 4360692,
+        "_ttfb_start": 4360692,
+        "_ttfb_end": 4376798,
+        "_download_start": 4376798,
+        "_download_end": 4741937,
+        "_all_end": 4741937
       },
       {
+        "time": 402239.99938964844,
         "pageref": "page_1_0_1",
-        "time": 402239.99937438965,
         "request": {
           "method": "POST",
           "url": "https://play.google.com/log?format=json&hasfast=true&authuser=0",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -6538,14 +6569,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 398887,
+          "cookies": [],
           "headers": [
             {
               "name": "access-control-allow-origin",
@@ -6608,23 +6640,26 @@
               "value": "private"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 398887,
-            "mimeType": "text/plain; charset=UTF-8"
+            "size": 131,
+            "mimeType": "text/plain; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 131
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 16142.999374389648,
+          "wait": 16142.999389648438,
           "receive": 386097
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 398887,
         "_chunks": [
           {
@@ -6864,17 +6899,21 @@
         },
         "_type": "Other",
         "_bytesIn": 131,
-        "_mimeType": "text/plain"
+        "_mimeType": "text/plain",
+        "_load_start": 4364437,
+        "_ttfb_start": 4364437,
+        "_ttfb_end": 4380579,
+        "_download_start": 4380579,
+        "_download_end": 4766676,
+        "_all_end": 4766676
       },
       {
+        "time": 210205.99938964844,
         "pageref": "page_1_0_1",
-        "time": 210205.99937438965,
         "request": {
           "method": "POST",
           "url": "https://www.google.com/gen_204?atyp=i&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&dt19=2&prm23=0&zx=1774655898138&opi=89978449",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -7006,14 +7045,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 99894,
+          "cookies": [],
           "headers": [
             {
               "name": "content-type",
@@ -7064,23 +7104,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 99894,
-            "mimeType": "text/html; charset=UTF-8"
+            "size": 28,
+            "mimeType": "text/html; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 28
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 26119.99937438965,
+          "wait": 26119.999389648438,
           "receive": 184086
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 99894,
         "_chunks": [
           {
@@ -7177,17 +7220,21 @@
         },
         "_type": "Other",
         "_bytesIn": 28,
-        "_mimeType": "text/html"
+        "_mimeType": "text/html",
+        "_load_start": 4395068,
+        "_ttfb_start": 4395068,
+        "_ttfb_end": 4421187,
+        "_download_start": 4421187,
+        "_download_end": 4605273,
+        "_all_end": 4605273
       },
       {
+        "time": 271977.9993286133,
         "pageref": "page_1_0_1",
-        "time": 261002.99934387207,
         "request": {
           "method": "OPTIONS",
           "url": "https://waa-pa.clients6.google.com/$rpc/google.internal.waa.v1.Waa/Ping",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -7239,14 +7286,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "access-control-allow-origin",
@@ -7313,23 +7361,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": "text/html"
+            "size": 2,
+            "mimeType": "text/html",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 2
         },
         "cache": {},
         "timings": {
-          "blocked": 807,
           "dns": 11782,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 20042.99934387207,
+          "wait": 31824.99932861328,
           "receive": 228371
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89360677291.081,
@@ -7416,8 +7467,8 @@
             }
           ]
         },
-        "_dns_start": 89360678098.081,
-        "_dns_end": 89360689880.081,
+        "_dns_start": 4448756,
+        "_dns_end": 4460538,
         "_dns_details": {
           "HTTPS": {
             "error": -105
@@ -7435,17 +7486,23 @@
         },
         "_type": "Other",
         "_bytesIn": 2,
-        "_mimeType": "application/json+protobuf"
+        "_mimeType": "application/json+protobuf",
+        "_dnsTimeMs": 178810680628,
+        "_dnsEndTimeMs": 178810692410,
+        "_load_start": 4448756,
+        "_ttfb_start": 4448756,
+        "_ttfb_end": 4480580,
+        "_download_start": 4480580,
+        "_download_end": 4708951,
+        "_all_end": 4708951
       },
       {
+        "time": 276561.9993286133,
         "pageref": "page_1_0_1",
-        "time": 276561.99934387207,
         "request": {
           "method": "OPTIONS",
           "url": "https://play.google.com/log?format=json&hasfast=true&authuser=0",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -7497,14 +7554,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "access-control-allow-origin",
@@ -7555,23 +7613,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": "text/plain; charset=UTF-8"
+            "size": 131,
+            "mimeType": "text/plain; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 131
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 12719.99934387207,
+          "wait": 12719.999328613281,
           "receive": 263842
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89360677922.081,
@@ -7643,17 +7704,21 @@
         },
         "_type": "Other",
         "_bytesIn": 131,
-        "_mimeType": "text/plain"
+        "_mimeType": "text/plain",
+        "_load_start": 4461238,
+        "_ttfb_start": 4461238,
+        "_ttfb_end": 4473957,
+        "_download_start": 4473957,
+        "_download_end": 4737799,
+        "_all_end": 4737799
       },
       {
+        "time": 80427.99938964844,
         "pageref": "page_1_0_1",
-        "time": 80427.99937438965,
         "request": {
           "method": "GET",
           "url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.2U8VzmOKlq4.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAARAAAAAAAAAAAAAIIAAQAAAAAAAAAAAAAAAAAgEABAAABAAAAAAAAAIAAAAAAQAAAAAAAAADAAEAAQRAAAAGAAAAAAAAAAAAAAAAAAAAAECEAAAAIAAA_zAwAgAAAAAAIAEAAAAAAAAAAMACAAAoAAAAQIAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAKAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABBQAAAIAgAAAAAAAAAAAAAAAAAAAAEAHAAAAAAAAAAAAAAAAAAAAAAA4AAAIBAAAAABwAGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIICIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY/d=0/dg=0/br=1/rs=ACT90oHOTy9eynRtK6hTVOLrgN_Rgotfaw/m=sy15b,sy15a,rtH1bd,SMquOb,sy15l,sy15j,sy15i,sy15f,syf6,d5EhJe,sy1mo,fCxEDd,sy1mn,sy1ml,sy1mk,sy1mh,sy15t,sy1mj,sy1mi,sy1mg,sy1ab,sy1aa,sy15u,sy13f,sy139,T1HOxc,LFk59d,sy15z,sy15r,sy15o,sy15p,sy15m,syqq,zx30Y,sy1mq,sy1mp,sy162,syy9,Wo3n8,ZgGg9b,dIoSBb,sy1wd,sy1wn,sy2ek,sy2ej,b6knsb,sy2eg,sy2ef,syy3,sy1sa,sysz,syqy,syny,sy13d,sy1wm,sy1n9,sy13b,syfl,sydu,syds,syai,sydw,JKoKVe,pXdRYb,sy3lc,syaj,syag,sy96,O1Gjze,TtcOte,wR5FRb,kQvlef,syfj,syfg,syfc,syfb,sycp,syfa,sydn,syf9,syf8,syf7,syf4,syf2,syf0,syey,sybb,syb0,syb2,syb1,syb7,syaq,syao,syez,syex,syev,sydj,syeu,syet,syei,syer,sye8,sydz,sye0,syeq,syci,syeg,syep,sye3,sye4,syen,sye2,syem,sydk,sydl,sye5,sydx,syef,syek,syee,syej,syed,syec,sye1,syea,sye9,sye7,sye6,syeh,sydy,sydr,sydm,syan,sy8j,zbML3c,gskBEc,sy1e9,s980lf,sy1nj,EbPKJf,sy13n,sy13l,syp1,CnSW2d,sy1nm,sy1nl,pFsdhd,sy169,sy167,zGLm3b,sy1ra,sy1r9,sy1r8,sy1r7,sy1el,sy1em,DhPYme,sy439,sy3tj,sy3th,syhg,sy3to,sy3ti,sy3tq,sy3te,sy438,KHourd,sy445,sy1tw,syyr,oQfbDd,sy44c,sy1pc,sy1ge,sy1ga,sy44a,sy44b,sy448,sy1p3,sy449,qmjr3?cb=121509377&xjs=s4",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -7777,14 +7842,15 @@
               "value": "u=1"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 242781,
+          "cookies": [],
           "headers": [
             {
               "name": "accept-ranges",
@@ -7859,23 +7925,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 242781,
-            "mimeType": "text/javascript; charset=UTF-8"
+            "mimeType": "text/javascript; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 242781
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 19957.99937438965,
+          "wait": 19957.999389648438,
           "receive": 60470
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 242781,
         "_chunks": [
           {
@@ -7997,17 +8066,21 @@
         "_first_byte": 89360769023.081,
         "_has_raw_bytes": true,
         "_netlog_id": "628",
-        "_fromNet": true
+        "_fromNet": true,
+        "_load_start": 4478112,
+        "_ttfb_start": 4478112,
+        "_ttfb_end": 4498069,
+        "_download_start": 4498069,
+        "_download_end": 4558539,
+        "_all_end": 4558539
       },
       {
+        "time": 24836.999267578125,
         "pageref": "page_1_0_1",
-        "time": 24836.999282836914,
         "request": {
           "method": "GET",
           "url": "https://www.google.com/xjs/_/js/md=2/k=xjs.hd.en.2U8VzmOKlq4.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAARAAAAAAAAAAAAAIIAAQAAAAAAAAAAAAAAAAAgEBBAAABAAAAAAAAAIAAAAAAQAAAAAAAAADAAEAAURAAAAGAQAAAAAAAAAAAAAAAAAAAECEAAAAIAAA_zAwAgAAAAAAIAEAAAAAAAAAAMACAAAoAAAAQIAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAKAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABBQAAAIAgAAAAAAAAAAAAAAAAAAAAEAHAAAAAAAAAAAAAAAAAAAAAAA4AAAIBAAAAABwEGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIoCIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY/rs=ACT90oHi8WL_-XBcSxNYA07GwUwfOW9tHg?cb=121509377",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -8131,14 +8204,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 1356,
+          "cookies": [],
           "headers": [
             {
               "name": "accept-ranges",
@@ -8213,23 +8287,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 1356,
-            "mimeType": "text/javascript; charset=UTF-8"
+            "size": 12337,
+            "mimeType": "text/javascript; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 12337
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 24127.999282836914,
+          "wait": 24127.999267578125,
           "receive": 709
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 1356,
         "_chunks": [
           {
@@ -8315,17 +8392,21 @@
         },
         "_type": "Other",
         "_bytesIn": 12337,
-        "_mimeType": "text/javascript"
+        "_mimeType": "text/javascript",
+        "_load_start": 4478397,
+        "_ttfb_start": 4478397,
+        "_ttfb_end": 4502524,
+        "_download_start": 4502524,
+        "_download_end": 4503233,
+        "_all_end": 4503233
       },
       {
+        "time": 29333.999267578125,
         "pageref": "page_1_0_1",
-        "time": 29333.999282836914,
         "request": {
           "method": "GET",
           "url": "https://www.google.com/client_204?atyp=i&biw=2308&bih=940&dpr=1.109375&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&opi=89978449",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -8449,14 +8530,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "content-type",
@@ -8511,23 +8593,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": "text/html; charset=UTF-8"
+            "size": 28,
+            "mimeType": "text/html; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 28
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 29333.999282836914,
+          "wait": 29333.999267578125,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89360748651.081,
@@ -8600,17 +8685,21 @@
         },
         "_type": "Image",
         "_bytesIn": 28,
-        "_mimeType": "text/html"
+        "_mimeType": "text/html",
+        "_load_start": 4478631,
+        "_ttfb_start": 4478631,
+        "_ttfb_end": 4507964,
+        "_download_start": 4507964,
+        "_download_end": 4507964,
+        "_all_end": 4507964
       },
       {
+        "time": 108322.99938964844,
         "pageref": "page_1_0_1",
-        "time": 108322.99937438965,
         "request": {
           "method": "POST",
           "url": "https://www.google.com/gen_204?atyp=i&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&vet=10ahUKEwjewI2zpMGTAxVSKFkFHU08JnEQuqMJCDs..s&bl=1Kij&s=webhp&lpl=CAUYATADOANiBhDg8ailAQ&zx=1774655898150&opi=89978449",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -8742,14 +8831,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 41439,
+          "cookies": [],
           "headers": [
             {
               "name": "content-type",
@@ -8800,23 +8890,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 41439,
-            "mimeType": "text/html; charset=UTF-8"
+            "size": 28,
+            "mimeType": "text/html; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 28
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 39064.99937438965,
+          "wait": 39064.99938964844,
           "receive": 69258
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 41439,
         "_chunks": [
           {
@@ -8907,17 +9000,21 @@
         },
         "_type": "Other",
         "_bytesIn": 28,
-        "_mimeType": "text/html"
+        "_mimeType": "text/html",
+        "_load_start": 4503712,
+        "_ttfb_start": 4503712,
+        "_ttfb_end": 4542776,
+        "_download_start": 4542776,
+        "_download_end": 4612034,
+        "_all_end": 4612034
       },
       {
+        "time": 37632.99938964844,
         "pageref": "page_1_0_1",
-        "time": 37632.99937438965,
         "request": {
           "method": "POST",
           "url": "https://waa-pa.clients6.google.com/$rpc/google.internal.waa.v1.Waa/Create",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -9021,14 +9118,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 38750,
+          "cookies": [],
           "headers": [
             {
               "name": "content-type",
@@ -9127,23 +9225,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 38750,
-            "mimeType": "application/json+protobuf; charset=UTF-8"
+            "size": 30905,
+            "mimeType": "application/json+protobuf; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 30905
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 33908.99937438965,
+          "wait": 33908.99938964844,
           "receive": 3724
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 38750,
         "_chunks": [
           {
@@ -9254,7 +9355,13 @@
         },
         "_type": "Other",
         "_bytesIn": 30905,
-        "_mimeType": "application/json+protobuf"
+        "_mimeType": "application/json+protobuf",
+        "_load_start": 4506981,
+        "_ttfb_start": 4506981,
+        "_ttfb_end": 4540889,
+        "_download_start": 4540889,
+        "_download_end": 4544613,
+        "_all_end": 4544613
       }
     ]
   }

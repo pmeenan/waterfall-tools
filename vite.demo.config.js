@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { resolve } from 'path';
 
 export default defineConfig({
   root: 'src/demo',
@@ -18,8 +19,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: './index.html',
-        canvas: './canvas/index.html'
+        main: resolve(__dirname, 'src/demo/index.html'),
+        canvas: resolve(__dirname, 'src/demo/canvas/index.html')
       }
     }
   }

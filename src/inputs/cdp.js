@@ -742,18 +742,22 @@ export async function processCDPFileNode(input, options = {}) {
             }
         };
         
-        const har = normalizeWPT(wptFormat);
+        const data = normalizeWPT(wptFormat);
         if (options.debug) console.log(`[cdp.js] Successfully normalized CDP to HAR.`);
-        har.log.creator.name = "waterfall-tools (devtools)";
+        data.log.creator.name = "waterfall-tools (devtools)";
         
-        // As with stream parsing pipelines, ensure we correctly evaluate output structurally!
-        const hasRuns = har.log.pages.some(p => !p.id.includes('_median_'));
+        const { buildWaterfallDataFromHar } = await import('../core/har-converter.js');
+        const relational = buildWaterfallDataFromHar(data.log, 'cdp');
+        
+        const pageKeys = Object.keys(relational.pages);
+        const hasRuns = pageKeys.some(id => !id.includes('_median_'));
         if (hasRuns) {
-            har.log.pages = har.log.pages.filter(p => !p.id.includes('_median_'));
-            har.log.entries = har.log.entries.filter(e => !e.pageref.includes('_median_'));
+            for (const id of pageKeys) {
+                if (id.includes('_median_')) delete relational.pages[id];
+            }
         }
-                
-        return har;
+        
+        return relational;
 
     } catch (e) {
         throw e;

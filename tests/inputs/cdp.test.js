@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { processCDPFileNode } from '../../src/inputs/cdp.js';
+import { WaterfallTools } from '../../src/core/waterfall-tools.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,7 +13,9 @@ test('Chrome DevTools Protocol (CDP) Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Chrome Devtools Protocol/www.google.com-devtools.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/cdp-google.har.json');
         
-        const result = await processCDPFileNode(inputPath, { debug: true });
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'cdp' });
+        const result = tool.getHar({ debug: true });
         
         // Auto-generate golden reference file if absent
         if (!fs.existsSync(refPath)) {
@@ -33,7 +35,7 @@ test('Chrome DevTools Protocol (CDP) Input Processor', async (t) => {
 
         assert.deepStrictEqual(normalizedResult, ref, 'Parsed CDP JSON does not match reference output');
         assert.strictEqual(normalizedResult.log.version, "1.2");
-        assert.strictEqual(normalizedResult.log.creator.name, "waterfall-tools (devtools)");
+        assert.strictEqual(normalizedResult.log.creator.name, "waterfall-tools");
         
         assert.ok(normalizedResult.log.pages.length > 0, "Should generate at least one page");
         assert.ok(normalizedResult.log.entries.length > 0, "Should generate multiple entries");
@@ -43,7 +45,9 @@ test('Chrome DevTools Protocol (CDP) Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Chrome Devtools Protocol/www.cnn.com-devtools.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/cdp-cnn.har.json');
         
-        const result = await processCDPFileNode(inputPath, { debug: true });
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'cdp' });
+        const result = tool.getHar({ debug: true });
         
         if (!fs.existsSync(refPath)) {
             console.log("Generating golden fixture for cdp-cnn.har.json...");
@@ -60,13 +64,16 @@ test('Chrome DevTools Protocol (CDP) Input Processor', async (t) => {
         ref.log.entries.forEach(e => e.startedDateTime = "SCRUBBED");
 
         assert.deepStrictEqual(normalizedResult, ref, 'Parsed CNN CDP JSON does not match reference output');
-        assert.strictEqual(normalizedResult.log.creator.name, "waterfall-tools (devtools)");
+        assert.strictEqual(normalizedResult.log.creator.name, "waterfall-tools");
     });
 
     await t.test('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Chrome Devtools Protocol/DOES_NOT_EXIST.json');
         await assert.rejects(
-            async () => await processCDPFileNode(inputPath, { debug: true }),
+            async () => {
+                const tool = new WaterfallTools();
+                await tool.loadFile(inputPath, { debug: true, format: 'cdp' });
+            },
             { code: 'ENOENT' },
             'Should reject with ENOENT when file is missing'
         );

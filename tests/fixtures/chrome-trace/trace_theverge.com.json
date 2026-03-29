@@ -3,7 +3,7 @@
     "version": "1.2",
     "creator": {
       "name": "waterfall-tools",
-      "version": "1.0.0"
+      "version": "0.2.0"
     },
     "pages": [
       {
@@ -14,6 +14,15 @@
           "onContentLoad": 2795.914,
           "_startRender": 268.659
         },
+        "_render": -1,
+        "_domContentLoadedEventStart": -1,
+        "_domContentLoadedEventEnd": -1,
+        "_loadEventStart": -1,
+        "_loadEventEnd": -1,
+        "_firstContentfulPaint": -1,
+        "_LargestContentfulPaint": -1,
+        "_domInteractive": -1,
+        "_bwDown": -1,
         "_unlinked_connections": [
           {
             "_id": "420",
@@ -23025,14 +23034,12 @@
     ],
     "entries": [
       {
+        "time": 7501793,
         "pageref": "page_1_0_1",
-        "time": 7501792.999984741,
         "request": {
           "method": "GET",
           "url": "https://ad.doubleclick.net/ddm/trackimp/N3671.147391VOX/B34858017.441106590;dc_trk_aid=634429741;dc_trk_cid=251115442;ord=318456.24521794234;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;gdpr=;gdpr_consent=;ltd=;dc_tdv=1?&610307227",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -23112,14 +23119,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 353014,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -23198,23 +23206,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 353014,
-            "mimeType": "text/html; charset=UTF-8"
+            "size": 42,
+            "mimeType": "text/html; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 42
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 86659.99998474121,
+          "wait": 86660,
           "receive": 7415133
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 353014,
         "_chunks": [
           {
@@ -23517,17 +23528,21 @@
         },
         "_type": "Image",
         "_bytesIn": 42,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 0,
+        "_ttfb_start": 0,
+        "_ttfb_end": 86660,
+        "_download_start": 86660,
+        "_download_end": 7501793,
+        "_all_end": 7501793
       },
       {
-        "pageref": "page_1_0_1",
         "time": 3149410,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "http://theverge.com/",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -23567,14 +23582,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 1119,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -23705,16 +23721,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 1119,
-            "mimeType": "text/javascript; charset=UTF-8"
+            "size": 928643,
+            "mimeType": "text/javascript; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 928643
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -23722,6 +23739,8 @@
           "wait": 65820,
           "receive": 3083590
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 1119,
         "_chunks": [
           {
@@ -23823,17 +23842,21 @@
         "_frame": "3CAEA0567A46ABD7E37D4C5DA38C3F7E",
         "_type": "Document",
         "_bytesIn": 928643,
-        "_mimeType": "text/html"
+        "_mimeType": "text/html",
+        "_load_start": 648303,
+        "_ttfb_start": 648303,
+        "_ttfb_end": 714123,
+        "_download_start": 714123,
+        "_download_end": 3797713,
+        "_all_end": 3797713
       },
       {
+        "time": 6720250.999511719,
         "pageref": "page_1_0_1",
-        "time": 6720250.999526978,
         "request": {
           "method": "GET",
           "url": "https://ad-delivery.net/px.gif?ch=1&e=0.8944788451525917",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -23885,14 +23908,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 726982,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -23979,23 +24003,26 @@
               "value": "9e3256c6de56ea36-IAD"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 726982,
-            "mimeType": "image/gif"
+            "size": 43,
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 43
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 16892.99952697754,
+          "wait": 16892.99951171875,
           "receive": 6703358
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 726982,
         "_chunks": [
           {
@@ -24312,17 +24339,21 @@
         },
         "_type": "Other",
         "_bytesIn": 43,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 1691919,
+        "_ttfb_start": 1691919,
+        "_ttfb_end": 1708811,
+        "_download_start": 1708811,
+        "_download_end": 8412169,
+        "_all_end": 8412169
       },
       {
-        "pageref": "page_1_0_1",
         "time": 4467439,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://dsum-sec.casalemedia.com/rrum?ixi=1&cm_dsp_id=85&cb=https%3A%2F%2Fcm.g.doubleclick.net%2Fpixel%3Fgoogle_nid%3Dcasale_media2_dbm%26google_cm%26google_sc%26google_hm%3D",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -24382,14 +24413,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 675086,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -24460,16 +24492,17 @@
               "value": "cfExtPri"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 675086,
-            "mimeType": ""
+            "size": 43,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 43
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -24477,6 +24510,8 @@
           "wait": 14813,
           "receive": 4452626
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 675086,
         "_chunks": [
           {
@@ -24807,17 +24842,21 @@
         },
         "_type": "Image",
         "_bytesIn": 43,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 1979852,
+        "_ttfb_start": 1979852,
+        "_ttfb_end": 1994665,
+        "_download_start": 1994665,
+        "_download_end": 6447291,
+        "_all_end": 6447291
       },
       {
+        "time": 3514559.9995117188,
         "pageref": "page_1_0_1",
-        "time": 3514559.9995269775,
         "request": {
           "method": "GET",
           "url": "https://ad.doubleclick.net/favicon.ico?ad=300x250&ad_box_=1&adnet=1&showad=1&size=250x250&e=0.9862708800982021",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -24889,14 +24928,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 71911,
+          "cookies": [],
           "headers": [
             {
               "name": "accept-ranges",
@@ -24967,23 +25007,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 71911,
-            "mimeType": "image/x-icon"
+            "size": 1078,
+            "mimeType": "image/x-icon",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 1078
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 1047348.9995269775,
+          "wait": 1047348.9995117188,
           "receive": 2467211
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 71911,
         "_chunks": [
           {
@@ -25154,17 +25197,21 @@
         },
         "_type": "Other",
         "_bytesIn": 1078,
-        "_mimeType": "image/x-icon"
+        "_mimeType": "image/x-icon",
+        "_load_start": 4896892,
+        "_ttfb_start": 4896892,
+        "_ttfb_end": 5944240,
+        "_download_start": 5944240,
+        "_download_end": 8411451,
+        "_all_end": 8411451
       },
       {
+        "time": 1583067,
         "pageref": "page_1_0_1",
-        "time": 1583066.9999847412,
         "request": {
           "method": "GET",
           "url": "https://sync-tm.everesttech.net/upi/pid/ZMAwryCI?redir=https%3A%2F%2Fdsum-sec.casalemedia.com%2Frum%3Fcm_dsp_id%3D88%26external_user_id%3D%24%7BTM_USER_ID%7D",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -25220,14 +25267,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 197652,
+          "cookies": [],
           "headers": [
             {
               "name": "x-robots-tag",
@@ -25294,23 +25342,26 @@
               "value": "0"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 197652,
-            "mimeType": ""
+            "size": 85,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 85
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 36105.99998474121,
+          "wait": 36106,
           "receive": 1546961
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 197652,
         "_chunks": [
           {
@@ -25486,17 +25537,21 @@
         },
         "_type": "Image",
         "_bytesIn": 85,
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 4902433,
+        "_ttfb_start": 4902433,
+        "_ttfb_end": 4938539,
+        "_download_start": 4938539,
+        "_download_end": 6485500,
+        "_all_end": 6485500
       },
       {
-        "pageref": "page_1_0_1",
         "time": 3467230.9993896484,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://events.bouncex.net/track.gif/reloadcampaigns?wklz=E4UwNg9ghgJgxlAtgBygSwOYDsDOAuOAVxwBcJEA3KYNKAIzBBwF4BSAdgCFWAmH1DCAD6JAJ7IQvHqwDMAQSkALcpL68AwlIHCEJEBgjBRIqBimyFfAKpYA1lggB3LOZ6a+kDIJhC0LtfJSAGZQYDiq0m5SOIR0OHA0dCDAQnAQWBTJOGjpQqRQJMTmgXwhYREa0bGIaCR6PiCI6GBCYGikQpnAgkIwIKE4xZY8ZeGu7jwxdDV1IA1NaC1tHV09MM2iQ8EDFVF8IF2tEF5zvv7SJSM741XTtfVC6dl6W6XXanv8UKKOoS3IoHCWBIryu5RufFgQgYEDgtmSQgBTBAwNBo12E1AGHaelAPmICKCoGE1BIaDgjDR72k7AAIgAyUCQWAIFDobD4LBIEDMKg0eiMRngaDwJCoTC4PBiCTMbQicSqdRy3T6QzGEimemICB9ZgABnpjhAcVqIDQMGYADYZAAOAAs9Io7Vq5uYAEZ2Ow7ZaAKw+m2WvVev0ATjd9L6TrgZotMltPpDPpkPHYMnYHstbptYct9O0TpAjld4fCAEdCCjo66ePSKWgUXU0IgmBqUO7Pd6-QGeDafexa20G1BkGgutl0swNRgZBGDuSeTB6SRFGhgD5UMAxHkyMBTMIYO0BXNmOilwAvCDMHh2g11huEQjVm08N2Bu1ugC0MDobpDH7tPpwEEH50OwQTsB+CYBnqNpwG6QR6t+eZ7vKMrKM29I4BAhDANGzBGnQ9J7sCzAEsAmEQEEJC+LGnAAGoAJIAMo8AAcjwEC2LYAAeVgAOI4AAslAboAEo4DgepugxthBDWijUD4royPRzEyAAKhQeo4CGOAAFKWkEcBMW6ihwAACgAMlZEh2kAA",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -25552,14 +25607,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 197298,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -25606,16 +25662,17 @@
               "value": "h3=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 197298,
-            "mimeType": "image/gif"
+            "size": 42,
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 42
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -25623,6 +25680,8 @@
           "wait": 14720.999389648438,
           "receive": 3452510
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 197298,
         "_chunks": [
           {
@@ -25761,17 +25820,21 @@
         },
         "_type": "Image",
         "_bytesIn": 42,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 4957847,
+        "_ttfb_start": 4957847,
+        "_ttfb_end": 4972567,
+        "_download_start": 4972567,
+        "_download_end": 8425077,
+        "_all_end": 8425077
       },
       {
-        "pageref": "page_1_0_1",
         "time": 738408,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://sb.scorecardresearch.com/cs/7976662/beacon.js",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -25827,14 +25890,15 @@
               "value": "[76 bytes were stripped]"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 6565,
+          "cookies": [],
           "headers": [
             {
               "name": "content-length",
@@ -25869,16 +25933,17 @@
               "value": "w9JYG2FXe3456Ybqqxz9asygQEWbIw65xg8qkmrI-eGbNqrI7-s-sA=="
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 6565,
-            "mimeType": ""
+            "size": 21373,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 21373
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -25886,6 +25951,8 @@
           "wait": 14319,
           "receive": 724089
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 6565,
         "_chunks": [
           {
@@ -25978,17 +26045,21 @@
         },
         "_type": "Script",
         "_bytesIn": 21373,
-        "_mimeType": "text/javascript"
+        "_mimeType": "text/javascript",
+        "_load_start": 5003532,
+        "_ttfb_start": 5003532,
+        "_ttfb_end": 5017851,
+        "_download_start": 5017851,
+        "_download_end": 5741940,
+        "_all_end": 5741940
       },
       {
-        "pageref": "page_1_0_1",
         "time": 2686028.999267578,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/SL_10967924_New_Savings_F3_CONTENT_V1_728x90.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -26048,14 +26119,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 568155,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -26074,16 +26146,17 @@
               "value": "0"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 568155,
-            "mimeType": "text/plain; charset=utf-8"
+            "mimeType": "text/plain; charset=utf-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 568155
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -26091,6 +26164,8 @@
           "wait": 24174.999267578125,
           "receive": 2661854
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 568155,
         "_chunks": [
           {
@@ -26283,17 +26358,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 5014617,
+        "_ttfb_start": 5014617,
+        "_ttfb_end": 5038791,
+        "_download_start": 5038791,
+        "_download_end": 7700645,
+        "_all_end": 7700645
       },
       {
-        "pageref": "page_1_0_1",
         "time": 2691731.999267578,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -26361,14 +26440,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 89748,
+          "cookies": [],
           "headers": [
             {
               "name": "accept-ranges",
@@ -26419,16 +26499,17 @@
               "value": "Origin"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 89748,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 89748
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -26436,6 +26517,8 @@
           "wait": 88975.99926757812,
           "receive": 2602756
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 89748,
         "_chunks": [
           {
@@ -26539,17 +26622,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 5014700,
+        "_ttfb_start": 5014700,
+        "_ttfb_end": 5103675,
+        "_download_start": 5103675,
+        "_download_end": 7706431,
+        "_all_end": 7706431
       },
       {
-        "pageref": "page_1_0_1",
         "time": 2692468.999267578,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -26613,14 +26700,15 @@
               "value": "[116 bytes were stripped]"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 90781,
+          "cookies": [],
           "headers": [
             {
               "name": "Content-Type",
@@ -26675,16 +26763,17 @@
               "value": "[118 bytes were stripped]"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 90781,
-            "mimeType": "image/gif"
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 90781
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -26692,6 +26781,8 @@
           "wait": 26700.999267578125,
           "receive": 2665768
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 90781,
         "_chunks": [
           {
@@ -26792,17 +26883,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 5014882,
+        "_ttfb_start": 5014882,
+        "_ttfb_end": 5041582,
+        "_download_start": 5041582,
+        "_download_end": 7707350,
+        "_all_end": 7707350
       },
       {
+        "time": 2625869.999206543,
         "pageref": "page_1_0_1",
-        "time": 2625869.9992218018,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -26874,14 +26969,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 125051,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -26960,23 +27056,26 @@
               "value": "69468850"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 125051,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 125051
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 14732.999221801758,
+          "wait": 14732.999206542969,
           "receive": 2611137
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 125051,
         "_chunks": [
           {
@@ -27084,17 +27183,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 5047200,
+        "_ttfb_start": 5047200,
+        "_ttfb_end": 5061932,
+        "_download_start": 5061932,
+        "_download_end": 7673069,
+        "_all_end": 7673069
       },
       {
-        "pageref": "page_1_0_1",
         "time": 2611706.9992370605,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -27142,14 +27245,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 40897,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -27188,16 +27292,17 @@
               "value": "h3=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 40897,
-            "mimeType": "application/json"
+            "mimeType": "application/json",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 40897
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -27205,6 +27310,8 @@
           "wait": 17937.999237060547,
           "receive": 2593769
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 40897,
         "_chunks": [
           {
@@ -27289,17 +27396,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 5059235,
+        "_ttfb_start": 5059235,
+        "_ttfb_end": 5077172,
+        "_download_start": 5077172,
+        "_download_end": 7670941,
+        "_all_end": 7670941
       },
       {
-        "pageref": "page_1_0_1",
         "time": 2604740.9992370605,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/SL_10967924_New_Savings_EF_CONTENT_V1_728x90.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -27367,14 +27478,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 1015,
+          "cookies": [],
           "headers": [
             {
               "name": "via",
@@ -27425,16 +27537,17 @@
               "value": "Origin"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 1015,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 1015
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -27442,6 +27555,8 @@
           "wait": 29885.999237060547,
           "receive": 2574855
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 1015,
         "_chunks": [
           {
@@ -27531,17 +27646,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 5060507,
+        "_ttfb_start": 5060507,
+        "_ttfb_end": 5090392,
+        "_download_start": 5090392,
+        "_download_end": 7665247,
+        "_all_end": 7665247
       },
       {
+        "time": 2605555.999206543,
         "pageref": "page_1_0_1",
-        "time": 2605555.9992218018,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/1x1.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -27609,14 +27728,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 111709,
+          "cookies": [],
           "headers": [
             {
               "name": "accept-ranges",
@@ -27667,23 +27787,26 @@
               "value": "Origin"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 111709,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 111709
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 11302.999221801758,
+          "wait": 11302.999206542969,
           "receive": 2594253
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 111709,
         "_chunks": [
           {
@@ -27786,17 +27909,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 5061783,
+        "_ttfb_start": 5061783,
+        "_ttfb_end": 5073085,
+        "_download_start": 5073085,
+        "_download_end": 7667338,
+        "_all_end": 7667338
       },
       {
-        "pageref": "page_1_0_1",
         "time": 1036887,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://match.deepintent.com/usersync/113",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -27856,14 +27983,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 631555,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -27894,16 +28022,17 @@
               "value": "a"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 631555,
-            "mimeType": "image/gif"
+            "size": 43,
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 43
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -27911,6 +28040,8 @@
           "wait": 27283,
           "receive": 1009604
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 631555,
         "_chunks": [
           {
@@ -28188,17 +28319,21 @@
         },
         "_type": "Image",
         "_bytesIn": 43,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 5414923,
+        "_ttfb_start": 5414923,
+        "_ttfb_end": 5442206,
+        "_download_start": 5442206,
+        "_download_end": 6451810,
+        "_all_end": 6451810
       },
       {
+        "time": 908095.9990844727,
         "pageref": "page_1_0_1",
-        "time": 908095.9990692139,
         "request": {
           "method": "OPTIONS",
           "url": "https://gum.criteo.com/sid/json?origin=prebid&topUrl=https%3A%2F%2Fwww.theverge.com%2F&bundle=ie3xRV9WQlNTWEV5TVRTeWRvc091MHJ4NlhMOU1UMTNaTXdSJTJCQlByckc3UUR6WDElMkZYeW4wNk9HN3Q3N2J1SGFZSVh1V292ZVZxRExMdGFqb2RjWDIlMkJPYzBWa0JHV20zdVU3RkVtbjBoTHhIZklKYnRwQjZvcEcwYXpBciUyQnZyeHVmOUx1RlFyVG0zZERpSkoyJTJCNlpkTFliaUh3JTNEJTNE&cw=1&lsw=1",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -28250,14 +28385,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 42,
+          "cookies": [],
           "headers": [
             {
               "name": "content-type",
@@ -28316,23 +28452,26 @@
               "value": "gzip"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 42,
-            "mimeType": "application/json; charset=utf-8"
+            "size": 423,
+            "mimeType": "application/json; charset=utf-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 423
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 15557.999069213867,
+          "wait": 15557.999084472656,
           "receive": 892538
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 42,
         "_chunks": [
           {
@@ -28410,17 +28549,21 @@
         },
         "_type": "Other",
         "_bytesIn": 423,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 5498974,
+        "_ttfb_start": 5498974,
+        "_ttfb_end": 5514531,
+        "_download_start": 5514531,
+        "_download_end": 6407069,
+        "_all_end": 6407069
       },
       {
-        "pageref": "page_1_0_1",
         "time": 935025,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cm.g.doubleclick.net/pixel?google_nid=index&google_cm&google_hm=acXBfsAoJTgAHyviALY4zgAABp8AAAAB&gdpr_consent=&us_privacy=&gdpr=&gpp=&gpp_sid=",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -28500,14 +28643,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 389810,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -28558,16 +28702,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 389810,
-            "mimeType": "text/html; charset=UTF-8"
+            "size": 170,
+            "mimeType": "text/html; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 170
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -28575,6 +28720,8 @@
           "wait": 15600,
           "receive": 919425
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 389810,
         "_chunks": [
           {
@@ -28764,17 +28911,21 @@
         },
         "_type": "Image",
         "_bytesIn": 170,
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 5499776,
+        "_ttfb_start": 5499776,
+        "_ttfb_end": 5515376,
+        "_download_start": 5515376,
+        "_download_end": 6434801,
+        "_all_end": 6434801
       },
       {
+        "time": 1951860.9992675781,
         "pageref": "page_1_0_1",
-        "time": 1951860.9992523193,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/SL_10967924_New_Savings_EF_CONTENT_V1_728x90.png",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -28822,14 +28973,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 50677,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -28872,23 +29024,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 50677,
-            "mimeType": "text/html; charset=UTF-8"
+            "mimeType": "text/html; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 50677
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 17364.999252319336,
+          "wait": 17364.999267578125,
           "receive": 1934496
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 50677,
         "_chunks": [
           {
@@ -28984,17 +29139,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 5748894,
+        "_ttfb_start": 5748894,
+        "_ttfb_end": 5766258,
+        "_download_start": 5766258,
+        "_download_end": 7700754,
+        "_all_end": 7700754
       },
       {
+        "time": 1953347.9992675781,
         "pageref": "page_1_0_1",
-        "time": 1953347.9992523193,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/SL_10967924_New_Savings_F2_BG_V1_728x90.jpg",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -29058,14 +29217,15 @@
               "value": "[37 bytes were stripped]"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 45885,
+          "cookies": [],
           "headers": [
             {
               "name": "Content-Type",
@@ -29108,23 +29268,26 @@
               "value": "max-age=86400"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 45885,
-            "mimeType": "image/gif"
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 45885
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 24313.999252319336,
+          "wait": 24313.999267578125,
           "receive": 1929034
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 45885,
         "_chunks": [
           {
@@ -29215,17 +29378,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/jpeg"
+        "_mimeType": "image/jpeg",
+        "_load_start": 5749094,
+        "_ttfb_start": 5749094,
+        "_ttfb_end": 5773407,
+        "_download_start": 5773407,
+        "_download_end": 7702441,
+        "_all_end": 7702441
       },
       {
+        "time": 767196,
         "pageref": "page_1_0_1",
-        "time": 767195.9999847412,
         "request": {
           "method": "GET",
           "url": "https://casale-match.dotomi.com/match/bounce/current?networkId=19998&version=1",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -29281,14 +29448,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 151977,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -29323,23 +29491,26 @@
               "value": "https://casale-match.dotomi.com/match/bounce/current?DotomiTest=22148031f5350657&is_secure=true&networkId=19998&version=1"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 151977,
-            "mimeType": ""
+            "size": 43,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 43
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 10745.999984741211,
+          "wait": 10746,
           "receive": 756450
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 151977,
         "_chunks": [
           {
@@ -29467,17 +29638,21 @@
         },
         "_type": "Image",
         "_bytesIn": 43,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 5775150,
+        "_ttfb_start": 5775150,
+        "_ttfb_end": 5785896,
+        "_download_start": 5785896,
+        "_download_end": 6542346,
+        "_all_end": 6542346
       },
       {
-        "pageref": "page_1_0_1",
         "time": 13920.998901367188,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
           "url": "https://api.sail-track.com/v1/track/event/pageview",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -29529,14 +29704,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 13,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -29575,16 +29751,17 @@
               "value": "POST,OPTIONS"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 13,
-            "mimeType": "text/plain"
+            "size": 120,
+            "mimeType": "text/plain",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 120
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -29592,6 +29769,8 @@
           "wait": 13324.998901367188,
           "receive": 596
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 13,
         "_chunks": [
           {
@@ -29665,17 +29844,21 @@
         },
         "_type": "Other",
         "_bytesIn": 120,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 6030223,
+        "_ttfb_start": 6030223,
+        "_ttfb_end": 6043547,
+        "_download_start": 6043547,
+        "_download_end": 6044143,
+        "_all_end": 6044143
       },
       {
-        "pageref": "page_1_0_1",
         "time": 1596460.9992370605,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -29731,14 +29914,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 8705,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -29769,16 +29953,17 @@
               "value": "h3=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 8705,
-            "mimeType": "application/json"
+            "mimeType": "application/json",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 8705
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -29786,6 +29971,8 @@
           "wait": 9600.999237060547,
           "receive": 1586860
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 8705,
         "_chunks": [
           {
@@ -29860,17 +30047,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6073689,
+        "_ttfb_start": 6073689,
+        "_ttfb_end": 6083289,
+        "_download_start": 6083289,
+        "_download_end": 7670149,
+        "_all_end": 7670149
       },
       {
-        "pageref": "page_1_0_1",
         "time": 1582769.9992370605,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -29946,14 +30137,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 4376,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -29996,16 +30188,17 @@
               "value": "123"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 4376,
-            "mimeType": "application/json"
+            "mimeType": "application/json",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 4376
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -30013,6 +30206,8 @@
           "wait": 141300.99923706055,
           "receive": 1441469
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 4376,
         "_chunks": [
           {
@@ -30096,17 +30291,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6085949,
+        "_ttfb_start": 6085949,
+        "_ttfb_end": 6227249,
+        "_download_start": 6227249,
+        "_download_end": 7668718,
+        "_all_end": 7668718
       },
       {
+        "time": 125819.99884033203,
         "pageref": "page_1_0_1",
-        "time": 68984.99884033203,
         "request": {
           "method": "OPTIONS",
           "url": "https://c2shb.pubgw.yahoo.com/bidRequest",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -30158,14 +30357,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -30200,23 +30400,26 @@
               "value": "https://www.theverge.com"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": ""
+            "size": 66,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 66
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": 56835,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 12149.998840332031,
+          "wait": 68984.99884033203,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89323240428.411,
@@ -30300,8 +30503,8 @@
             }
           ]
         },
-        "_dns_start": 89323239789.411,
-        "_dns_end": 89323296624.411,
+        "_dns_start": 6090130,
+        "_dns_end": 6146965,
         "_frame": "3CAEA0567A46ABD7E37D4C5DA38C3F7E",
         "_initiator": {
           "fetchType": "fetch",
@@ -30309,17 +30512,23 @@
         },
         "_type": "Other",
         "_bytesIn": 66,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_dnsTimeMs": 178734789213,
+        "_dnsEndTimeMs": 178734846048,
+        "_load_start": 6090130,
+        "_ttfb_start": 6090130,
+        "_ttfb_end": 6159114,
+        "_download_start": 6159114,
+        "_download_end": 6159114,
+        "_all_end": 6159114
       },
       {
-        "pageref": "page_1_0_1",
         "time": 13121.998840332031,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
           "url": "https://c2shb.pubgw.yahoo.com/bidRequest",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -30371,14 +30580,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -30413,16 +30623,17 @@
               "value": "https://www.theverge.com"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": ""
+            "size": 66,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 66
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -30430,6 +30641,8 @@
           "wait": 13121.998840332031,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89323240249.411,
@@ -30485,17 +30698,21 @@
         },
         "_type": "Other",
         "_bytesIn": 66,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 6090246,
+        "_ttfb_start": 6090246,
+        "_ttfb_end": 6103367,
+        "_download_start": 6103367,
+        "_download_end": 6103367,
+        "_all_end": 6103367
       },
       {
+        "time": 13395.998840332031,
         "pageref": "page_1_0_1",
-        "time": 13395.99885559082,
         "request": {
           "method": "OPTIONS",
           "url": "https://c2shb.pubgw.yahoo.com/bidRequest",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -30547,14 +30764,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -30589,23 +30807,26 @@
               "value": "https://www.theverge.com"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": ""
+            "size": 66,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 66
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 13395.99885559082,
+          "wait": 13395.998840332031,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89323240019.411,
@@ -30661,17 +30882,21 @@
         },
         "_type": "Other",
         "_bytesIn": 66,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 6090513,
+        "_ttfb_start": 6090513,
+        "_ttfb_end": 6103908,
+        "_download_start": 6103908,
+        "_download_end": 6103908,
+        "_all_end": 6103908
       },
       {
-        "pageref": "page_1_0_1",
         "time": 13957.998840332031,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
           "url": "https://targeting.unrulymedia.com/unruly_prebid",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -30723,14 +30948,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -30761,16 +30987,17 @@
               "value": "text/plain charset=UTF-8"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": "text/plain charset=UTF-8"
+            "size": 11,
+            "mimeType": "text/plain charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 11
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -30778,6 +31005,8 @@
           "wait": 13957.998840332031,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89323242263.411,
@@ -30843,17 +31072,21 @@
         },
         "_type": "Other",
         "_bytesIn": 11,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 6091179,
+        "_ttfb_start": 6091179,
+        "_ttfb_end": 6105136,
+        "_download_start": 6105136,
+        "_download_end": 6105136,
+        "_all_end": 6105136
       },
       {
+        "time": 13238.998840332031,
         "pageref": "page_1_0_1",
-        "time": 13238.998825073242,
         "request": {
           "method": "OPTIONS",
           "url": "https://targeting.unrulymedia.com/unruly_prebid",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -30905,14 +31138,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -30943,23 +31177,26 @@
               "value": "text/plain charset=UTF-8"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": "text/plain charset=UTF-8"
+            "size": 11,
+            "mimeType": "text/plain charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 11
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 13238.998825073242,
+          "wait": 13238.998840332031,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89323242750.411,
@@ -31025,17 +31262,21 @@
         },
         "_type": "Other",
         "_bytesIn": 11,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 6091392,
+        "_ttfb_start": 6091392,
+        "_ttfb_end": 6104630,
+        "_download_start": 6104630,
+        "_download_end": 6104630,
+        "_all_end": 6104630
       },
       {
-        "pageref": "page_1_0_1",
         "time": 1559385.9992370605,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/SL_10967924_New_Savings_F2_BG_V1_728x90.jpg",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -31107,14 +31348,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 2830,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -31153,16 +31395,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 2830,
-            "mimeType": "text/plain; charset=utf-8"
+            "mimeType": "text/plain; charset=utf-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 2830
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -31170,6 +31413,8 @@
           "wait": 47802.99923706055,
           "receive": 1511583
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 2830,
         "_chunks": [
           {
@@ -31250,17 +31495,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/jpeg"
+        "_mimeType": "image/jpeg",
+        "_load_start": 6098314,
+        "_ttfb_start": 6098314,
+        "_ttfb_end": 6146116,
+        "_download_start": 6146116,
+        "_download_end": 7657699,
+        "_all_end": 7657699
       },
       {
-        "pageref": "page_1_0_1",
         "time": 1595213.9992370605,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://ad-events.flashtalking.com/reportV3/ft.stat?0-10603611;6030391;40876161-101-0-66602F03B9082B-9834236",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -31320,14 +31569,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 65827,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -31346,16 +31596,17 @@
               "value": "0"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 65827,
-            "mimeType": "text/plain; charset=utf-8"
+            "size": 66,
+            "mimeType": "text/plain; charset=utf-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 66
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -31363,6 +31614,8 @@
           "wait": 14384.999237060547,
           "receive": 1580829
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 65827,
         "_chunks": [
           {
@@ -31421,17 +31674,21 @@
         },
         "_type": "Image",
         "_bytesIn": 66,
-        "_mimeType": "text/plain"
+        "_mimeType": "text/plain",
+        "_load_start": 6109310,
+        "_ttfb_start": 6109310,
+        "_ttfb_end": 6123694,
+        "_download_start": 6123694,
+        "_download_end": 7704523,
+        "_all_end": 7704523
       },
       {
-        "pageref": "page_1_0_1",
         "time": 1557165.9992370605,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -31483,14 +31740,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 36120,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -31581,16 +31839,17 @@
               "value": "9e3256b93bf98302-IAD"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 36120,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 36120
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -31598,6 +31857,8 @@
           "wait": 16071.999237060547,
           "receive": 1541094
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 36120,
         "_chunks": [
           {
@@ -31692,17 +31953,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6109394,
+        "_ttfb_start": 6109394,
+        "_ttfb_end": 6125465,
+        "_download_start": 6125465,
+        "_download_end": 7666559,
+        "_all_end": 7666559
       },
       {
+        "time": 1601139.9992675781,
         "pageref": "page_1_0_1",
-        "time": 1601139.9992523193,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -31770,14 +32035,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 48783,
+          "cookies": [],
           "headers": [
             {
               "name": "via",
@@ -31828,23 +32094,26 @@
               "value": "Origin"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 48783,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 48783
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 26886.999252319336,
+          "wait": 26886.999267578125,
           "receive": 1574253
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 48783,
         "_chunks": [
           {
@@ -31938,17 +32207,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6109448,
+        "_ttfb_start": 6109448,
+        "_ttfb_end": 6136334,
+        "_download_start": 6136334,
+        "_download_end": 7710587,
+        "_all_end": 7710587
       },
       {
+        "time": 1600532.9992675781,
         "pageref": "page_1_0_1",
-        "time": 1600532.9992523193,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -32020,14 +32293,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 151822,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -32114,23 +32388,26 @@
               "value": "44,23.48.100.132"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 151822,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 151822
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 15384.999252319336,
+          "wait": 15384.999267578125,
           "receive": 1585148
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 151822,
         "_chunks": [
           {
@@ -32248,17 +32525,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6109501,
+        "_ttfb_start": 6109501,
+        "_ttfb_end": 6124885,
+        "_download_start": 6124885,
+        "_download_end": 7710033,
+        "_all_end": 7710033
       },
       {
+        "time": 1555419.999206543,
         "pageref": "page_1_0_1",
-        "time": 1555419.9992218018,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -32314,14 +32595,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 2047,
+          "cookies": [],
           "headers": [
             {
               "name": "content-type",
@@ -32368,23 +32650,26 @@
               "value": "Fri, 27 Mar 2026 23:57:40 GMT"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 2047,
-            "mimeType": "text/plain"
+            "mimeType": "text/plain",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 2047
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 38051.99922180176,
+          "wait": 38051.99920654297,
           "receive": 1517368
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 2047,
         "_chunks": [
           {
@@ -32464,17 +32749,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6119708,
+        "_ttfb_start": 6119708,
+        "_ttfb_end": 6157759,
+        "_download_start": 6157759,
+        "_download_end": 7675127,
+        "_all_end": 7675127
       },
       {
+        "time": 1563487.999206543,
         "pageref": "page_1_0_1",
-        "time": 1563487.9992218018,
         "request": {
           "method": "GET",
           "url": "https://ad-events.flashtalking.com/reportV3/ft.stat?0-10603611;6030391;40876161-101-0-66602F03B9082B-6739505",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -32534,14 +32823,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 42760,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -32560,23 +32850,26 @@
               "value": "0"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 42760,
-            "mimeType": "text/plain; charset=utf-8"
+            "size": 66,
+            "mimeType": "text/plain; charset=utf-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 66
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 39647.99922180176,
+          "wait": 39647.99920654297,
           "receive": 1523840
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 42760,
         "_chunks": [
           {
@@ -32649,17 +32942,21 @@
         },
         "_type": "Image",
         "_bytesIn": 66,
-        "_mimeType": "text/plain"
+        "_mimeType": "text/plain",
+        "_load_start": 6120225,
+        "_ttfb_start": 6120225,
+        "_ttfb_end": 6159872,
+        "_download_start": 6159872,
+        "_download_end": 7683712,
+        "_all_end": 7683712
       },
       {
-        "pageref": "page_1_0_1",
         "time": 336562,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://dmp.brand-display.com/cm/api/index?cm_dsp_id=191&cm_user_id=%3cIndex_user_id%3e",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -32719,14 +33016,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 30930,
+          "cookies": [],
           "headers": [
             {
               "name": "access-control-allow-origin",
@@ -32769,16 +33067,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 30930,
-            "mimeType": "text/html; charset=utf-8"
+            "size": 43,
+            "mimeType": "text/html; charset=utf-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 43
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -32786,6 +33085,8 @@
           "wait": 27121,
           "receive": 309441
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 30930,
         "_chunks": [
           {
@@ -32868,17 +33169,21 @@
         },
         "_type": "Image",
         "_bytesIn": 43,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 6145984,
+        "_ttfb_start": 6145984,
+        "_ttfb_end": 6173105,
+        "_download_start": 6173105,
+        "_download_end": 6482546,
+        "_all_end": 6482546
       },
       {
+        "time": 1561222.9992675781,
         "pageref": "page_1_0_1",
-        "time": 1561222.9992523193,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -32950,14 +33255,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 31528,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -33036,23 +33342,26 @@
               "value": "694687c8"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 31528,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 31528
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 31546.999252319336,
+          "wait": 31546.999267578125,
           "receive": 1529676
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 31528,
         "_chunks": [
           {
@@ -33154,17 +33463,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6146786,
+        "_ttfb_start": 6146786,
+        "_ttfb_end": 6178332,
+        "_download_start": 6178332,
+        "_download_end": 7708008,
+        "_all_end": 7708008
       },
       {
+        "time": 1534606.9992675781,
         "pageref": "page_1_0_1",
-        "time": 1534606.9992523193,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -33240,14 +33553,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 31460,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -33282,23 +33596,26 @@
               "value": "private, max-age=0, no-cache, no-store"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 31460,
-            "mimeType": "application/json"
+            "mimeType": "application/json",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 31460
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 160107.99925231934,
+          "wait": 160107.99926757812,
           "receive": 1374499
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 31460,
         "_chunks": [
           {
@@ -33394,17 +33711,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6174709,
+        "_ttfb_start": 6174709,
+        "_ttfb_end": 6334816,
+        "_download_start": 6334816,
+        "_download_end": 7709315,
+        "_all_end": 7709315
       },
       {
+        "time": 1525209.9992675781,
         "pageref": "page_1_0_1",
-        "time": 1525209.9992523193,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/1x1.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -33472,14 +33793,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 40446,
+          "cookies": [],
           "headers": [
             {
               "name": "via",
@@ -33530,23 +33852,26 @@
               "value": "Origin"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 40446,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 40446
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 147768.99925231934,
+          "wait": 147768.99926757812,
           "receive": 1377441
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 40446,
         "_chunks": [
           {
@@ -33640,17 +33965,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6175703,
+        "_ttfb_start": 6175703,
+        "_ttfb_end": 6323471,
+        "_download_start": 6323471,
+        "_download_end": 7700912,
+        "_all_end": 7700912
       },
       {
+        "time": 1485221.999206543,
         "pageref": "page_1_0_1",
-        "time": 1485221.9992218018,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -33722,14 +34051,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 51652,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -33808,23 +34138,26 @@
               "value": "69468810"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 51652,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 51652
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 36015.99922180176,
+          "wait": 36015.99920654297,
           "receive": 1449206
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 51652,
         "_chunks": [
           {
@@ -33926,17 +34259,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6186973,
+        "_ttfb_start": 6186973,
+        "_ttfb_end": 6222988,
+        "_download_start": 6222988,
+        "_download_end": 7672194,
+        "_all_end": 7672194
       },
       {
-        "pageref": "page_1_0_1",
         "time": 29730,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://ssum-sec.casalemedia.com/usermatchredir?s=184023&cb=https%3A%2F%2Fcm.g.doubleclick.net%2Fpixel%3Fgoogle_nid%3Dindex%26google_hm%3D&gdpr_consent=&gdpr=&gpp=&gpp_sid=&google_gid=CAESEPD8Jv2xHSTjT18qJOqBf6Y&google_cver=1",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -33996,14 +34333,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -34074,16 +34412,17 @@
               "value": "cfExtPri"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 0,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -34091,6 +34430,8 @@
           "wait": 29730,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89323642038.411,
@@ -34152,17 +34493,21 @@
               "104.18.26.193"
             ]
           }
-        }
+        },
+        "_load_start": 6435953,
+        "_ttfb_start": 6435953,
+        "_ttfb_end": 6465683,
+        "_download_start": 6465683,
+        "_download_end": 6465683,
+        "_all_end": 6465683
       },
       {
-        "pageref": "page_1_0_1",
         "time": 26221,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cm.g.doubleclick.net/pixel?google_nid=casale_media2_dbm&google_cm&google_sc&google_hm=acXBfsAoJTgAHyviALY4zgAA",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -34238,14 +34583,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -34296,16 +34642,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 0,
-            "mimeType": "text/html; charset=UTF-8"
+            "mimeType": "text/html; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -34313,6 +34660,8 @@
           "wait": 26221,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89323654647.411,
@@ -34370,17 +34719,21 @@
               "142.250.31.156"
             ]
           }
-        }
+        },
+        "_load_start": 6448589,
+        "_ttfb_start": 6448589,
+        "_ttfb_end": 6474810,
+        "_download_start": 6474810,
+        "_download_end": 6474810,
+        "_all_end": 6474810
       },
       {
+        "time": 1173824,
         "pageref": "page_1_0_1",
-        "time": 1173823.9999847412,
         "request": {
           "method": "GET",
           "url": "https://ad.doubleclick.net/ddm/trackimp/N3671.147391VOX/B34858017.441106590;dc_trk_aid=634429741;dc_trk_cid=251115442;ord=318456.24521794234;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;gdpr=;gdpr_consent=;ltd=;dc_tdv=1?&86719224",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -34460,14 +34813,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 170,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -34546,23 +34900,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 170,
-            "mimeType": "text/html; charset=UTF-8"
+            "size": 42,
+            "mimeType": "text/html; charset=UTF-8",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 42
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 31813.99998474121,
+          "wait": 31814,
           "receive": 1142010
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 170,
         "_chunks": [
           {
@@ -34645,17 +35002,21 @@
         },
         "_type": "Image",
         "_bytesIn": 42,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 6467040,
+        "_ttfb_start": 6467040,
+        "_ttfb_end": 6498854,
+        "_download_start": 6498854,
+        "_download_end": 7640864,
+        "_all_end": 7640864
       },
       {
-        "pageref": "page_1_0_1",
         "time": 1235177.9992675781,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -34723,14 +35084,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 76597,
+          "cookies": [],
           "headers": [
             {
               "name": "via",
@@ -34781,16 +35143,17 @@
               "value": "Origin"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 76597,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 76597
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -34798,6 +35161,8 @@
           "wait": 31593.999267578125,
           "receive": 1203584
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 76597,
         "_chunks": [
           {
@@ -34905,17 +35270,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6469102,
+        "_ttfb_start": 6469102,
+        "_ttfb_end": 6500695,
+        "_download_start": 6500695,
+        "_download_end": 7704279,
+        "_all_end": 7704279
       },
       {
+        "time": 1936912.9995117188,
         "pageref": "page_1_0_1",
-        "time": 1936912.9995269775,
         "request": {
           "method": "GET",
           "url": "https://ad-delivery.net/px.gif?ch=2&e=0.6916253736402024",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -34967,14 +35336,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 78608,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -35061,23 +35431,26 @@
               "value": "9e3256c6de52ea36-IAD"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 78608,
-            "mimeType": "image/gif"
+            "size": 43,
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 43
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 27705.99952697754,
+          "wait": 27705.99951171875,
           "receive": 1909207
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 78608,
         "_chunks": [
           {
@@ -35186,17 +35559,21 @@
         },
         "_type": "Other",
         "_bytesIn": 43,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 6475955,
+        "_ttfb_start": 6475955,
+        "_ttfb_end": 6503660,
+        "_download_start": 6503660,
+        "_download_end": 8412867,
+        "_all_end": 8412867
       },
       {
+        "time": 1225024.9992675781,
         "pageref": "page_1_0_1",
-        "time": 1225024.9992523193,
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/blank.png",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -35264,14 +35641,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 36888,
+          "cookies": [],
           "headers": [
             {
               "name": "accept-ranges",
@@ -35322,23 +35700,26 @@
               "value": "Origin"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 36888,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 36888
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 27668.999252319336,
+          "wait": 27668.999267578125,
           "receive": 1197356
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 36888,
         "_chunks": [
           {
@@ -35427,17 +35808,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/png"
+        "_mimeType": "image/png",
+        "_load_start": 6483638,
+        "_ttfb_start": 6483638,
+        "_ttfb_end": 6511306,
+        "_download_start": 6511306,
+        "_download_end": 7708662,
+        "_all_end": 7708662
       },
       {
+        "time": 1964602.9993896484,
         "pageref": "page_1_0_1",
-        "time": 1964602.9994049072,
         "request": {
           "method": "POST",
           "url": "https://analytics.tiktok.com/api/v2/pixel/act",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -35509,14 +35894,15 @@
               "value": "u=4, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 222720,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -35591,23 +35977,26 @@
               "value": "6946ed4c"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 222720,
-            "mimeType": ""
+            "size": 751,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 751
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 13650.999404907227,
+          "wait": 13650.999389648438,
           "receive": 1950952
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 222720,
         "_chunks": [
           {
@@ -35744,17 +36133,21 @@
         },
         "_type": "Other",
         "_bytesIn": 751,
-        "_mimeType": "text/plain"
+        "_mimeType": "text/plain",
+        "_load_start": 6486359,
+        "_ttfb_start": 6486359,
+        "_ttfb_end": 6500009,
+        "_download_start": 6500009,
+        "_download_end": 8450961,
+        "_all_end": 8450961
       },
       {
+        "time": 18691,
         "pageref": "page_1_0_1",
-        "time": 18690.99998474121,
         "request": {
           "method": "GET",
           "url": "https://casale-match.dotomi.com/match/bounce/current?DotomiTest=22148031f5350657&is_secure=true&networkId=19998&version=1",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -35814,14 +36207,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -35852,23 +36246,26 @@
               "value": "https://dsum.casalemedia.com/rum?cm_dsp_id=65&external_user_id=AQADEig9uGV3bgI13nLvAQEBAQEBAQCcMLpwEgEBAJwwunAS&expiration=1774742261&is_secure=true"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 0,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 18690.99998474121,
+          "wait": 18691,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 89323749822.411,
@@ -35919,17 +36316,21 @@
               "8.18.45.41"
             ]
           }
-        }
+        },
+        "_load_start": 6543713,
+        "_ttfb_start": 6543713,
+        "_ttfb_end": 6562404,
+        "_download_start": 6562404,
+        "_download_end": 6562404,
+        "_all_end": 6562404
       },
       {
-        "pageref": "page_1_0_1",
         "time": 1873331.9992675781,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://ep1.adtrafficquality.google/pagead/sodar?id=sodar2&v=253&t=2&li=gpt_m202603230101&jk=676874405732464&bg=!bm2lbQ_NAAYbyhOnO8o7AEcBe5WfOM-op5MDOu3I-X3f0ijFYRIpn1J4dKeHutac3lrR19uNPYU_faCd1QPN6RUqW26958JsHzO6X2SOabfrZ2rHGIpKGAIAAACVUgAAAAVoAQd-ADegVuUHXBhooTmfGBw_kpR4JnFCfdeX8c7zwvTpOtzh6756pSzh9hKxqnH74orEjXgREgTXNcm3mQJMZeKDGaYDITiZE525Bv4s7j91zowHnlySOyIGg3A-EIhg0rV7BMNTf7ovtjK0ccwfolzHTx7cm8TEw3cU_nHeTcN5nfWnwy8G3BGYnJgOBtdcLtdn7fdp2HOAvx6kYvSeGN3R2wsrAQrBGk9zmbx11OrcyMMuMocYThGRdsgSptPHUty9GnILqKHilGmGbO_gbJidV4xM9dT323_b8jOAthhWTY_pVwCQtE9uornWEpxc2ttcPGA84Sm1zXpYw8b1dfp_-Z2BF3A5ionuqyWJZrho_1DvBKUQY_9eQNe4dhjgKMOBvUbIzCPf83dEOrXbiGRtbczrrNF44B2zV66hP6UHKx9lDucLG7LOtabnVGS0VkkN_QW7GzNWosIUwa0pL3zDXVoZBTrtTMGdQNjG_eSDPFA0BVcjUFQA8QOsTo51LS4nVrSkW5rvSPtaAykcWh9JIXkdC_x3TAPaK2jPzDz3fWTfLQ1XKgbMpQHvO0inZTJGLbgMIqIDZ43lzyaELTbsg0a4dI7-PO61LFsmi6ru0mEyIpwvtEK85cRV8BsS1twwBO884LNp59VC4XRhPn0OXv_bwiCQlX5rm9ABj6i30XDOAHJn6E4D0cC7g0hKz0oZvi8AiQVj_-mRHYRPzmjevdKlBGWFcsSstitxa_kdoIUQDKQdGLjFAEO9crxltc7jyuv90U7LrtLqOYgHMfJ-wXmrzQVrw7XeLQVscFjbMUfe7U90rHPdEQHOEtPEeJHrkcGE1CahBG4Rn9zTyLnWAODqFdjctXag",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -35985,14 +36386,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 222967,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -36035,16 +36437,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 222967,
-            "mimeType": "image/"
+            "size": 17,
+            "mimeType": "image/",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 17
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -36052,6 +36455,8 @@
           "wait": 23669.999267578125,
           "receive": 1849662
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 222967,
         "_chunks": [
           {
@@ -36171,17 +36576,21 @@
         },
         "_type": "Image",
         "_bytesIn": 17,
-        "_mimeType": "image/"
+        "_mimeType": "image/",
+        "_load_start": 6563577,
+        "_ttfb_start": 6563577,
+        "_ttfb_end": 6587246,
+        "_download_start": 6587246,
+        "_download_end": 8436908,
+        "_all_end": 8436908
       },
       {
+        "time": 971688.9995727539,
         "pageref": "page_1_0_1",
-        "time": 971688.9995880127,
         "request": {
           "method": "POST",
           "url": "https://prebid-a.rubiconproject.com/event",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -36245,14 +36654,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 8429,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -36267,23 +36677,26 @@
               "value": "*"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 8429,
-            "mimeType": ""
+            "size": 126,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 126
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 29538.999588012695,
+          "wait": 29538.999572753906,
           "receive": 942150
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 8429,
         "_chunks": [
           {
@@ -36371,17 +36784,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_bytesIn": 126
+        "_bytesIn": 126,
+        "_load_start": 7505265,
+        "_ttfb_start": 7505265,
+        "_ttfb_end": 7534803,
+        "_download_start": 7534803,
+        "_download_end": 8476953,
+        "_all_end": 8476953
       },
       {
-        "pageref": "page_1_0_1",
         "time": 56651.999267578125,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://cdn.flashtalking.com/231515/instantAssets/SL_10967924_New_Savings_F3_BG_V1_728x90.jpg",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -36461,14 +36878,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 13158,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -36539,16 +36957,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 13158,
-            "mimeType": "image/gif"
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 13158
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -36556,6 +36975,8 @@
           "wait": 32615.999267578125,
           "receive": 24036
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 13158,
         "_chunks": [
           {
@@ -36648,7 +37069,13 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/jpeg"
+        "_mimeType": "image/jpeg",
+        "_load_start": 7643915,
+        "_ttfb_start": 7643915,
+        "_ttfb_end": 7676530,
+        "_download_start": 7676530,
+        "_download_end": 7700566,
+        "_all_end": 7700566
       }
     ]
   }

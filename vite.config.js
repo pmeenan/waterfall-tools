@@ -4,7 +4,7 @@ import { resolve } from 'path';
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/core/conductor.js'),
+      entry: resolve(__dirname, 'src/core/waterfall-tools.js'),
       name: 'WaterfallTools',
       fileName: (format) => `waterfall-tools.${format}.js`
     },

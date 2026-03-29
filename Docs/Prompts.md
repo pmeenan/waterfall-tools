@@ -201,3 +201,133 @@ Are there any streaming SAX token processors that work with native browser API's
 ```
 yes, please make the change to the zero-polyfill approach as the browser is our primary deployment target. Make all of the necessary changes and run all of the relevant tests to make sure the various processing is working as expected
 ```
+
+# Refactor
+
+```
+We are going to do a major refactoring of the API and internal data representation.
+
+The external API should be a single object named `WaterfallTools`.
+
+The existing Conductor processFile, processStream, processBuffer, and processUrl should be exposed through WaterfallTools as `loadFile`, `loadStream`, `loadBuffer`, and `loadUrl` methods (and likely be renamed to be consistent).
+
+WaterfallTools should keep the representation of the data in it's internal memory using the new structure (described below).
+
+The existing WaterfallCanvas render method should be exposed through WaterfallTools as `renderTo` and take the container element and options as arguments.
+
+Migrate the internal representation from an Extended HAR structure to one that better represents the underlying data and that makes it easier to analyize and retrieve data from.
+
+Structururally, it should look something like:
+
+``json
+{
+    "metadata": {
+        "source": "filename/url",
+        "format": "har/wpt/netlog/cdp/chrome-trace/tcpdump",
+        ...
+    },
+    "pages": {
+        "page_id": {
+            "url": "https://www.google.com",
+            "requests": {
+                "request_id":{
+                    "url": "https://www.google.com",
+                    "method": "GET",
+                    "status": 200,
+                    "headers": {},
+                    "body": "",
+                    ...
+                }
+                ...
+            }
+        }
+        ...
+    },
+    "tcp_connections": {
+        "connection_id": {
+            "ip": "[IP_ADDRESS]",
+            "port": 1234,
+            "client_port": 1234,
+            "start_time": 1234567890,
+            "end_time": 1234567890,
+            "bytes_sent": 123456,
+            "bytes_received": 123456,
+            "duplicate_bytes_sent": 123456,
+            "duplicate_bytes_received": 123456,
+            "retransmits": 123456,
+            "tls": {
+                "version": "TLS 1.3",
+                "cipher": "TLS_AES_256_GCM_SHA384",
+                "certificate_info": {
+                    ...
+                }
+            }
+        }
+    },
+    "http2_connections": {
+        "connection_id": {
+            "tcp_connection_id": "connection_id",
+            "options": {
+            },
+            "streams": {
+                "stream_id": {
+                    "headers": {},
+                    "body": "",
+                    ...
+                }
+                ...
+            }
+        },
+        ...
+    },
+    "quic_connections": {
+        "connection_id": {
+            "ip_address": "[IP_ADDRESS]",
+            "port": 1234,
+            "client_port": 1234,
+            "start_time": 1234567890,
+            "end_time": 1234567890,
+            "bytes_sent": 123456,
+            "bytes_received": 123456,
+            "retransmits": 123456,
+            "tls": {
+                "version": "TLS 1.3",
+                "cipher": "TLS_AES_256_GCM_SHA384",
+                "certificate_info": {
+                    ...
+                }
+            },
+            "streams": {
+                "stream_id": {
+                },
+                ...
+            }
+        },
+        ...
+    },
+    "dns": {
+        "query_id": {
+            "query": "www.google.com",
+            "type": "A",
+            "ip_addresses": ["address", "address"],
+            "response": { raw, structured response },
+            "start_time": 1234567890,
+            "end_time": 1234567890,
+        },
+        ...
+    }
+}
+``
+
+The data format is representative, not exact json. The goal is to have a structure that makes it easy to analyze and retrieve data from. Make sure all of the data contained in the original sources can be maintained in the new structure.
+
+The timings for connection setup, dns lookup, tls, etc should not be associated directly with any request in the internal representation. Instead, the request objects should have references to the connection, dns, and tls objects that they are associated with and they can be flattened at the time they are retrieved through the API (and for drawing waterfalls).
+
+The WaterfallTools object should expose a method to get the HAR representation (and take options).
+
+The CLI should use the new API as the main entrypoint.
+
+The API should expose methods to get an individual page, with or without the requests, an individual request, with or without the body, etc. This method would take care of associating the "ownership" of the DNS, connection and TLS times with an appropriate request and pull in the relevant dns, connection and stream-level information.
+
+Migrate the existing tests, golden results, README.md, Architecture.md, schema documentation and AGENTS.md to use the new API and data structure.
+```

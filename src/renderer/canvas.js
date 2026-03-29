@@ -36,9 +36,17 @@ export class WaterfallCanvas {
         }
     }
 
-    render(entries, pageObj = null) {
-        this.rawEntries = entries || [];
-        this.pageObj = pageObj;
+    render(pageData) {
+        this.pageData = pageData;
+        
+        // Ensure an iterable array of requests natively matching legacy structures internally purely for the render phase
+        this.rawEntries = [];
+        if (pageData && pageData.requests) {
+            this.rawEntries = Object.values(pageData.requests);
+            // Re-enforce strictly deterministic ordering
+            this.rawEntries.sort((a, b) => a.time_start - b.time_start);
+        }
+        
         this._requestRender();
     }
     
@@ -52,7 +60,7 @@ export class WaterfallCanvas {
             
             const { rows, dimensions, pageEvents } = Layout.calculateRows(this.rawEntries, canvasWidth, {
                 showLegend: this.options.showLegend,
-                page: this.pageObj
+                page: this.pageData
             });
             
             this.draw(rows, dimensions, pageEvents);
@@ -207,7 +215,6 @@ export class WaterfallCanvas {
     }
 
     draw(rows, dimensions, pageEvents = {}) {
-        const rawEntries = this.rawEntries;
         const dpr = window.devicePixelRatio || 1;
         this.canvas.style.width = dimensions.canvasWidth + 'px';
         this.canvas.style.height = dimensions.canvasHeight + 'px';
@@ -234,15 +241,15 @@ export class WaterfallCanvas {
                 }
             });
 
-            const baseStartMs = rows.length > 0 ? rows.reduce((min, row) => Math.min(min, row.start), Number.MAX_SAFE_INTEGER) : 0;
+            // Inherit structured relational time base preventing timeline disconnects intrinsically
+            const baseStartMs = dimensions.baseMs || (rows.length > 0 ? rows[0].start : 0);
             const topOffset = rows.length > 0 && rows[0].y1 > 35 ? 35 : 0;
             const rowHeight = 18;
             
             // Determine primary document URL to identify cross-document iframes natively
             let mainDocUrl = '';
-            if (rawEntries && rawEntries.length > 0 && rawEntries[0]) {
-                const rawEntry = rawEntries[0];
-                const docUrl = rawEntry._documentURL || rawEntry.request?.url || '';
+            if (rows && rows.length > 0 && rows[0]) {
+                const docUrl = rows[0].documentURL || rows[0].url || '';
                 mainDocUrl = docUrl.split('?')[0].split('#')[0];
             }
             
@@ -344,22 +351,7 @@ export class WaterfallCanvas {
                 let sTtfbEnd = xScaler(row.ttfbEnd - baseStartMs);
                 let sDownload = xScaler(row.downloadStart - baseStartMs);
                 let eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
-
-                const rawEntry = rawEntries[index];
-                if (rawEntry) {
-                    if (rawEntry._created !== undefined) sWait = xScaler(rawEntry._created);
-                    if (rawEntry._dns_start !== undefined) sDns = xScaler(rawEntry._dns_start);
-                    if (rawEntry._dns_end !== undefined) sDnsEnd = xScaler(rawEntry._dns_end);
-                    if (rawEntry._connect_start !== undefined) sConn = xScaler(rawEntry._connect_start);
-                    if (rawEntry._connect_end !== undefined) sConnEnd = xScaler(rawEntry._connect_end);
-                    if (rawEntry._ssl_start !== undefined) sSsl = xScaler(rawEntry._ssl_start);
-                    if (rawEntry._ssl_end !== undefined) sSslEnd = xScaler(rawEntry._ssl_end);
-                    if (rawEntry._ttfb_start !== undefined) sTtfb = xScaler(rawEntry._ttfb_start);
-                    if (rawEntry._ttfb_end !== undefined) sTtfbEnd = xScaler(rawEntry._ttfb_end);
-                    if (rawEntry._download_start !== undefined) sDownload = xScaler(rawEntry._download_start);
-                    if (rawEntry._download_end !== undefined) eDownload = xScaler(rawEntry._download_end);
-                    else if (rawEntry._all_end !== undefined) eDownload = xScaler(rawEntry._all_end);
-                }
+                // Native mapping directly provides absolute layouts resolving all timings naturally without overrides
                 
                 const barHeight = row.y2 - row.y1 + 1;
                 const stateHeight = Math.max(2, Math.floor(barHeight / 2));
@@ -376,40 +368,26 @@ export class WaterfallCanvas {
                 if (sSsl < sSslEnd) this.drawBar(sSsl, sSslEnd, stateY1, stateY2, row.colors.ssl, true);
                 
                 // Request bodies
-                if (rawEntry && rawEntry._chunks && rawEntry._chunks.length > 0) {
-                    // WPT logic: draw TTFB gradient across entire download range if chunks are detailed
-                    // To do this mathematically, we trace the full bounds of the request by anchoring `bgStart` safely...
-                    let bgStart = sTtfb;
-                    if (rawEntry._ttfb_start !== undefined) bgStart = xScaler(rawEntry._ttfb_start);
-                    else if (rawEntry._download_start !== undefined) bgStart = xScaler(rawEntry._download_start);
-                    
-                    // ...and dynamically extending `bgEndMs` outwards. We deliberately process the boundaries natively
-                    // entirely as `ms` relative integers ensuring math operators aren't comparing scaled Canvas dimensions to raw timestamp ms.
+                if (row.chunks && row.chunks.length > 0) {
+                    // Trace bounds naturally mapped from row
+                    let bgStart = xScaler(row.ttfbStart - baseStartMs);
                     let bgEndMs = Math.max(row.end, row.downloadEnd) - baseStartMs;
-                    if (rawEntry._download_end !== undefined) bgEndMs = rawEntry._download_end;
-                    else if (rawEntry._all_end !== undefined) bgEndMs = rawEntry._all_end;
                     
-                    // Crucially, expand `bgEndMs` to encompass `_ttfb_end` just natively if it lingers past typical download conclusions.
-                    if (rawEntry._ttfb_end !== undefined && rawEntry._ttfb_end > bgEndMs) bgEndMs = rawEntry._ttfb_end;
-                    
-                    // Finally serialize the verified boundary into geometric pixel X-coordinates and draw the entire backing.
                     const bgEnd = xScaler(bgEndMs);
                     this.drawBar(bgStart, Math.max(bgStart + 1, bgEnd), barY1, barY2, row.colors.ttfb, true);
                     
-                    let minMs = 0;
-                    if (rawEntry._download_start !== undefined) minMs = rawEntry._download_start;
-                    else if (rawEntry._ttfb_end !== undefined) minMs = rawEntry._ttfb_end;
-                    else if (rawEntry._ttfb_start !== undefined) minMs = rawEntry._ttfb_start;
-                    else minMs = row.downloadStart - baseStartMs;
-                    
+                    let minMs = row.ttfbStart - baseStartMs;
                     let maxBw = dimensions.maxBw || 0;
                     
                     if (maxBw > 0) {
                         // Overlay chunks
-                        rawEntry._chunks.forEach(chunk => {
+                        row.chunks.forEach(chunk => {
                             if (chunk.ts !== undefined) {
-                                let startMs = chunk.ts;
+                                let cTs = chunk.ts;
+                                // Auto-detect unix absolute bounds
+                                if (cTs > 1000000000000) cTs -= baseStartMs;
                                 
+                                let startMs = cTs;
                                 if (chunk.bytes !== undefined) {
                                     const chunkTime = chunk.bytes / (maxBw / 8.0);
                                     if (chunkTime > 0) {
@@ -420,23 +398,23 @@ export class WaterfallCanvas {
                                 startMs = Math.max(minMs, startMs);
                                 
                                 const chunkStartX = xScaler(startMs);
-                                const chunkEndX = xScaler(chunk.ts);
+                                const chunkEndX = xScaler(cTs);
                                 
                                 this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
                             }
                         });
                     } else {
                         // When max bandwidth is not available, draw a solid download block
-                        // from the end of ttfb (time of the first chunk) to the end of the request
                         let firstChunkTs = minMs;
-                        if (rawEntry._chunks.length > 0 && rawEntry._chunks[0].ts !== undefined) {
-                            firstChunkTs = Math.max(minMs, rawEntry._chunks[0].ts);
+                        if (row.chunks.length > 0 && row.chunks[0].ts !== undefined) {
+                            let cTs = row.chunks[0].ts;
+                            if (cTs > 1000000000000) cTs -= baseStartMs;
+                            firstChunkTs = Math.max(minMs, cTs);
                         }
                         
                         const chunkStartX = xScaler(firstChunkTs);
                         const chunkEndX = xScaler(bgEndMs);
                         
-                        // Enforce minimum visibility by deferring to drawBar's x2 <= x1 check implicitly
                         this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
                     }
                 } else {
@@ -488,12 +466,12 @@ export class WaterfallCanvas {
                 }
 
                 // JS Execution
-                if (rawEntry && rawEntry._js_timing && rawEntry._js_timing.length > 0) {
+                if (row.jsTiming && row.jsTiming.length > 0) {
                     const jsHeight = Math.max(2, Math.floor(barHeight * 0.5));
                     const jsY1 = row.y1 + Math.floor((barHeight - jsHeight) / 2);
                     const jsY2 = jsY1 + jsHeight - 1;
 
-                    rawEntry._js_timing.forEach(times => {
+                    row.jsTiming.forEach(times => {
                         const startX = xScaler(times[0]);
                         const endX = xScaler(times[1]);
                         this.drawBar(startX, endX, jsY1, jsY2, row.colors.js, false);
@@ -502,8 +480,8 @@ export class WaterfallCanvas {
 
                 // URL Text Label
                 let textColor = '#000';
-                if (rawEntry && rawEntry._documentURL) {
-                    const reqDocUrl = rawEntry._documentURL.split('?')[0].split('#')[0];
+                if (row.documentURL) {
+                    const reqDocUrl = row.documentURL.split('?')[0].split('#')[0];
                     if (reqDocUrl && mainDocUrl && reqDocUrl !== mainDocUrl) {
                         textColor = '#0000ff'; // Blue for distinct document contexts
                     }
@@ -512,7 +490,7 @@ export class WaterfallCanvas {
                 let textX = 10;
                 
                 // Draw Render Blocking Indicator
-                if (rawEntry && rawEntry._renderBlocking === 'blocking') {
+                if (row.renderBlocking === 'blocking') {
                     const iconY = row.y1 + 2;
                     const iconW = 14;
                     

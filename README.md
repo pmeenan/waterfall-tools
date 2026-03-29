@@ -5,7 +5,7 @@ Waterfall Tools is a robust, performant library for parsing, analyzing, and visu
 ## Features
 
 - **Format Agnostic**: Easily parses `HAR`, `Netlog`, `Chrome Trace`, `CDP`, `WebPageTest JSON`, and raw `TCPDUMP` captures (with automatic TLS/QUIC payload decryption support).
-- **Core Orchestrator (`Conductor`)**: Unified API that identifies format types automatically, parsing them uniformly into strict structurally-sound Extended HAR outputs.
+- **Core Orchestrator (`WaterfallTools`)**: Unified API that identifies format types automatically, parsing them uniformly into strict structurally-sound relational payloads.
 - **Isomorphic Architecture**: The core generative pipelines naturally run natively inside Node.js, and directly alongside Vite projects inside modern Browsers (assuming `stream` / `crypto` bundle polyfills).
 - **Zero DOM-Bloat Canvas Renderer**: Scales cleanly visually scaling to render 50 or 50,000 requests smoothly, mitigating severe `O(N)` UI thrashing typical in trace viewer projects.
 
@@ -19,15 +19,18 @@ npm install waterfall-tools
 
 ## API Usage
 
-Ensure your build system supports generic ESModules (`"type": "module"` natively out-of-the-box). The unified interface for the tools is the core `Conductor` artifact.
+Ensure your build system supports generic ESModules (`"type": "module"` natively out-of-the-box). The single interface for the library is the `WaterfallTools` class.
 
 ### Processing a Local File (Node.js)
 
 ```javascript
-import { Conductor } from 'waterfall-tools/core/conductor.js';
+import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
+
+const wt = new WaterfallTools();
 
 // Automatically identifies the file format natively (No options required!)
-const waterfallHar = await Conductor.processFile('./trace.cap.gz');
+await wt.loadFile('./trace.cap.gz');
+const waterfallHar = wt.getHar();
 
 console.log(`Successfully generated HAR with ${waterfallHar.log.entries.length} requests`);
 ```
@@ -35,62 +38,63 @@ console.log(`Successfully generated HAR with ${waterfallHar.log.entries.length} 
 ### Processing a Stream (Browser or Node.js)
 
 ```javascript
-import { Conductor } from 'waterfall-tools/core/conductor.js';
+import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
 import { Readable } from 'stream'; // Handled globally via NodeJS, polyfilled natively targeting browsers
 
-// Note: You must explicitly specify `options.format` when piping a streaming target.
-const arrayBuffer = await uploadedFile.arrayBuffer();
-const bufferData = Buffer.from(arrayBuffer);
+const wt = new WaterfallTools();
 
-// Manually wrap the payload inside a backward-compatible instance protecting browser polyfills
+// Note: You must explicitly specify `options.format` when piping a streaming target.
 const fileStream = new Readable({
     read() {
         this.push(bufferData);
         this.push(null);
     }
 });
-const waterfallHar = await Conductor.processStream(fileStream, { 
+
+await wt.loadStream(fileStream, { 
     format: 'tcpdump', 
     isGz: true, 
     keyLogInput: keyLogStream // You can concurrently explicitly provide TLS keylog hooks!
 });
+const waterfallHar = wt.getHar();
 ```
 
 ### Processing a Non-Streaming Buffer (Browser or Node.js)
 
 ```javascript
-import { Conductor } from 'waterfall-tools/core/conductor.js';
+import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
 
 // When you already have the file totally loaded in memory (Buffer, ArrayBuffer, Uint8Array):
 const bufferData = await uploadedFile.arrayBuffer();
 
 // The core engine will automatically sniff the array bytes identifying formats naturally!
-const waterfallHar = await Conductor.processBuffer(bufferData);
+const wt = new WaterfallTools();
+await wt.loadBuffer(bufferData);
 ```
 
 ### Loading from an External URL (Browser or Node.js)
 
 ```javascript
-import { Conductor } from 'waterfall-tools/core/conductor.js';
+import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
 
 // The library automatically fetches, extracts, sniffs, and processes remote trace payloads.
-const waterfallHar = await Conductor.processURL('https://example.com/trace.json.gz');
+const wt = new WaterfallTools();
+await wt.loadUrl('https://example.com/trace.json.gz');
 ```
 
 ### Visualizing using the View Engine (Browser Context)
 
 ```javascript
-import { WaterfallCanvas } from 'waterfall-tools/renderer/canvas.js';
+import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
+
+const wt = new WaterfallTools();
+await wt.loadUrl('https://example.com/trace.json.gz');
 
 // The engine targets a parent container div and natively generates & manages its own internal `<canvas>`
 const containerElement = document.getElementById('waterfall-container');
 
-// Instantiate the renderer (automatically binds ResizeObservers for responsive scaling)
-const renderEngine = new WaterfallCanvas(containerElement, { minWidth: 800 });
-
-// Provide the raw HAR entries and it autonomously calculates layouts and draws
-const page = waterfallHar.log.pages ? waterfallHar.log.pages[0] : null;
-renderEngine.render(waterfallHar.log.entries, page);
+// Instantiate the renderer completely mapped and scaled automagically natively:
+await wt.renderTo(containerElement, { minWidth: 800, showLegend: true });
 ```
 
 ## CLI Interface

@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { processWPTFileNode } from '../../src/inputs/wpt-json.js';
+import { WaterfallTools } from '../../src/core/waterfall-tools.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,7 +13,9 @@ test('WebPageTest JSON Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/WebPageTest JSON/www.google.com-wpt.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/wpt-google.har.json');
         
-        const result = await processWPTFileNode(inputPath, { debug: true });
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'wpt' });
+        let result = tool.getHar({ debug: true });
         
         // Auto-generate golden reference file if absent
         if (!fs.existsSync(refPath)) {
@@ -47,7 +49,9 @@ test('WebPageTest JSON Input Processor', async (t) => {
         
         // This execution naturally exercises the custom PRUNING Token Filter. 
         // If it was just Assembler, Node would likely OutOfMemory / choke on a 13MB gzipped string buffer organically.
-        const result = await processWPTFileNode(inputPath, { debug: true });
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'wpt' });
+        let result = tool.getHar({ debug: true });
         
         if (!fs.existsSync(refPath)) {
             console.log("Generating golden fixture for wpt-cnn.har.json...");
@@ -73,7 +77,10 @@ test('WebPageTest JSON Input Processor', async (t) => {
     await t.test('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/WebPageTest JSON/DOES_NOT_EXIST.json');
         await assert.rejects(
-            async () => await processWPTFileNode(inputPath, { debug: true }),
+            async () => {
+                const tool = new WaterfallTools();
+                await tool.loadFile(inputPath, { debug: true, format: 'wpt' });
+            },
             { code: 'ENOENT' },
             'Should reject with ENOENT when file is missing'
         );

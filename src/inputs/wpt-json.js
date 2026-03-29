@@ -1,3 +1,5 @@
+import { buildWaterfallDataFromHar } from '../core/har-converter.js';
+
 // WebPageTest JSON Input Processor
 // Processes natively without node polyfills using purely Web Streams mapping seamlessly
 /**
@@ -323,5 +325,5 @@ export async function processWPTFileNode(input, options = {}) {
         output.log.pages.forEach(p => p._bwDown = output.log._bwDown);
     }
 
-    return output;
+    return buildWaterfallDataFromHar(output.log, 'wpt');
 }

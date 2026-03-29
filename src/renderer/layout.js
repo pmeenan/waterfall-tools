@@ -105,7 +105,7 @@ export class Layout {
             baseMs = new Date(options.page.startedDateTime).getTime();
         } else {
             for (let i = 0; i < entries.length; i++) {
-                const temp = new Date(entries[i].startedDateTime).getTime();
+                const temp = entries[i].time_start;
                 if (temp < baseMs) {
                     baseMs = temp;
                 }
@@ -113,44 +113,58 @@ export class Layout {
         }
         
         const processedRows = entries.map((entry, index) => {
-            const start = new Date(entry.startedDateTime).getTime();
-            let end = start + entry.time;
+            let start = entry.time_start;
             
-            let dnsStart = start;
-            let connectStart = start;
-            let sslStart = start;
-            let requestStart = start;
-            let ttfb = start;
-            let blockedEnd = start;
-
-            if (entry.timings) {
-                if (entry.timings.blocked > 0) blockedEnd = start + entry.timings.blocked;
-                else blockedEnd = start;
-                
-                dnsStart = blockedEnd;
-                connectStart = dnsStart + Math.max(0, entry.timings.dns);
-                sslStart = connectStart;
-                
-                requestStart = connectStart + Math.max(0, entry.timings.connect);
-                if (entry.timings.ssl > 0) {
-                    sslStart = requestStart - entry.timings.ssl; // SSL happens at end of connect
-                }
-                
-                requestStart += Math.max(0, entry.timings.send);
-                ttfb = requestStart + Math.max(0, entry.timings.wait);
+            // Map absolute chronological beginning to gracefully capture earlier connection bindings
+            if (entry._dnsTimeMs > 0 && entry._dnsTimeMs < start) start = entry._dnsTimeMs;
+            if (entry._connectTimeMs > 0 && entry._connectTimeMs < start) start = entry._connectTimeMs;
+            
+            let timeTotal = 0;
+            if (entry.timings && entry.timings.dns > 0) timeTotal += entry.timings.dns;
+            if (entry.timings && entry.timings.connect > 0) timeTotal += entry.timings.connect;
+            if (entry.timings) timeTotal += entry.timings.wait || 0;
+            if (entry.timings) timeTotal += entry.timings.receive || 0;
+            
+            let end = entry.time_start + timeTotal;
+            if (entry.time_end && entry.time_end > end) end = entry.time_end;
+            
+            let blockedEnd = entry.time_start;
+            if (entry.timings && entry.timings.blocked > 0) blockedEnd = entry.time_start + entry.timings.blocked;
+            
+            let dnsStart = entry._dnsTimeMs > 0 ? entry._dnsTimeMs : blockedEnd;
+            let dnsEnd = entry._dnsEndTimeMs > 0 ? entry._dnsEndTimeMs : dnsStart + (entry.timings ? Math.max(0, entry.timings.dns) : 0);
+            
+            let connectStart = entry._connectTimeMs > 0 ? entry._connectTimeMs : dnsEnd;
+            let connectEnd = entry._connectEndTimeMs > 0 ? entry._connectEndTimeMs : connectStart + (entry.timings ? Math.max(0, entry.timings.connect) : 0);
+            
+            let sslStart = entry._sslStartTimeMs > 0 ? entry._sslStartTimeMs : connectEnd;
+            
+            // HTTP Request Phase strictly maps to absolute issue timestamps
+            let requestStart = entry.time_start > 0 ? entry.time_start : connectEnd + (entry.timings ? Math.max(0, entry.timings.send || 0) : 0);
+            
+            let ttfb = requestStart;
+            if (entry.first_data_time > 0) {
+                ttfb = entry.first_data_time;
+            } else {
+                ttfb = requestStart + (entry.timings ? Math.max(0, entry.timings.wait || 0) : 0);
+            }
+            
+            // Protect against legacy inversions where connection ends dynamically post request starts
+            if (requestStart < connectEnd) {
+                requestStart = connectEnd;
+                ttfb = Math.max(ttfb, requestStart);
             }
 
             maxTime = Math.max(maxTime, end - baseMs);
-
-            const colors = this.getRequestColors(entry.response?.content?.mimeType, entry.request?.url);
+            const colors = this.getRequestColors(entry.mimeType, entry.url);
             
             return {
                 index,
-                url: this.formatUrl(entry.request?.url),
-                time: entry.time,
+                url: this.formatUrl(entry.url),
+                time: timeTotal,
                 start,
                 end,
-                status: entry.response?.status,
+                status: entry.status,
                 blockedEnd,
                 dnsStart, dnsEnd: connectStart,
                 connectStart, connectEnd: sslStart,
@@ -159,8 +173,10 @@ export class Layout {
                 ttfbEnd: ttfb,
                 downloadStart: ttfb,
                 downloadEnd: end,
-                chunks: entry._chunks || [], // Handle WPT custom chunks if they exist
-                jsTiming: entry._js_timing || [], // Handle script executions overlapping
+                chunks: entry._chunks || [], // Handle WPT custom chunks natively matching
+                jsTiming: entry._js_timing || [], 
+                documentURL: entry._documentURL || '',
+                renderBlocking: entry._renderBlocking || '',
                 colors
             };
         });
@@ -218,6 +234,7 @@ export class Layout {
                 canvasWidth, 
                 canvasHeight: processedRows.length * ROW_HEIGHT + (ROW_HEIGHT * 3) + yOffset, 
                 maxTime,
+                baseMs,
                 labelsWidth,
                 widthPerMs,
                 maxBw

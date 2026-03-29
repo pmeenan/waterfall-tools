@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert';
 import path from 'node:path';
 import fs from 'node:fs';
-import { processChromeTraceFileNode } from '../../src/inputs/chrome-trace.js';
+import { WaterfallTools } from '../../src/core/waterfall-tools.js';
 
 test('Chrome Trace Input Processing', async (t) => {
 
@@ -19,7 +19,9 @@ test('Chrome Trace Input Processing', async (t) => {
             const fixturePath = path.resolve(`tests/fixtures/chrome-trace/${filename}.json`);
             const inputPath = path.resolve(`Sample/Data/Chrome Traces/${filename}.json.gz`);
 
-            const har = await processChromeTraceFileNode(inputPath, { debug: true });
+            const tool = new WaterfallTools();
+            await tool.loadFile(inputPath, { debug: true, format: 'chrome-trace' });
+            const har = tool.getHar({ debug: true });
             
             // Scrub dynamic Dates
             if (har.log && har.log.pages) {

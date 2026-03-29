@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
-import { processHARFileNode } from '../../src/inputs/har.js';
+import { WaterfallTools } from '../../src/core/waterfall-tools.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,7 +22,16 @@ test('HAR Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/WebPageTest/amazon.har.gz');
         const refPath = path.resolve(__dirname, '../fixtures/amazon.har.json');
         
-        const result = await processHARFileNode(inputPath, { debug: true });
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'har' });
+        const result = JSON.parse(JSON.stringify(tool.getHar({ debug: true })));
+        
+        if (!fs.existsSync(refPath)) {
+            console.log(`Generating golden fixture for amazon.har.json...`);
+            fs.mkdirSync(path.dirname(refPath), { recursive: true });
+            fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
+        }
+        
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
         assert.deepStrictEqual(result, ref, 'Parsed WPT HAR does not match reference output');
@@ -38,7 +47,16 @@ test('HAR Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/Chrome/www.google.com.har');
         const refPath = path.resolve(__dirname, '../fixtures/chrome-google.har.json');
         
-        const result = await processHARFileNode(inputPath, { debug: true });
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'har' });
+        const result = JSON.parse(JSON.stringify(tool.getHar({ debug: true })));
+        
+        if (!fs.existsSync(refPath)) {
+            console.log(`Generating golden fixture for chrome-google.har.json...`);
+            fs.mkdirSync(path.dirname(refPath), { recursive: true });
+            fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
+        }
+        
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
         assert.deepStrictEqual(result, ref, 'Parsed Chrome HAR does not match reference output');
@@ -53,7 +71,16 @@ test('HAR Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/Firefox/www.google.com_Archive [26-03-27 17-36-46].har');
         const refPath = path.resolve(__dirname, '../fixtures/firefox-google.har.json');
         
-        const result = await processHARFileNode(inputPath, { debug: true });
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'har' });
+        const result = JSON.parse(JSON.stringify(tool.getHar({ debug: true })));
+        
+        if (!fs.existsSync(refPath)) {
+            console.log(`Generating golden fixture for firefox-google.har.json...`);
+            fs.mkdirSync(path.dirname(refPath), { recursive: true });
+            fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
+        }
+        
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
         assert.deepStrictEqual(result, ref, 'Parsed Firefox HAR does not match reference output');
@@ -67,7 +94,10 @@ test('HAR Input Processor', async (t) => {
     await t.test('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/DOES_NOT_EXIST.har');
         await assert.rejects(
-            async () => await processHARFileNode(inputPath, { debug: true }),
+            async () => {
+                const tool = new WaterfallTools();
+                await tool.loadFile(inputPath, { debug: true, format: 'har' });
+            },
             { code: 'ENOENT' },
             'Should reject with ENOENT when file is missing'
         );

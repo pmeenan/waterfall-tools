@@ -275,15 +275,20 @@ export async function processChromeTraceFileNode(input, options = {}) {
 
         const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, final_start_time);
         
-        if (har.log && har.log.pages && har.log.pages.length > 0) {
+        // Add minimal layout mapping overrides for Chrome trace
+        if (har.log && har.log.pages.length > 0) {
             const page = har.log.pages[0];
             page.title = 'Chrome Trace Default View';
+            if (!page.pageTimings) page.pageTimings = {};
             if (pageTimings.onLoad > 0) page.pageTimings.onLoad = pageTimings.onLoad;
             if (pageTimings.onContentLoad > 0) page.pageTimings.onContentLoad = pageTimings.onContentLoad;
             if (pageTimings._startRender > 0) page.pageTimings._startRender = pageTimings._startRender;
         }
-
-        return har;
+        
+        if (options.debug) console.log(`[chrome-trace.js] Finished applying HAR generation successfully.`);
+        
+        const { buildWaterfallDataFromHar } = await import('../core/har-converter.js');
+        return buildWaterfallDataFromHar(har.log, 'chrome-trace');
 
     } catch (e) {
         throw e;

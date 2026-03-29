@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { processNetlogFileNode } from '../../src/inputs/netlog.js';
+import { WaterfallTools } from '../../src/core/waterfall-tools.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,7 +13,9 @@ test('Netlog JSON Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Netlog/www.google.com-netlog.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/netlog-google.har.json');
         
-        const result = await processNetlogFileNode(inputPath, { debug: true });
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'netlog' });
+        let result = tool.getHar({ debug: true });
         
         // Auto-generate golden reference file if absent
         if (!fs.existsSync(refPath)) {
@@ -23,6 +25,7 @@ test('Netlog JSON Input Processor', async (t) => {
         }
 
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
+        result = JSON.parse(JSON.stringify(result)); // sanitize for assert
 
         assert.deepStrictEqual(result, ref, 'Parsed Netlog JSON does not match reference output');
         assert.strictEqual(result.log.version, "1.2");
@@ -40,7 +43,9 @@ test('Netlog JSON Input Processor', async (t) => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Netlog/amazon1_netlog.json.gz');
         const refPath = path.resolve(__dirname, '../fixtures/netlog-amazon1.har.json');
         
-        const result = await processNetlogFileNode(inputPath, { debug: true });
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'netlog' });
+        let result = tool.getHar({ debug: true });
         
         if (!fs.existsSync(refPath)) {
             console.log("Generating golden fixture for netlog-amazon1.har.json...");
@@ -49,6 +54,7 @@ test('Netlog JSON Input Processor', async (t) => {
         }
 
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
+        result = JSON.parse(JSON.stringify(result)); // sanitize for assert
 
         assert.deepStrictEqual(result, ref, 'Parsed Amazon Netlog JSON does not match reference output');
         assert.strictEqual(result.log.creator.name, "waterfall-tools");
@@ -60,7 +66,10 @@ test('Netlog JSON Input Processor', async (t) => {
     await t.test('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/Netlog/DOES_NOT_EXIST.json.gz');
         await assert.rejects(
-            async () => await processNetlogFileNode(inputPath, { debug: true }),
+            async () => {
+                const tool = new WaterfallTools();
+                await tool.loadFile(inputPath, { debug: true, format: 'netlog' });
+            },
             { code: 'ENOENT' },
             'Should reject with ENOENT when file is missing'
         );

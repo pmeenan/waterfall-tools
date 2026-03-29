@@ -3,7 +3,7 @@
     "version": "1.2",
     "creator": {
       "name": "waterfall-tools",
-      "version": "1.0.0"
+      "version": "0.2.0"
     },
     "pages": [
       {
@@ -14,6 +14,15 @@
           "onContentLoad": 2230.323,
           "_startRender": 427.207
         },
+        "_render": -1,
+        "_domContentLoadedEventStart": -1,
+        "_domContentLoadedEventEnd": -1,
+        "_loadEventStart": -1,
+        "_loadEventEnd": -1,
+        "_firstContentfulPaint": -1,
+        "_LargestContentfulPaint": -1,
+        "_domInteractive": -1,
+        "_bwDown": -1,
         "_unlinked_connections": [
           {
             "_id": "159",
@@ -9900,14 +9909,12 @@
     ],
     "entries": [
       {
-        "pageref": "page_1_0_1",
         "time": 4817415,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://google.com/.well-known/web-identity",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -9967,14 +9974,15 @@
               "value": "u=0"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 1016623,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -10017,16 +10025,17 @@
               "value": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 1016623,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 1016623
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -10034,6 +10043,8 @@
           "wait": 87047,
           "receive": 4730368
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 1016623,
         "_chunks": [
           {
@@ -10426,17 +10437,21 @@
         "_uncompressed_bytes_in": 7101524,
         "_stream_id": 5,
         "_netlog_id": "1000000",
-        "_fromNet": true
+        "_fromNet": true,
+        "_load_start": 0,
+        "_ttfb_start": 0,
+        "_ttfb_end": 87047,
+        "_download_start": 87047,
+        "_download_end": 4817415,
+        "_all_end": 4817415
       },
       {
-        "pageref": "page_1_0_1",
         "time": 2847194.9996643066,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
           "url": "https://out053a3bejgh7t0phqa0csou.litix.io/",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -10504,14 +10519,15 @@
               "value": "en-US,en;q=0.9"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 566468,
+          "cookies": [],
           "headers": [
             {
               "name": "access-control-allow-methods",
@@ -10538,16 +10554,17 @@
               "value": "envoy"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 566468,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 566468
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -10555,6 +10572,8 @@
           "wait": 18865.99966430664,
           "receive": 2828329
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 566468,
         "_chunks": [
           {
@@ -10770,17 +10789,21 @@
           "fetchType": "fetch",
           "type": "script"
         },
-        "_type": "Other"
+        "_type": "Other",
+        "_load_start": 4328384,
+        "_ttfb_start": 4328384,
+        "_ttfb_end": 4347249,
+        "_download_start": 4347249,
+        "_download_end": 7175578,
+        "_all_end": 7175578
       },
       {
+        "time": 2170779.999633789,
         "pageref": "page_1_0_1",
-        "time": 2170779.999649048,
         "request": {
           "method": "GET",
           "url": "https://dt.adsafeprotected.com/dt?anId=928791&asId=29e2ddfe-6c93-19c2-842b-55c5677b4c5b&tv=%7Bc:85BASs,pingTime:-2,time:71,type:a,im:%7Bsf:0,pom:1,prf:%7BbeA:84,beZ:84,mfA:86,mfZ:88,cmA:106,inA:106,inZ:110,prA:111,prZ:115,si:116,poA:116,bl:121,poZ:121,cmZ:121,loA:128,loZ:129,ltA:155,ltZ:155,rt:1,bc:n%7D%7D,sca:%7Bdfp:%7Bdf:0%7D%7D,env:%7Bgca:false,cca:true,ccd:%7Bversion:1,uspString:1YYN%7D,gca2:false%7D,clog:%5B%7Bpiv:100,vs:i,r:,w:317,h:178,t:42%7D%5D,ve:%7BvEventCount:1,vEvents:%5B%7Bt:0,rt:-83,tp:adVideoStart,sl:n,ad_duration:6.006,volume:1,devol:1%7D%5D%7D,es:0,sc:1,ha:1,fgad:1,fif:0,gmnp:0,for:1,b11:0,cnod:1,gm:1,slTimes:%7Bi:71,o:0,n:0,pp:0,pm:0,ri:108%7D,slEvents:%5B%7Bsl:i,t:42,wc:0.0.2307.939,ac:1524.402.317.178,am:o1,cc:1524.402.317.178,piv:100,obst:0,th:na,reas:,bkn:%7Bpiv:%5B46~100%5D,as:%5B46~317.178%5D%7D%7D%5D,slEventCount:1,em:true,fr:true,e:,tt:jload,dtt:0,og:-60.100,fm:vf7bDHz+11%7C12%7C13%7C14%7C15%7C16%7C17%7C18%7C19%7C1a%7C1b%7C1c%7C1d*.928791,idMap:1d*,pd:CV8L.internal-pdf-viewer,rmeas:1,oren:31,rend:1,renddet:env.or,siq:32,slid:%5Bomid-verification-script-frame-dcc95c7d-eedf-4ce5-94ac-9704f2ff71c5%5D,msd:0,ph:939,igt:0,sinceFw:38,readyFired:true%7D&br=c",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -10836,14 +10859,15 @@
               "value": "i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 2624630,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -10870,23 +10894,26 @@
               "value": "Fri, 27 Mar 2026 23:51:44 GMT"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 2624630,
-            "mimeType": "image/gif"
+            "size": 43,
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 43
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 13637.999649047852,
+          "wait": 13637.999633789062,
           "receive": 2157142
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 2624630,
         "_chunks": [
           {
@@ -11390,17 +11417,21 @@
         },
         "_type": "Image",
         "_bytesIn": 43,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 4329426,
+        "_ttfb_start": 4329426,
+        "_ttfb_end": 4343063,
+        "_download_start": 4343063,
+        "_download_end": 6500205,
+        "_all_end": 6500205
       },
       {
+        "time": 2090752.999633789,
         "pageref": "page_1_0_1",
-        "time": 2090752.9996490479,
         "request": {
           "method": "GET",
           "url": "https://fly.amer-free.prd.media.cnn.com/amer/8e1f82e5-5a27-5f4b-bc50-0b8070c1cad5/v/0_10143e/v3/10.mp4",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -11456,14 +11487,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 163620,
+          "cookies": [],
           "headers": [
             {
               "name": "content-length",
@@ -11578,23 +11610,26 @@
               "value": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 163620,
-            "mimeType": "video/mp4"
+            "size": 10841,
+            "mimeType": "video/mp4",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 10841
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 15366.999649047852,
+          "wait": 15366.999633789062,
           "receive": 2075386
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 163620,
         "_chunks": [
           {
@@ -11710,17 +11745,21 @@
         },
         "_type": "Other",
         "_bytesIn": 10841,
-        "_mimeType": "video/mp4"
+        "_mimeType": "video/mp4",
+        "_load_start": 4329837,
+        "_ttfb_start": 4329837,
+        "_ttfb_end": 4345203,
+        "_download_start": 4345203,
+        "_download_end": 6420589,
+        "_all_end": 6420589
       },
       {
+        "time": 2043177.999633789,
         "pageref": "page_1_0_1",
-        "time": 2043177.9996490479,
         "request": {
           "method": "GET",
           "url": "https://tpsc-video-ue.doubleverify.com/visit.jpg?vstevt=2&tagtype=video&ctx=30744702&cmp=35150675&sid=10519677&plc=440149964&crt=250725104&advid=10394157&adsrv=1&dup=5089c481-fdb0-4af6-8043-71f098ff9b0e&dvtagver=dvot_2026-03-26_779ce70f6_44039b4&vad=6000&vmftype=video&cawf=crtwrp&dvp_infra=cloudflare&zjsver=1.1.6&gdpr=0&vstvr=2.0-i&dvp_media=1&dvp_psf=0&app=[APPBUNDLE]&essd=[SERVERSIDE]",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -11776,14 +11815,15 @@
               "value": "en-US,en;q=0.9"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 131091,
+          "cookies": [],
           "headers": [
             {
               "name": "Date",
@@ -11806,23 +11846,26 @@
               "value": "no-cache"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 131091,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 131091
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 12393.999649047852,
+          "wait": 12393.999633789062,
           "receive": 2030784
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 131091,
         "_chunks": [
           {
@@ -11909,17 +11952,21 @@
           "fetchType": "fetch",
           "type": "script"
         },
-        "_type": "Other"
+        "_type": "Other",
+        "_load_start": 4375494,
+        "_ttfb_start": 4375494,
+        "_ttfb_end": 4387887,
+        "_download_start": 4387887,
+        "_download_end": 6418671,
+        "_all_end": 6418671
       },
       {
+        "time": 2054520.999633789,
         "pageref": "page_1_0_1",
-        "time": 2054520.9996185303,
         "request": {
           "method": "GET",
           "url": "https://vtrk.dv.tech/?tid=ZW-12000000&ec=vast&cid=5089c481-fdb0-4af6-8043-71f098ff9b0e&el=https%3A%2F%2Fserverside.doubleclick.net%2Fddm%2Fpfadx%2FN1424131.4673788WARNERBROSDISCOV%2FB35150675.440149964%3Bsz%3D0x0%3Bord%3D1200359237%3Bdc_lat%3D%3Bdc_rdid%3D%3Btag_for_child_directed_treatment%3D%3Btfua%3D%3Bdc_tdv%3D1%3Bdcmt%3Dtext%2Fxml%3Bdc_sdk_apis%3D%255BAPIFRAMEWORKS%255D%3Bdc_omid_p%3D%255BOMIDPARTNER%255D%3Bgdpr%3D0%3Bgdpr_consent%3D%3Bdc_mpos%3D%255BBREAKPOSITION%255D%3Bltd%3D%3Fves%3DdGltZXN0YW1wOiAxNzc0NjU1NTAzNTIxCmNsaWNrX3Rocm91Z2hfdXJsOiAiaHR0cHM6Ly9hZGNsaWNrLmcuZG91YmxlY2xpY2submV0L3Bjcy9jbGljaz94YWk9QUtBT2pzdTgzOE1wSFdBbnhVdmdFcDZiVHhzMm50TzdhaXJ6bFg1MENBY0JzdDk2bFBKZnA0aGQwUTc4dVpaOExfUEhXbmFxd1VoYW9kT2Z3aEJ6Zmg1eFNwRzlsUmZMek4tRlFqTFZkUktlQzJkLUNzaEE3R0d6MFRJTGs4YTBpMFNPQlAweXBSU0ZwNnRoazlIcjI5NHNLTE9kTE1LalpndUNJbzBEUzk2MlFGeU9HR3FWcnJqcXJkRXM2eWJ6bHZoYl8xUGdEU0xVTWVBMmZ3UzNmLV8zYW41UWRfeDVCWWR4M1hNMlFRRTFmRlQ5VjYtWm42WWc2Q3BVRURMN0Vwa2NpWFNNWFQ2R1VNMGpZQVllRVRXUWVTb1JZbnBFakcyMjBXTkxqbkpPRFBBWkwtVkp1SnJlVnhpT09OMzJsMVFGM1ZFLVVISTVLMjJaQ19JN1ZFd2xtQUlNLTFIRnlGcEtFbGpFY0g2Y1M2S3dqTXdyb1Y5WE9DNmFxMG9kT0hFS2pQdGp4RFZ0bFJ2NFRzREVPV29qNGZXYXhBSERwOXFnOEtuX3B5YkxaLUFwdlFLZmw4VElLYXdxOHVvWXZBWmsmc2FpPUFNZmwtWVFoYzlqNFVURk9UN28yQnpiQXNDdlBod2p0Tk9fYmFsZy1zbmd5VE8tajFTWWlTVl8wLWUxUXlpS3Z1OEJxVXRPWTFCQ1FqOEp0ak9uOXQ5LXlScXVpRWU3UENVS0dXeHlCelB4YTFXT3dCRHo1LU91eEJubG5OYVBDd0dnUEVFMnZYV20yNVpqaTJ2R0pja3NmVGlCX1pjMUZobHBPNXRpUWFLTkd3Y25uQ3BiUy0zeTJxbFJfUU5vdGM2SG1wS2wwZlBuWl8wYmhIc25YTTl5YU5adEJEazkydEZRZXVzcFhMLUEwZGN1d2JLazRWVXJ1NkswejZBUXcxdXdZekhQZlN1Zlh5bk9Ub0pTUzdqaG93eU1iTS1qUSZzaWc9Q2cwQXJLSlN6RlVuZWh6cllrUEZFQUUmY3J5PTEmZmJzX2FlaWQ9JTVCZ3dfZmJzYWVpZCU1RCZ1cmxmaXg9MSZhZHVybD1odHRwczovL2QuYWdrbi5jb20vcGl4ZWwvMTA2OTEvJTNGY2hlJTNEMTk1NTg0NjYyNCUyNmNtaWQlM0QzNTE1MDY3NSUyNnNpZCUzRDEwNTE5Njc3JTI2cGlkJTNENDQwMTQ5OTY0JTI2Y2dpZCUzRDYzNDcyMzIyMyUyNmNpZCUzRDI1MDcyNTEwNCUyNmFpZCUzRDEwMzk0MTU3JTI2Z2RwciUzRCUyNCU3QkdEUFIlN0QlMjZnZHByX2NvbnNlbnQlM0QlMjQlN0JHRFBSX0NPTlNFTlRfNDY4JTdEJTI2bDElM0RodHRwczovL21ldGEuY29tL2NvbW11bml0eSUzRnV0bV9tZWRpdW0lM0RwYWlkYWRzJTI2dXRtX3NvdXJjZSUzRDEwNTE5Njc3JTI2dXRtX2NvbnRlbnQlM0Q0NDAxNDk5NjQtMjUwNzI1MTA0JTI2dXRtX3Rlcm0lM0QxNTI0NzAlMjZ1dG1fY2FtcGFpZ24lM0RQdWJsaWNBZmZhaXJzLVJlcHV0YXRpb24tQ1BWUTEtTElEMjU0Mi0yMDI2JTI2ZGNsaWQlM0QlMjVlZGNsaWQhJTI2Z2FkX3NvdXJjZSUzRDclMjZnYWRfY2FtcGFpZ25pZCUzRDIzNTUwNzQwMzg4Igo%26dc_cid%3D250725104%26dc_adid%3D634723223&ea=impression&cm114=1&cm115=31&cd101=vast&cd102=src&cd108=crtwrp&cd111=inline&cd112=unwrapped&cd116=vast%3Adoubleclick.net%3A31%3A1%3A0&cd117=2&cd145=%5BSERVERSIDE%5D&cd170=1&cd183=dvot_2026-03-26_779ce70f6_44039b4&cd188=IAD&cd189=cloudflare&cd190=30744702&cd191=35150675&cd192=10519677&cd193=440149964&cd194=10394157&cd195=0&cd196=1&cd141=%5BAPIFRAMEWORKS%5D&cd142=%5BTIMESTAMP%5D&cd143=[TIMESTAMP]&z=[CACHEBUSTING]",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -11971,14 +12018,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 348213,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -12025,23 +12073,26 @@
               "value": "cfExtPri"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 348213,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 348213
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 12061.999618530273,
+          "wait": 12061.999633789062,
           "receive": 2042459
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 348213,
         "_chunks": [
           {
@@ -12195,17 +12246,21 @@
           "fetchType": "fetch",
           "type": "script"
         },
-        "_type": "Other"
+        "_type": "Other",
+        "_load_start": 4376996,
+        "_ttfb_start": 4376996,
+        "_ttfb_end": 4389057,
+        "_download_start": 4389057,
+        "_download_end": 6431516,
+        "_all_end": 6431516
       },
       {
-        "pageref": "page_1_0_1",
         "time": 2040421.9996032715,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://googleads4.g.doubleclick.net/pcs/view?xai=AKAOjsuxJOBv94RlnV8NUFw9YuDSGHzVxeQuicOJ0ee7bHpFLYGpmsUPjvez24R3-7lkHBSN3OriIMWB9zTNdyxukLcs1eKdhlqcpKOzdt6Id9wq59K6QRnJkxk0tE_VrBox5iw_2vw_VAGQy4XfZpcyZ4TOMQeGOl9VRgK5_j-MgUeMHOHP&sai=AMfl-YQUoYxggeh-aCpqIJJ1NwJfLfR8giK5PdGoy229iylLqvL5pFdst037cWGkty_srgzXtM6oYJA_leo4-ARaLs9nno5Ir8tq7UYRqekLjVy0w9lKa9dzcwTonxJer7WFGBqiMefPu45ExbunAEtKSyybqSp6h2rPCw9LL9eXZdeuh05c4Qe-t2K4kaeveJabIjFCunN64xV-rewIWy9ZM51tqksofxXurwUt-O_RT6AEIFGfKVNgMB0hXNfd-ZoFqZp4uuHZ3XOuT-qGjql3283m2QnY-BiVNLCYx0Y&sig=Cg0ArKJSzFM6plji_BNMEAE&uach_m=%5BUACH%5D&cry=1&fbs_aeid=%5Bgw_fbsaeid%5D&urlfix=1&adurl=",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -12277,14 +12332,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 244241,
+          "cookies": [],
           "headers": [
             {
               "name": "p3p",
@@ -12339,16 +12395,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 244241,
-            "mimeType": "image/gif"
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 244241
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -12356,6 +12413,8 @@
           "wait": 12401.999603271484,
           "receive": 2028020
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 244241,
         "_chunks": [
           {
@@ -12514,17 +12573,21 @@
           "type": "script"
         },
         "_type": "Other",
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 4381339,
+        "_ttfb_start": 4381339,
+        "_ttfb_end": 4393740,
+        "_download_start": 4393740,
+        "_download_end": 6421760,
+        "_all_end": 6421760
       },
       {
+        "time": 2008722.999572754,
         "pageref": "page_1_0_1",
-        "time": 2008722.9995880127,
         "request": {
           "method": "GET",
           "url": "https://p.tvpixel.com/com.snowplowanalytics.iglu/v1?schema=iglu:com.dataplusmath/video_impression/jsonschema/1-0-0&aid=meta_marketer_0e9fb00e-c65d-417a-b74c-ca170ed10d99&cb=1955846624&pub_id=10519677&adv_id=10394157&adv_nm=&c_id=35150675&c_nm=&pl_id=440149964&pl_nm=&ad_id=634723223&ad_nm=250725104&ad_len=&width=&height=&fw_caid=&u_id=&u_ip=&v_id=&v_nm=&app_id=&app_nm=&dvc_typ=&dvc_id=&dvc_lat=&us_privacy=",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -12576,14 +12639,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 24525,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -12622,23 +12686,26 @@
               "value": "max-age=31536000; includeSubDomains"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 24525,
-            "mimeType": "image/gif"
+            "size": 43,
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 43
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 14364.999588012695,
+          "wait": 14364.999572753906,
           "receive": 1994358
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 24525,
         "_chunks": [
           {
@@ -12757,17 +12824,21 @@
         },
         "_type": "Other",
         "_bytesIn": 43,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 4381533,
+        "_ttfb_start": 4381533,
+        "_ttfb_end": 4395897,
+        "_download_start": 4395897,
+        "_download_end": 6390255,
+        "_all_end": 6390255
       },
       {
+        "time": 1989644.999572754,
         "pageref": "page_1_0_1",
-        "time": 1989644.9995880127,
         "request": {
           "method": "GET",
           "url": "https://fly.amer-free.prd.media.cnn.com/amer/8e1f82e5-5a27-5f4b-bc50-0b8070c1cad5/v/0_10143e/v3/8.mp4",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -12823,14 +12894,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 210376,
+          "cookies": [],
           "headers": [
             {
               "name": "content-length",
@@ -12945,23 +13017,26 @@
               "value": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 210376,
-            "mimeType": "video/mp4"
+            "size": 10693,
+            "mimeType": "video/mp4",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 10693
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 16753.999588012695,
+          "wait": 16753.999572753906,
           "receive": 1972891
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 210376,
         "_chunks": [
           {
@@ -13057,17 +13132,21 @@
         },
         "_type": "Other",
         "_bytesIn": 10693,
-        "_mimeType": "video/mp4"
+        "_mimeType": "video/mp4",
+        "_load_start": 4383158,
+        "_ttfb_start": 4383158,
+        "_ttfb_end": 4399911,
+        "_download_start": 4399911,
+        "_download_end": 6372802,
+        "_all_end": 6372802
       },
       {
+        "time": 2057471.999572754,
         "pageref": "page_1_0_1",
-        "time": 2057471.9995880127,
         "request": {
           "method": "GET",
           "url": "https://cdn.doubleverify.com/dvbm.js",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -13127,14 +13206,15 @@
               "value": "en-US,en;q=0.9"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 669922,
+          "cookies": [],
           "headers": [
             {
               "name": "Content-Encoding",
@@ -13185,23 +13265,26 @@
               "value": "keep-alive"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 669922,
-            "mimeType": "text/javascript"
+            "mimeType": "text/javascript",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 669922
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 16332.999588012695,
+          "wait": 16332.999572753906,
           "receive": 2041139
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 669922,
         "_chunks": [
           {
@@ -13330,17 +13413,21 @@
         "_line": "GET /dvbm.js HTTP/1.1\r\n",
         "_has_raw_bytes": true,
         "_netlog_id": "419",
-        "_fromNet": true
+        "_fromNet": true,
+        "_load_start": 4384418,
+        "_ttfb_start": 4384418,
+        "_ttfb_end": 4400750,
+        "_download_start": 4400750,
+        "_download_end": 6441889,
+        "_all_end": 6441889
       },
       {
-        "pageref": "page_1_0_1",
         "time": 4295516.999847412,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://tpsc-ue1.doubleverify.com/event.png?impid=5c98bac791a04f29b0233e70f0adebe4&dup=5089c481-fdb0-4af6-8043-71f098ff9b0e&flavor=1&gdpr=0&gdpr_consent=&q1b5=606&q1ad=606&ivab11=606&lftb=606&sftb=606&vattp=606&omgr=4&m50invms=606&ee_dp_m50invnprms=606&eoid=30",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -13400,14 +13487,15 @@
               "value": "en-US,en;q=0.9"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 755831,
+          "cookies": [],
           "headers": [
             {
               "name": "Date",
@@ -13430,16 +13518,17 @@
               "value": "max-age=0"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 755831,
-            "mimeType": ""
+            "size": 162,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 162
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -13447,6 +13536,8 @@
           "wait": 89815.99984741211,
           "receive": 4205701
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 755831,
         "_chunks": [
           {
@@ -13673,17 +13764,21 @@
         },
         "_type": "Image",
         "_bytesIn": 162,
-        "_mimeType": "text/plain"
+        "_mimeType": "text/plain",
+        "_load_start": 4821214,
+        "_ttfb_start": 4821214,
+        "_ttfb_end": 4911029,
+        "_download_start": 4911029,
+        "_download_end": 9116730,
+        "_all_end": 9116730
       },
       {
+        "time": 241818.99938964844,
         "pageref": "page_1_0_1",
-        "time": 241818.99937438965,
         "request": {
           "method": "OPTIONS",
           "url": "https://events.brightline.tv/track",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -13735,14 +13830,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -13765,23 +13861,26 @@
               "value": "*"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": ""
+            "size": 2,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 2
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 24340.99937438965,
+          "wait": 24340.999389648438,
           "receive": 217478
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 88966118281.176,
@@ -13841,17 +13940,21 @@
         },
         "_type": "Other",
         "_bytesIn": 2,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 5300605,
+        "_ttfb_start": 5300605,
+        "_ttfb_end": 5324945,
+        "_download_start": 5324945,
+        "_download_end": 5542423,
+        "_all_end": 5542423
       },
       {
+        "time": 242286.99938964844,
         "pageref": "page_1_0_1",
-        "time": 242286.99937438965,
         "request": {
           "method": "OPTIONS",
           "url": "https://events.brightline.tv/track",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -13903,14 +14006,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -13933,23 +14037,26 @@
               "value": "*"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": ""
+            "size": 2,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 2
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 24999.99937438965,
+          "wait": 24999.999389648438,
           "receive": 217287
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 88966128092.176,
@@ -14009,17 +14116,21 @@
         },
         "_type": "Other",
         "_bytesIn": 2,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 5300705,
+        "_ttfb_start": 5300705,
+        "_ttfb_end": 5325704,
+        "_download_start": 5325704,
+        "_download_end": 5542991,
+        "_all_end": 5542991
       },
       {
+        "time": 219426.99932861328,
         "pageref": "page_1_0_1",
-        "time": 219426.99934387207,
         "request": {
           "method": "OPTIONS",
           "url": "https://events.brightline.tv/track",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -14071,14 +14182,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -14101,23 +14213,26 @@
               "value": "*"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": ""
+            "size": 2,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 2
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 33509.99934387207,
+          "wait": 33509.99932861328,
           "receive": 185917
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 88966181642.176,
@@ -14177,17 +14292,21 @@
         },
         "_type": "Other",
         "_bytesIn": 2,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 5322274,
+        "_ttfb_start": 5322274,
+        "_ttfb_end": 5355783,
+        "_download_start": 5355783,
+        "_download_end": 5541700,
+        "_all_end": 5541700
       },
       {
-        "pageref": "page_1_0_1",
         "time": 24761.999298095703,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
           "url": "https://events.brightline.tv/track",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -14239,14 +14358,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "date",
@@ -14269,16 +14389,17 @@
               "value": "*"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 0,
-            "mimeType": ""
+            "size": 2,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 2
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -14286,6 +14407,8 @@
           "wait": 24761.999298095703,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 88966321057.176,
@@ -14345,17 +14468,21 @@
         },
         "_type": "Other",
         "_bytesIn": 2,
-        "_mimeType": "application/json"
+        "_mimeType": "application/json",
+        "_load_start": 5518864,
+        "_ttfb_start": 5518864,
+        "_ttfb_end": 5543625,
+        "_download_start": 5543625,
+        "_download_end": 5543625,
+        "_all_end": 5543625
       },
       {
-        "pageref": "page_1_0_1",
         "time": 41691,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://idsync.rlcdn.com/709804.gif?partner_uid=e9b92_7622087347051677337",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -14407,14 +14534,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 126579,
+          "cookies": [],
           "headers": [
             {
               "name": "cache-control",
@@ -14457,16 +14585,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 126579,
-            "mimeType": ""
+            "size": 42,
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 42
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -14474,6 +14603,8 @@
           "wait": 41691,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 126579,
         "_chunks": [
           {
@@ -14549,17 +14680,21 @@
         },
         "_type": "Other",
         "_bytesIn": 42,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_load_start": 6334936,
+        "_ttfb_start": 6334936,
+        "_ttfb_end": 6376627,
+        "_download_start": 6376627,
+        "_download_end": 6376627,
+        "_all_end": 6376627
       },
       {
+        "time": 34323.999572753906,
         "pageref": "page_1_0_1",
-        "time": 34323.999588012695,
         "request": {
           "method": "GET",
           "url": "https://fly.amer-free.prd.media.cnn.com/amer/8e1f82e5-5a27-5f4b-bc50-0b8070c1cad5/a/0_ba7097/a0/7.mp4",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -14615,14 +14750,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 42001,
+          "cookies": [],
           "headers": [
             {
               "name": "content-length",
@@ -14737,23 +14873,26 @@
               "value": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 42001,
-            "mimeType": "video/mp4"
+            "size": 8260,
+            "mimeType": "video/mp4",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 8260
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 14195.999588012695,
+          "wait": 14195.999572753906,
           "receive": 20128
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 42001,
         "_chunks": [
           {
@@ -14846,17 +14985,21 @@
         },
         "_type": "Other",
         "_bytesIn": 8260,
-        "_mimeType": "video/mp4"
+        "_mimeType": "video/mp4",
+        "_load_start": 6337828,
+        "_ttfb_start": 6337828,
+        "_ttfb_end": 6352023,
+        "_download_start": 6352023,
+        "_download_end": 6372151,
+        "_all_end": 6372151
       },
       {
+        "time": 59938.999572753906,
         "pageref": "page_1_0_1",
-        "time": 59938.999588012695,
         "request": {
           "method": "GET",
           "url": "https://fly.amer-free.prd.media.cnn.com/amer/8e1f82e5-5a27-5f4b-bc50-0b8070c1cad5/v/0_10143e/v3/9.mp4",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -14912,14 +15055,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 107463,
+          "cookies": [],
           "headers": [
             {
               "name": "content-length",
@@ -15034,23 +15178,26 @@
               "value": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 107463,
-            "mimeType": "video/mp4"
+            "size": 10509,
+            "mimeType": "video/mp4",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 10509
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 19483.999588012695,
+          "wait": 19483.999572753906,
           "receive": 40455
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 107463,
         "_chunks": [
           {
@@ -15140,17 +15287,21 @@
         },
         "_type": "Other",
         "_bytesIn": 10509,
-        "_mimeType": "video/mp4"
+        "_mimeType": "video/mp4",
+        "_load_start": 6340309,
+        "_ttfb_start": 6340309,
+        "_ttfb_end": 6359792,
+        "_download_start": 6359792,
+        "_download_end": 6400247,
+        "_all_end": 6400247
       },
       {
+        "time": 11183.999572753906,
         "pageref": "page_1_0_1",
-        "time": 11183.999588012695,
         "request": {
           "method": "GET",
           "url": "https://fly.amer-free.prd.media.cnn.com/amer/8e1f82e5-5a27-5f4b-bc50-0b8070c1cad5/v/0_10143e/v3/7.mp4",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -15206,14 +15357,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 228763,
+          "cookies": [],
           "headers": [
             {
               "name": "content-length",
@@ -15328,23 +15480,26 @@
               "value": "h3=\":443\";ma=86400,h3-29=\":443\";ma=86400,h3-27=\":443\";ma=86400"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 228763,
-            "mimeType": "video/mp4"
+            "size": 10771,
+            "mimeType": "video/mp4",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 10771
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 10592.999588012695,
+          "wait": 10592.999572753906,
           "receive": 591
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 228763,
         "_chunks": [
           {
@@ -15437,17 +15592,21 @@
         },
         "_type": "Other",
         "_bytesIn": 10771,
-        "_mimeType": "video/mp4"
+        "_mimeType": "video/mp4",
+        "_load_start": 6342686,
+        "_ttfb_start": 6342686,
+        "_ttfb_end": 6353278,
+        "_download_start": 6353278,
+        "_download_end": 6353869,
+        "_all_end": 6353869
       },
       {
-        "pageref": "page_1_0_1",
         "time": 30100.999145507812,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://pixel.adsafeprotected.com/jload?anId=928791&pubId=1173361&campId=preroll&pubOrder=92198913&pubCreative=318833160&placementId=92199440&chanId=&custom=&custom2=",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -15503,14 +15662,15 @@
               "value": "u=1"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 93957,
+          "cookies": [],
           "headers": [
             {
               "name": "server",
@@ -15545,16 +15705,17 @@
               "value": "Fri, 03-Apr-26 23:51:44 GMT"
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 93957,
-            "mimeType": "application/javascript"
+            "size": 328267,
+            "mimeType": "application/javascript",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 328267
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -15562,6 +15723,8 @@
           "wait": 14348.999145507812,
           "receive": 15752
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 93957,
         "_chunks": [
           {
@@ -15645,17 +15808,21 @@
         },
         "_type": "Script",
         "_bytesIn": 328267,
-        "_mimeType": "application/javascript"
+        "_mimeType": "application/javascript",
+        "_load_start": 6374333,
+        "_ttfb_start": 6374333,
+        "_ttfb_end": 6388681,
+        "_download_start": 6388681,
+        "_download_end": 6404433,
+        "_all_end": 6404433
       },
       {
-        "pageref": "page_1_0_1",
         "time": 47518,
+        "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
           "url": "https://idsync.rlcdn.com/1000.gif?memo=CKypKxIlCiEIARDBxwkaGWU5YjkyXzc2MjIwODczNDcwNTE2NzczMzcQABoNCJCwnM4GEgUI6AcQAEIASgA",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -15707,14 +15874,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "QUIC",
-          "headersSize": -1,
-          "bodySize": 0,
+          "cookies": [],
           "headers": [
             {
               "name": "cache-control",
@@ -15753,16 +15921,17 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 0,
-            "mimeType": ""
+            "mimeType": "",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
@@ -15770,6 +15939,8 @@
           "wait": 47518,
           "receive": 0
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 0,
         "_chunks": [],
         "_created": 88967239787.176,
@@ -15820,17 +15991,21 @@
               "35.244.154.8"
             ]
           }
-        }
+        },
+        "_load_start": 6379519,
+        "_ttfb_start": 6379519,
+        "_ttfb_end": 6427037,
+        "_download_start": 6427037,
+        "_download_end": 6427037,
+        "_all_end": 6427037
       },
       {
+        "time": 78631.9995727539,
         "pageref": "page_1_0_1",
-        "time": 2001739.9995880127,
         "request": {
           "method": "GET",
           "url": "https://d.agkn.com/pixel/10690/?che=1955846624&cmid=35150675&sid=10519677&pid=440149964&cgid=634723223&cid=250725104&aid=10394157&gdpr=0&gdpr_consent=",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -15882,14 +16057,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 78815,
+          "cookies": [],
           "headers": [
             {
               "name": "content-type",
@@ -15940,23 +16116,26 @@
               "value": "qQudlHcwc1JPUvNKS6zF96CQ48z6ruTck8h4HFuTvGMrKdNVF__UBg=="
             }
           ],
-          "cookies": [],
           "content": {
-            "size": 78815,
-            "mimeType": "image/gif"
+            "size": 43,
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 43
         },
         "cache": {},
         "timings": {
-          "blocked": 1957403,
           "dns": 34295,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 9562.999588012695,
+          "wait": 43857.999572753906,
           "receive": 479
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 78815,
         "_chunks": [
           {
@@ -16094,8 +16273,8 @@
             }
           ]
         },
-        "_dns_start": 88967194424.176,
-        "_dns_end": 88967228719.176,
+        "_dns_start": 6422828,
+        "_dns_end": 6457123,
         "_dns_details": {
           "HTTPS": {
             "cname": [
@@ -16111,17 +16290,23 @@
         },
         "_type": "Other",
         "_bytesIn": 43,
-        "_mimeType": "image/gif"
+        "_mimeType": "image/gif",
+        "_dnsTimeMs": 178021455930,
+        "_dnsEndTimeMs": 178021490225,
+        "_load_start": 6422828,
+        "_ttfb_start": 6422828,
+        "_ttfb_end": 6466685,
+        "_download_start": 6466685,
+        "_download_end": 6467164,
+        "_all_end": 6467164
       },
       {
+        "time": 40334.999572753906,
         "pageref": "page_1_0_1",
-        "time": 40334.999588012695,
         "request": {
           "method": "GET",
           "url": "https://pippio.com/api/sync?pid=5324&_=2",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": -1,
           "cookies": [],
           "headers": [
             {
@@ -16173,14 +16358,15 @@
               "value": "u=1, i"
             }
           ],
-          "queryString": []
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
         },
         "response": {
           "status": -1,
           "statusText": "",
           "httpVersion": "HTTP/2",
-          "headersSize": -1,
-          "bodySize": 42,
+          "cookies": [],
           "headers": [
             {
               "name": "cache-control",
@@ -16231,23 +16417,26 @@
               "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
             }
           ],
-          "cookies": [],
           "content": {
             "size": 42,
-            "mimeType": "image/gif"
+            "mimeType": "image/gif",
+            "compression": 0
           },
-          "redirectURL": ""
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 42
         },
         "cache": {},
         "timings": {
-          "blocked": -1,
           "dns": -1,
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 39764.999588012695,
+          "wait": 39764.999572753906,
           "receive": 570
         },
+        "serverIPAddress": "",
+        "connection": "",
         "_bytes_in": 42,
         "_chunks": [
           {
@@ -16298,7 +16487,13 @@
         "_stream_id": 3,
         "_uncompressed_bytes_in": 42,
         "_netlog_id": "411",
-        "_fromNet": true
+        "_fromNet": true,
+        "_load_start": 6428423,
+        "_ttfb_start": 6428423,
+        "_ttfb_end": 6468187,
+        "_download_start": 6468187,
+        "_download_end": 6468757,
+        "_all_end": 6468757
       }
     ]
   }

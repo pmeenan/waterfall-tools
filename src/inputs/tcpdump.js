@@ -203,8 +203,8 @@ export async function processTcpdumpNode(input, options = {}) {
         }
         if (options.debug) console.log(`[tcpdump.js] Successfully verified ${udpCount} UDP connections`);
 
-        const harResult = generateHarFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups());
-        return harResult;
+        const dataResult = buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups());
+        return dataResult;
 
     } catch (e) {
         console.error("Execution Error:", e);
@@ -215,74 +215,105 @@ export async function processTcpdumpNode(input, options = {}) {
     }
 }
 
-function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
-    const entries = [];
+function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
+    const data = {
+        metadata: { format: 'tcpdump' },
+        pages: {
+            "page_0": {
+                id: "page_0",
+                url: "http://unknown/",
+                title: "",
+                startedDateTime: new Date().toISOString(),
+                pageTimings: {},
+                requests: {}
+            }
+        },
+        tcp_connections: {},
+        http2_connections: {},
+        quic_connections: {},
+        dns: {}
+    };
+
+    let reqIndex = 0;
     
-    // Helper to resolve IP
+    // Process DNS
+    for (let i = 0; i < dnsLookups.length; i++) {
+        const lookup = dnsLookups[i];
+        const dnsId = `dns_${i}`;
+        data.dns[dnsId] = {
+            query: lookup.domain,
+            type: lookup.type || "A",
+            ip_addresses: lookup.ips || [],
+            start_time: lookup.requestTime * 1000,
+            end_time: lookup.responseTime * 1000
+        };
+        lookup._dsnId = dnsId;
+    }
+
     const resolveHostname = (ip) => {
         for (const lookup of dnsLookups) {
-            if (lookup.ips && lookup.ips.includes(ip)) {
-                return lookup.domain;
-            }
+            if (lookup.ips && lookup.ips.includes(ip)) return lookup.domain;
         }
         return ip;
     };
-    
-    // Map connections helper
+
     const mapConnection = (conn, isUdp, getRequestsFunc) => {
         let reqs = getRequestsFunc(conn);
-        if (!reqs) return;
         
         let connectTimeMs = -1;
         let connectEndTimeMs = -1;
         let sslStartTimeMs = -1;
         
-        if (!isUdp) { // TCP connection timings
-            // Connect: first SYN to SYN-ACK
+        if (!isUdp) {
             const syn = conn.clientFlow.allFrames.find(f => f.flags.SYN);
             const synAck = conn.serverFlow.allFrames.find(f => f.flags.SYN && f.flags.ACK);
             if (syn && synAck) {
                 connectTimeMs = syn.time * 1000;
                 connectEndTimeMs = synAck.time * 1000;
             }
-            
-            // TLS: Usually ClientHello (first data pkt from client). We approximate it here.
-            // Our decoders might have exact timings but we can approximate TLS start as the first client payload
             const clientHello = conn.clientFlow.contiguousChunks.find(c => c.bytes.length > 5);
-            if (clientHello) {
-                sslStartTimeMs = clientHello.time * 1000;
+            if (clientHello) sslStartTimeMs = clientHello.time * 1000;
+            
+            data.tcp_connections[conn.id.toString()] = {
+                ip: conn.serverIp,
+                port: conn.serverPort,
+                client_port: conn.clientPort,
+                start_time: connectTimeMs > 0 ? connectTimeMs : null,
+                end_time: connectEndTimeMs > 0 ? connectEndTimeMs : null,
+                bytes_sent: conn.clientFlow.bytesSent || 0,
+                bytes_received: conn.serverFlow.bytesReceived || 0,
+                tls: { start_time: sslStartTimeMs > 0 ? sslStartTimeMs : null }
+            };
+        } else {
+            if (conn.quicParams && conn.quicParams.handshakeTime) {
+                connectTimeMs = conn.clientFlow.frames[0].time * 1000;
+                connectEndTimeMs = conn.quicParams.handshakeTime * 1000;
+                sslStartTimeMs = connectTimeMs;
             }
+            data.quic_connections[conn.id.toString()] = {
+                ip: conn.serverIp,
+                port: conn.serverPort,
+                client_port: conn.clientPort,
+                start_time: connectTimeMs > 0 ? connectTimeMs : null,
+                end_time: connectEndTimeMs > 0 ? connectEndTimeMs : null,
+                tls: { start_time: sslStartTimeMs > 0 ? sslStartTimeMs : null }
+            };
         }
         
-        // Match UDP connection bindings
-        if (isUdp && conn.quicParams && conn.quicParams.handshakeTime) {
-            connectTimeMs = conn.clientFlow.frames[0].time * 1000;
-            connectEndTimeMs = conn.quicParams.handshakeTime * 1000; // Handshake completed
-            sslStartTimeMs = connectTimeMs; // QUIC folds TLS into 0-RTT/1-RTT
-        }
+        if (!reqs) return;
 
         for (const req of reqs) {
-            // Unify HTTP1, HTTP2, HTTP3 definitions into ExtendedHAREntry
-            const timeMs = req.time * 1000; // Epoch ms
+            const timeMs = req.time * 1000;
             
-            // Find DNS
-            let dnsTimeMs = -1;
-            let dnsEndTimeMs = -1;
             let hostname = '';
-            
             if (req.url) {
-                try {
-                    const parsed = new URL(req.url);
-                    hostname = parsed.hostname;
-                } catch(e) {}
+                try { hostname = new URL(req.url).hostname; } catch(e) {}
             }
             
+            let dnsId = null;
             if (hostname) {
-                 const dnsRecord = dnsLookups.find(l => l.domain === hostname && (l.ips.includes(conn.serverIp) || l.cname)); // simplified match
-                 if (dnsRecord) {
-                      dnsTimeMs = dnsRecord.requestTime * 1000;
-                      dnsEndTimeMs = dnsRecord.responseTime * 1000;
-                 }
+                 const dnsRecord = dnsLookups.find(l => l.domain === hostname && (l.ips.includes(conn.serverIp) || l.cname));
+                 if (dnsRecord && dnsRecord._dsnId) dnsId = dnsRecord._dsnId;
             }
             
             let firstDataTimeMs = -1;
@@ -299,149 +330,75 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
                  bytesIn = req.data.reduce((acc, obj) => acc + (obj.length || 0), 0);
             }
 
-            const reqMethod = req.method || 'GET';
-            const reqUrl = req.url || `http://${conn.serverIp}/`;
-            
-            // Rebuild mapped arrays
             let harHeaders = [];
-            if (Array.isArray(req.headers)) {
-                harHeaders = req.headers;
-            } else if (req.headers && typeof req.headers === 'object') {
-                for (const [name, val] of Object.entries(req.headers)) {
-                    harHeaders.push({name, value: val.toString()});
-                }
+            if (Array.isArray(req.headers)) harHeaders = req.headers;
+            else if (req.headers && typeof req.headers === 'object') {
+                for (const [name, val] of Object.entries(req.headers)) harHeaders.push({name, value: val.toString()});
             }
             
             let resHeaders = [];
             let contentType = "";
+            let resStatus = req.statusCode || 200;
             if (req.responseHeaders) {
-                if (Array.isArray(req.responseHeaders)) {
-                    resHeaders = req.responseHeaders;
-                } else if (typeof req.responseHeaders === 'object') {
-                    for (const [name, val] of Object.entries(req.responseHeaders)) {
-                        resHeaders.push({name, value: val.toString()});
-                    }
+                if (Array.isArray(req.responseHeaders)) resHeaders = req.responseHeaders;
+                else if (typeof req.responseHeaders === 'object') {
+                    for (const [name, val] of Object.entries(req.responseHeaders)) resHeaders.push({name, value: val.toString()});
                 }
                 const ctHeader = resHeaders.find(h => h.name.toLowerCase() === 'content-type');
                 if (ctHeader) contentType = ctHeader.value.split(';')[0].trim();
+                const statusHeader = resHeaders.find(h => h.name.toLowerCase() === ':status');
+                if(statusHeader) resStatus = parseInt(statusHeader.value) || resStatus;
             }
-            
-            // Standard Time mappings
-            let send = 0; // Upload time
-            let dns = (dnsTimeMs > 0 && dnsEndTimeMs > 0) ? Math.max(0, dnsEndTimeMs - dnsTimeMs) : -1;
-            let connect = (connectTimeMs > 0 && connectEndTimeMs > 0) ? Math.max(0, connectEndTimeMs - connectTimeMs) : -1;
-            let ssl = -1; 
-            if (reqUrl.startsWith('https:') || isUdp) {
-                if (isUdp) {
-                    ssl = (sslStartTimeMs > 0 && connectEndTimeMs > 0) ? Math.max(0, connectEndTimeMs - sslStartTimeMs) : -1;
-                } else {
-                    ssl = (sslStartTimeMs > 0 && timeMs > 0) ? Math.max(0, timeMs - sslStartTimeMs) : -1;
-                }
-            }
-            
-            let totalTime = 0;
-            if (lastDataTimeMs > 0) totalTime = Math.max(0, lastDataTimeMs - timeMs);
-            
-            let wait = (firstDataTimeMs > 0) ? Math.max(0, firstDataTimeMs - timeMs) : totalTime;
-            let receive = (lastDataTimeMs > 0 && firstDataTimeMs > 0) ? Math.max(0, lastDataTimeMs - firstDataTimeMs) : 0;
-            
-            const reqObj = {
-                startedDateTime: new Date(timeMs).toISOString(),
-                time: totalTime,
-                request: {
-                    method: reqMethod,
-                    url: reqUrl,
-                    httpVersion: req.httpVersion || "HTTP/1.1",
-                    cookies: [],
-                    headers: harHeaders,
-                    queryString: [],
-                    headersSize: -1,
-                    bodySize: -1
-                },
-                response: {
-                    status: req.statusCode || 200,
-                    statusText: req.statusText || "",
-                    httpVersion: req.httpVersion || "HTTP/1.1",
-                    cookies: [],
-                    headers: resHeaders,
-                    content: {
-                        size: bytesIn,
-                        mimeType: contentType,
-                        compression: 0
-                    },
-                    redirectURL: "",
-                    headersSize: -1,
-                    bodySize: bytesIn
-                },
-                cache: {},
-                timings: {
-                    dns: dns,
-                    connect: connect,
-                    ssl: ssl,
-                    send: send,
-                    wait: wait,
-                    receive: receive
-                },
-                serverIPAddress: conn.serverIp,
-                connection: conn.id.toString(),
-                _protocol: isUdp ? "QUIC" : "TCP",
-                _bytesIn: bytesIn,
-                _timeMs: timeMs,
-                _dnsTimeMs: dnsTimeMs,
-                _dnsEndTimeMs: dnsEndTimeMs,
-                _connectTimeMs: connectTimeMs,
-                _connectEndTimeMs: connectEndTimeMs,
-                _sslStartTimeMs: sslStartTimeMs,
-                _firstDataTimeMs: firstDataTimeMs,
-                _lastDataTimeMs: lastDataTimeMs
+
+            const reqId = `req_${reqIndex++}`;
+            data.pages["page_0"].requests[reqId] = {
+                url: req.url || `http://${conn.serverIp}/`,
+                method: req.method || 'GET',
+                status: resStatus,
+                statusText: req.statusText || "",
+                httpVersion: req.httpVersion || "HTTP/1.1",
+                headers: harHeaders,
+                responseHeaders: resHeaders,
+                mimeType: contentType,
+                bytes_in: bytesIn,
+                serverIp: conn.serverIp,
+                time_start: timeMs,
+                first_data_time: firstDataTimeMs,
+                time_end: lastDataTimeMs,
+                connection_id: conn.id.toString(),
+                dns_query_id: dnsId,
+                stream_id: req.streamId || null,
+                _protocol: isUdp ? "QUIC" : "TCP"
             };
-            entries.push(reqObj);
         }
     };
-    
-    // HTTP/1 Extractor
+
     const extractHttp1 = (conn) => {
         if (conn.protocol !== 'http/1.1' || !conn.http) return null;
         let reqs = [];
         for (let i = 0; i < conn.http.requests.length; i++) {
             let reqMsg = conn.http.requests[i];
             let resMsg = conn.http.responses[i] || {};
-            
-            // Handle reversed flows cleanly
             if (reqMsg.firstLine && reqMsg.firstLine.startsWith('HTTP/')) {
-                 const tmp = reqMsg;
-                 reqMsg = resMsg;
-                 resMsg = tmp;
+                 const tmp = reqMsg; reqMsg = resMsg; resMsg = tmp;
             }
-            
-            let method = "GET";
-            let url = ""; 
+            let method = "GET"; let url = ""; 
             if (reqMsg.firstLine) {
                 const parts = reqMsg.firstLine.split(' ');
-                method = parts[0] || "GET";
-                url = parts[1] || "";
+                method = parts[0] || "GET"; url = parts[1] || "";
             }
-            
-            let status = 200;
-            let statusText = "OK";
+            let status = 200; let statusText = "OK";
             if (resMsg.firstLine) {
                 const parts = resMsg.firstLine.split(' ');
                 status = parseInt(parts[1]) || 200;
                 statusText = parts.slice(2).join(' ');
             }
-            
             let host = reqMsg.headers.find(h => h.name.toLowerCase() === 'host');
             let fullUrl = host ? `http://${host.value}${url}` : url;
-            
             reqs.push({
-                time: reqMsg.time,
-                method: method,
-                url: fullUrl,
-                headers: reqMsg.headers,
-                responseHeaders: resMsg.headers || [],
-                statusCode: status,
-                statusText: statusText,
-                data: resMsg.data || [],
+                time: reqMsg.time, method: method, url: fullUrl,
+                headers: reqMsg.headers, responseHeaders: resMsg.headers || [],
+                statusCode: status, statusText: statusText, data: resMsg.data || [],
                 httpVersion: "HTTP/1.1",
                 _firstServerTimeMs: resMsg.time,
                 _lastServerTimeMs: resMsg.data && resMsg.data.length > 0 ? resMsg.data[resMsg.data.length - 1].time : resMsg.time
@@ -450,32 +407,24 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
         return reqs;
     };
     
-    // HTTP/2 Extractor
     const extractHttp2 = (conn) => {
         let streams = conn.http2 ? conn.http2.streams : null;
         if (!streams) return null;
-        
         let reqs = [];
         for (const [id, stream] of streams.entries()) {
             if (!stream.headers || !stream.headers.client || stream.headers.client.length === 0) continue;
-            
             let method = stream.headers.client.find(h => h.name === ':method')?.value || 'GET';
             let path = stream.headers.client.find(h => h.name === ':path')?.value || '/';
             let auth = stream.headers.client.find(h => h.name === ':authority')?.value || resolveHostname(conn.serverIp);
             let scheme = stream.headers.client.find(h => h.name === ':scheme')?.value || 'https';
             let status = stream.headers.server ? (parseInt(stream.headers.server.find(h => h.name === ':status')?.value) || 200) : 200;
-            
             let reqTime = stream.headers.clientTime || 0;
-            
             reqs.push({
-                time: reqTime,
-                method: method,
-                url: `${scheme}://${auth}${path}`,
+                time: reqTime, method: method, url: `${scheme}://${auth}${path}`,
                 headers: stream.headers.client.filter(h => !h.name.startsWith(':')),
                 responseHeaders: stream.headers.server ? stream.headers.server.filter(h => !h.name.startsWith(':')) : [],
-                statusCode: status,
-                data: stream.data.server || [],
-                httpVersion: "HTTP/2",
+                statusCode: status, data: stream.data.server || [],
+                httpVersion: "HTTP/2", streamId: id,
                 _firstServerTimeMs: stream.headers.serverTime || null,
                 _lastServerTimeMs: stream.data.server && stream.data.server.length > 0 ? stream.data.server[stream.data.server.length - 1].time : (stream.headers.serverTime || null)
             });
@@ -483,27 +432,19 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
         return reqs;
     };
 
-    // HTTP/3 Extractor
     const extractHttp3 = (conn) => {
         let streams = conn.http3;
         if (!streams) return null;
-        
         let reqs = [];
         for (const [id, stream] of streams.entries()) {
-            if ((!stream.headers || stream.headers.length === 0) && (!stream.responses || stream.responses.length === 0)) {
-                console.log(`[tcpdump.js] Dropping incomplete stream ${id}`);
-                continue; // Not a fully formed request stream
-            }
-            
+            if ((!stream.headers || stream.headers.length === 0) && (!stream.responses || stream.responses.length === 0)) continue;
             let method = stream.headers?.find(h => h.name === ':method')?.value || 'GET';
             let path = stream.headers?.find(h => h.name === ':path')?.value || '/';
             let auth = stream.headers?.find(h => h.name === ':authority')?.value || resolveHostname(conn.serverIp);
             let scheme = stream.headers?.find(h => h.name === ':scheme')?.value || 'https';
             let status = 200;
-            
             let resHeaders = [];
             let dataBlocks = [];
-            
             if (stream.responses) {
                  for (const res of stream.responses) {
                       if (res.headers && res.headers.length > 0) {
@@ -516,17 +457,12 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
                       }
                  }
             }
-            
             let reqTime = stream.firstClientTime || stream.time;
-            
             reqs.push({
-                time: reqTime,
-                method: method,
-                url: `${scheme}://${auth}${path}`,
-                headers: stream.headers.filter(h => !h.name.startsWith(':')),
+                time: reqTime, method: method, url: `${scheme}://${auth}${path}`,
+                headers: stream.headers ? stream.headers.filter(h => !h.name.startsWith(':')) : [],
                 responseHeaders: resHeaders.filter(h => !h.name.startsWith(':')),
-                statusCode: status,
-                data: dataBlocks,
+                statusCode: status, data: dataBlocks, streamId: id,
                 httpVersion: "HTTP/3",
                 _firstServerTimeMs: stream.firstServerTime,
                 _lastServerTimeMs: stream.lastServerTime
@@ -535,149 +471,59 @@ function generateHarFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
         return reqs;
     };
     
-    // Process TCP Connections
     for (const conn of tcpConnections) {
-        if (conn.protocol === 'http/1.1') {
-             mapConnection(conn, false, extractHttp1);
-        } else if (conn.protocol === 'http2') {
-             mapConnection(conn, false, extractHttp2);
-        }
+        if (conn.protocol === 'http/1.1') mapConnection(conn, false, extractHttp1);
+        else if (conn.protocol === 'http2') mapConnection(conn, false, extractHttp2);
     }
-    
-    // Process UDP Connections
     for (const conn of udpConnections) {
-        if (conn.http3 && conn.http3.size > 0) {
-            mapConnection(conn, true, extractHttp3);
-        }
+        if (conn.http3 && conn.http3.size > 0) mapConnection(conn, true, extractHttp3);
     }
     
-    // Chronological Sort
-    entries.sort((a, b) => new Date(a.startedDateTime) - new Date(b.startedDateTime));
-    
-    // Deduplicate DNS and Connection Timelines
-    const seenDnsHosts = new Set();
-    const seenConnections = new Set();
-    
-    // 0-Anchor Bounding Setup
     let globalEarliestMs = Number.MAX_SAFE_INTEGER;
-    for (const entry of entries) {
-        if (entry._timeMs > 0 && entry._timeMs < globalEarliestMs) globalEarliestMs = entry._timeMs;
-        if (entry._dnsTimeMs > 0 && entry._dnsTimeMs < globalEarliestMs) globalEarliestMs = entry._dnsTimeMs;
-        if (entry._connectTimeMs > 0 && entry._connectTimeMs < globalEarliestMs) globalEarliestMs = entry._connectTimeMs;
-    }
-    
-    for (const entry of entries) {
-        let hostname = '';
-        try {
-            hostname = new URL(entry.request.url).hostname;
-        } catch(e) {}
+    const reqs = Object.values(data.pages["page_0"].requests);
+    if (reqs.length > 0) {
+        reqs.sort((a, b) => a.time_start - b.time_start);
         
-        if (hostname && entry.timings.dns > -1) {
-            if (seenDnsHosts.has(hostname)) {
-                entry.timings.dns = -1;
-                entry._dnsTimeMs = -1;
-                entry._dnsEndTimeMs = -1;
-            } else {
-                seenDnsHosts.add(hostname);
-            }
-        }
-        
-        const connId = entry.connection;
-        if (connId && (entry.timings.connect > -1 || entry.timings.ssl > -1)) {
-            if (seenConnections.has(connId)) {
-                entry.timings.connect = -1;
-                entry.timings.ssl = -1;
-                entry._connectTimeMs = -1;
-                entry._connectEndTimeMs = -1;
-                entry._sslStartTimeMs = -1;
-            } else {
-                seenConnections.add(connId);
-            }
-        }
-        
-        // Map native WebPageTest properties natively tracking off the exact globalEarliestMs anchor unconditionally
-        if (entry._timeMs > 0) entry._load_start = Math.floor(entry._timeMs - globalEarliestMs);
-        if (entry._dnsTimeMs > 0) entry._dns_start = Math.floor(entry._dnsTimeMs - globalEarliestMs);
-        if (entry._dnsEndTimeMs > 0) entry._dns_end = Math.floor(entry._dnsEndTimeMs - globalEarliestMs);
-        if (entry._connectTimeMs > 0) entry._connect_start = Math.floor(entry._connectTimeMs - globalEarliestMs);
-        if (entry._connectEndTimeMs > 0) entry._connect_end = Math.floor(entry._connectEndTimeMs - globalEarliestMs);
-        if (entry._sslStartTimeMs > 0) entry._ssl_start = Math.floor(entry._sslStartTimeMs - globalEarliestMs);
-        if (entry._timeMs > 0 && entry.timings.ssl > 0) entry._ssl_end = entry._load_start;
-        if (entry._timeMs > 0) entry._ttfb_start = entry._load_start;
-        if (entry._firstDataTimeMs > 0) entry._ttfb_end = Math.floor(entry._firstDataTimeMs - globalEarliestMs);
-        if (entry._firstDataTimeMs > 0) entry._download_start = entry._ttfb_end;
-        if (entry._lastDataTimeMs > 0) {
-            entry._download_end = Math.floor(entry._lastDataTimeMs - globalEarliestMs);
-            entry._all_end = entry._download_end;
-        }
-
-        // Strict HAR 1.2 time enforcement directly summing non-negative active phases (avoids cross-idle stretching)
-        let exactTime = 0;
-        if (entry.timings.dns > 0) exactTime += entry.timings.dns;
-        if (entry.timings.connect > 0) exactTime += entry.timings.connect;
-        exactTime += entry.timings.wait;
-        exactTime += entry.timings.receive;
-        entry.time = exactTime;
-
-        // Clean private tracking metrics implicitly
-        delete entry._timeMs;
-        delete entry._dnsTimeMs;
-        delete entry._dnsEndTimeMs;
-        delete entry._connectTimeMs;
-        delete entry._connectEndTimeMs;
-        delete entry._sslStartTimeMs;
-        delete entry._firstDataTimeMs;
-        delete entry._lastDataTimeMs;
-    }
-    
-    // Assign proper references and Page Entry
-    let pageStartedDateTime = (globalEarliestMs !== Number.MAX_SAFE_INTEGER) ? new Date(globalEarliestMs).toISOString() : new Date().toISOString();
-    let pageId = 'page_0';
-    let url = 'http://unknown/';
-    
-    if (entries.length > 0) {
-        pageStartedDateTime = entries[0].startedDateTime;
-        url = entries[0].request.url; // Default to first resource
-        
-        // Scan for explicit document base page via standard heuristics (sec-fetch-dest)
-        for (const entry of entries) {
-            const destHeader = entry.request.headers.find(h => h.name.toLowerCase() === 'sec-fetch-dest');
+        let url = reqs[0].url;
+        let start = reqs[0].time_start;
+        for (const req of reqs) {
+            const destHeader = req.headers.find(h => h.name.toLowerCase() === 'sec-fetch-dest');
             if (destHeader && destHeader.value === 'document') {
-                url = entry.request.url;
-                pageStartedDateTime = entry.startedDateTime; // Override start if there was a disjoint stream prior (like DoH or pre-connect)
-                break;
+                url = req.url; start = req.time_start; break;
             }
-            // Fallback heuristics: First 200 OK text/html
-            const ctHeader = entry.response.headers.find(h => h.name.toLowerCase() === 'content-type');
-            if (ctHeader && ctHeader.value.includes('text/html') && entry.response.status === 200) {
-                url = entry.request.url;
-                pageStartedDateTime = entry.startedDateTime;
-                break;
+            const ctHeader = req.responseHeaders.find(h => h.name.toLowerCase() === 'content-type');
+            if (ctHeader && ctHeader.value.includes('text/html') && req.status === 200) {
+                url = req.url; start = req.time_start; break;
             }
         }
-    }
-    
-    // Bind all to pageref
-    for (const entry of entries) {
-        entry.pageref = pageId;
-    }
-    
-    return {
-        log: {
-            version: "1.2",
-            creator: {
-                name: "waterfall-tools",
-                version: "0.1.0"
-            },
-            pages: [
-                {
-                    startedDateTime: pageStartedDateTime,
-                    id: pageId,
-                    title: url,
-                    pageTimings: {}
+        data.pages["page_0"].url = url;
+        data.pages["page_0"].title = url;
+        
+        // Find absolute earliest bounded time
+        for (const req of reqs) {
+            if (req.time_start > 0 && req.time_start < globalEarliestMs) globalEarliestMs = req.time_start;
+            
+            // Check connections for earlier times
+            if (req.connection_id) {
+                const conn = data.tcp_connections[req.connection_id] || data.quic_connections[req.connection_id];
+                if (conn && conn.start_time > 0 && conn.start_time < globalEarliestMs) {
+                    globalEarliestMs = conn.start_time;
                 }
-            ],
-            entries: entries
+            }
+            // Check DNS for earlier times
+            if (req.dns_query_id) {
+                const dnsObj = data.dns[req.dns_query_id];
+                if (dnsObj && dnsObj.start_time > 0 && dnsObj.start_time < globalEarliestMs) {
+                    globalEarliestMs = dnsObj.start_time;
+                }
+            }
         }
-    };
+        if (globalEarliestMs === Number.MAX_SAFE_INTEGER) globalEarliestMs = start;
+    }
+    
+    if (globalEarliestMs !== Number.MAX_SAFE_INTEGER) {
+        data.pages["page_0"].startedDateTime = new Date(globalEarliestMs).toISOString();
+    }
+    
+    return data;
 }

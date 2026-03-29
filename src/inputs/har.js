@@ -115,5 +115,6 @@ export async function processHARFileNode(input, options = {}) {
         if (nodeFsStream) nodeFsStream.destroy();
     }
 
-    return output;
+    const { buildWaterfallDataFromHar } = await import('../core/har-converter.js');
+    return buildWaterfallDataFromHar(output.log, 'har');
 }

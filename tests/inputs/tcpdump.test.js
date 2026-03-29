@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { processTcpdumpNode } from '../../src/inputs/tcpdump.js';
+import { WaterfallTools } from '../../src/core/waterfall-tools.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,7 +14,10 @@ test('Tcpdump Processor Generates Valid HAR', async (t) => {
     const fixturePath = path.join(__dirname, '../fixtures/tcpdump-google-har.json');
 
     // Run processor natively loading keylogs dynamically configured per naming rules internally
-    const har = await processTcpdumpNode(inputPath, { debug: true });
+    // Run processor natively loading keylogs dynamically configured per naming rules internally
+    const tool = new WaterfallTools();
+    await tool.loadFile(inputPath, { debug: true, format: 'tcpdump' });
+    const har = tool.getHar({ debug: true });
 
     // Dynamic assertions verifying parser integrity
     assert.strictEqual(har.log.version, "1.2");
