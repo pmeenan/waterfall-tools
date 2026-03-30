@@ -421,7 +421,7 @@ class DevToolsParser {
                 if (raw_request.request_type) request.request_type = raw_request.request_type;
                 request.load_ms = -1;
                 
-                let start_time = raw_request.startTime - raw_page_data.startTime;
+                let start_time = raw_request.startTime;
                 if (raw_request.response && raw_request.response.timing && raw_request.response.timing.sendStart >= 0) {
                     start_time = raw_request.response.timing.sendStart;
                     if (page_data.fullyLoaded === undefined || start_time > page_data.fullyLoaded) {
@@ -429,10 +429,10 @@ class DevToolsParser {
                     }
                 }
                 if (raw_request.endTime !== undefined) {
-                    const end_time = raw_request.endTime - raw_page_data.startTime;
+                    const end_time = raw_request.endTime;
                     request.load_ms = Math.round(end_time - start_time);
-                    if (page_data.fullyLoaded === undefined || end_time > page_data.fullyLoaded) {
-                        page_data.fullyLoaded = Math.round(end_time);
+                    if (page_data.fullyLoaded === undefined || (end_time - raw_page_data.startTime) > page_data.fullyLoaded) {
+                        page_data.fullyLoaded = Math.round(end_time - raw_page_data.startTime);
                     }
                 }
                 
@@ -654,6 +654,26 @@ class DevToolsParser {
                     }
                 }
                 
+                
+                if (request.dns_end >= 0 && request.dns_start >= 0 && request.dns_end >= request.dns_start) {
+                    request.dns_ms = request.dns_end - request.dns_start;
+                }
+                if (request.connect_end >= 0 && request.connect_start >= 0 && request.connect_end >= request.connect_start) {
+                    request.connect_ms = request.connect_end - request.connect_start;
+                }
+                if (request.ssl_end >= 0 && request.ssl_start >= 0 && request.ssl_end >= request.ssl_start) {
+                    request.ssl_ms = request.ssl_end - request.ssl_start;
+                }
+                if (request.load_ms >= 0 && request.ttfb_ms >= 0 && request.load_ms >= request.ttfb_ms) {
+                    request.download_ms = request.load_ms - request.ttfb_ms;
+                } else if (request.load_ms >= 0 && request.ttfb_ms < 0) {
+                    request.download_ms = request.load_ms;
+                }
+                if (request.load_ms >= 0) {
+                    request.all_ms = request.load_ms;
+                }
+                request.created = raw_request.startTime - raw_page_data.startTime;
+
                 requests.push(request);
             }
         }

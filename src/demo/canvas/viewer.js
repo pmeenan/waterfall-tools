@@ -18,6 +18,7 @@ async function fileToReadable(file) {
 async function processFiles(files) {
     if (files.length === 0) return;
     
+    dropZone.classList.remove('hidden');
     dropZone.innerHTML = `<h2>Loading...</h2><p>Parsing files, this could take a few seconds.</p>`;
 
     try {
@@ -84,18 +85,33 @@ async function processFiles(files) {
 // Event Listeners
 
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, preventDefaults, false);
+    document.body.addEventListener(eventName, preventDefaults, false);
 });
 function preventDefaults(e) {
     e.preventDefault();
     e.stopPropagation();
 }
 
-['dragenter', 'dragover'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-active'), false);
-});
-['dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-active'), false);
+let dragCounter = 0;
+
+document.body.addEventListener('dragenter', (e) => {
+    dragCounter++;
+    if (dragCounter === 1) {
+        dropZone.classList.remove('hidden');
+        dropZone.classList.add('drag-active');
+    }
 });
 
-dropZone.addEventListener('drop', (e) => processFiles(e.dataTransfer.files));
+document.body.addEventListener('dragleave', (e) => {
+    dragCounter--;
+    if (dragCounter === 0) {
+        dropZone.classList.remove('drag-active');
+        if (rendererCanvas) dropZone.classList.add('hidden');
+    }
+});
+
+document.body.addEventListener('drop', (e) => {
+    dragCounter = 0;
+    dropZone.classList.remove('drag-active');
+    processFiles(e.dataTransfer.files);
+});

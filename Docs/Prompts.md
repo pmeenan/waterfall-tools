@@ -331,3 +331,25 @@ The API should expose methods to get an individual page, with or without the req
 
 Migrate the existing tests, golden results, README.md, Architecture.md, schema documentation and AGENTS.md to use the new API and data structure.
 ```
+
+# Added Waterfall testing UI
+
+```
+Add steps to Phase 5 of the plan to modify the canvas render UI to have some UI that allows for toggling of features (and automatically re-drawing the waterfall when each changes):
+- Have a dropdown for selecting which page in the data set to render
+- Toggle between a regular waterfall and a connection-view waterfall where all of the requests for a given connection are stacked on a single row
+- Toggle between a full waterfall and a thumbnail view
+- Specifying a start and end time for the displayed waterfall (in seconds with dcimals allowed)
+- A filter for which requests to include as a comma-separated list of individual requests or ranges of requests
+- Checkboxes for toggling the display of specific chart features:
+a. Vertical lines for user timing marks
+b. CPU Utilization line graph displayed below the waterfall
+c. Bandwidth utilization graph below the waterfall
+d. Browser main thread activity (color-coded by type of activity)
+e. Long tasks row below the waterfall
+f. If Ellipsis should separate requests where some requests were removed
+g. If the request row labels should be displayed (vs the bars taking the full width)
+h. If each request should display the individual download chunk timing vs the whole download time being a solid bar
+i. If the JS execution times for each request should be displayed
+j. If the waiting time should be rendered
+```

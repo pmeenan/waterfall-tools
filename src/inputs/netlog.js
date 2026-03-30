@@ -57,15 +57,29 @@ export class Netlog {
     addTraceEvent(trace_event) {
         if (trace_event && trace_event.args && trace_event.name) {
             try {
+                // Handle id2.local multiplexing natively (Chrome traces reuse memory addresses)
                 let id = trace_event.id;
+                let is_multiplexed = false;
                 if (id === undefined && trace_event.id2) {
                     id = trace_event.id2.local !== undefined ? trace_event.id2.local : trace_event.id2.global;
+                    is_multiplexed = true;
                 }
+                
                 if (id === undefined) return;
                 
                 if (typeof id === 'string') {
                     if (id.startsWith('0x')) id = parseInt(id, 16);
                     else id = parseInt(id, 10);
+                }
+                
+                // Route repeated C++ memory pointers to unique request IDs to prevent payload collisions
+                if (is_multiplexed) {
+                    if (!this.trace_id_aliases) this.trace_id_aliases = {};
+                    const name = trace_event.name;
+                    if ((name === 'REQUEST_ALIVE' || name === 'URL_REQUEST_START_JOB') && trace_event.ph === 'b') {
+                        this.trace_id_aliases[id] = `trace_${id}_${this.netlog.next_request_id++}`;
+                    }
+                    if (this.trace_id_aliases[id]) id = this.trace_id_aliases[id];
                 }
                 
                 let event_type = null;
@@ -748,7 +762,7 @@ export class Netlog {
                     if (request.end === undefined && stream.end !== undefined) request.end = stream.end;
                     if (stream.bytes_in > request.bytes_in) {
                         request.bytes_in = stream.bytes_in;
-                        request.chunks = stream.chunks;
+                        request.chunks = stream.chunks ? JSON.parse(JSON.stringify(stream.chunks)) : [];
                     }
                 }
             }
@@ -935,7 +949,15 @@ export class Netlog {
         else {
             for (const request of requests) {
                 if (request.start !== undefined && request.netlog_id !== undefined) {
-                    request.start = request.start + ((request.netlog_id % 10000) / 1000000.0);
+                    let numId = request.netlog_id;
+                    if (typeof numId === 'string' && numId.startsWith('trace_')) {
+                        const match = numId.match(/\d+$/);
+                        if (match) numId = parseInt(match[0], 10);
+                        else numId = 0;
+                    }
+                    if (typeof numId === 'string') numId = parseInt(numId, 10) || 0;
+                    
+                    request.start = request.start + ((numId % 10000) / 1000000.0);
                 }
                 if (this.bodies[request.netlog_id] && this.bodies[request.netlog_id].length > 0) {
                     try {
@@ -1049,22 +1071,47 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
             
             const resHeaders = [];
             let mimeType = '';
+            let parsedStatus = -1;
+            let parsedStatusText = '';
+            let parsedHttpVersion = req.protocol || '';
+
             if (req.response_headers) {
                 for (const h of req.response_headers) {
+                    // Try to match HTTP/1.x status line (e.g. "HTTP/1.1 200 OK" or "HTTP/1.1 302 Found")
+                    if (h.toUpperCase().startsWith('HTTP/')) {
+                        const match = h.match(/^HTTP\/([^\s]+)\s+(\d+)\s*(.*)/i);
+                        if (match) {
+                            if (!parsedHttpVersion) parsedHttpVersion = 'HTTP/' + match[1];
+                            parsedStatus = parseInt(match[2]);
+                            parsedStatusText = match[3].trim();
+                        }
+                    } else if (h.toLowerCase().startsWith(':status')) {
+                        // Match HTTP/2 or QUIC pseudo headers
+                        const match = h.match(/^:status:\s*(\d+)/i);
+                        if (match) {
+                            parsedStatus = parseInt(match[1]);
+                        }
+                    }
+
                     const colon = h.indexOf(':');
                     if (colon > 0) {
                         const hName = h.substring(0,colon).trim();
                         const hVal = h.substring(colon+1).trim();
                         resHeaders.push({name: hName, value: hVal});
-                        if (hName.toLowerCase() === 'content-type') mimeType = hVal;
+                        if (hName.toLowerCase() === 'content-type') mimeType = hVal.split(';')[0].trim();
                     }
                 }
             }
 
             const urlStr = req.url || '';
             let reqStartedDateTime = dateStr;
-            if (req.start !== undefined) {
-                reqStartedDateTime = new Date(new Date(dateStr).getTime() + req.start).toISOString();
+            if (req.start !== undefined && !isNaN(req.start)) {
+                // dateStr is derived from new Date((run_start_epoch * 1000) || Date.now())
+                // so new Date(dateStr).getTime() yields epoch milliseconds.
+                // req.start is in milliseconds relative to the netlog/trace base start_time.
+                // Adding them gives the correct absolute epoch ms for this request.
+                const baseEpochMs = new Date(dateStr).getTime();
+                reqStartedDateTime = new Date(baseEpochMs + req.start).toISOString();
             }
 
             const content = {
@@ -1084,7 +1131,7 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
                 request: {
                     method: req.method || 'GET',
                     url: urlStr,
-                    httpVersion: req.protocol || '',
+                    httpVersion: parsedHttpVersion,
                     headersSize: -1,
                     bodySize: -1,
                     cookies: [],
@@ -1092,9 +1139,9 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
                     queryString: []
                 },
                 response: {
-                    status: req.responseCode !== undefined ? parseInt(req.responseCode) : -1,
-                    statusText: '',
-                    httpVersion: req.protocol || '',
+                    status: parsedStatus !== -1 ? parsedStatus : (req.responseCode !== undefined ? parseInt(req.responseCode) : -1),
+                    statusText: parsedStatusText,
+                    httpVersion: parsedHttpVersion || req.protocol || '',
                     headersSize: -1,
                     bodySize: req.bytes_in !== undefined ? parseInt(req.bytes_in) : -1,
                     headers: resHeaders,
@@ -1111,7 +1158,10 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
                     send: 0,
                     wait,
                     receive
-                }
+                },
+                _chunks: req.chunks || [],
+                _chunks_in: req.chunks_in || [],
+                _chunks_out: req.chunks_out || []
             };
 
             for (const key of Object.keys(req)) {

@@ -150,7 +150,8 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
                 time_end: lastDataTimeMs,
                 connection_id: connId,
                 dns_query_id: dnsId,
-                stream_id: null
+                stream_id: null,
+                _chunks: entry._chunks || []
             };
             
             // Map ALL custom HAR properties inherently preventing data loss across ingestion streams

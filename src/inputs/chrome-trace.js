@@ -85,6 +85,14 @@ export async function processChromeTraceFileNode(input, options = {}) {
         let marked_start_time = null;
         let pageTimings = { onLoad: -1, onContentLoad: -1, _startRender: -1 };
 
+        // Wall-clock epoch estimation: Chrome traces use CLOCK_MONOTONIC (system uptime)
+        // for all ts values. We need a real UNIX epoch for HAR startedDateTime generation.
+        // Strategy: extract the first HTTP "date:" response header from netlog events,
+        // pair it with the monotonic ts at which the response was received, and compute
+        // the offset (real_epoch_us - monotonic_ts_us). This offset converts any monotonic
+        // timestamp to real wall-clock time.
+        let monotonicToEpochOffsetUs = null; // microseconds: add to monotonic ts to get epoch
+
         const targetPaths = hasTraceEventsWrapper ? ['$.traceEvents.*'] : ['$.*'];
         const parser = new JSONParser({ paths: targetPaths, keepStack: false });
 
@@ -97,6 +105,26 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 // 1. Process Netlog
                 if (cat === 'netlog' || cat.includes('netlog')) {
                     netlog.addTraceEvent(trace_event);
+                    
+                    // Attempt wall-clock extraction from the first HTTP response "date:" header
+                    // that appears in netlog HEADERS_RECEIVED events.
+                    if (monotonicToEpochOffsetUs === null && trace_event.ts > 0 &&
+                        trace_event.args && trace_event.args.params && trace_event.args.params.headers) {
+                        const headers = trace_event.args.params.headers;
+                        if (Array.isArray(headers)) {
+                            for (const h of headers) {
+                                if (typeof h === 'string' && h.toLowerCase().startsWith('date:')) {
+                                    const dateVal = h.substring(5).trim();
+                                    const parsed = Date.parse(dateVal);
+                                    if (!isNaN(parsed) && parsed > 946684800000) { // sanity: after year 2000
+                                        // parsed is real epoch in ms, trace_event.ts is monotonic in µs
+                                        monotonicToEpochOffsetUs = (parsed * 1000) - trace_event.ts;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     return;
                 }
                 
@@ -156,7 +184,25 @@ export async function processChromeTraceFileNode(input, options = {}) {
                             if (data.statusCode) req.status = data.statusCode;
                             if (data.mimeType) req.mimeType = data.mimeType;
                             if (data.headers) req.responseHeaders = data.headers;
-                            if (data.timing) req.timing = data.timing;
+                            if (data.timing) {
+                                req.timing = data.timing;
+                                // Fallback wall-clock extraction from devtools.timeline timing.requestTime
+                                // timing.requestTime is in seconds from CLOCK_MONOTONIC
+                                // We can also check response headers for a Date header here
+                                if (monotonicToEpochOffsetUs === null && data.timing.requestTime > 0 && data.headers) {
+                                    for (const hdr of Object.values(data.headers)) {
+                                        if (typeof hdr === 'string' && (hdr.toLowerCase().startsWith('date:') || hdr.toLowerCase().startsWith('date'))) {
+                                            const dateStr = hdr.replace(/^date:\s*/i, '').trim();
+                                            const parsed = Date.parse(dateStr);
+                                            if (!isNaN(parsed) && parsed > 946684800000) {
+                                                // timing.requestTime is in seconds, convert to µs
+                                                monotonicToEpochOffsetUs = (parsed * 1000) - (data.timing.requestTime * 1000000);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
                         } else if (name === 'ResourceReceivedData' && data) {
                             if (data.encodedDataLength) req.bytesIn += data.encodedDataLength;
                         } else if (name === 'ResourceFinish' && data) {
@@ -187,14 +233,12 @@ export async function processChromeTraceFileNode(input, options = {}) {
         let unlinked_sockets = results ? (results.unlinked_sockets || []) : [];
         let unlinked_dns = results ? (results.unlinked_dns || []) : [];
         
-        let final_start_time = (start_time !== null) ? start_time / 1000.0 : (results && results.start_time !== undefined ? results.start_time : 0);
-        
         let offset = 0;
         if (results && results.start_time !== undefined && start_time !== null) {
-            offset = results.start_time - (start_time / 1000.0);
+            offset = results.start_time - start_time;
         }
 
-        if (offset !== 0) {
+        if (offset !== 0 && requests.length > 0) {
             const times = ['dns_start', 'dns_end', 'connect_start', 'connect_end', 'ssl_start', 'ssl_end', 'start', 'created', 'first_byte', 'end'];
             for (const req of requests) {
                 for (const tname of times) {
@@ -203,6 +247,25 @@ export async function processChromeTraceFileNode(input, options = {}) {
             }
         }
         
+        // final_start_time is in MILLISECONDS (from microsecond start_time / 1000)
+        // But it's still in monotonic time. We need to convert to real epoch.
+        let final_start_time = (start_time !== null) ? (start_time / 1000.0) : ((results && results.start_time !== undefined) ? (results.start_time / 1000.0) : 0);
+
+        // Apply monotonic-to-epoch offset if we extracted one from HTTP date headers.
+        // monotonicToEpochOffsetUs is in microseconds. Convert us -> ms and add to final_start_time.
+        if (monotonicToEpochOffsetUs !== null) {
+            final_start_time += monotonicToEpochOffsetUs / 1000.0;
+            if (options.debug) console.log(`[chrome-trace.js] Applied monotonic-to-epoch offset: ${monotonicToEpochOffsetUs} µs. Epoch start: ${new Date(final_start_time).toISOString()}`);
+        } else {
+            // Fallback: use Date.now() as an approximation. The relative timings will be correct
+            // but absolute wall-clock dates will be approximate.
+            if (final_start_time < 946684800000) { // looks like monotonic, not epoch
+                const now = Date.now();
+                if (options.debug) console.log(`[chrome-trace.js] No wall-clock reference found. Using Date.now() as epoch approximation.`);
+                final_start_time = now;
+            }
+        }
+
         // Create a quick lookup for timeline requests by URL
         const timeline_by_url = new Map();
         for (const tl_req of Object.values(timeline_requests)) {
@@ -210,12 +273,13 @@ export async function processChromeTraceFileNode(input, options = {}) {
             if (tl_req.overwrittenURL) timeline_by_url.set(tl_req.overwrittenURL, tl_req);
         }
 
-        // Augment netlog requests with timeline data
+        // Augment netlog requests with timeline data and mark as matched
         for (const req of requests) {
             if (!req.url) continue;
             const matched_timeline_req = timeline_by_url.get(req.url);
             
             if (matched_timeline_req) {
+                matched_timeline_req._matched = true;
                 if (matched_timeline_req.priority && !req.priority) req.priority = matched_timeline_req.priority;
                 if (matched_timeline_req.renderBlocking !== undefined) req.renderBlocking = matched_timeline_req.renderBlocking;
                 if (matched_timeline_req.frame) req.frame = matched_timeline_req.frame;
@@ -226,54 +290,107 @@ export async function processChromeTraceFileNode(input, options = {}) {
             }
         }
 
-        // If netlog events were entirely missing, synthesize the layout from timeline fallback
-        if (requests.length === 0) {
-            for (const tl_req of Object.values(timeline_requests)) {
-                if (!tl_req.url || (!tl_req.url.startsWith('http') && !tl_req.url.startsWith('ws'))) continue;
-                let r = {
-                    url: tl_req.overwrittenURL || tl_req.url,
-                    method: tl_req.method || 'GET',
-                    status: tl_req.status || 200,
-                    bytesIn: tl_req.bytesIn || 0,
-                    responseHeaders: tl_req.responseHeaders,
-                    priority: tl_req.priority,
-                    renderBlocking: tl_req.renderBlocking,
-                    frame: tl_req.frame,
-                    initiator: tl_req.initiator,
-                    type: tl_req.resourceType,
-                    mimeType: tl_req.mimeType
-                };
-                r.start = tl_req.requestTime;
-                r.end = tl_req.finishTime || tl_req.requestTime;
-                r.first_byte = r.end;
-                
-                if (tl_req.timing) {
-                    const rt = tl_req.timing.requestTime * 1000.0; 
-                    r.start = rt;
-                    if (tl_req.timing.receiveHeadersEnd > 0) r.first_byte = rt + tl_req.timing.receiveHeadersEnd;
-                    if (tl_req.timing.dnsStart >= 0) r.dns_start = rt + tl_req.timing.dnsStart;
-                    if (tl_req.timing.dnsEnd >= 0) r.dns_end = rt + tl_req.timing.dnsEnd;
-                    if (tl_req.timing.connectStart >= 0) r.connect_start = rt + tl_req.timing.connectStart;
-                    if (tl_req.timing.connectEnd >= 0) r.connect_end = rt + tl_req.timing.connectEnd;
-                    if (tl_req.timing.sslStart >= 0) r.ssl_start = rt + tl_req.timing.sslStart;
-                    if (tl_req.timing.sslEnd >= 0) r.ssl_end = rt + tl_req.timing.sslEnd;
+        // Determine base_time in microseconds natively allowing fallback loop subtraction
+        let base_time_microseconds = (start_time !== null) ? start_time : ((results && results.start_time !== undefined) ? results.start_time : 0);
+
+        if (base_time_microseconds === 0) {
+            let earliest_ms = Number.MAX_VALUE;
+            for (const tl of Object.values(timeline_requests)) {
+                if (tl.requestTime !== undefined && tl.requestTime < earliest_ms) {
+                    earliest_ms = tl.requestTime; // in MILLISECONDS
                 }
-                requests.push(r);
             }
-            
-            if (offset !== 0) {
-                const times = ['dns_start', 'dns_end', 'connect_start', 'connect_end', 'ssl_start', 'ssl_end', 'start', 'created', 'first_byte', 'end'];
+            if (earliest_ms !== Number.MAX_VALUE) {
+                base_time_microseconds = earliest_ms * 1000.0; // scale back to MICROSECONDS
+                final_start_time = earliest_ms; // map back for HAR entries natively
+                
+                // Critical step: If netlog events bypassed absolute start_time subtraction earlier
+                // due to start_time missing from raw chunks, apply the subtracted base fallback now
                 for (const req of requests) {
+                    const times = ['dns_start', 'dns_end', 'connect_start', 'connect_end', 'ssl_start', 'ssl_end', 'start', 'created', 'first_byte', 'end'];
                     for (const tname of times) {
-                        if (req[tname] !== undefined) req[tname] += offset;
+                        if (req[tname] !== undefined) req[tname] -= base_time_microseconds;
+                    }
+                    if (req.chunks_in) {
+                        for (const chunk of req.chunks_in) {
+                            chunk.ts -= base_time_microseconds;
+                        }
+                    }
+                    if (req.chunks_out) {
+                        for (const chunk of req.chunks_out) {
+                            chunk.ts -= base_time_microseconds;
+                        }
                     }
                 }
             }
         }
+
+        // Synthesize any devtools requests that missed matched netlog mapping paths cleanly
+        for (const [reqId, tl_req] of Object.entries(timeline_requests)) {
+            if (tl_req._matched) continue; // Already merged into a netlog request
+            if (tl_req.requestTime === undefined) continue; // Prevent NaN propagation
+            
+            const r = {
+                _id: reqId,
+                netlog_id: reqId,
+                url: tl_req.url,
+                method: tl_req.method || 'GET',
+                status: tl_req.status || 0,
+                priority: tl_req.priority || 'Lowest',
+                renderBlocking: tl_req.renderBlocking,
+                frame: tl_req.frame,
+                initiator: tl_req.initiator,
+                type: tl_req.resourceType,
+                mimeType: tl_req.mimeType,
+                bytesIn: tl_req.bytesIn || 0,
+                responseHeaders: tl_req.responseHeaders || []
+            };
+            
+            // Expected bounds track strictly microsecond ranges relative to base arrays naturally.
+            r.start = (tl_req.requestTime * 1000.0) - base_time_microseconds;
+            r.end = ((tl_req.finishTime || tl_req.requestTime) * 1000.0) - base_time_microseconds;
+            r.first_byte = r.end;
+            
+            if (tl_req.timing) {
+                const rt = (tl_req.timing.requestTime * 1000000.0) - base_time_microseconds;
+                r.start = rt;
+                
+                if (tl_req.timing.receiveHeadersEnd > 0) r.first_byte = rt + (tl_req.timing.receiveHeadersEnd * 1000.0);
+                if (tl_req.timing.dnsStart >= 0) r.dns_start = rt + (tl_req.timing.dnsStart * 1000.0);
+                if (tl_req.timing.dnsEnd >= 0) r.dns_end = rt + (tl_req.timing.dnsEnd * 1000.0);
+                if (tl_req.timing.connectStart >= 0) r.connect_start = rt + (tl_req.timing.connectStart * 1000.0);
+                if (tl_req.timing.connectEnd >= 0) r.connect_end = rt + (tl_req.timing.connectEnd * 1000.0);
+                if (tl_req.timing.sslStart >= 0) r.ssl_start = rt + (tl_req.timing.sslStart * 1000.0);
+                if (tl_req.timing.sslEnd >= 0) r.ssl_end = rt + (tl_req.timing.sslEnd * 1000.0);
+            }
+            
+            requests.push(r);
+        }
         
         if (options.debug) console.log(`[chrome-trace.js] Successfully normalized Netlog data. Synthesized ${requests.length} requests.`);
 
-        const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, final_start_time);
+        // Scale ALL internal times from MICROSECONDS to MILLISECONDS since HAR mappings require ms natively.
+        const scaleTimes = ['dns_start', 'dns_end', 'connect_start', 'connect_end', 'ssl_start', 'ssl_end', 'start', 'created', 'first_byte', 'end'];
+        for (const req of requests) {
+             for (const tname of scaleTimes) {
+                 if (req[tname] !== undefined) req[tname] /= 1000.0;
+             }
+             if (req.chunks_in) { for (const c of req.chunks_in) if (c.ts !== undefined) c.ts /= 1000.0; }
+             if (req.chunks_out) { for (const c of req.chunks_out) if (c.ts !== undefined) c.ts /= 1000.0; }
+        }
+        for (const s of unlinked_sockets) {
+             for (const tname of scaleTimes) {
+                 if (s[tname] !== undefined) s[tname] /= 1000.0;
+             }
+        }
+        for (const d of unlinked_dns) {
+             if (d.start !== undefined) d.start /= 1000.0;
+             if (d.end !== undefined) d.end /= 1000.0;
+        }
+
+        // normalizeNetlogToHAR natively expects `run_start_epoch` in SECONDS
+        // We divide `final_start_time` (ms) by 1000.0 to securely map it natively
+        const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, final_start_time / 1000.0);
         
         // Add minimal layout mapping overrides for Chrome trace
         if (har.log && har.log.pages.length > 0) {

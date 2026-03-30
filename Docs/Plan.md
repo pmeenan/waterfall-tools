@@ -39,6 +39,9 @@ This document breaks down the development of the Waterfall Tools library into in
 ## Phase 3: The Orchestrator & API
 **Goal:** Build the central `conductor` that intelligently manages inputs and acts as the developer API.
 - [x] Implement `src/inputs/orchestrator.js` to manage registered source parsers.
+- [x] Integrate PCAP/PCAPNG parsing engine via stream transformations.
+- [x] Automate test validation matching legacy Python outputs.
+- [x] Fix and harden data extraction routines per parser format (e.g. missing HTTP/3 metrics in Traces, fixing `.netlog` chunk mapping references).
 - [x] Implement auto-detection logic to identify if a raw input payload is a HAR, Chrome Trace, WPT, or other supported format based on the payload, not the file name (and automatically handle gzipped versions of each).
 - [x] Create the `src/core/conductor.js` main class export that coordinates between the auto-detected parser and the intermediary output format. It should support streaming input, raw data and files as input. It should also support the caller providing a key log for TLS decryption and should support a cli for passing in any of the supported file formats and outputting the HAR file (with a `--keylog` option for TLS decryption and a simple, descriptive, short file name).
 - [x] Integrate standard `--debug` flag logic and dynamic `options.debug` support across all pipeline parsing execution and viewers ensuring rich telemetry visibility natively.
@@ -53,6 +56,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Implement `src/renderer/layout.js` to calculate row heights, X-axis timestamps, scale distributions and standard WebPageTest color coding.
 - [x] Implement `src/renderer/canvas.js` to draw requests as cascading blocks on a provided `<canvas>`.
 - [x] Implement logic to leverage `requestAnimationFrame` ensuring efficient updates and redraws. 
+- [x] Support global document drag-and-drop targets for seamless file parsing updates.
 - [ ] Implement a dynamic UI to toggle canvas render features with automatic redraws upon changes:
   - [ ] A dropdown for selecting which page in the data set to render.
   - [ ] Toggle between a regular waterfall and a connection-view waterfall where all of the requests for a given connection are stacked on a single row.
@@ -100,3 +104,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [ ] Add explicit intermediary references coupling standard timeline moments to image frames natively into standard HAR output objects.
 - [ ] Bootstrap `src/filmstrip/` interfaces configured to inject array bundles composing individual images or trace screenshots efficiently.
 - [ ] Build renderer sub-layers synchronizing active progression cursor overlays mapping trace screenshots alongside specific timeframe elements live.
+
+- [x] Integrate fallback mapping engine for missing `URL_REQUEST_START_JOB` data from `v8.timeline` categories natively mapping `requestTime` fallbacks.
+- [x] Address catastrophic C++ memory memory address pointer overlapping within `devtools.netlog` array processing intrinsically inside `chrome-trace`.
+

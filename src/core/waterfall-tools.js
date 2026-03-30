@@ -68,12 +68,16 @@ export class WaterfallTools {
         const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
         let format = options.format;
         let isGz = options.isGz;
+        let hasTraceEventsWrapper = options.hasTraceEventsWrapper;
 
         if (!format) {
             const detected = await identifyFormatFromBuffer(buf, options);
             format = detected.format;
             if (isGz === undefined) {
                 isGz = detected.isGz;
+            }
+            if (hasTraceEventsWrapper === undefined && detected.hasTraceEventsWrapper !== undefined) {
+                hasTraceEventsWrapper = detected.hasTraceEventsWrapper;
             }
             if (format === 'unknown') {
                 throw new Error('Could not automatically identify format from buffer');
@@ -83,6 +87,7 @@ export class WaterfallTools {
         const stream = new Blob([buf]).stream();
         const streamOptions = { ...options, format };
         if (isGz !== undefined) streamOptions.isGz = isGz;
+        if (hasTraceEventsWrapper !== undefined) streamOptions.hasTraceEventsWrapper = hasTraceEventsWrapper;
         
         return await this.loadStream(stream, streamOptions);
     }

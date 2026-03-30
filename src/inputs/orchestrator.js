@@ -21,15 +21,20 @@ function isGzip(buffer) {
 function finishSniffing(text, resolve) {
     const minText = text.replace(/\s/g, '');
     
-    if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) return resolve('netlog');
-    if (minText.includes('CLIENT_RANDOM') || minText.includes('CLIENT_HANDSHAKE_TRAFFIC_SECRET') || minText.includes('CLIENT_TRAFFIC_SECRET_0')) return resolve('keylog');
-    if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":') || minText.includes('"testRuns":') || minText.includes('"average":'))) return resolve('wpt');
-    if (minText.startsWith('{"traceEvents":') || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) return resolve('chrome-trace');
-    if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":')) return resolve('chrome-trace');
-    if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) return resolve('cdp');
-    if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) return resolve('har');
+    if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) return resolve({ format: 'netlog' });
+    if (minText.includes('CLIENT_RANDOM') || minText.includes('CLIENT_HANDSHAKE_TRAFFIC_SECRET') || minText.includes('CLIENT_TRAFFIC_SECRET_0')) return resolve({ format: 'keylog' });
+    if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":') || minText.includes('"testRuns":') || minText.includes('"average":'))) return resolve({ format: 'wpt' });
+    if (minText.startsWith('{"traceEvents":') || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) {
+        return resolve({ 
+            format: 'chrome-trace', 
+            hasTraceEventsWrapper: minText.startsWith('{"traceEvents":') 
+        });
+    }
+    if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":')) return resolve({ format: 'chrome-trace', hasTraceEventsWrapper: false });
+    if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) return resolve({ format: 'cdp' });
+    if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) return resolve({ format: 'har' });
     
-    resolve('unknown');
+    resolve({ format: 'unknown' });
 }
 
 export async function identifyFormat(filePath, options = {}) {
@@ -77,7 +82,7 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
                     const { done, value } = await reader.read();
                     if (done) break;
                     sniffed = Buffer.concat([sniffed, Buffer.from(value)]);
-                    if (sniffed.length >= 4000) {
+                    if (sniffed.length >= 65536) {
                         try { await reader.cancel(); } catch (e) {}
                         break;
                     }
@@ -99,10 +104,11 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
     }
 
     return new Promise((resolve) => {
-        const textToSniff = textBuf.subarray(0, 4000).toString('utf-8');
-        finishSniffing(textToSniff, (format) => {
-            if (options.debug) console.log(`[orchestrator.js] Sniffed buffer and determined format: '${format}'`);
-            resolve({ format, isGz });
+        const textToSniff = textBuf.subarray(0, 65536).toString('utf-8');
+        finishSniffing(textToSniff, (result) => {
+            if (options.debug) console.log(`[orchestrator.js] Sniffed buffer and determined format: '${result.format}'`);
+            result.isGz = isGz;
+            resolve(result);
         });
     });
 }

@@ -271,25 +271,28 @@ export class WaterfallCanvas {
             const gridY1 = topOffset + rowHeight + 1;
             const gridY2 = dimensions.canvasHeight - rowHeight;
 
-            this.ctx.strokeStyle = 'rgb(192,192,192)';
-            this.ctx.beginPath();
-            
-            for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
-                const x = Math.floor(xScaler(t)) + 0.5;
-                this.ctx.moveTo(x, gridY1);
-                this.ctx.lineTo(x, gridY2);
-            }
-            this.ctx.stroke();
+            // Safety: if maxTime is 0 or intervalMs is 0, skip grid drawing to prevent infinite loops
+            if (dimensions.maxTime > 0 && intervalMs > 0) {
+                this.ctx.strokeStyle = 'rgb(192,192,192)';
+                this.ctx.beginPath();
+                
+                for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
+                    const x = Math.floor(xScaler(t)) + 0.5;
+                    this.ctx.moveTo(x, gridY1);
+                    this.ctx.lineTo(x, gridY2);
+                }
+                this.ctx.stroke();
 
-            this.ctx.fillStyle = '#000';
-            this.ctx.font = '11px sans-serif';
-            this.ctx.textAlign = 'center';
+                this.ctx.fillStyle = '#000';
+                this.ctx.font = '11px sans-serif';
+                this.ctx.textAlign = 'center';
 
-            for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
-                const x = Math.floor(xScaler(t)) + 0.5;
-                const labelText = this.getTimeScaleLabel(t, intervalMs) + 's';
-                this.ctx.fillText(labelText, x, topOffset + 14);
-                this.ctx.fillText(labelText, x, dimensions.canvasHeight - rowHeight + 13);
+                for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
+                    const x = Math.floor(xScaler(t)) + 0.5;
+                    const labelText = this.getTimeScaleLabel(t, intervalMs) + 's';
+                    this.ctx.fillText(labelText, x, topOffset + 14);
+                    this.ctx.fillText(labelText, x, dimensions.canvasHeight - rowHeight + 13);
+                }
             }
 
             // 5. Page Event Lines (DOM loaded, LCP, Start Render)
@@ -406,7 +409,7 @@ export class WaterfallCanvas {
                     } else {
                         // When max bandwidth is not available, draw a solid download block
                         let firstChunkTs = minMs;
-                        if (row.chunks.length > 0 && row.chunks[0].ts !== undefined) {
+                        if (row.chunks && row.chunks.length > 0 && row.chunks[0].ts !== undefined) {
                             let cTs = row.chunks[0].ts;
                             if (cTs > 1000000000000) cTs -= baseStartMs;
                             firstChunkTs = Math.max(minMs, cTs);
