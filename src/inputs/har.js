@@ -60,7 +60,7 @@ export async function processHARFileNode(input, options = {}) {
 
     try {
         if (typeof input === 'string') {
-            const fs = await import('node:fs');
+            const fs = await import(/* @vite-ignore */ 'node:fs');
             
             const header = new Uint8Array(2);
             try {
@@ -72,7 +72,7 @@ export async function processHARFileNode(input, options = {}) {
             }
             isGz = isGzip(header);
             
-            const { Readable } = await import('node:stream');
+            const { Readable } = await import(/* @vite-ignore */ 'node:stream');
             nodeFsStream = fs.createReadStream(input);
             stream = Readable.toWeb(nodeFsStream);
         }

@@ -14,7 +14,7 @@ export async function processTcpdumpNode(input, options = {}) {
 
     try {
         if (typeof input === 'string') {
-            const fs = await import('node:fs');
+            const fs = await import(/* @vite-ignore */ 'node:fs');
             
             const header = new Uint8Array(2);
             let fd;
@@ -28,7 +28,7 @@ export async function processTcpdumpNode(input, options = {}) {
             
             isGz = header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b;
             
-            const { Readable } = await import('node:stream');
+            const { Readable } = await import(/* @vite-ignore */ 'node:stream');
             nodeFsStream = fs.createReadStream(input);
             stream = Readable.toWeb(nodeFsStream);
         }
@@ -66,8 +66,8 @@ export async function processTcpdumpNode(input, options = {}) {
             try {
                 let klStream = keyLogInput;
                 if (typeof keyLogInput === 'string') {
-                    const fs = await import('node:fs');
-                    const { Readable } = await import('node:stream');
+                    const fs = await import(/* @vite-ignore */ 'node:fs');
+                    const { Readable } = await import(/* @vite-ignore */ 'node:stream');
                     klStream = Readable.toWeb(fs.createReadStream(keyLogInput));
                 }
                 

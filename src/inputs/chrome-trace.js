@@ -26,10 +26,9 @@ export async function processChromeTraceFileNode(input, options = {}) {
 
     try {
         if (typeof input === 'string') {
-            const fs = await import('node:fs');
-            
+            const fs = await import(/* @vite-ignore */ 'node:fs');
+
             const header = new Uint8Array(2);
-            let peekSource = fs.createReadStream(input);
             try {
                 const fd = fs.openSync(input, 'r');
                 fs.readSync(fd, header, 0, 2, 0);
@@ -37,40 +36,35 @@ export async function processChromeTraceFileNode(input, options = {}) {
             } catch (e) {
                 throw e;
             }
-            
+
             isGz = isGzip(header);
-            
-            // Only peek if wrapper state isn't explicitly passed
+
+            // Only peek if wrapper state isn't explicitly passed.
+            // When called via the Conductor/orchestrator, hasTraceEventsWrapper is already
+            // detected during format sniffing. This path only fires from standalone CLI usage.
             if (options.hasTraceEventsWrapper === undefined) {
-                let peekStream = peekSource;
+                const { Readable } = await import(/* @vite-ignore */ 'node:stream');
+                let peekFsStream = fs.createReadStream(input);
+                let peekWebStream = Readable.toWeb(peekFsStream);
                 if (isGz) {
-                    const zlib = await import('node:zlib');
-                    peekStream = peekSource.pipe(zlib.createGunzip());
+                    peekWebStream = peekWebStream.pipeThrough(new DecompressionStream('gzip'));
                 }
-                
-                let prefix = await new Promise((res) => {
-                    let result = '';
-                    peekStream.on('error', () => {});
-                    peekStream.on('data', (d) => {
-                        result += d.toString('utf-8');
-                        if (result.length > 20) {
-                            peekStream.destroy();
-                            peekSource.destroy();
-                            res(result);
-                        }
-                    });
-                    peekStream.on('end', () => {
-                        peekSource.destroy();
-                        res(result);
-                    });
-                });
-                
+                const peekReader = peekWebStream.pipeThrough(new TextDecoderStream()).getReader();
+                let prefix = '';
+                try {
+                    while (prefix.length < 30) {
+                        const { done, value } = await peekReader.read();
+                        if (done) break;
+                        prefix += value;
+                    }
+                } finally {
+                    try { peekReader.cancel(); } catch (e) {}
+                    peekFsStream.destroy();
+                }
                 hasTraceEventsWrapper = prefix.replace(/\s/g, '').startsWith('{"traceEvents":');
-            } else {
-                peekSource.destroy();
             }
-            
-            const { Readable } = await import('node:stream');
+
+            const { Readable } = await import(/* @vite-ignore */ 'node:stream');
             nodeFsStream = fs.createReadStream(input);
             stream = Readable.toWeb(nodeFsStream);
         }

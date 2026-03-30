@@ -96,7 +96,7 @@ export async function identifyFormat(filePath, options = {}) {
     }
 
     // Dynamically import node modules so browser bundle doesn't crash if explicitly bypassing node paths
-    const fs = await import('node:fs');
+    const fs = await import(/* @vite-ignore */ 'node:fs');
 
     // Read up to 64KB for format sniffing using a Uint8Array (not Node Buffer)
     const sniffBuf = new Uint8Array(65536);
