@@ -107,4 +107,4 @@ This document breaks down the development of the Waterfall Tools library into in
 
 - [x] Integrate fallback mapping engine for missing `URL_REQUEST_START_JOB` data from `v8.timeline` categories natively mapping `requestTime` fallbacks.
 - [x] Address catastrophic C++ memory memory address pointer overlapping within `devtools.netlog` array processing intrinsically inside `chrome-trace`.
-
+- [x] Normalize `CLOCK_MONOTONIC` system uptimes within Chrome Traces to real UNIX epochs dynamically extracting `date:` HTTP response headers preventing 1970 Date object regressions across renderer timeouts.
