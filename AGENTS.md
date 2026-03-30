@@ -168,3 +168,8 @@ When working on this codebase, you must adhere to the following strict architect
     - All tests MUST use **vitest** (`import { describe, it, expect } from 'vitest'`), NOT `node:test` or `node:assert`. The project uses vitest as its test runner (`npm test` runs `vitest`).
     - Use `describe`/`it` for test structure and `expect()` for assertions (e.g., `expect(x).toBe(y)`, `expect(x).toEqual(y)`, `expect(x).toBeTruthy()`, `expect(fn).rejects.toThrow()`).
     - Test files follow the `*.test.js` naming convention under `tests/inputs/` and `tests/outputs/`.
+
+41. **CDP (Chrome DevTools Protocol) Timing Nuances:**
+    - CDP Network events (`Network.requestWillBeSent`, `Network.responseReceived`) log natively in system seconds (`timestamp`), but the underlying DevTools layout operates strictly in milliseconds. Parsers MUST calculate the relative differences (e.g. `timestamp - first_timestamp`) and explicitly multiply by `1000.0`.
+    - Furthermore, `response.timing` objects (like `dnsStart`, `connectStart`) natively log relative millisecond offsets against `requestTime`. Parsers MUST aggressively compute and map these relative bounds to the absolute Request `startTime` explicitly; otherwise, critical visual phases (DNS, TCP, TLS) will completely fail to appear in standard Waterfall exports.
+    - Because CDP intercepts do not natively guarantee a `responseReceived` phase for aborted or manually blocked requests, parsers must actively scrub unbounded requests (where `endTime` remains undefined) and explicitly fault them out (`errorCode = 12999`) preventing infinite loading state ghost bars natively.
