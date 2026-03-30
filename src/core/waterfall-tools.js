@@ -225,25 +225,6 @@ export class WaterfallTools {
     }
 
     /**
-     * Renders the waterfall diagram to the specified DOM container using the internal canvas renderer.
-     * Inherently binds against the requested Page ID mapping DNS/TLS boundaries appropriately.
-     * @param {HTMLElement|string} containerElement 
-     * @param {Object} options 
-     */
-    async renderTo(containerElement, options = {}) {
-        const { WaterfallCanvas } = await import('../renderer/canvas.js');
-        const renderer = new WaterfallCanvas(containerElement, options);
-        
-        const pageId = options.pageId || Object.keys(this.data.pages)[0];
-        if (!pageId) return renderer;
-
-        const pageObj = this.getPage(pageId, { includeRequests: true });
-        renderer.render(pageObj);
-        
-        return renderer;
-    }
-
-    /**
      * Compiles standard Extended HAR 1.2 Format strictly derived from internal Relational mapping
      * @param {Object} options 
      */

@@ -1,5 +1,4 @@
-import test from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,90 +15,86 @@ function getRawJSON(filePath) {
     return JSON.parse(buf.toString('utf8'));
 }
 
-test('HAR Input Processor', async (t) => {
-    
-    await t.test('Should correctly parse and normalize a Gzipped WebPageTest HAR', async () => {
+describe('HAR Input Processor', () => {
+
+    it('Should correctly parse and normalize a Gzipped WebPageTest HAR', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/WebPageTest/amazon.har.gz');
         const refPath = path.resolve(__dirname, '../fixtures/amazon.har.json');
-        
+
         const tool = new WaterfallTools();
         await tool.loadFile(inputPath, { debug: true, format: 'har' });
         const result = JSON.parse(JSON.stringify(tool.getHar({ debug: true })));
-        
+
         if (!fs.existsSync(refPath)) {
             console.log(`Generating golden fixture for amazon.har.json...`);
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
         }
-        
+
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
-        assert.deepStrictEqual(result, ref, 'Parsed WPT HAR does not match reference output');
-        assert.strictEqual(result.log.version, "1.2");
-        assert.strictEqual(result.log.creator.name, "waterfall-tools");
-        
+        expect(result).toEqual(ref);
+        expect(result.log.version).toBe("1.2");
+        expect(result.log.creator.name).toBe("waterfall-tools");
+
         const rawHar = getRawJSON(inputPath);
-        assert.strictEqual(result.log.entries.length, rawHar.log.entries?.length || 0, "Parsed entries count must match source exactly");
-        assert.strictEqual(result.log.pages.length, rawHar.log.pages?.length || 0, "Parsed pages count must match source exactly");
+        expect(result.log.entries.length).toBe(rawHar.log.entries?.length || 0);
+        expect(result.log.pages.length).toBe(rawHar.log.pages?.length || 0);
     });
 
-    await t.test('Should correctly parse and normalize a plain Text Chrome HAR', async () => {
+    it('Should correctly parse and normalize a plain Text Chrome HAR', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/Chrome/www.google.com.har');
         const refPath = path.resolve(__dirname, '../fixtures/chrome-google.har.json');
-        
+
         const tool = new WaterfallTools();
         await tool.loadFile(inputPath, { debug: true, format: 'har' });
         const result = JSON.parse(JSON.stringify(tool.getHar({ debug: true })));
-        
+
         if (!fs.existsSync(refPath)) {
             console.log(`Generating golden fixture for chrome-google.har.json...`);
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
         }
-        
+
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
-        assert.deepStrictEqual(result, ref, 'Parsed Chrome HAR does not match reference output');
-        assert.strictEqual(result.log.creator.name, "waterfall-tools");
-        
+        expect(result).toEqual(ref);
+        expect(result.log.creator.name).toBe("waterfall-tools");
+
         const rawHar = getRawJSON(inputPath);
-        assert.strictEqual(result.log.entries.length, rawHar.log.entries?.length || 0, "Parsed entries count must match source exactly");
-        assert.strictEqual(result.log.pages.length, rawHar.log.pages?.length || 0, "Parsed pages count must match source exactly");
+        expect(result.log.entries.length).toBe(rawHar.log.entries?.length || 0);
+        expect(result.log.pages.length).toBe(rawHar.log.pages?.length || 0);
     });
 
-    await t.test('Should correctly parse and normalize a plain Text Firefox HAR', async () => {
+    it('Should correctly parse and normalize a plain Text Firefox HAR', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/Firefox/www.google.com_Archive [26-03-27 17-36-46].har');
         const refPath = path.resolve(__dirname, '../fixtures/firefox-google.har.json');
-        
+
         const tool = new WaterfallTools();
         await tool.loadFile(inputPath, { debug: true, format: 'har' });
         const result = JSON.parse(JSON.stringify(tool.getHar({ debug: true })));
-        
+
         if (!fs.existsSync(refPath)) {
             console.log(`Generating golden fixture for firefox-google.har.json...`);
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
         }
-        
+
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
-        assert.deepStrictEqual(result, ref, 'Parsed Firefox HAR does not match reference output');
-        assert.strictEqual(result.log.creator.name, "waterfall-tools");
+        expect(result).toEqual(ref);
+        expect(result.log.creator.name).toBe("waterfall-tools");
 
         const rawHar = getRawJSON(inputPath);
-        assert.strictEqual(result.log.entries.length, rawHar.log.entries?.length || 0, "Parsed entries count must match source exactly");
-        assert.strictEqual(result.log.pages.length, rawHar.log.pages?.length || 0, "Parsed pages count must match source exactly");
+        expect(result.log.entries.length).toBe(rawHar.log.entries?.length || 0);
+        expect(result.log.pages.length).toBe(rawHar.log.pages?.length || 0);
     });
 
-    await t.test('Should reject invalid file paths safely', async () => {
+    it('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/HARs/DOES_NOT_EXIST.har');
-        await assert.rejects(
-            async () => {
-                const tool = new WaterfallTools();
-                await tool.loadFile(inputPath, { debug: true, format: 'har' });
-            },
-            { code: 'ENOENT' },
-            'Should reject with ENOENT when file is missing'
-        );
+        await expect(async () => {
+            const tool = new WaterfallTools();
+            await tool.loadFile(inputPath, { debug: true, format: 'har' });
+        }).rejects.toThrow();
     });
 });

@@ -14,7 +14,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Implement `src/inputs/har.js` to accept raw standard HAR files and normalize them into the strictly structured Extended HAR format.
 - [x] Build a stand-alone CLI mode wrapper for the HAR parser that takes an input file and generates the intermediary HAR file output.
 - [x] Create automated tests validating the HAR parser against known-good sample outputs, explicitly testing HAR files from WebPageTest, Chrome, and Firefox.
-  *Note: Validation uses `node:test` against static pre-rendered `tests/fixtures/` snapshots generated natively by the CLI to enforce immutable verification of streaming decoders.*
+  *Note: Validation uses `vitest` against static pre-rendered `tests/fixtures/` snapshots generated natively by the CLI to enforce immutable verification of streaming decoders.*
 - [x] Add decoding, processing, and validation for WebPageTest JSON formats (`src/inputs/wpt-json.js`).
 - [x] Add decoding, processing, and validation for Netlog formats (`src/inputs/netlog.js`).
 - [x] Add decoding, processing, and validation for Chrome Dev Tools Protocol (CDP) formats (`src/inputs/cdp.js`).
@@ -35,6 +35,9 @@ This document breaks down the development of the Waterfall Tools library into in
   - [x] **HAR Generation & Validation:** Turn the decoded protocols from the tcpdump processing into requests and page data that can be used for generating the HAR format and then the creation and validation of the resulting HAR from the tcpdump input.
 - [x] Restructure the `src/inputs` directory so that the core libraries are separated from the cli interfaces and utility functions (in a logical grouping in separate folders) so it's not a flat, giant collection of files. If it makes sense, the core libraries can be at the root.
 - [x] **Zero Polyfill Migration:** Convert all node-native stream and crypto logic globally across all input pipelines to purely Web APIs native to Browser engines to ensure a fundamentally lightweight and robust isomorphic library footprint.
+- [x] Integrate fallback mapping engine for missing `URL_REQUEST_START_JOB` data from `v8.timeline` categories natively mapping `requestTime` fallbacks.
+- [x] Address catastrophic C++ memory address pointer overlapping within `devtools.netlog` array processing inside `chrome-trace`.
+- [x] Normalize `CLOCK_MONOTONIC` system uptimes within Chrome Traces to real UNIX epochs dynamically extracting `date:` HTTP response headers preventing 1970 Date object regressions across renderer timeouts.
 
 ## Phase 3: The Orchestrator & API
 **Goal:** Build the central `conductor` that intelligently manages inputs and acts as the developer API.
@@ -104,7 +107,3 @@ This document breaks down the development of the Waterfall Tools library into in
 - [ ] Add explicit intermediary references coupling standard timeline moments to image frames natively into standard HAR output objects.
 - [ ] Bootstrap `src/filmstrip/` interfaces configured to inject array bundles composing individual images or trace screenshots efficiently.
 - [ ] Build renderer sub-layers synchronizing active progression cursor overlays mapping trace screenshots alongside specific timeframe elements live.
-
-- [x] Integrate fallback mapping engine for missing `URL_REQUEST_START_JOB` data from `v8.timeline` categories natively mapping `requestTime` fallbacks.
-- [x] Address catastrophic C++ memory memory address pointer overlapping within `devtools.netlog` array processing intrinsically inside `chrome-trace`.
-- [x] Normalize `CLOCK_MONOTONIC` system uptimes within Chrome Traces to real UNIX epochs dynamically extracting `date:` HTTP response headers preventing 1970 Date object regressions across renderer timeouts.

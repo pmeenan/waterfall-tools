@@ -1108,7 +1108,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 202,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -1176,7 +1176,7 @@
           ],
           "content": {
             "size": 2007,
-            "mimeType": "text/html; charset=UTF-8",
+            "mimeType": "text/html",
             "compression": 0
           },
           "redirectURL": "",
@@ -1194,13 +1194,15 @@
         },
         "serverIPAddress": "",
         "connection": "conn_req_0",
-        "_bytes_in": 2007,
         "_chunks": [
           {
             "ts": 149,
             "bytes": 2007
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 2007,
         "_created": 15,
         "_url": "https://www.amazon.com/",
         "_priority": "Highest",
@@ -1464,7 +1466,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -1546,7 +1548,6 @@
         },
         "serverIPAddress": "",
         "connection": "conn_req_1",
-        "_bytes_in": 504079,
         "_chunks": [
           {
             "ts": 358,
@@ -1938,6 +1939,9 @@
             "inflated": 18359
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 504079,
         "_created": 165,
         "_url": "https://1c5c1ecf7303.c0b160fb.us-east-1.token.awswaf.com/1c5c1ecf7303/d6a7a58005ec/04c5ab18cd2d/challenge.js",
         "_priority": "High",
@@ -2171,7 +2175,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "QUIC",
           "cookies": [],
@@ -2257,13 +2261,15 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 481,
         "_chunks": [
           {
             "ts": 1632,
             "bytes": 481
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 481,
         "_created": 1493,
         "_url": "https://1c5c1ecf7303.c0b160fb.us-east-1.token.awswaf.com/1c5c1ecf7303/d6a7a58005ec/04c5ab18cd2d/inputs?client=browser",
         "_priority": "High",
@@ -2412,7 +2418,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "QUIC",
           "cookies": [],
@@ -2498,13 +2504,15 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 276,
         "_chunks": [
           {
             "ts": 1888,
             "bytes": 276
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 276,
         "_created": 1738,
         "_url": "https://1c5c1ecf7303.c0b160fb.us-east-1.token.awswaf.com/1c5c1ecf7303/d6a7a58005ec/04c5ab18cd2d/mp_verify",
         "_priority": "High",
@@ -2643,7 +2651,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -2769,13 +2777,15 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 17542,
         "_chunks": [
           {
             "ts": 1874,
             "bytes": 17542
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 17542,
         "_created": 1744,
         "_url": "https://www.amazon.com/favicon.ico",
         "_priority": "High",
@@ -2936,7 +2946,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "QUIC",
           "cookies": [],
@@ -3022,13 +3032,15 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 276,
         "_chunks": [
           {
             "ts": 2051,
             "bytes": 276
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 276,
         "_created": 1901,
         "_url": "https://1c5c1ecf7303.c0b160fb.us-east-1.token.awswaf.com/1c5c1ecf7303/d6a7a58005ec/04c5ab18cd2d/mp_verify",
         "_priority": "High",
@@ -3179,7 +3191,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "QUIC",
           "cookies": [],
@@ -3253,7 +3265,6 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 1826,
         "_chunks": [
           {
             "ts": 2128,
@@ -3261,6 +3272,9 @@
             "inflated": 5070
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 1826,
         "_created": 2078,
         "_url": "https://www.amazon.com/",
         "_priority": "Highest",
@@ -3396,7 +3410,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -3506,7 +3520,6 @@
         },
         "serverIPAddress": "",
         "connection": "conn_req_7",
-        "_bytes_in": 18915,
         "_chunks": [
           {
             "ts": 2315,
@@ -3514,6 +3527,9 @@
             "inflated": 37633
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 18915,
         "_created": 2162,
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min._V1_.css",
         "_priority": "Highest",
@@ -3806,7 +3822,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -3916,7 +3932,6 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 821,
         "_chunks": [
           {
             "ts": 2403,
@@ -3924,6 +3939,9 @@
             "inflated": 1787
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 821,
         "_created": 2346,
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/csminstrumentation/csm-captcha-instrumentation.min.js",
         "_priority": "Low",
@@ -4058,7 +4076,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -4168,7 +4186,6 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 661,
         "_chunks": [
           {
             "ts": 2416,
@@ -4176,6 +4193,9 @@
             "inflated": 1829
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 661,
         "_created": 2354,
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/csminstrumentation/rd-script-6d68177fa6061598e9509dc4b5bdd08d.js",
         "_priority": "Low",
@@ -4314,7 +4334,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -4428,13 +4448,15 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 16972,
         "_chunks": [
           {
             "ts": 2440,
             "bytes": 16972
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 16972,
         "_created": 2358,
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/amazonui/sprites/aui_sprite_0007-1x._V383827579_.png",
         "_priority": "Low",
@@ -4570,7 +4592,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "QUIC",
           "cookies": [],
@@ -4680,7 +4702,6 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 2871,
         "_chunks": [
           {
             "ts": 2482,
@@ -4688,6 +4709,9 @@
             "inflated": 7210
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 2871,
         "_created": 2443,
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/csminstrumentation/ue-base-1c399ad9886cab69575e1e5ee15c61a1._V313498596_.js",
         "_priority": "Low",
@@ -4814,7 +4838,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "QUIC",
           "cookies": [],
@@ -4924,7 +4948,6 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 7138,
         "_chunks": [
           {
             "ts": 2529,
@@ -4932,6 +4955,9 @@
             "inflated": 19614
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 7138,
         "_created": 2499,
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/AUIClients/ClientSideMetricsAUIJavascript-51171fbdd28e1a7a61e922e8f0272af8bc74d37b.secure.variant-desktop-session-snapshot-keypress.min._V2_.js",
         "_priority": "Low",
@@ -5058,7 +5084,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -5100,13 +5126,15 @@
         },
         "serverIPAddress": "",
         "connection": "conn_req_13",
-        "_bytes_in": 43,
         "_chunks": [
           {
             "ts": 2602,
             "bytes": 43
           }
         ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 43,
         "_created": 2337,
         "_url": "https://fls-na.amazon.com/1/oc-csi/1/OP/requestId=8NR9ZEG52GNJFC1G1KPR&js=1",
         "_priority": "High",
@@ -5400,7 +5428,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 204,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -5442,8 +5470,10 @@
         },
         "serverIPAddress": "",
         "connection": "",
-        "_bytes_in": 0,
         "_chunks": [],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 0,
         "_created": 3545,
         "_url": "https://fls-na.amazon.com/1/batch/1/OE/",
         "_priority": "Lowest",

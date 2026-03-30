@@ -1,10 +1,9 @@
-import { test } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import path from 'node:path';
 import fs from 'node:fs';
 import { WaterfallTools } from '../../src/core/waterfall-tools.js';
 
-test('Chrome Trace Input Processing', async (t) => {
+describe('Chrome Trace Input Processing', () => {
 
     const files = [
         'trace_theverge.com',
@@ -15,14 +14,14 @@ test('Chrome Trace Input Processing', async (t) => {
     ];
 
     for (const filename of files) {
-        await t.test(`Transforms ${filename} correctly`, async () => {
+        it(`Transforms ${filename} correctly`, async () => {
             const fixturePath = path.resolve(`tests/fixtures/chrome-trace/${filename}.json`);
             const inputPath = path.resolve(`Sample/Data/Chrome Traces/${filename}.json.gz`);
 
             const tool = new WaterfallTools();
             await tool.loadFile(inputPath, { debug: true, format: 'chrome-trace' });
             const har = tool.getHar({ debug: true });
-            
+
             // Scrub dynamic Dates
             if (har.log && har.log.pages) {
                 har.log.pages.forEach(p => delete p.startedDateTime);
@@ -32,7 +31,7 @@ test('Chrome Trace Input Processing', async (t) => {
             }
 
             const cleanHar = JSON.parse(JSON.stringify(har));
-            
+
             if (fs.existsSync(fixturePath)) {
                 const snapshot = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
                 if (snapshot.log && snapshot.log.pages) {
@@ -41,7 +40,7 @@ test('Chrome Trace Input Processing', async (t) => {
                 if (snapshot.log && snapshot.log.entries) {
                     snapshot.log.entries.forEach(e => delete e.startedDateTime);
                 }
-                assert.deepStrictEqual(cleanHar, snapshot);
+                expect(cleanHar).toEqual(snapshot);
             } else {
                 console.log(`Writing baseline for ${filename}`);
                 fs.mkdirSync(path.dirname(fixturePath), { recursive: true });

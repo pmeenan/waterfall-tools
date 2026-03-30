@@ -9,7 +9,7 @@
       {
         "id": "page_1_0_1",
         "title": "Run 1, First View for ",
-        "startedDateTime": "2026-03-29T15:58:43.495Z",
+        "startedDateTime": "2026-03-30T20:30:41.398Z",
         "pageTimings": {
           "onLoad": 1331,
           "onContentLoad": -1,
@@ -45,8 +45,8 @@
     ],
     "entries": [
       {
-        "startedDateTime": "2026-03-29T15:58:43.495Z",
-        "time": 98,
+        "startedDateTime": "2026-03-30T20:30:41.398Z",
+        "time": 185,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -310,10 +310,16 @@
           "ssl": -1,
           "send": 0,
           "wait": 98,
-          "receive": 0
+          "receive": 87
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 185,
+            "bytes": 185125
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -331,19 +337,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Document",
-        "_load_ms": 165,
+        "_load_ms": 185,
         "_ttfb_ms": 98,
         "_load_start": 0,
         "_load_start_float": 0.809000000000001,
         "_bytesIn": 55528,
         "_objectSize": 55528,
         "_objectSizeUncompressed": 185125,
-        "_chunks": [
-          {
-            "ts": 185,
-            "bytes": 185125
-          }
-        ],
         "_expires": "-1",
         "_cacheControl": "private, max-age=0",
         "_contentType": "text/html",
@@ -430,15 +430,18 @@
           ]
         },
         "_bytesOut": 1149,
+        "_download_ms": 87,
+        "_all_ms": 185,
+        "_created": 0,
         "_ttfb_start": 0,
         "_ttfb_end": 98,
         "_download_start": 98,
-        "_download_end": 98,
-        "_all_end": 98
+        "_download_end": 185,
+        "_all_end": 185
       },
       {
-        "startedDateTime": "2026-03-29T15:58:43.689Z",
-        "time": 29,
+        "startedDateTime": "2026-03-30T20:30:41.592Z",
+        "time": 51,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -662,10 +665,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 29,
-          "receive": 0
+          "receive": 22
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 246,
+            "bytes": 2922
+          },
+          {
+            "ts": 246,
+            "bytes": 1330
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -683,23 +696,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Stylesheet",
-        "_load_ms": 32,
+        "_load_ms": 51,
         "_ttfb_ms": 29,
         "_load_start": 194,
         "_load_start_float": 195.00099999822677,
         "_bytesIn": 1356,
         "_objectSize": 1330,
         "_objectSizeUncompressed": 2922,
-        "_chunks": [
-          {
-            "ts": 246,
-            "bytes": 2922
-          },
-          {
-            "ts": 246,
-            "bytes": 1330
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 12:05:54 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/css",
@@ -776,15 +779,18 @@
           ]
         },
         "_bytesOut": 2173,
+        "_download_ms": 22,
+        "_all_ms": 51,
+        "_created": 193.92099999822676,
         "_ttfb_start": 194,
         "_ttfb_end": 223,
         "_download_start": 223,
-        "_download_end": 223,
-        "_all_end": 223
+        "_download_end": 245,
+        "_all_end": 245
       },
       {
-        "startedDateTime": "2026-03-29T15:58:43.692Z",
-        "time": 51,
+        "startedDateTime": "2026-03-30T20:30:41.595Z",
+        "time": 461,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -1004,34 +1010,10 @@
           "ssl": -1,
           "send": 0,
           "wait": 51,
-          "receive": 0
+          "receive": 410
         },
         "serverIPAddress": "",
         "connection": "",
-        "_run": 1,
-        "_cached": 0,
-        "_type": 3,
-        "_id": "2821.3",
-        "_request_id": "2821.3",
-        "_ip_addr": "[2001:4860:482a:7700::]",
-        "_full_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEBBAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAACIgAACDAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEUYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGCAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=1/ed=1/dg=4/br=1/rs=ACT90oFJ_kaQLvlOHarigft6xzDTotXVbg/ee=ALeJib:B8gLwd;AfeaP:TkrAjf;BMxAGc:E5bFse;BgS6mb:fidj5d;BjwMce:cXX2Wb;CIZTGb:Kqhykb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;Dkk6ge:JZmW9e;DpcR3d:zL72xf;Du7NI:C6zLgf;EABSZ:MXZt9d;ESrPQc:mNTJvc;EVNhjf:pw70Gc;EjXHpb:pSHqh;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F54IAe:ZgsFh;F9mqte:UoRcbe;FSxmUe:fiZR8b;Fkukfc:i8H2c;Fmv9Nc:O1Tzwc;G0KhTb:LIaoZ;GEkGdd:e1RzQd;GleZL:J1A7Od;HMDDWe:G8QUdb;HgsCtf:jLgnvd;HtPxrd:Gx8jAb;IBADCc:RYquRb;IoGlCf:b5lhvb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KA3P2:C3JnCe;KDb6nb:fE9n2;KOxcK:OZqGte;KQzWid:ZMKkN;KpRAue:Tia57b;LBgRLc:SdcwHb,XVMNvd;LBn8Cf:bJ9L0c;LEikZe:byfTOb,lsjVmc;LXA8b:q7OdKd;LsNahb:ucGLNb;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OIfWUb:qfOYcd;OgagBe:cNTe0;OiqE2c:TFpEK;OoK5v:Sp69O;OohIYe:mpEAQb;Pjplud:PoEs9b;PpTLXd:pJYjx;Q1Ow7b:x5CSu;QE20Be:gIltO;QFOGlf:PQ2Aoe;QGR0gd:Mlhmy;QYLF2b:pAQYUd;Qw8Feb:jpavUe;R4IIIb:QWfeKf;R9Ulx:CR7Ufe;RCF5Sd:X1kBmd;SLtqO:Kh1xYe;SMDL4c:fTfGO;SNUn3:ZwDk9d,xD8Kp;ScI3Yc:e7Hzgb,e7Hzgb;ShpF6e:N0pvGc;SwCqAd:fXbCZc;SzQQ3e:dNhofb;TIUVQd:M8uRWb;TroZ1d:vVVzjb;U96pRd:FsR04;UBKJZ:LGDJGb;UDrY1c:N0F29d,W50NVd,eps46d,rw5jGd,wciyUe;UVmjEd:EesRsb;UVzb9c:IvPZ6d;UYRIEb:HzTAQc;UyG7Kb:wQd0G;V2HTTe:RolTY;VGRfx:VFqbr;VMuEm:pL7sBc;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;VsAqSb:PGf2Re;W9QSQe:ynCWwc;WDGyFe:jcVOxd;WXtNeb:QU9BMd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YV5bee:IvPZ6d;YnHUBf:sNsSob;ZSH6tc:QAvyLe;ZWEUA:afR4Cf;ZlOOMb:P0I0Ec;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bDXwRe:UsyOtc;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:ZgGg9b;dLlj2:Qqt3Gf;dXdZV:a7QTqd;dowIGb:ebZ3mb,ebZ3mb;dtl0hd:lLQWFe;eBAeSb:Ck63tb;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;eO3lse:UefOmb;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:ws9Tlc;hK67qb:QWEO5b;hVic1b:Kqhykb;heHB1:sFczq;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;hwoVHd:zw4U8c;iFQyKf:QIhFr;iySzae:a6xXfd;jJj2G:kF2o2b;k1O0rf:pnOULd;k2Qxcb:XY51pe;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;liAz7d:kF2o2b;mWzs9c:fz5ukf;nBZnZe:CvErjb;nJw4Gd:dPFZH;nrDcw:SuEoDe;oGtAuc:sOXFj;oSUNyd:fTfGO,fTfGO;oUlnpc:RagDlc;okUaUd:wItadb;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:JKoKVe;pj82le:ww04Df;qGV2uc:HHi04c;qQEoOc:KUM7Z,d7YSfd;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:sgY6Zb;qavrXe:I0C9u;qddgKe:d7YSfd,x4FYXe;rdexKf:FEkKD;rmWaj:PMS6Sd;ropkZ:hjoqoe;sTsDMc:JksfDf;sZmdvc:rdGEfc;tH4IIe:Ymry6;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;vEYCNb:FaqsVd;vRlMvf:Iw9Xo;vfVwPd:lcrkwe;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:dt4g2b;wQlYve:aLUfP;wR5FRb:O1Gjze,TtcOte;wV5Pjc:L8KGxe;x9N9ie:KH4Qof;xBbsrc:NEW1Qc;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zOsCQe:Ko78Df;zaIgPb:Sl0pxd/m=cdos,hsm,jsa,mb4ZUb,cEt90b,SNUn3,qddgKe,sTsDMc,dtl0hd,eHDfl,YV5bee,d,csi",
-        "_is_secure": 1,
-        "_method": "GET",
-        "_host": "www.google.com",
-        "_url": "/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEBBAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAACIgAACDAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEUYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGCAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=1/ed=1/dg=4/br=1/rs=ACT90oFJ_kaQLvlOHarigft6xzDTotXVbg/ee=ALeJib:B8gLwd;AfeaP:TkrAjf;BMxAGc:E5bFse;BgS6mb:fidj5d;BjwMce:cXX2Wb;CIZTGb:Kqhykb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;Dkk6ge:JZmW9e;DpcR3d:zL72xf;Du7NI:C6zLgf;EABSZ:MXZt9d;ESrPQc:mNTJvc;EVNhjf:pw70Gc;EjXHpb:pSHqh;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F54IAe:ZgsFh;F9mqte:UoRcbe;FSxmUe:fiZR8b;Fkukfc:i8H2c;Fmv9Nc:O1Tzwc;G0KhTb:LIaoZ;GEkGdd:e1RzQd;GleZL:J1A7Od;HMDDWe:G8QUdb;HgsCtf:jLgnvd;HtPxrd:Gx8jAb;IBADCc:RYquRb;IoGlCf:b5lhvb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KA3P2:C3JnCe;KDb6nb:fE9n2;KOxcK:OZqGte;KQzWid:ZMKkN;KpRAue:Tia57b;LBgRLc:SdcwHb,XVMNvd;LBn8Cf:bJ9L0c;LEikZe:byfTOb,lsjVmc;LXA8b:q7OdKd;LsNahb:ucGLNb;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OIfWUb:qfOYcd;OgagBe:cNTe0;OiqE2c:TFpEK;OoK5v:Sp69O;OohIYe:mpEAQb;Pjplud:PoEs9b;PpTLXd:pJYjx;Q1Ow7b:x5CSu;QE20Be:gIltO;QFOGlf:PQ2Aoe;QGR0gd:Mlhmy;QYLF2b:pAQYUd;Qw8Feb:jpavUe;R4IIIb:QWfeKf;R9Ulx:CR7Ufe;RCF5Sd:X1kBmd;SLtqO:Kh1xYe;SMDL4c:fTfGO;SNUn3:ZwDk9d,xD8Kp;ScI3Yc:e7Hzgb,e7Hzgb;ShpF6e:N0pvGc;SwCqAd:fXbCZc;SzQQ3e:dNhofb;TIUVQd:M8uRWb;TroZ1d:vVVzjb;U96pRd:FsR04;UBKJZ:LGDJGb;UDrY1c:N0F29d,W50NVd,eps46d,rw5jGd,wciyUe;UVmjEd:EesRsb;UVzb9c:IvPZ6d;UYRIEb:HzTAQc;UyG7Kb:wQd0G;V2HTTe:RolTY;VGRfx:VFqbr;VMuEm:pL7sBc;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;VsAqSb:PGf2Re;W9QSQe:ynCWwc;WDGyFe:jcVOxd;WXtNeb:QU9BMd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YV5bee:IvPZ6d;YnHUBf:sNsSob;ZSH6tc:QAvyLe;ZWEUA:afR4Cf;ZlOOMb:P0I0Ec;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bDXwRe:UsyOtc;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:ZgGg9b;dLlj2:Qqt3Gf;dXdZV:a7QTqd;dowIGb:ebZ3mb,ebZ3mb;dtl0hd:lLQWFe;eBAeSb:Ck63tb;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;eO3lse:UefOmb;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:ws9Tlc;hK67qb:QWEO5b;hVic1b:Kqhykb;heHB1:sFczq;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;hwoVHd:zw4U8c;iFQyKf:QIhFr;iySzae:a6xXfd;jJj2G:kF2o2b;k1O0rf:pnOULd;k2Qxcb:XY51pe;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;liAz7d:kF2o2b;mWzs9c:fz5ukf;nBZnZe:CvErjb;nJw4Gd:dPFZH;nrDcw:SuEoDe;oGtAuc:sOXFj;oSUNyd:fTfGO,fTfGO;oUlnpc:RagDlc;okUaUd:wItadb;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:JKoKVe;pj82le:ww04Df;qGV2uc:HHi04c;qQEoOc:KUM7Z,d7YSfd;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:sgY6Zb;qavrXe:I0C9u;qddgKe:d7YSfd,x4FYXe;rdexKf:FEkKD;rmWaj:PMS6Sd;ropkZ:hjoqoe;sTsDMc:JksfDf;sZmdvc:rdGEfc;tH4IIe:Ymry6;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;vEYCNb:FaqsVd;vRlMvf:Iw9Xo;vfVwPd:lcrkwe;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:dt4g2b;wQlYve:aLUfP;wR5FRb:O1Gjze,TtcOte;wV5Pjc:L8KGxe;x9N9ie:KH4Qof;xBbsrc:NEW1Qc;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zOsCQe:Ko78Df;zaIgPb:Sl0pxd/m=cdos,hsm,jsa,mb4ZUb,cEt90b,SNUn3,qddgKe,sTsDMc,dtl0hd,eHDfl,YV5bee,d,csi",
-        "_raw_id": "2821.3",
-        "_frame_id": "1DB8BEFD510639221CD5879370430880",
-        "_documentURL": "https://www.google.com/",
-        "_isSameSite": true,
-        "_responseCode": 200,
-        "_request_type": "Script",
-        "_load_ms": 442,
-        "_ttfb_ms": 51,
-        "_load_start": 197,
-        "_load_start_float": 197.53199999755319,
-        "_bytesIn": 365098,
-        "_objectSize": 365017,
-        "_objectSizeUncompressed": 1028346,
         "_chunks": [
           {
             "ts": 658,
@@ -1110,6 +1092,30 @@
             "bytes": 365070
           }
         ],
+        "_run": 1,
+        "_cached": 0,
+        "_type": 3,
+        "_id": "2821.3",
+        "_request_id": "2821.3",
+        "_ip_addr": "[2001:4860:482a:7700::]",
+        "_full_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEBBAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAACIgAACDAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEUYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGCAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=1/ed=1/dg=4/br=1/rs=ACT90oFJ_kaQLvlOHarigft6xzDTotXVbg/ee=ALeJib:B8gLwd;AfeaP:TkrAjf;BMxAGc:E5bFse;BgS6mb:fidj5d;BjwMce:cXX2Wb;CIZTGb:Kqhykb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;Dkk6ge:JZmW9e;DpcR3d:zL72xf;Du7NI:C6zLgf;EABSZ:MXZt9d;ESrPQc:mNTJvc;EVNhjf:pw70Gc;EjXHpb:pSHqh;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F54IAe:ZgsFh;F9mqte:UoRcbe;FSxmUe:fiZR8b;Fkukfc:i8H2c;Fmv9Nc:O1Tzwc;G0KhTb:LIaoZ;GEkGdd:e1RzQd;GleZL:J1A7Od;HMDDWe:G8QUdb;HgsCtf:jLgnvd;HtPxrd:Gx8jAb;IBADCc:RYquRb;IoGlCf:b5lhvb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KA3P2:C3JnCe;KDb6nb:fE9n2;KOxcK:OZqGte;KQzWid:ZMKkN;KpRAue:Tia57b;LBgRLc:SdcwHb,XVMNvd;LBn8Cf:bJ9L0c;LEikZe:byfTOb,lsjVmc;LXA8b:q7OdKd;LsNahb:ucGLNb;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OIfWUb:qfOYcd;OgagBe:cNTe0;OiqE2c:TFpEK;OoK5v:Sp69O;OohIYe:mpEAQb;Pjplud:PoEs9b;PpTLXd:pJYjx;Q1Ow7b:x5CSu;QE20Be:gIltO;QFOGlf:PQ2Aoe;QGR0gd:Mlhmy;QYLF2b:pAQYUd;Qw8Feb:jpavUe;R4IIIb:QWfeKf;R9Ulx:CR7Ufe;RCF5Sd:X1kBmd;SLtqO:Kh1xYe;SMDL4c:fTfGO;SNUn3:ZwDk9d,xD8Kp;ScI3Yc:e7Hzgb,e7Hzgb;ShpF6e:N0pvGc;SwCqAd:fXbCZc;SzQQ3e:dNhofb;TIUVQd:M8uRWb;TroZ1d:vVVzjb;U96pRd:FsR04;UBKJZ:LGDJGb;UDrY1c:N0F29d,W50NVd,eps46d,rw5jGd,wciyUe;UVmjEd:EesRsb;UVzb9c:IvPZ6d;UYRIEb:HzTAQc;UyG7Kb:wQd0G;V2HTTe:RolTY;VGRfx:VFqbr;VMuEm:pL7sBc;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;VsAqSb:PGf2Re;W9QSQe:ynCWwc;WDGyFe:jcVOxd;WXtNeb:QU9BMd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YV5bee:IvPZ6d;YnHUBf:sNsSob;ZSH6tc:QAvyLe;ZWEUA:afR4Cf;ZlOOMb:P0I0Ec;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bDXwRe:UsyOtc;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:ZgGg9b;dLlj2:Qqt3Gf;dXdZV:a7QTqd;dowIGb:ebZ3mb,ebZ3mb;dtl0hd:lLQWFe;eBAeSb:Ck63tb;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;eO3lse:UefOmb;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:ws9Tlc;hK67qb:QWEO5b;hVic1b:Kqhykb;heHB1:sFczq;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;hwoVHd:zw4U8c;iFQyKf:QIhFr;iySzae:a6xXfd;jJj2G:kF2o2b;k1O0rf:pnOULd;k2Qxcb:XY51pe;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;liAz7d:kF2o2b;mWzs9c:fz5ukf;nBZnZe:CvErjb;nJw4Gd:dPFZH;nrDcw:SuEoDe;oGtAuc:sOXFj;oSUNyd:fTfGO,fTfGO;oUlnpc:RagDlc;okUaUd:wItadb;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:JKoKVe;pj82le:ww04Df;qGV2uc:HHi04c;qQEoOc:KUM7Z,d7YSfd;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:sgY6Zb;qavrXe:I0C9u;qddgKe:d7YSfd,x4FYXe;rdexKf:FEkKD;rmWaj:PMS6Sd;ropkZ:hjoqoe;sTsDMc:JksfDf;sZmdvc:rdGEfc;tH4IIe:Ymry6;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;vEYCNb:FaqsVd;vRlMvf:Iw9Xo;vfVwPd:lcrkwe;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:dt4g2b;wQlYve:aLUfP;wR5FRb:O1Gjze,TtcOte;wV5Pjc:L8KGxe;x9N9ie:KH4Qof;xBbsrc:NEW1Qc;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zOsCQe:Ko78Df;zaIgPb:Sl0pxd/m=cdos,hsm,jsa,mb4ZUb,cEt90b,SNUn3,qddgKe,sTsDMc,dtl0hd,eHDfl,YV5bee,d,csi",
+        "_is_secure": 1,
+        "_method": "GET",
+        "_host": "www.google.com",
+        "_url": "/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEBBAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAACIgAACDAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEUYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGCAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=1/ed=1/dg=4/br=1/rs=ACT90oFJ_kaQLvlOHarigft6xzDTotXVbg/ee=ALeJib:B8gLwd;AfeaP:TkrAjf;BMxAGc:E5bFse;BgS6mb:fidj5d;BjwMce:cXX2Wb;CIZTGb:Kqhykb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;Dkk6ge:JZmW9e;DpcR3d:zL72xf;Du7NI:C6zLgf;EABSZ:MXZt9d;ESrPQc:mNTJvc;EVNhjf:pw70Gc;EjXHpb:pSHqh;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F54IAe:ZgsFh;F9mqte:UoRcbe;FSxmUe:fiZR8b;Fkukfc:i8H2c;Fmv9Nc:O1Tzwc;G0KhTb:LIaoZ;GEkGdd:e1RzQd;GleZL:J1A7Od;HMDDWe:G8QUdb;HgsCtf:jLgnvd;HtPxrd:Gx8jAb;IBADCc:RYquRb;IoGlCf:b5lhvb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KA3P2:C3JnCe;KDb6nb:fE9n2;KOxcK:OZqGte;KQzWid:ZMKkN;KpRAue:Tia57b;LBgRLc:SdcwHb,XVMNvd;LBn8Cf:bJ9L0c;LEikZe:byfTOb,lsjVmc;LXA8b:q7OdKd;LsNahb:ucGLNb;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OIfWUb:qfOYcd;OgagBe:cNTe0;OiqE2c:TFpEK;OoK5v:Sp69O;OohIYe:mpEAQb;Pjplud:PoEs9b;PpTLXd:pJYjx;Q1Ow7b:x5CSu;QE20Be:gIltO;QFOGlf:PQ2Aoe;QGR0gd:Mlhmy;QYLF2b:pAQYUd;Qw8Feb:jpavUe;R4IIIb:QWfeKf;R9Ulx:CR7Ufe;RCF5Sd:X1kBmd;SLtqO:Kh1xYe;SMDL4c:fTfGO;SNUn3:ZwDk9d,xD8Kp;ScI3Yc:e7Hzgb,e7Hzgb;ShpF6e:N0pvGc;SwCqAd:fXbCZc;SzQQ3e:dNhofb;TIUVQd:M8uRWb;TroZ1d:vVVzjb;U96pRd:FsR04;UBKJZ:LGDJGb;UDrY1c:N0F29d,W50NVd,eps46d,rw5jGd,wciyUe;UVmjEd:EesRsb;UVzb9c:IvPZ6d;UYRIEb:HzTAQc;UyG7Kb:wQd0G;V2HTTe:RolTY;VGRfx:VFqbr;VMuEm:pL7sBc;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;VsAqSb:PGf2Re;W9QSQe:ynCWwc;WDGyFe:jcVOxd;WXtNeb:QU9BMd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YV5bee:IvPZ6d;YnHUBf:sNsSob;ZSH6tc:QAvyLe;ZWEUA:afR4Cf;ZlOOMb:P0I0Ec;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bDXwRe:UsyOtc;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:ZgGg9b;dLlj2:Qqt3Gf;dXdZV:a7QTqd;dowIGb:ebZ3mb,ebZ3mb;dtl0hd:lLQWFe;eBAeSb:Ck63tb;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;eO3lse:UefOmb;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:ws9Tlc;hK67qb:QWEO5b;hVic1b:Kqhykb;heHB1:sFczq;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;hwoVHd:zw4U8c;iFQyKf:QIhFr;iySzae:a6xXfd;jJj2G:kF2o2b;k1O0rf:pnOULd;k2Qxcb:XY51pe;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;liAz7d:kF2o2b;mWzs9c:fz5ukf;nBZnZe:CvErjb;nJw4Gd:dPFZH;nrDcw:SuEoDe;oGtAuc:sOXFj;oSUNyd:fTfGO,fTfGO;oUlnpc:RagDlc;okUaUd:wItadb;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:JKoKVe;pj82le:ww04Df;qGV2uc:HHi04c;qQEoOc:KUM7Z,d7YSfd;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:sgY6Zb;qavrXe:I0C9u;qddgKe:d7YSfd,x4FYXe;rdexKf:FEkKD;rmWaj:PMS6Sd;ropkZ:hjoqoe;sTsDMc:JksfDf;sZmdvc:rdGEfc;tH4IIe:Ymry6;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;vEYCNb:FaqsVd;vRlMvf:Iw9Xo;vfVwPd:lcrkwe;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:dt4g2b;wQlYve:aLUfP;wR5FRb:O1Gjze,TtcOte;wV5Pjc:L8KGxe;x9N9ie:KH4Qof;xBbsrc:NEW1Qc;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zOsCQe:Ko78Df;zaIgPb:Sl0pxd/m=cdos,hsm,jsa,mb4ZUb,cEt90b,SNUn3,qddgKe,sTsDMc,dtl0hd,eHDfl,YV5bee,d,csi",
+        "_raw_id": "2821.3",
+        "_frame_id": "1DB8BEFD510639221CD5879370430880",
+        "_documentURL": "https://www.google.com/",
+        "_isSameSite": true,
+        "_responseCode": 200,
+        "_request_type": "Script",
+        "_load_ms": 461,
+        "_ttfb_ms": 51,
+        "_load_start": 197,
+        "_load_start_float": 197.53199999755319,
+        "_bytesIn": 365098,
+        "_objectSize": 365017,
+        "_objectSizeUncompressed": 1028346,
         "_expires": "Fri, 26 Mar 2027 09:58:34 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/javascript",
@@ -1185,15 +1191,18 @@
           ]
         },
         "_bytesOut": 4839,
+        "_download_ms": 410,
+        "_all_ms": 461,
+        "_created": 196.07899999755318,
         "_ttfb_start": 197,
         "_ttfb_end": 248,
         "_download_start": 248,
-        "_download_end": 248,
-        "_all_end": 248
+        "_download_end": 658,
+        "_all_end": 658
       },
       {
-        "startedDateTime": "2026-03-29T15:58:43.810Z",
-        "time": 78,
+        "startedDateTime": "2026-03-30T20:30:41.713Z",
+        "time": 187,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -1401,10 +1410,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 78,
-          "receive": 0
+          "receive": 109
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 501,
+            "bytes": 660
+          },
+          {
+            "ts": 503,
+            "bytes": 660
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -1422,23 +1441,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Image",
-        "_load_ms": 167,
+        "_load_ms": 187,
         "_ttfb_ms": 78,
         "_load_start": 315,
         "_load_start_float": 316.1379999973576,
         "_bytesIn": 682,
         "_objectSize": 660,
         "_objectSizeUncompressed": 660,
-        "_chunks": [
-          {
-            "ts": 501,
-            "bytes": 660
-          },
-          {
-            "ts": 503,
-            "bytes": 660
-          }
-        ],
         "_expires": "Thu, 26 Mar 2026 23:03:49 GMT",
         "_cacheControl": "private, max-age=31536000",
         "_contentType": "image/webp",
@@ -1511,15 +1520,18 @@
           ]
         },
         "_bytesOut": 1679,
+        "_download_ms": 109,
+        "_all_ms": 187,
+        "_created": 309.4939999973576,
         "_ttfb_start": 315,
         "_ttfb_end": 393,
         "_download_start": 393,
-        "_download_end": 393,
-        "_all_end": 393
+        "_download_end": 502,
+        "_all_end": 502
       },
       {
-        "startedDateTime": "2026-03-29T15:58:43.824Z",
-        "time": 51,
+        "startedDateTime": "2026-03-30T20:30:41.727Z",
+        "time": 176,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -1699,34 +1711,10 @@
           "ssl": -1,
           "send": 0,
           "wait": 51,
-          "receive": 0
+          "receive": 125
         },
         "serverIPAddress": "",
         "connection": "",
-        "_run": 1,
-        "_cached": 0,
-        "_type": 3,
-        "_id": "2821.6",
-        "_request_id": "2821.6",
-        "_ip_addr": "[2607:f8b0:4004:c08::5e]",
-        "_full_url": "https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2",
-        "_is_secure": 1,
-        "_method": "GET",
-        "_host": "fonts.gstatic.com",
-        "_url": "/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2",
-        "_raw_id": "2821.6",
-        "_frame_id": "1DB8BEFD510639221CD5879370430880",
-        "_documentURL": "https://www.google.com/",
-        "_isSameSite": false,
-        "_responseCode": 200,
-        "_request_type": "Font",
-        "_load_ms": 157,
-        "_ttfb_ms": 51,
-        "_load_start": 329,
-        "_load_start_float": 330.4679999998533,
-        "_bytesIn": 15371,
-        "_objectSize": 15344,
-        "_objectSizeUncompressed": 15344,
         "_chunks": [
           {
             "ts": 503,
@@ -1745,6 +1733,30 @@
             "bytes": 15344
           }
         ],
+        "_run": 1,
+        "_cached": 0,
+        "_type": 3,
+        "_id": "2821.6",
+        "_request_id": "2821.6",
+        "_ip_addr": "[2607:f8b0:4004:c08::5e]",
+        "_full_url": "https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2",
+        "_is_secure": 1,
+        "_method": "GET",
+        "_host": "fonts.gstatic.com",
+        "_url": "/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2",
+        "_raw_id": "2821.6",
+        "_frame_id": "1DB8BEFD510639221CD5879370430880",
+        "_documentURL": "https://www.google.com/",
+        "_isSameSite": false,
+        "_responseCode": 200,
+        "_request_type": "Font",
+        "_load_ms": 176,
+        "_ttfb_ms": 51,
+        "_load_start": 329,
+        "_load_start_float": 330.4679999998533,
+        "_bytesIn": 15371,
+        "_objectSize": 15344,
+        "_objectSizeUncompressed": 15344,
         "_expires": "Fri, 26 Mar 2027 13:38:29 GMT",
         "_cacheControl": "public, max-age=31536000",
         "_contentType": "font/woff2",
@@ -1810,15 +1822,18 @@
           ]
         },
         "_bytesOut": 811,
+        "_download_ms": 125,
+        "_all_ms": 176,
+        "_created": 221.77999999985332,
         "_ttfb_start": 329,
         "_ttfb_end": 380,
         "_download_start": 380,
-        "_download_end": 380,
-        "_all_end": 380
+        "_download_end": 505,
+        "_all_end": 505
       },
       {
-        "startedDateTime": "2026-03-29T15:58:43.826Z",
-        "time": 91,
+        "startedDateTime": "2026-03-30T20:30:41.729Z",
+        "time": 176,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -1998,10 +2013,24 @@
           "ssl": -1,
           "send": 0,
           "wait": 91,
-          "receive": 0
+          "receive": 85
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 507,
+            "bytes": 7471
+          },
+          {
+            "ts": 507,
+            "bytes": 7965
+          },
+          {
+            "ts": 507,
+            "bytes": 15436
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -2019,27 +2048,13 @@
         "_isSameSite": false,
         "_responseCode": 200,
         "_request_type": "Font",
-        "_load_ms": 156,
+        "_load_ms": 176,
         "_ttfb_ms": 91,
         "_load_start": 331,
         "_load_start_float": 331.7289999980144,
         "_bytesIn": 15463,
         "_objectSize": 15436,
         "_objectSizeUncompressed": 15436,
-        "_chunks": [
-          {
-            "ts": 507,
-            "bytes": 7471
-          },
-          {
-            "ts": 507,
-            "bytes": 7965
-          },
-          {
-            "ts": 507,
-            "bytes": 15436
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 15:01:35 GMT",
         "_cacheControl": "public, max-age=31536000",
         "_contentType": "font/woff2",
@@ -2105,15 +2120,18 @@
           ]
         },
         "_bytesOut": 815,
+        "_download_ms": 85,
+        "_all_ms": 176,
+        "_created": 221.96799999801442,
         "_ttfb_start": 331,
         "_ttfb_end": 422,
         "_download_start": 422,
-        "_download_end": 422,
-        "_all_end": 422
+        "_download_end": 507,
+        "_all_end": 507
       },
       {
-        "startedDateTime": "2026-03-29T15:58:43.829Z",
-        "time": 69,
+        "startedDateTime": "2026-03-30T20:30:41.732Z",
+        "time": 174,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -2293,34 +2311,10 @@
           "ssl": -1,
           "send": 0,
           "wait": 69,
-          "receive": 0
+          "receive": 105
         },
         "serverIPAddress": "",
         "connection": "",
-        "_run": 1,
-        "_cached": 0,
-        "_type": 3,
-        "_id": "2821.5",
-        "_request_id": "2821.5",
-        "_ip_addr": "[2607:f8b0:4004:c08::5e]",
-        "_full_url": "https://fonts.gstatic.com/s/googlesans/v29/4UaGrENHsxJlGDuGo1OIlL3Owp4.woff2",
-        "_is_secure": 1,
-        "_method": "GET",
-        "_host": "fonts.gstatic.com",
-        "_url": "/s/googlesans/v29/4UaGrENHsxJlGDuGo1OIlL3Owp4.woff2",
-        "_raw_id": "2821.5",
-        "_frame_id": "1DB8BEFD510639221CD5879370430880",
-        "_documentURL": "https://www.google.com/",
-        "_isSameSite": false,
-        "_responseCode": 200,
-        "_request_type": "Font",
-        "_load_ms": 155,
-        "_ttfb_ms": 69,
-        "_load_start": 334,
-        "_load_start_float": 335.04299999900206,
-        "_bytesIn": 39548,
-        "_objectSize": 39516,
-        "_objectSizeUncompressed": 39516,
         "_chunks": [
           {
             "ts": 508,
@@ -2347,6 +2341,30 @@
             "bytes": 39519
           }
         ],
+        "_run": 1,
+        "_cached": 0,
+        "_type": 3,
+        "_id": "2821.5",
+        "_request_id": "2821.5",
+        "_ip_addr": "[2607:f8b0:4004:c08::5e]",
+        "_full_url": "https://fonts.gstatic.com/s/googlesans/v29/4UaGrENHsxJlGDuGo1OIlL3Owp4.woff2",
+        "_is_secure": 1,
+        "_method": "GET",
+        "_host": "fonts.gstatic.com",
+        "_url": "/s/googlesans/v29/4UaGrENHsxJlGDuGo1OIlL3Owp4.woff2",
+        "_raw_id": "2821.5",
+        "_frame_id": "1DB8BEFD510639221CD5879370430880",
+        "_documentURL": "https://www.google.com/",
+        "_isSameSite": false,
+        "_responseCode": 200,
+        "_request_type": "Font",
+        "_load_ms": 174,
+        "_ttfb_ms": 69,
+        "_load_start": 334,
+        "_load_start_float": 335.04299999900206,
+        "_bytesIn": 39548,
+        "_objectSize": 39516,
+        "_objectSizeUncompressed": 39516,
         "_expires": "Thu, 25 Mar 2027 11:48:18 GMT",
         "_cacheControl": "public, max-age=31536000",
         "_contentType": "font/woff2",
@@ -2412,15 +2430,18 @@
           ]
         },
         "_bytesOut": 822,
+        "_download_ms": 105,
+        "_all_ms": 174,
+        "_created": 220.3159999990021,
         "_ttfb_start": 334,
         "_ttfb_end": 403,
         "_download_start": 403,
-        "_download_end": 403,
-        "_all_end": 403
+        "_download_end": 508,
+        "_all_end": 508
       },
       {
-        "startedDateTime": "2026-03-29T15:58:43.835Z",
-        "time": 41,
+        "startedDateTime": "2026-03-30T20:30:41.738Z",
+        "time": 488,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -2587,39 +2608,15 @@
         },
         "cache": {},
         "timings": {
-          "dns": -1,
-          "connect": -1,
-          "ssl": -1,
+          "dns": 36,
+          "connect": 63,
+          "ssl": 44,
           "send": 0,
-          "wait": 41,
-          "receive": 0
+          "wait": 140,
+          "receive": 249
         },
         "serverIPAddress": "",
-        "connection": "",
-        "_run": 1,
-        "_cached": 0,
-        "_type": 3,
-        "_id": "2821.4",
-        "_request_id": "2821.4",
-        "_ip_addr": "[2607:f8b0:4004:c21::5e]",
-        "_full_url": "https://www.gstatic.com/og/_/js/k=og.asy.en_US.fh17Jb9Is2A.2019.O/rt=j/m=_ac,_awd,ada,lldp,qads,abld/exm=/d=1/ed=1/rs=AA2YrTuSzwr9n3ULMyPU3yXllcHG7SQxjA",
-        "_is_secure": 1,
-        "_method": "GET",
-        "_host": "www.gstatic.com",
-        "_url": "/og/_/js/k=og.asy.en_US.fh17Jb9Is2A.2019.O/rt=j/m=_ac,_awd,ada,lldp,qads,abld/exm=/d=1/ed=1/rs=AA2YrTuSzwr9n3ULMyPU3yXllcHG7SQxjA",
-        "_raw_id": "2821.4",
-        "_frame_id": "1DB8BEFD510639221CD5879370430880",
-        "_documentURL": "https://www.google.com/",
-        "_isSameSite": false,
-        "_responseCode": 200,
-        "_request_type": "Script",
-        "_load_ms": 270,
-        "_ttfb_ms": 41,
-        "_load_start": 340,
-        "_load_start_float": 341.03899999944963,
-        "_bytesIn": 81832,
-        "_objectSize": 81236,
-        "_objectSizeUncompressed": 223260,
+        "connection": "conn_req_3",
         "_chunks": [
           {
             "ts": 629,
@@ -2642,18 +2639,42 @@
             "bytes": 81326
           }
         ],
+        "_run": 1,
+        "_cached": 0,
+        "_type": 3,
+        "_id": "2821.4",
+        "_request_id": "2821.4",
+        "_ip_addr": "[2607:f8b0:4004:c21::5e]",
+        "_full_url": "https://www.gstatic.com/og/_/js/k=og.asy.en_US.fh17Jb9Is2A.2019.O/rt=j/m=_ac,_awd,ada,lldp,qads,abld/exm=/d=1/ed=1/rs=AA2YrTuSzwr9n3ULMyPU3yXllcHG7SQxjA",
+        "_is_secure": 1,
+        "_method": "GET",
+        "_host": "www.gstatic.com",
+        "_url": "/og/_/js/k=og.asy.en_US.fh17Jb9Is2A.2019.O/rt=j/m=_ac,_awd,ada,lldp,qads,abld/exm=/d=1/ed=1/rs=AA2YrTuSzwr9n3ULMyPU3yXllcHG7SQxjA",
+        "_raw_id": "2821.4",
+        "_frame_id": "1DB8BEFD510639221CD5879370430880",
+        "_documentURL": "https://www.google.com/",
+        "_isSameSite": false,
+        "_responseCode": 200,
+        "_request_type": "Script",
+        "_load_ms": 290,
+        "_ttfb_ms": 41,
+        "_load_start": 340,
+        "_load_start_float": 341.03899999944963,
+        "_bytesIn": 81832,
+        "_objectSize": 81236,
+        "_objectSizeUncompressed": 223260,
         "_expires": "Tue, 23 Mar 2027 11:56:15 GMT",
         "_cacheControl": "public, max-age=31536000",
         "_contentType": "text/javascript",
         "_contentEncoding": "gzip",
         "_socket": 258,
         "_protocol": "HTTP/2",
-        "_dns_start": 200,
-        "_dns_end": 236,
-        "_connect_start": 242,
-        "_connect_end": 261,
-        "_ssl_start": 261,
-        "_ssl_end": 305,
+        "_dns_start": 340,
+        "_dns_end": 376,
+        "_connect_start": 376,
+        "_connect_end": 439,
+        "_ssl_start": 395,
+        "_ssl_end": 340,
         "_securityDetails": {
           "protocol": "TLS 1.3",
           "keyExchange": "",
@@ -2746,15 +2767,26 @@
           ]
         },
         "_bytesOut": 890,
+        "_dns_ms": 36,
+        "_connect_ms": 19,
+        "_ssl_ms": 44,
+        "_download_ms": 249,
+        "_all_ms": 290,
+        "_created": 197.0839999994496,
+        "_dnsTimeMs": 1774902641738,
+        "_dnsEndTimeMs": 1774902641774,
+        "_connectTimeMs": 1774902641774,
+        "_connectEndTimeMs": 1774902641837,
+        "_sslStartTimeMs": 1774902641793,
         "_ttfb_start": 340,
-        "_ttfb_end": 381,
-        "_download_start": 381,
-        "_download_end": 381,
-        "_all_end": 381
+        "_ttfb_end": 480,
+        "_download_start": 480,
+        "_download_end": 729,
+        "_all_end": 729
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.012Z",
-        "time": 76,
+        "startedDateTime": "2026-03-30T20:30:41.915Z",
+        "time": 136,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -3030,10 +3062,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 76,
-          "receive": 0
+          "receive": 60
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 632,
+            "bytes": 102
+          },
+          {
+            "ts": 653,
+            "bytes": 111
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -3051,23 +3093,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "XHR",
-        "_load_ms": 116,
+        "_load_ms": 136,
         "_ttfb_ms": 76,
         "_load_start": 517,
         "_load_start_float": 517.5039999968457,
         "_bytesIn": 156,
         "_objectSize": 156,
         "_objectSizeUncompressed": 102,
-        "_chunks": [
-          {
-            "ts": 632,
-            "bytes": 102
-          },
-          {
-            "ts": 653,
-            "bytes": 111
-          }
-        ],
         "_expires": "Thu, 26 Mar 2026 23:03:49 GMT",
         "_cacheControl": "private",
         "_contentType": "text/plain",
@@ -3157,15 +3189,18 @@
           ]
         },
         "_bytesOut": 3467,
+        "_download_ms": 60,
+        "_all_ms": 136,
+        "_created": 499.0879999968456,
         "_ttfb_start": 517,
         "_ttfb_end": 593,
         "_download_start": 593,
-        "_download_end": 593,
-        "_all_end": 593
+        "_download_end": 653,
+        "_all_end": 653
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.059Z",
-        "time": 21,
+        "startedDateTime": "2026-03-30T20:30:41.962Z",
+        "time": 41,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -3341,10 +3376,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 21,
-          "receive": 0
+          "receive": 20
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 606,
+            "bytes": 5610
+          },
+          {
+            "ts": 606,
+            "bytes": 1591
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -3362,23 +3407,13 @@
         "_isSameSite": false,
         "_responseCode": 200,
         "_request_type": "Stylesheet",
-        "_load_ms": 22,
+        "_load_ms": 41,
         "_ttfb_ms": 21,
         "_load_start": 564,
         "_load_start_float": 564.9639999990088,
         "_bytesIn": 1716,
         "_objectSize": 1582,
         "_objectSizeUncompressed": 5610,
-        "_chunks": [
-          {
-            "ts": 606,
-            "bytes": 5610
-          },
-          {
-            "ts": 606,
-            "bytes": 1591
-          }
-        ],
         "_expires": "Sun, 21 Mar 2027 21:42:23 GMT",
         "_cacheControl": "public, max-age=31536000",
         "_contentType": "text/css",
@@ -3443,15 +3478,18 @@
           ]
         },
         "_bytesOut": 913,
+        "_download_ms": 20,
+        "_all_ms": 41,
+        "_created": 561.9919999990088,
         "_ttfb_start": 564,
         "_ttfb_end": 585,
         "_download_start": 585,
-        "_download_end": 585,
-        "_all_end": 585
+        "_download_end": 605,
+        "_all_end": 605
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.100Z",
-        "time": 28,
+        "startedDateTime": "2026-03-30T20:30:42.003Z",
+        "time": 297,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -3663,10 +3701,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 28,
-          "receive": 0
+          "receive": 269
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -3684,7 +3723,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "Ping",
-        "_load_ms": 277,
+        "_load_ms": 297,
         "_ttfb_ms": 28,
         "_load_start": 605,
         "_load_start_float": 605.8329999996103,
@@ -3764,15 +3803,18 @@
           ]
         },
         "_bytesOut": 1905,
+        "_download_ms": 269,
+        "_all_ms": 297,
+        "_created": 593.3189999996102,
         "_ttfb_start": 605,
         "_ttfb_end": 633,
         "_download_start": 633,
-        "_download_end": 633,
-        "_all_end": 633
+        "_download_end": 902,
+        "_all_end": 902
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.150Z",
-        "time": 28,
+        "startedDateTime": "2026-03-30T20:30:42.053Z",
+        "time": 268,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -3984,10 +4026,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 28,
-          "receive": 0
+          "receive": 240
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -4005,7 +4048,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "Ping",
-        "_load_ms": 249,
+        "_load_ms": 268,
         "_ttfb_ms": 28,
         "_load_start": 655,
         "_load_start_float": 656.4299999968154,
@@ -4085,15 +4128,18 @@
           ]
         },
         "_bytesOut": 1881,
+        "_download_ms": 240,
+        "_all_ms": 268,
+        "_created": 652.2429999968153,
         "_ttfb_start": 655,
         "_ttfb_end": 683,
         "_download_start": 683,
-        "_download_end": 683,
-        "_all_end": 683
+        "_download_end": 923,
+        "_all_end": 923
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.370Z",
-        "time": 27,
+        "startedDateTime": "2026-03-30T20:30:42.273Z",
+        "time": 109,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -4301,10 +4347,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 27,
-          "receive": 0
+          "receive": 82
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -4322,7 +4369,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "Ping",
-        "_load_ms": 90,
+        "_load_ms": 109,
         "_ttfb_ms": 27,
         "_load_start": 875,
         "_load_start_float": 876.0889999979187,
@@ -4401,15 +4448,18 @@
           ]
         },
         "_bytesOut": 2235,
+        "_download_ms": 82,
+        "_all_ms": 109,
+        "_created": 875.2839999979187,
         "_ttfb_start": 875,
         "_ttfb_end": 902,
         "_download_start": 902,
-        "_download_end": 902,
-        "_all_end": 902
+        "_download_end": 984,
+        "_all_end": 984
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.448Z",
-        "time": 31,
+        "startedDateTime": "2026-03-30T20:30:42.351Z",
+        "time": 194,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -4633,34 +4683,10 @@
           "ssl": -1,
           "send": 0,
           "wait": 31,
-          "receive": 0
+          "receive": 163
         },
         "serverIPAddress": "",
         "connection": "",
-        "_run": 1,
-        "_cached": 0,
-        "_type": 3,
-        "_id": "2821.18",
-        "_request_id": "2821.18",
-        "_ip_addr": "[2001:4860:482a:7700::]",
-        "_full_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/ck=xjs.hd.TAmzkjqCqQ0.L.B1.O/am=AIAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAACEAAAAIACViCCABAAAAAAAAHEACoAAAAAAAAAAACAAAACAEBBAAABAAAAAAAAAIAAACAAAAAgAAAAIABgACAACIgAACDAgAAAAAAgAAAAAAAAAAAACBCAAAAEACAfxgYAwAAAADAkIQBQAAAAACAMGABAAAUAAAAIEAAAAAAAABEkAABAAQMAAEAAAgAAAAAAAEAQggCAhQQAUAAAAIAAAAAAAAAICAAAAAAAAEBgIBACCAAAAAAAQUCgABAIAABAgEAbwQyAABAIkAAABAdAAAAAAAIAAAAAAAAAAAAAIATAIBAAACABcAHEUYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGCAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/ujg=1/rs=ACT90oGxttMSAXGyPEs3KJxz6tnHGlLN3g/m=U9EYge,syz7,loL8vb,syzl,syzk,syzc,syzf,sy10a,sy106,sycx,sycy,sycs,sy108,sy10d,sygf,syge,sygd,sy109,sy10b,sy10e,sy10f,sy10c,syzj,syzs,syzo,syzn,syzm,syz9,sy105,sy103,sy102,sy101,syzw,syzy,syzz,syzu,syzt,sy100,syzv,syzr,syzq,syzp,syzb,syz3,syyh,syyg,syzd,ms4mZb,syx5,B2qlPe,sy134,NzU6V,sy13m,sy90,WlNQGd,syz2,syz0,syyz,DPreE,sy13o,sy13n,nabPbb,abd,sy43r,TDFkye?xjs=s3",
-        "_is_secure": 1,
-        "_method": "GET",
-        "_host": "www.google.com",
-        "_url": "/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/ck=xjs.hd.TAmzkjqCqQ0.L.B1.O/am=AIAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAACEAAAAIACViCCABAAAAAAAAHEACoAAAAAAAAAAACAAAACAEBBAAABAAAAAAAAAIAAACAAAAAgAAAAIABgACAACIgAACDAgAAAAAAgAAAAAAAAAAAACBCAAAAEACAfxgYAwAAAADAkIQBQAAAAACAMGABAAAUAAAAIEAAAAAAAABEkAABAAQMAAEAAAgAAAAAAAEAQggCAhQQAUAAAAIAAAAAAAAAICAAAAAAAAEBgIBACCAAAAAAAQUCgABAIAABAgEAbwQyAABAIkAAABAdAAAAAAAIAAAAAAAAAAAAAIATAIBAAACABcAHEUYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGCAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/ujg=1/rs=ACT90oGxttMSAXGyPEs3KJxz6tnHGlLN3g/m=U9EYge,syz7,loL8vb,syzl,syzk,syzc,syzf,sy10a,sy106,sycx,sycy,sycs,sy108,sy10d,sygf,syge,sygd,sy109,sy10b,sy10e,sy10f,sy10c,syzj,syzs,syzo,syzn,syzm,syz9,sy105,sy103,sy102,sy101,syzw,syzy,syzz,syzu,syzt,sy100,syzv,syzr,syzq,syzp,syzb,syz3,syyh,syyg,syzd,ms4mZb,syx5,B2qlPe,sy134,NzU6V,sy13m,sy90,WlNQGd,syz2,syz0,syyz,DPreE,sy13o,sy13n,nabPbb,abd,sy43r,TDFkye?xjs=s3",
-        "_raw_id": "2821.18",
-        "_frame_id": "1DB8BEFD510639221CD5879370430880",
-        "_documentURL": "https://www.google.com/",
-        "_isSameSite": true,
-        "_responseCode": 200,
-        "_request_type": "Script",
-        "_load_ms": 174,
-        "_ttfb_ms": 31,
-        "_load_start": 953,
-        "_load_start_float": 954.3789999982624,
-        "_bytesIn": 40849,
-        "_objectSize": 40818,
-        "_objectSizeUncompressed": 121661,
         "_chunks": [
           {
             "ts": 1148,
@@ -4679,6 +4705,30 @@
             "bytes": 40821
           }
         ],
+        "_run": 1,
+        "_cached": 0,
+        "_type": 3,
+        "_id": "2821.18",
+        "_request_id": "2821.18",
+        "_ip_addr": "[2001:4860:482a:7700::]",
+        "_full_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/ck=xjs.hd.TAmzkjqCqQ0.L.B1.O/am=AIAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAACEAAAAIACViCCABAAAAAAAAHEACoAAAAAAAAAAACAAAACAEBBAAABAAAAAAAAAIAAACAAAAAgAAAAIABgACAACIgAACDAgAAAAAAgAAAAAAAAAAAACBCAAAAEACAfxgYAwAAAADAkIQBQAAAAACAMGABAAAUAAAAIEAAAAAAAABEkAABAAQMAAEAAAgAAAAAAAEAQggCAhQQAUAAAAIAAAAAAAAAICAAAAAAAAEBgIBACCAAAAAAAQUCgABAIAABAgEAbwQyAABAIkAAABAdAAAAAAAIAAAAAAAAAAAAAIATAIBAAACABcAHEUYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGCAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/ujg=1/rs=ACT90oGxttMSAXGyPEs3KJxz6tnHGlLN3g/m=U9EYge,syz7,loL8vb,syzl,syzk,syzc,syzf,sy10a,sy106,sycx,sycy,sycs,sy108,sy10d,sygf,syge,sygd,sy109,sy10b,sy10e,sy10f,sy10c,syzj,syzs,syzo,syzn,syzm,syz9,sy105,sy103,sy102,sy101,syzw,syzy,syzz,syzu,syzt,sy100,syzv,syzr,syzq,syzp,syzb,syz3,syyh,syyg,syzd,ms4mZb,syx5,B2qlPe,sy134,NzU6V,sy13m,sy90,WlNQGd,syz2,syz0,syyz,DPreE,sy13o,sy13n,nabPbb,abd,sy43r,TDFkye?xjs=s3",
+        "_is_secure": 1,
+        "_method": "GET",
+        "_host": "www.google.com",
+        "_url": "/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/ck=xjs.hd.TAmzkjqCqQ0.L.B1.O/am=AIAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAACEAAAAIACViCCABAAAAAAAAHEACoAAAAAAAAAAACAAAACAEBBAAABAAAAAAAAAIAAACAAAAAgAAAAIABgACAACIgAACDAgAAAAAAgAAAAAAAAAAAACBCAAAAEACAfxgYAwAAAADAkIQBQAAAAACAMGABAAAUAAAAIEAAAAAAAABEkAABAAQMAAEAAAgAAAAAAAEAQggCAhQQAUAAAAIAAAAAAAAAICAAAAAAAAEBgIBACCAAAAAAAQUCgABAIAABAgEAbwQyAABAIkAAABAdAAAAAAAIAAAAAAAAAAAAAIATAIBAAACABcAHEUYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGCAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/ujg=1/rs=ACT90oGxttMSAXGyPEs3KJxz6tnHGlLN3g/m=U9EYge,syz7,loL8vb,syzl,syzk,syzc,syzf,sy10a,sy106,sycx,sycy,sycs,sy108,sy10d,sygf,syge,sygd,sy109,sy10b,sy10e,sy10f,sy10c,syzj,syzs,syzo,syzn,syzm,syz9,sy105,sy103,sy102,sy101,syzw,syzy,syzz,syzu,syzt,sy100,syzv,syzr,syzq,syzp,syzb,syz3,syyh,syyg,syzd,ms4mZb,syx5,B2qlPe,sy134,NzU6V,sy13m,sy90,WlNQGd,syz2,syz0,syyz,DPreE,sy13o,sy13n,nabPbb,abd,sy43r,TDFkye?xjs=s3",
+        "_raw_id": "2821.18",
+        "_frame_id": "1DB8BEFD510639221CD5879370430880",
+        "_documentURL": "https://www.google.com/",
+        "_isSameSite": true,
+        "_responseCode": 200,
+        "_request_type": "Script",
+        "_load_ms": 194,
+        "_ttfb_ms": 31,
+        "_load_start": 953,
+        "_load_start_float": 954.3789999982624,
+        "_bytesIn": 40849,
+        "_objectSize": 40818,
+        "_objectSizeUncompressed": 121661,
         "_expires": "Fri, 26 Mar 2027 12:05:54 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/javascript",
@@ -4756,15 +4806,18 @@
           ]
         },
         "_bytesOut": 2525,
+        "_download_ms": 163,
+        "_all_ms": 194,
+        "_created": 953.4529999982624,
         "_ttfb_start": 953,
         "_ttfb_end": 984,
         "_download_start": 984,
-        "_download_end": 984,
-        "_all_end": 984
+        "_download_end": 1147,
+        "_all_end": 1147
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.454Z",
-        "time": 75,
+        "startedDateTime": "2026-03-30T20:30:42.357Z",
+        "time": 193,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -4988,10 +5041,16 @@
           "ssl": -1,
           "send": 0,
           "wait": 75,
-          "receive": 0
+          "receive": 118
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1153,
+            "bytes": 1359
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -5009,19 +5068,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Fetch",
-        "_load_ms": 173,
+        "_load_ms": 193,
         "_ttfb_ms": 75,
         "_load_start": 959,
         "_load_start_float": 960.1579999983678,
         "_bytesIn": 1385,
         "_objectSize": 1359,
         "_objectSizeUncompressed": 12323,
-        "_chunks": [
-          {
-            "ts": 1153,
-            "bytes": 1359
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 09:34:15 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/javascript",
@@ -5099,15 +5152,18 @@
           ]
         },
         "_bytesOut": 2112,
+        "_download_ms": 118,
+        "_all_ms": 193,
+        "_created": 959.3099999983679,
         "_ttfb_start": 959,
         "_ttfb_end": 1034,
         "_download_start": 1034,
-        "_download_end": 1034,
-        "_all_end": 1034
+        "_download_end": 1152,
+        "_all_end": 1152
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.469Z",
-        "time": 73,
+        "startedDateTime": "2026-03-30T20:30:42.372Z",
+        "time": 159,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -5311,10 +5367,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 73,
-          "receive": 0
+          "receive": 86
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -5332,7 +5389,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "Image",
-        "_load_ms": 139,
+        "_load_ms": 159,
         "_ttfb_ms": 73,
         "_load_start": 974,
         "_load_start_float": 975.1339999987052,
@@ -5409,15 +5466,18 @@
           ]
         },
         "_bytesOut": 1699,
+        "_download_ms": 86,
+        "_all_ms": 159,
+        "_created": 974.2159999987052,
         "_ttfb_start": 974,
         "_ttfb_end": 1047,
         "_download_start": 1047,
-        "_download_end": 1047,
-        "_all_end": 1047
+        "_download_end": 1133,
+        "_all_end": 1133
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.625Z",
-        "time": 95,
+        "startedDateTime": "2026-03-30T20:30:42.528Z",
+        "time": 128,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -5685,10 +5745,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 95,
-          "receive": 0
+          "receive": 33
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1255,
+            "bytes": 2879
+          },
+          {
+            "ts": 1260,
+            "bytes": 1898
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -5706,23 +5776,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "XHR",
-        "_load_ms": 109,
+        "_load_ms": 128,
         "_ttfb_ms": 95,
         "_load_start": 1130,
         "_load_start_float": 1131.352999999744,
         "_bytesIn": 1957,
         "_objectSize": 1957,
         "_objectSizeUncompressed": 2879,
-        "_chunks": [
-          {
-            "ts": 1255,
-            "bytes": 2879
-          },
-          {
-            "ts": 1260,
-            "bytes": 1898
-          }
-        ],
         "_expires": "Thu, 26 Mar 2026 23:03:50 GMT",
         "_cacheControl": "private, max-age=3600",
         "_contentType": "application/json",
@@ -5810,15 +5870,18 @@
           ]
         },
         "_bytesOut": 1694,
+        "_download_ms": 33,
+        "_all_ms": 128,
+        "_created": 1129.2439999997441,
         "_ttfb_start": 1130,
         "_ttfb_end": 1225,
         "_download_start": 1225,
-        "_download_end": 1225,
-        "_all_end": 1225
+        "_download_end": 1258,
+        "_all_end": 1258
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.656Z",
-        "time": 34,
+        "startedDateTime": "2026-03-30T20:30:42.559Z",
+        "time": 52,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -6042,10 +6105,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 34,
-          "receive": 0
+          "receive": 18
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1213,
+            "bytes": 5006
+          },
+          {
+            "ts": 1214,
+            "bytes": 2159
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -6063,23 +6136,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Script",
-        "_load_ms": 34,
+        "_load_ms": 52,
         "_ttfb_ms": 34,
         "_load_start": 1161,
         "_load_start_float": 1162.4769999988082,
         "_bytesIn": 2186,
         "_objectSize": 2159,
         "_objectSizeUncompressed": 5006,
-        "_chunks": [
-          {
-            "ts": 1213,
-            "bytes": 5006
-          },
-          {
-            "ts": 1214,
-            "bytes": 2159
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 12:05:55 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/javascript",
@@ -6157,15 +6220,18 @@
           ]
         },
         "_bytesOut": 2182,
+        "_download_ms": 18,
+        "_all_ms": 52,
+        "_created": 1159.7389999988081,
         "_ttfb_start": 1161,
         "_ttfb_end": 1195,
         "_download_start": 1195,
-        "_download_end": 1195,
-        "_all_end": 1195
+        "_download_end": 1213,
+        "_all_end": 1213
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.662Z",
-        "time": 34,
+        "startedDateTime": "2026-03-30T20:30:42.565Z",
+        "time": 49,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -6373,10 +6439,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 34,
-          "receive": 0
+          "receive": 15
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -6394,7 +6461,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "Ping",
-        "_load_ms": 34,
+        "_load_ms": 49,
         "_ttfb_ms": 34,
         "_load_start": 1167,
         "_load_start_float": 1167.9849999973144,
@@ -6473,15 +6540,18 @@
           ]
         },
         "_bytesOut": 1716,
+        "_download_ms": 15,
+        "_all_ms": 49,
+        "_created": 1167.0849999973143,
         "_ttfb_start": 1167,
         "_ttfb_end": 1201,
         "_download_start": 1201,
-        "_download_end": 1201,
-        "_all_end": 1201
+        "_download_end": 1216,
+        "_all_end": 1216
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.664Z",
-        "time": 35,
+        "startedDateTime": "2026-03-30T20:30:42.567Z",
+        "time": 84,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -6689,10 +6759,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 35,
-          "receive": 0
+          "receive": 49
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -6710,7 +6781,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "Ping",
-        "_load_ms": 64,
+        "_load_ms": 84,
         "_ttfb_ms": 35,
         "_load_start": 1169,
         "_load_start_float": 1169.9819999991619,
@@ -6789,15 +6860,18 @@
           ]
         },
         "_bytesOut": 1725,
+        "_download_ms": 49,
+        "_all_ms": 84,
+        "_created": 1169.0999999991618,
         "_ttfb_start": 1169,
         "_ttfb_end": 1204,
         "_download_start": 1204,
-        "_download_end": 1204,
-        "_all_end": 1204
+        "_download_end": 1253,
+        "_all_end": 1253
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.688Z",
-        "time": 64,
+        "startedDateTime": "2026-03-30T20:30:42.591Z",
+        "time": 131,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -7061,10 +7135,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 64,
-          "receive": 0
+          "receive": 67
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1309,
+            "bytes": 102
+          },
+          {
+            "ts": 1325,
+            "bytes": 118
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -7082,23 +7166,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "XHR",
-        "_load_ms": 112,
+        "_load_ms": 131,
         "_ttfb_ms": 64,
         "_load_start": 1193,
         "_load_start_float": 1194.1179999993894,
         "_bytesIn": 173,
         "_objectSize": 173,
         "_objectSizeUncompressed": 102,
-        "_chunks": [
-          {
-            "ts": 1309,
-            "bytes": 102
-          },
-          {
-            "ts": 1325,
-            "bytes": 118
-          }
-        ],
         "_expires": "",
         "_cacheControl": "",
         "_contentType": "text/plain",
@@ -7185,15 +7259,18 @@
           ]
         },
         "_bytesOut": 3551,
+        "_download_ms": 67,
+        "_all_ms": 131,
+        "_created": 1188.0569999993895,
         "_ttfb_start": 1193,
         "_ttfb_end": 1257,
         "_download_start": 1257,
-        "_download_end": 1257,
-        "_all_end": 1257
+        "_download_end": 1324,
+        "_all_end": 1324
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.731Z",
-        "time": 34,
+        "startedDateTime": "2026-03-30T20:30:42.634Z",
+        "time": 123,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -7417,10 +7494,16 @@
           "ssl": -1,
           "send": 0,
           "wait": 34,
-          "receive": 0
+          "receive": 89
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1360,
+            "bytes": 358
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -7438,19 +7521,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Fetch",
-        "_load_ms": 104,
+        "_load_ms": 123,
         "_ttfb_ms": 34,
         "_load_start": 1236,
         "_load_start_float": 1236.6359999988804,
         "_bytesIn": 386,
         "_objectSize": 358,
         "_objectSizeUncompressed": 783,
-        "_chunks": [
-          {
-            "ts": 1360,
-            "bytes": 358
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 12:05:55 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/css",
@@ -7528,15 +7605,18 @@
           ]
         },
         "_bytesOut": 2112,
+        "_download_ms": 89,
+        "_all_ms": 123,
+        "_created": 1235.6289999988803,
         "_ttfb_start": 1236,
         "_ttfb_end": 1270,
         "_download_start": 1270,
-        "_download_end": 1270,
-        "_all_end": 1270
+        "_download_end": 1359,
+        "_all_end": 1359
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.739Z",
-        "time": 34,
+        "startedDateTime": "2026-03-30T20:30:42.642Z",
+        "time": 151,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -7760,35 +7840,10 @@
           "ssl": -1,
           "send": 0,
           "wait": 34,
-          "receive": 0
+          "receive": 117
         },
         "serverIPAddress": "",
         "connection": "",
-        "_run": 1,
-        "_cached": 0,
-        "_type": 3,
-        "_id": "2821.27",
-        "_request_id": "2821.27",
-        "_ip_addr": "[2001:4860:482a:7700::]",
-        "_full_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEABAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAAAIgAAADAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEEYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/rs=ACT90oF9RxYG0fB7bzuvB9UW-3n-2x05GA/m=sy158,sy157,rtH1bd,sy14j,sy14k,sy14m,sy14n,syez,sy14i,sy14e,sy14d,sy13z,syev,sybf,sybc,syb6,sy13y,SMquOb,sy8k,sy8j,syh0,sygz,sygw,sygx,sygv,syh9,syh6,syh4,sygu,sycr,sycw,sybg,sybi,syc2,syc1,sybu,syc0,sybz,sybn,sybx,syby,syct,sycm,sycg,syc6,syc7,sycf,syce,syc5,sych,sybp,sybq,sybr,sybs,sybo,syc8,sybw,sybt,syd2,sybj,syb3,sybe,syb7,syb9,sybd,sybm,syci,sygm,sygt,sygr,sygq,sygp,sy8w,sy8z,sygo,sygs,sygn,sygl,sygi,sygg,sy94,uxMpU,syg9,sydc,syd7,syd6,syco,sycn,syd9,syd4,syda,sybl,sycd,syd5,sycz,sy9n,sy9k,sy9j,sy9i,sy9h,sy9g,Mlhmy,QGR0gd,PoEs9b,Pjplud,OTA3Ae,sy9d,sy98,A1yn5d,YIZmRd,sy8s,sy8q,sy8p,sy8o,sy8m,byfTOb,lsjVmc,LEikZe,sy8l,kWgXee,ovKuLd,sgY6Zb,qafBPd,ebZ3mb,dowIGb,sy15i,sy15g,sy15f,sy15c,syf0,d5EhJe,sy1mi,fCxEDd,sy1mh,sy1mf,sy1me,sy1mb,sy15q,sy1md,sy1mc,sy1ma,sy1ab,sy1aa,sy1a9,sy142,sy15n,sy15r,sy13c,sy136,T1HOxc,LFk59d,sy15w,sy15o,sy15l,sy15m,sy15j,syqm,zx30Y,sy1mk,sy1mj,sy15z,syy5,Wo3n8,ZgGg9b,dIoSBb,sy1w9,sy1wj,sy2eg,sy2ef,b6knsb,sy2ec,sy2eb,syxz,sy1s6,sysv,syqu,synu,sy13a,sy1wi,sy1n3,sy138,syff,sydo,sydm,syac,sydq,JKoKVe,pXdRYb,sy3l1,syad,syaa,sy92,O1Gjze,TtcOte,wR5FRb,kQvlef,syfd,syfa,syf6,syf5?xjs=s4",
-        "_is_secure": 1,
-        "_method": "GET",
-        "_host": "www.google.com",
-        "_url": "/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEABAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAAAIgAAADAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEEYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/rs=ACT90oF9RxYG0fB7bzuvB9UW-3n-2x05GA/m=sy158,sy157,rtH1bd,sy14j,sy14k,sy14m,sy14n,syez,sy14i,sy14e,sy14d,sy13z,syev,sybf,sybc,syb6,sy13y,SMquOb,sy8k,sy8j,syh0,sygz,sygw,sygx,sygv,syh9,syh6,syh4,sygu,sycr,sycw,sybg,sybi,syc2,syc1,sybu,syc0,sybz,sybn,sybx,syby,syct,sycm,sycg,syc6,syc7,sycf,syce,syc5,sych,sybp,sybq,sybr,sybs,sybo,syc8,sybw,sybt,syd2,sybj,syb3,sybe,syb7,syb9,sybd,sybm,syci,sygm,sygt,sygr,sygq,sygp,sy8w,sy8z,sygo,sygs,sygn,sygl,sygi,sygg,sy94,uxMpU,syg9,sydc,syd7,syd6,syco,sycn,syd9,syd4,syda,sybl,sycd,syd5,sycz,sy9n,sy9k,sy9j,sy9i,sy9h,sy9g,Mlhmy,QGR0gd,PoEs9b,Pjplud,OTA3Ae,sy9d,sy98,A1yn5d,YIZmRd,sy8s,sy8q,sy8p,sy8o,sy8m,byfTOb,lsjVmc,LEikZe,sy8l,kWgXee,ovKuLd,sgY6Zb,qafBPd,ebZ3mb,dowIGb,sy15i,sy15g,sy15f,sy15c,syf0,d5EhJe,sy1mi,fCxEDd,sy1mh,sy1mf,sy1me,sy1mb,sy15q,sy1md,sy1mc,sy1ma,sy1ab,sy1aa,sy1a9,sy142,sy15n,sy15r,sy13c,sy136,T1HOxc,LFk59d,sy15w,sy15o,sy15l,sy15m,sy15j,syqm,zx30Y,sy1mk,sy1mj,sy15z,syy5,Wo3n8,ZgGg9b,dIoSBb,sy1w9,sy1wj,sy2eg,sy2ef,b6knsb,sy2ec,sy2eb,syxz,sy1s6,sysv,syqu,synu,sy13a,sy1wi,sy1n3,sy138,syff,sydo,sydm,syac,sydq,JKoKVe,pXdRYb,sy3l1,syad,syaa,sy92,O1Gjze,TtcOte,wR5FRb,kQvlef,syfd,syfa,syf6,syf5?xjs=s4",
-        "_raw_id": "2821.27",
-        "_frame_id": "1DB8BEFD510639221CD5879370430880",
-        "_documentURL": "https://www.google.com/",
-        "_isLinkPreload": true,
-        "_isSameSite": true,
-        "_responseCode": 200,
-        "_request_type": "Script",
-        "_load_ms": 131,
-        "_ttfb_ms": 34,
-        "_load_start": 1244,
-        "_load_start_float": 1245.420999998504,
-        "_bytesIn": 75718,
-        "_objectSize": 75680,
-        "_objectSizeUncompressed": 241344,
         "_chunks": [
           {
             "ts": 1396,
@@ -7823,6 +7878,31 @@
             "bytes": 75688
           }
         ],
+        "_run": 1,
+        "_cached": 0,
+        "_type": 3,
+        "_id": "2821.27",
+        "_request_id": "2821.27",
+        "_ip_addr": "[2001:4860:482a:7700::]",
+        "_full_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEABAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAAAIgAAADAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEEYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/rs=ACT90oF9RxYG0fB7bzuvB9UW-3n-2x05GA/m=sy158,sy157,rtH1bd,sy14j,sy14k,sy14m,sy14n,syez,sy14i,sy14e,sy14d,sy13z,syev,sybf,sybc,syb6,sy13y,SMquOb,sy8k,sy8j,syh0,sygz,sygw,sygx,sygv,syh9,syh6,syh4,sygu,sycr,sycw,sybg,sybi,syc2,syc1,sybu,syc0,sybz,sybn,sybx,syby,syct,sycm,sycg,syc6,syc7,sycf,syce,syc5,sych,sybp,sybq,sybr,sybs,sybo,syc8,sybw,sybt,syd2,sybj,syb3,sybe,syb7,syb9,sybd,sybm,syci,sygm,sygt,sygr,sygq,sygp,sy8w,sy8z,sygo,sygs,sygn,sygl,sygi,sygg,sy94,uxMpU,syg9,sydc,syd7,syd6,syco,sycn,syd9,syd4,syda,sybl,sycd,syd5,sycz,sy9n,sy9k,sy9j,sy9i,sy9h,sy9g,Mlhmy,QGR0gd,PoEs9b,Pjplud,OTA3Ae,sy9d,sy98,A1yn5d,YIZmRd,sy8s,sy8q,sy8p,sy8o,sy8m,byfTOb,lsjVmc,LEikZe,sy8l,kWgXee,ovKuLd,sgY6Zb,qafBPd,ebZ3mb,dowIGb,sy15i,sy15g,sy15f,sy15c,syf0,d5EhJe,sy1mi,fCxEDd,sy1mh,sy1mf,sy1me,sy1mb,sy15q,sy1md,sy1mc,sy1ma,sy1ab,sy1aa,sy1a9,sy142,sy15n,sy15r,sy13c,sy136,T1HOxc,LFk59d,sy15w,sy15o,sy15l,sy15m,sy15j,syqm,zx30Y,sy1mk,sy1mj,sy15z,syy5,Wo3n8,ZgGg9b,dIoSBb,sy1w9,sy1wj,sy2eg,sy2ef,b6knsb,sy2ec,sy2eb,syxz,sy1s6,sysv,syqu,synu,sy13a,sy1wi,sy1n3,sy138,syff,sydo,sydm,syac,sydq,JKoKVe,pXdRYb,sy3l1,syad,syaa,sy92,O1Gjze,TtcOte,wR5FRb,kQvlef,syfd,syfa,syf6,syf5?xjs=s4",
+        "_is_secure": 1,
+        "_method": "GET",
+        "_host": "www.google.com",
+        "_url": "/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEABAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAAAIgAAADAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEEYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/rs=ACT90oF9RxYG0fB7bzuvB9UW-3n-2x05GA/m=sy158,sy157,rtH1bd,sy14j,sy14k,sy14m,sy14n,syez,sy14i,sy14e,sy14d,sy13z,syev,sybf,sybc,syb6,sy13y,SMquOb,sy8k,sy8j,syh0,sygz,sygw,sygx,sygv,syh9,syh6,syh4,sygu,sycr,sycw,sybg,sybi,syc2,syc1,sybu,syc0,sybz,sybn,sybx,syby,syct,sycm,sycg,syc6,syc7,sycf,syce,syc5,sych,sybp,sybq,sybr,sybs,sybo,syc8,sybw,sybt,syd2,sybj,syb3,sybe,syb7,syb9,sybd,sybm,syci,sygm,sygt,sygr,sygq,sygp,sy8w,sy8z,sygo,sygs,sygn,sygl,sygi,sygg,sy94,uxMpU,syg9,sydc,syd7,syd6,syco,sycn,syd9,syd4,syda,sybl,sycd,syd5,sycz,sy9n,sy9k,sy9j,sy9i,sy9h,sy9g,Mlhmy,QGR0gd,PoEs9b,Pjplud,OTA3Ae,sy9d,sy98,A1yn5d,YIZmRd,sy8s,sy8q,sy8p,sy8o,sy8m,byfTOb,lsjVmc,LEikZe,sy8l,kWgXee,ovKuLd,sgY6Zb,qafBPd,ebZ3mb,dowIGb,sy15i,sy15g,sy15f,sy15c,syf0,d5EhJe,sy1mi,fCxEDd,sy1mh,sy1mf,sy1me,sy1mb,sy15q,sy1md,sy1mc,sy1ma,sy1ab,sy1aa,sy1a9,sy142,sy15n,sy15r,sy13c,sy136,T1HOxc,LFk59d,sy15w,sy15o,sy15l,sy15m,sy15j,syqm,zx30Y,sy1mk,sy1mj,sy15z,syy5,Wo3n8,ZgGg9b,dIoSBb,sy1w9,sy1wj,sy2eg,sy2ef,b6knsb,sy2ec,sy2eb,syxz,sy1s6,sysv,syqu,synu,sy13a,sy1wi,sy1n3,sy138,syff,sydo,sydm,syac,sydq,JKoKVe,pXdRYb,sy3l1,syad,syaa,sy92,O1Gjze,TtcOte,wR5FRb,kQvlef,syfd,syfa,syf6,syf5?xjs=s4",
+        "_raw_id": "2821.27",
+        "_frame_id": "1DB8BEFD510639221CD5879370430880",
+        "_documentURL": "https://www.google.com/",
+        "_isLinkPreload": true,
+        "_isSameSite": true,
+        "_responseCode": 200,
+        "_request_type": "Script",
+        "_load_ms": 151,
+        "_ttfb_ms": 34,
+        "_load_start": 1244,
+        "_load_start_float": 1245.420999998504,
+        "_bytesIn": 75718,
+        "_objectSize": 75680,
+        "_objectSizeUncompressed": 241344,
         "_expires": "Fri, 26 Mar 2027 12:05:55 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/javascript",
@@ -7899,15 +7979,18 @@
           ]
         },
         "_bytesOut": 3247,
+        "_download_ms": 117,
+        "_all_ms": 151,
+        "_created": 1240.2809999985038,
         "_ttfb_start": 1244,
         "_ttfb_end": 1278,
         "_download_start": 1278,
-        "_download_end": 1278,
-        "_all_end": 1278
+        "_download_end": 1395,
+        "_all_end": 1395
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.742Z",
-        "time": 69,
+        "startedDateTime": "2026-03-30T20:30:42.645Z",
+        "time": 185,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -8131,35 +8214,10 @@
           "ssl": -1,
           "send": 0,
           "wait": 69,
-          "receive": 0
+          "receive": 116
         },
         "serverIPAddress": "",
         "connection": "",
-        "_run": 1,
-        "_cached": 0,
-        "_type": 3,
-        "_id": "2821.28",
-        "_request_id": "2821.28",
-        "_ip_addr": "[2001:4860:482a:7700::]",
-        "_full_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEABAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAAAIgAAADAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEEYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/rs=ACT90oF9RxYG0fB7bzuvB9UW-3n-2x05GA/m=sycj,syf4,sydh,syf3,syf2,syf1,syey,syew,syeu,syes,syb5,syau,syaw,syav,syb1,syak,syai,syet,syer,syep,sydd,syeo,syen,syec,syel,sye2,sydt,sydu,syek,sycc,syea,syej,sydx,sydy,syeh,sydw,syeg,syde,sydf,sydz,sydr,sye9,syee,sye8,syed,sye7,sye6,sydv,sye4,sye3,sye1,sye0,syeb,syds,sydl,sydg,syah,sy8f,zbML3c,gskBEc,sy1e8,s980lf,sy166,sy164,zGLm3b,sy1r4,sy1r3,sy1r2,sy1r1,sy1ek,sy1el,DhPYme,sy431,sy3tc,sy3ta,syhc,sy3th,sy3tb,sy3tj,sy3t7,sy430,KHourd,sy43x,sy1ts,syyn,oQfbDd,sy444,sy1p6,sy1gd,sy1g9,syyf,syyd,syye,syyc,sy442,sy443,sy440,sy1ox,syym,sy441,qmjr3?xjs=s4",
-        "_is_secure": 1,
-        "_method": "GET",
-        "_host": "www.google.com",
-        "_url": "/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEABAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAAAIgAAADAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEEYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/rs=ACT90oF9RxYG0fB7bzuvB9UW-3n-2x05GA/m=sycj,syf4,sydh,syf3,syf2,syf1,syey,syew,syeu,syes,syb5,syau,syaw,syav,syb1,syak,syai,syet,syer,syep,sydd,syeo,syen,syec,syel,sye2,sydt,sydu,syek,sycc,syea,syej,sydx,sydy,syeh,sydw,syeg,syde,sydf,sydz,sydr,sye9,syee,sye8,syed,sye7,sye6,sydv,sye4,sye3,sye1,sye0,syeb,syds,sydl,sydg,syah,sy8f,zbML3c,gskBEc,sy1e8,s980lf,sy166,sy164,zGLm3b,sy1r4,sy1r3,sy1r2,sy1r1,sy1ek,sy1el,DhPYme,sy431,sy3tc,sy3ta,syhc,sy3th,sy3tb,sy3tj,sy3t7,sy430,KHourd,sy43x,sy1ts,syyn,oQfbDd,sy444,sy1p6,sy1gd,sy1g9,syyf,syyd,syye,syyc,sy442,sy443,sy440,sy1ox,syym,sy441,qmjr3?xjs=s4",
-        "_raw_id": "2821.28",
-        "_frame_id": "1DB8BEFD510639221CD5879370430880",
-        "_documentURL": "https://www.google.com/",
-        "_isLinkPreload": true,
-        "_isSameSite": true,
-        "_responseCode": 200,
-        "_request_type": "Script",
-        "_load_ms": 166,
-        "_ttfb_ms": 69,
-        "_load_start": 1247,
-        "_load_start_float": 1248.3170000002256,
-        "_bytesIn": 55027,
-        "_objectSize": 54992,
-        "_objectSizeUncompressed": 190233,
         "_chunks": [
           {
             "ts": 1433,
@@ -8186,6 +8244,31 @@
             "bytes": 54997
           }
         ],
+        "_run": 1,
+        "_cached": 0,
+        "_type": 3,
+        "_id": "2821.28",
+        "_request_id": "2821.28",
+        "_ip_addr": "[2001:4860:482a:7700::]",
+        "_full_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEABAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAAAIgAAADAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEEYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/rs=ACT90oF9RxYG0fB7bzuvB9UW-3n-2x05GA/m=sycj,syf4,sydh,syf3,syf2,syf1,syey,syew,syeu,syes,syb5,syau,syaw,syav,syb1,syak,syai,syet,syer,syep,sydd,syeo,syen,syec,syel,sye2,sydt,sydu,syek,sycc,syea,syej,sydx,sydy,syeh,sydw,syeg,syde,sydf,sydz,sydr,sye9,syee,sye8,syed,sye7,sye6,sydv,sye4,sye3,sye1,sye0,syeb,syds,sydl,sydg,syah,sy8f,zbML3c,gskBEc,sy1e8,s980lf,sy166,sy164,zGLm3b,sy1r4,sy1r3,sy1r2,sy1r1,sy1ek,sy1el,DhPYme,sy431,sy3tc,sy3ta,syhc,sy3th,sy3tb,sy3tj,sy3t7,sy430,KHourd,sy43x,sy1ts,syyn,oQfbDd,sy444,sy1p6,sy1gd,sy1g9,syyf,syyd,syye,syyc,sy442,sy443,sy440,sy1ox,syym,sy441,qmjr3?xjs=s4",
+        "_is_secure": 1,
+        "_method": "GET",
+        "_host": "www.google.com",
+        "_url": "/xjs/_/js/k=xjs.hd.en.CGk2uM3WbfA.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAAQgAAAAAAAAAAAAEEAAIAAAAAAAAAAAAAAAACAEABAAABAAAAAAAAAIAAACAAAAAAAAAAIABgACAAAIgAAADAAAAAAAAAAAAAAAAAAAAACBCAAAAEACAfxgYAQAAAAAAkAAAAAAAAAAAAGABAAAUAAAAIEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAQAAAABQAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQUAgAAAIAAAAAAAAAAAAAAAAAAAAAAdAAAAAAAAAAAAAAAAAAAAAIADAIBAAAAAAAAHEEYAABAAAAAAQAeAwAOGFBQAAAAAAAAAAAAAAAAAAAAAAAAEIABzIYGAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIDQpmAx/d=0/dg=0/br=1/rs=ACT90oF9RxYG0fB7bzuvB9UW-3n-2x05GA/m=sycj,syf4,sydh,syf3,syf2,syf1,syey,syew,syeu,syes,syb5,syau,syaw,syav,syb1,syak,syai,syet,syer,syep,sydd,syeo,syen,syec,syel,sye2,sydt,sydu,syek,sycc,syea,syej,sydx,sydy,syeh,sydw,syeg,syde,sydf,sydz,sydr,sye9,syee,sye8,syed,sye7,sye6,sydv,sye4,sye3,sye1,sye0,syeb,syds,sydl,sydg,syah,sy8f,zbML3c,gskBEc,sy1e8,s980lf,sy166,sy164,zGLm3b,sy1r4,sy1r3,sy1r2,sy1r1,sy1ek,sy1el,DhPYme,sy431,sy3tc,sy3ta,syhc,sy3th,sy3tb,sy3tj,sy3t7,sy430,KHourd,sy43x,sy1ts,syyn,oQfbDd,sy444,sy1p6,sy1gd,sy1g9,syyf,syyd,syye,syyc,sy442,sy443,sy440,sy1ox,syym,sy441,qmjr3?xjs=s4",
+        "_raw_id": "2821.28",
+        "_frame_id": "1DB8BEFD510639221CD5879370430880",
+        "_documentURL": "https://www.google.com/",
+        "_isLinkPreload": true,
+        "_isSameSite": true,
+        "_responseCode": 200,
+        "_request_type": "Script",
+        "_load_ms": 185,
+        "_ttfb_ms": 69,
+        "_load_start": 1247,
+        "_load_start_float": 1248.3170000002256,
+        "_bytesIn": 55027,
+        "_objectSize": 54992,
+        "_objectSizeUncompressed": 190233,
         "_expires": "Fri, 26 Mar 2027 12:05:55 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/javascript",
@@ -8262,15 +8345,18 @@
           ]
         },
         "_bytesOut": 2679,
+        "_download_ms": 116,
+        "_all_ms": 185,
+        "_created": 1242.6610000002256,
         "_ttfb_start": 1247,
         "_ttfb_end": 1316,
         "_download_start": 1316,
-        "_download_end": 1316,
-        "_all_end": 1316
+        "_download_end": 1432,
+        "_all_end": 1432
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.835Z",
-        "time": 32,
+        "startedDateTime": "2026-03-30T20:30:42.738Z",
+        "time": 40,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -8470,10 +8556,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 32,
-          "receive": 0
+          "receive": 8
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -8491,7 +8578,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "Image",
-        "_load_ms": 32,
+        "_load_ms": 40,
         "_ttfb_ms": 32,
         "_load_start": 1340,
         "_load_start_float": 1340.9859999991627,
@@ -8567,15 +8654,18 @@
           ]
         },
         "_bytesOut": 1721,
+        "_download_ms": 8,
+        "_all_ms": 40,
+        "_created": 1335.3009999991627,
         "_ttfb_start": 1340,
         "_ttfb_end": 1372,
         "_download_start": 1372,
-        "_download_end": 1372,
-        "_all_end": 1372
+        "_download_end": 1380,
+        "_all_end": 1380
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.850Z",
-        "time": 108,
+        "startedDateTime": "2026-03-30T20:30:42.753Z",
+        "time": 537,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -8763,14 +8853,24 @@
         "cache": {},
         "timings": {
           "dns": -1,
-          "connect": -1,
-          "ssl": -1,
+          "connect": 48,
+          "ssl": 32,
           "send": 0,
-          "wait": 108,
-          "receive": 0
+          "wait": 156,
+          "receive": 333
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "conn_req_24",
+        "_chunks": [
+          {
+            "ts": 1793,
+            "bytes": 53
+          },
+          {
+            "ts": 1797,
+            "bytes": 48
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -8788,23 +8888,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "XHR",
-        "_load_ms": 422,
+        "_load_ms": 441,
         "_ttfb_ms": 108,
         "_load_start": 1355,
         "_load_start_float": 1355.9280000001988,
         "_bytesIn": 392,
         "_objectSize": 30,
         "_objectSizeUncompressed": 53,
-        "_chunks": [
-          {
-            "ts": 1793,
-            "bytes": 53
-          },
-          {
-            "ts": 1797,
-            "bytes": 48
-          }
-        ],
         "_expires": "",
         "_cacheControl": "",
         "_contentType": "application/json+protobuf",
@@ -8813,9 +8903,9 @@
         "_protocol": "HTTP/2",
         "_dns_start": 1307,
         "_dns_end": 1307,
-        "_connect_start": 1307,
-        "_connect_end": 1323,
-        "_ssl_start": 1323,
+        "_connect_start": 1355,
+        "_connect_end": 1403,
+        "_ssl_start": 1371,
         "_ssl_end": 1355,
         "_securityDetails": {
           "protocol": "TLS 1.3",
@@ -9147,15 +9237,24 @@
           ]
         },
         "_bytesOut": 1479,
+        "_dns_ms": 0,
+        "_connect_ms": 16,
+        "_ssl_ms": 32,
+        "_download_ms": 333,
+        "_all_ms": 441,
+        "_created": 1304.2260000001988,
+        "_connectTimeMs": 1774902642753,
+        "_connectEndTimeMs": 1774902642801,
+        "_sslStartTimeMs": 1774902642769,
         "_ttfb_start": 1355,
-        "_ttfb_end": 1463,
-        "_download_start": 1463,
-        "_download_end": 1463,
-        "_all_end": 1463
+        "_ttfb_end": 1511,
+        "_download_start": 1511,
+        "_download_end": 1844,
+        "_all_end": 1844
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.884Z",
-        "time": 76,
+        "startedDateTime": "2026-03-30T20:30:42.787Z",
+        "time": 110,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -9327,10 +9426,16 @@
           "ssl": -1,
           "send": 0,
           "wait": 76,
-          "receive": 0
+          "receive": 34
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1500,
+            "bytes": 1322
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -9348,19 +9453,13 @@
         "_isSameSite": false,
         "_responseCode": 200,
         "_request_type": "Other",
-        "_load_ms": 91,
+        "_load_ms": 110,
         "_ttfb_ms": 76,
         "_load_start": 1389,
         "_load_start_float": 1389.52199999948,
         "_bytesIn": 1650,
         "_objectSize": 1345,
         "_objectSizeUncompressed": 1322,
-        "_chunks": [
-          {
-            "ts": 1500,
-            "bytes": 1322
-          }
-        ],
         "_expires": "Sun, 21 Mar 2027 21:29:12 GMT",
         "_cacheControl": "public, max-age=31536000",
         "_contentType": "image/x-icon",
@@ -9424,15 +9523,18 @@
           ]
         },
         "_bytesOut": 882,
+        "_download_ms": 34,
+        "_all_ms": 110,
+        "_created": 1372.0539999994799,
         "_ttfb_start": 1389,
         "_ttfb_end": 1465,
         "_download_start": 1465,
-        "_download_end": 1465,
-        "_all_end": 1465
+        "_download_end": 1499,
+        "_all_end": 1499
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.885Z",
-        "time": 93,
+        "startedDateTime": "2026-03-30T20:30:42.788Z",
+        "time": 325,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -9651,15 +9753,29 @@
         },
         "cache": {},
         "timings": {
-          "dns": -1,
-          "connect": -1,
-          "ssl": -1,
+          "dns": 4,
+          "connect": 48,
+          "ssl": 48,
           "send": 0,
-          "wait": 93,
-          "receive": 0
+          "wait": 145,
+          "receive": 128
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "conn_req_28",
+        "_chunks": [
+          {
+            "ts": 1517,
+            "bytes": 6749
+          },
+          {
+            "ts": 1593,
+            "bytes": 40826
+          },
+          {
+            "ts": 1607,
+            "bytes": 48434
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -9677,39 +9793,25 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Other",
-        "_load_ms": 202,
+        "_load_ms": 221,
         "_ttfb_ms": 93,
         "_load_start": 1390,
         "_load_start_float": 1390.8899999980683,
         "_bytesIn": 47604,
         "_objectSize": 47572,
         "_objectSizeUncompressed": 175424,
-        "_chunks": [
-          {
-            "ts": 1517,
-            "bytes": 6749
-          },
-          {
-            "ts": 1593,
-            "bytes": 40826
-          },
-          {
-            "ts": 1607,
-            "bytes": 48434
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 19:42:16 GMT",
         "_cacheControl": "public, max-age=31536000",
         "_contentType": "text/plain",
         "_contentEncoding": "br",
         "_socket": 414,
         "_protocol": "h3",
-        "_dns_start": 1378,
-        "_dns_end": 1382,
-        "_connect_start": 1383,
-        "_connect_end": 1383,
-        "_ssl_start": 1383,
-        "_ssl_end": 1431,
+        "_dns_start": 1390,
+        "_dns_end": 1394,
+        "_connect_start": 1394,
+        "_connect_end": 1442,
+        "_ssl_start": 1394,
+        "_ssl_end": 1390,
         "_securityDetails": {
           "protocol": "QUIC",
           "keyExchange": "",
@@ -9949,15 +10051,26 @@
           ]
         },
         "_bytesOut": 1182,
+        "_dns_ms": 4,
+        "_connect_ms": 0,
+        "_ssl_ms": 48,
+        "_download_ms": 128,
+        "_all_ms": 221,
+        "_created": 1377.2509999980684,
+        "_dnsTimeMs": 1774902642788,
+        "_dnsEndTimeMs": 1774902642792,
+        "_connectTimeMs": 1774902642792,
+        "_connectEndTimeMs": 1774902642840,
+        "_sslStartTimeMs": 1774902642792,
         "_ttfb_start": 1390,
-        "_ttfb_end": 1483,
-        "_download_start": 1483,
-        "_download_end": 1483,
-        "_all_end": 1483
+        "_ttfb_end": 1535,
+        "_download_start": 1535,
+        "_download_end": 1663,
+        "_all_end": 1663
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.969Z",
-        "time": 38,
+        "startedDateTime": "2026-03-30T20:30:42.872Z",
+        "time": 67,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -10181,10 +10294,16 @@
           "ssl": -1,
           "send": 0,
           "wait": 38,
-          "receive": 0
+          "receive": 29
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1531,
+            "bytes": 1889
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -10202,19 +10321,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Fetch",
-        "_load_ms": 48,
+        "_load_ms": 67,
         "_ttfb_ms": 38,
         "_load_start": 1474,
         "_load_start_float": 1474.924999997505,
         "_bytesIn": 1921,
         "_objectSize": 1889,
         "_objectSizeUncompressed": 7335,
-        "_chunks": [
-          {
-            "ts": 1531,
-            "bytes": 1889
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 12:05:56 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/css",
@@ -10292,15 +10405,18 @@
           ]
         },
         "_bytesOut": 2200,
+        "_download_ms": 29,
+        "_all_ms": 67,
+        "_created": 1450.645999997505,
         "_ttfb_start": 1474,
         "_ttfb_end": 1512,
         "_download_start": 1512,
-        "_download_end": 1512,
-        "_all_end": 1512
+        "_download_end": 1541,
+        "_all_end": 1541
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.969Z",
-        "time": 49,
+        "startedDateTime": "2026-03-30T20:30:42.872Z",
+        "time": 83,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -10524,10 +10640,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 49,
-          "receive": 0
+          "receive": 34
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1558,
+            "bytes": 31222
+          },
+          {
+            "ts": 1558,
+            "bytes": 9875
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -10546,23 +10672,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Script",
-        "_load_ms": 64,
+        "_load_ms": 83,
         "_ttfb_ms": 49,
         "_load_start": 1474,
         "_load_start_float": 1474.665999996766,
         "_bytesIn": 9908,
         "_objectSize": 9875,
         "_objectSizeUncompressed": 31222,
-        "_chunks": [
-          {
-            "ts": 1558,
-            "bytes": 31222
-          },
-          {
-            "ts": 1558,
-            "bytes": 9875
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 12:05:56 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/javascript",
@@ -10639,15 +10755,18 @@
           ]
         },
         "_bytesOut": 2444,
+        "_download_ms": 34,
+        "_all_ms": 83,
+        "_created": 1452.964999996766,
         "_ttfb_start": 1474,
         "_ttfb_end": 1523,
         "_download_start": 1523,
-        "_download_end": 1523,
-        "_all_end": 1523
+        "_download_end": 1557,
+        "_all_end": 1557
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.980Z",
-        "time": 60,
+        "startedDateTime": "2026-03-30T20:30:42.883Z",
+        "time": 64,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -10859,10 +10978,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 60,
-          "receive": 0
+          "receive": 4
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -10880,7 +11000,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "XHR",
-        "_load_ms": 60,
+        "_load_ms": 64,
         "_ttfb_ms": 60,
         "_load_start": 1485,
         "_load_start_float": 1485.9919999996982,
@@ -10959,15 +11079,18 @@
           ]
         },
         "_bytesOut": 1594,
+        "_download_ms": 4,
+        "_all_ms": 64,
+        "_created": 1463.3759999996983,
         "_ttfb_start": 1485,
         "_ttfb_end": 1545,
         "_download_start": 1545,
-        "_download_end": 1545,
-        "_all_end": 1545
+        "_download_end": 1549,
+        "_all_end": 1549
       },
       {
-        "startedDateTime": "2026-03-29T15:58:44.983Z",
-        "time": 47,
+        "startedDateTime": "2026-03-30T20:30:42.886Z",
+        "time": 81,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -11175,10 +11298,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 47,
-          "receive": 0
+          "receive": 34
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -11196,7 +11320,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "Ping",
-        "_load_ms": 62,
+        "_load_ms": 81,
         "_ttfb_ms": 47,
         "_load_start": 1488,
         "_load_start_float": 1489.4959999976522,
@@ -11275,15 +11399,18 @@
           ]
         },
         "_bytesOut": 1707,
+        "_download_ms": 34,
+        "_all_ms": 81,
+        "_created": 1460.4039999976521,
         "_ttfb_start": 1488,
         "_ttfb_end": 1535,
         "_download_start": 1535,
-        "_download_end": 1535,
-        "_all_end": 1535
+        "_download_end": 1569,
+        "_all_end": 1569
       },
       {
-        "startedDateTime": "2026-03-29T15:58:45.026Z",
-        "time": 38,
+        "startedDateTime": "2026-03-30T20:30:42.929Z",
+        "time": 50,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -11491,10 +11618,11 @@
           "ssl": -1,
           "send": 0,
           "wait": 38,
-          "receive": 0
+          "receive": 12
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -11512,7 +11640,7 @@
         "_isSameSite": true,
         "_responseCode": 204,
         "_request_type": "Ping",
-        "_load_ms": 38,
+        "_load_ms": 50,
         "_ttfb_ms": 38,
         "_load_start": 1531,
         "_load_start_float": 1531.9059999990823,
@@ -11591,15 +11719,18 @@
           ]
         },
         "_bytesOut": 1786,
+        "_download_ms": 12,
+        "_all_ms": 50,
+        "_created": 1513.6019999990822,
         "_ttfb_start": 1531,
         "_ttfb_end": 1569,
         "_download_start": 1569,
-        "_download_end": 1569,
-        "_all_end": 1569
+        "_download_end": 1581,
+        "_all_end": 1581
       },
       {
-        "startedDateTime": "2026-03-29T15:58:45.036Z",
-        "time": 89,
+        "startedDateTime": "2026-03-30T20:30:42.939Z",
+        "time": 313,
         "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
@@ -11743,14 +11874,15 @@
         "cache": {},
         "timings": {
           "dns": -1,
-          "connect": -1,
-          "ssl": -1,
+          "connect": 112,
+          "ssl": 94,
           "send": 0,
-          "wait": 89,
+          "wait": 201,
           "receive": 0
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "conn_req_25",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -11781,10 +11913,10 @@
         "_protocol": "HTTP/2",
         "_dns_start": -1,
         "_dns_end": -1,
-        "_connect_start": 1379,
-        "_connect_end": 1397,
-        "_ssl_start": 1397,
-        "_ssl_end": 1491,
+        "_connect_start": 1541,
+        "_connect_end": 1653,
+        "_ssl_start": 1559,
+        "_ssl_end": 1541,
         "_securityDetails": {
           "protocol": "TLS 1.3",
           "keyExchange": "",
@@ -12104,15 +12236,23 @@
           ]
         },
         "_bytesOut": 646,
+        "_connect_ms": 18,
+        "_ssl_ms": 94,
+        "_download_ms": 0,
+        "_all_ms": 89,
+        "_created": 1314.5909999984724,
+        "_connectTimeMs": 1774902642939,
+        "_connectEndTimeMs": 1774902643051,
+        "_sslStartTimeMs": 1774902642957,
         "_ttfb_start": 1541,
-        "_ttfb_end": 1630,
-        "_download_start": 1630,
-        "_download_end": 1630,
-        "_all_end": 1630
+        "_ttfb_end": 1742,
+        "_download_start": 1742,
+        "_download_end": 1742,
+        "_all_end": 1742
       },
       {
-        "startedDateTime": "2026-03-29T15:58:45.067Z",
-        "time": 30,
+        "startedDateTime": "2026-03-30T20:30:42.970Z",
+        "time": 45,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -12336,10 +12476,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 30,
-          "receive": 0
+          "receive": 15
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1607,
+            "bytes": 907
+          },
+          {
+            "ts": 1619,
+            "bytes": 557
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -12357,23 +12507,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Fetch",
-        "_load_ms": 30,
+        "_load_ms": 45,
         "_ttfb_ms": 30,
         "_load_start": 1572,
         "_load_start_float": 1573.4859999978737,
         "_bytesIn": 594,
         "_objectSize": 557,
         "_objectSizeUncompressed": 907,
-        "_chunks": [
-          {
-            "ts": 1607,
-            "bytes": 907
-          },
-          {
-            "ts": 1619,
-            "bytes": 557
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 12:05:56 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/css",
@@ -12451,15 +12591,18 @@
           ]
         },
         "_bytesOut": 2107,
+        "_download_ms": 15,
+        "_all_ms": 45,
+        "_created": 1563.1169999978738,
         "_ttfb_start": 1572,
         "_ttfb_end": 1602,
         "_download_start": 1602,
-        "_download_end": 1602,
-        "_all_end": 1602
+        "_download_end": 1617,
+        "_all_end": 1617
       },
       {
-        "startedDateTime": "2026-03-29T15:58:45.067Z",
-        "time": 41,
+        "startedDateTime": "2026-03-30T20:30:42.970Z",
+        "time": 53,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -12683,10 +12826,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 41,
-          "receive": 0
+          "receive": 12
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1626,
+            "bytes": 12663
+          },
+          {
+            "ts": 1626,
+            "bytes": 4827
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -12705,23 +12858,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Script",
-        "_load_ms": 41,
+        "_load_ms": 53,
         "_ttfb_ms": 41,
         "_load_start": 1572,
         "_load_start_float": 1573.053999999484,
         "_bytesIn": 4862,
         "_objectSize": 4827,
         "_objectSizeUncompressed": 12663,
-        "_chunks": [
-          {
-            "ts": 1626,
-            "bytes": 12663
-          },
-          {
-            "ts": 1626,
-            "bytes": 4827
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 12:05:56 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/javascript",
@@ -12798,15 +12941,18 @@
           ]
         },
         "_bytesOut": 2235,
+        "_download_ms": 12,
+        "_all_ms": 53,
+        "_created": 1565.270999999484,
         "_ttfb_start": 1572,
         "_ttfb_end": 1613,
         "_download_start": 1613,
-        "_download_end": 1613,
-        "_all_end": 1613
+        "_download_end": 1625,
+        "_all_end": 1625
       },
       {
-        "startedDateTime": "2026-03-29T15:58:45.130Z",
-        "time": 24,
+        "startedDateTime": "2026-03-30T20:30:43.033Z",
+        "time": 37,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -13034,10 +13180,20 @@
           "ssl": -1,
           "send": 0,
           "wait": 24,
-          "receive": 0
+          "receive": 13
         },
         "serverIPAddress": "",
         "connection": "",
+        "_chunks": [
+          {
+            "ts": 1673,
+            "bytes": 2020
+          },
+          {
+            "ts": 1673,
+            "bytes": 1048
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -13056,23 +13212,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "Script",
-        "_load_ms": 24,
+        "_load_ms": 37,
         "_ttfb_ms": 24,
         "_load_start": 1635,
         "_load_start_float": 1636.2739999990654,
         "_bytesIn": 1085,
         "_objectSize": 1048,
         "_objectSizeUncompressed": 2020,
-        "_chunks": [
-          {
-            "ts": 1673,
-            "bytes": 2020
-          },
-          {
-            "ts": 1673,
-            "bytes": 1048
-          }
-        ],
         "_expires": "Fri, 26 Mar 2027 11:03:40 GMT",
         "_cacheControl": "public, immutable, max-age=31536000",
         "_contentType": "text/javascript",
@@ -13150,15 +13296,18 @@
           ]
         },
         "_bytesOut": 2241,
+        "_download_ms": 13,
+        "_all_ms": 37,
+        "_created": 1631.3589999990654,
         "_ttfb_start": 1635,
         "_ttfb_end": 1659,
         "_download_start": 1659,
-        "_download_end": 1659,
-        "_all_end": 1659
+        "_download_end": 1672,
+        "_all_end": 1672
       },
       {
-        "startedDateTime": "2026-03-29T15:58:45.843Z",
-        "time": 89,
+        "startedDateTime": "2026-03-30T20:30:43.746Z",
+        "time": 382,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -13322,14 +13471,20 @@
         "cache": {},
         "timings": {
           "dns": -1,
-          "connect": -1,
-          "ssl": -1,
+          "connect": 49,
+          "ssl": 33,
           "send": 0,
-          "wait": 89,
-          "receive": 0
+          "wait": 138,
+          "receive": 195
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "conn_req_37",
+        "_chunks": [
+          {
+            "ts": 2634,
+            "bytes": 131
+          }
+        ],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -13347,19 +13502,13 @@
         "_isSameSite": true,
         "_responseCode": 200,
         "_request_type": "XHR",
-        "_load_ms": 265,
+        "_load_ms": 284,
         "_ttfb_ms": 89,
         "_load_start": 2348,
         "_load_start_float": 2349.490999997717,
         "_bytesIn": 375,
         "_objectSize": 131,
         "_objectSizeUncompressed": 131,
-        "_chunks": [
-          {
-            "ts": 2634,
-            "bytes": 131
-          }
-        ],
         "_expires": "",
         "_cacheControl": "",
         "_contentType": "text/plain",
@@ -13368,10 +13517,10 @@
         "_protocol": "HTTP/2",
         "_dns_start": 2300,
         "_dns_end": 2300,
-        "_connect_start": 2300,
-        "_connect_end": 2316,
-        "_ssl_start": 2316,
-        "_ssl_end": 2349,
+        "_connect_start": 2348,
+        "_connect_end": 2397,
+        "_ssl_start": 2364,
+        "_ssl_end": 2348,
         "_securityDetails": {
           "protocol": "TLS 1.3",
           "keyExchange": "",
@@ -13597,15 +13746,24 @@
           ]
         },
         "_bytesOut": 1343,
+        "_dns_ms": 0,
+        "_connect_ms": 16,
+        "_ssl_ms": 33,
+        "_download_ms": 195,
+        "_all_ms": 284,
+        "_created": 2297.5989999977173,
+        "_connectTimeMs": 1774902643746,
+        "_connectEndTimeMs": 1774902643795,
+        "_sslStartTimeMs": 1774902643762,
         "_ttfb_start": 2348,
-        "_ttfb_end": 2437,
-        "_download_start": 2437,
-        "_download_end": 2437,
-        "_all_end": 2437
+        "_ttfb_end": 2486,
+        "_download_start": 2486,
+        "_download_end": 2681,
+        "_all_end": 2681
       },
       {
-        "startedDateTime": "2026-03-29T15:58:45.888Z",
-        "time": 101,
+        "startedDateTime": "2026-03-30T20:30:43.791Z",
+        "time": 205,
         "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
@@ -13729,14 +13887,15 @@
         "cache": {},
         "timings": {
           "dns": -1,
-          "connect": -1,
-          "ssl": -1,
+          "connect": 52,
+          "ssl": 36,
           "send": 0,
-          "wait": 101,
+          "wait": 153,
           "receive": 0
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "conn_req_38",
+        "_chunks": [],
         "_run": 1,
         "_cached": 0,
         "_type": 3,
@@ -13767,9 +13926,9 @@
         "_protocol": "HTTP/2",
         "_dns_start": -1,
         "_dns_end": -1,
-        "_connect_start": 2341,
-        "_connect_end": 2357,
-        "_ssl_start": 2357,
+        "_connect_start": 2393,
+        "_connect_end": 2445,
+        "_ssl_start": 2409,
         "_ssl_end": 2393,
         "_securityDetails": {
           "protocol": "TLS 1.3",
@@ -13986,11 +14145,19 @@
           ]
         },
         "_bytesOut": 577,
+        "_connect_ms": 16,
+        "_ssl_ms": 36,
+        "_download_ms": 0,
+        "_all_ms": 101,
+        "_created": 2304.579999999987,
+        "_connectTimeMs": 1774902643791,
+        "_connectEndTimeMs": 1774902643843,
+        "_sslStartTimeMs": 1774902643807,
         "_ttfb_start": 2393,
-        "_ttfb_end": 2494,
-        "_download_start": 2494,
-        "_download_end": 2494,
-        "_all_end": 2494
+        "_ttfb_end": 2546,
+        "_download_start": 2546,
+        "_download_end": 2546,
+        "_all_end": 2546
       }
     ]
   }

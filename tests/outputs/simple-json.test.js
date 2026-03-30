@@ -1,5 +1,4 @@
-import test from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,32 +6,32 @@ import { generateSimpleJSON } from '../../src/outputs/simple-json.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-test('Simple JSON Output Processor', async (t) => {
-    await t.test('Should transform an Extended HAR object into simple flat objects', () => {
+describe('Simple JSON Output Processor', () => {
+    it('Should transform an Extended HAR object into simple flat objects', () => {
         const fixturePath = path.resolve(__dirname, '../fixtures/chrome-google.har.json');
         const rawData = fs.readFileSync(fixturePath, 'utf8');
         const harData = JSON.parse(rawData);
 
         const result = generateSimpleJSON(harData);
 
-        assert.ok(Array.isArray(result), 'Result should be an array');
-        assert.strictEqual(result.length, harData.log.entries.length, 'Should map exactly 1:1 to entries');
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBe(harData.log.entries.length);
 
         // Check the first entry explicitly
         const first = result[0];
-        assert.strictEqual(first.index, 0);
-        assert.ok(first.url.length > 0, 'URL should be populated');
-        assert.ok(first.method, 'Method should be found');
-        assert.strictEqual(first.status, harData.log.entries[0].response.status);
+        expect(first.index).toBe(0);
+        expect(first.url.length).toBeGreaterThan(0);
+        expect(first.method).toBeTruthy();
+        expect(first.status).toBe(harData.log.entries[0].response.status);
     });
 
-    await t.test('Should handle empty or invalid HAR safely', () => {
-        assert.deepStrictEqual(generateSimpleJSON(null), [], 'Should handle null');
-        assert.deepStrictEqual(generateSimpleJSON({}), [], 'Should handle empty object');
-        assert.deepStrictEqual(generateSimpleJSON({ log: {} }), [], 'Should handle missing entries array');
+    it('Should handle empty or invalid HAR safely', () => {
+        expect(generateSimpleJSON(null)).toEqual([]);
+        expect(generateSimpleJSON({})).toEqual([]);
+        expect(generateSimpleJSON({ log: {} })).toEqual([]);
     });
 
-    await t.test('Should map Extended properties if present natively', () => {
+    it('Should map Extended properties if present natively', () => {
         const fakeHar = {
             log: {
                 entries: [
@@ -54,17 +53,17 @@ test('Simple JSON Output Processor', async (t) => {
         };
 
         const result = generateSimpleJSON(fakeHar);
-        assert.strictEqual(result.length, 1);
-        
+        expect(result.length).toBe(1);
+
         const first = result[0];
-        assert.strictEqual(first.url, "http://example.com/test");
-        assert.strictEqual(first.method, "POST");
-        assert.strictEqual(first.status, 204);
-        assert.strictEqual(first.bytesIn, 1500);
-        assert.strictEqual(first.bytesOut, 500);
-        assert.strictEqual(first.dns_ms, 10);
-        assert.strictEqual(first.ttfb_ms, 50);
-        assert.strictEqual(first.load_ms, 100);
-        assert.strictEqual(first.ip, "1.2.3.4");
+        expect(first.url).toBe("http://example.com/test");
+        expect(first.method).toBe("POST");
+        expect(first.status).toBe(204);
+        expect(first.bytesIn).toBe(1500);
+        expect(first.bytesOut).toBe(500);
+        expect(first.dns_ms).toBe(10);
+        expect(first.ttfb_ms).toBe(50);
+        expect(first.load_ms).toBe(100);
+        expect(first.ip).toBe("1.2.3.4");
     });
 });
