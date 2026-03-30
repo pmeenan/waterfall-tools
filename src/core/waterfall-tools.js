@@ -60,12 +60,26 @@ export class WaterfallTools {
 
     /**
      * Processes a network trace from a raw Memory Buffer natively.
-     * @param {Buffer|ArrayBuffer|Uint8Array} buffer 
-     * @param {Object} options 
+     * Accepts ArrayBuffer, Uint8Array, or Node Buffer — all handled isomorphically
+     * without depending on the Node-specific Buffer class.
+     * @param {ArrayBuffer|Uint8Array} buffer
+     * @param {Object} options
      * @returns {Promise<WaterfallTools>}
      */
     async loadBuffer(buffer, options = {}) {
-        const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
+        // Normalize to Uint8Array without requiring Node's Buffer class
+        let buf;
+        if (buffer instanceof Uint8Array) {
+            buf = buffer;
+        } else if (buffer instanceof ArrayBuffer) {
+            buf = new Uint8Array(buffer);
+        } else if (buffer && buffer.buffer instanceof ArrayBuffer) {
+            // Handles Node Buffer and other TypedArray views
+            buf = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+        } else {
+            buf = new Uint8Array(buffer);
+        }
+
         let format = options.format;
         let isGz = options.isGz;
         let hasTraceEventsWrapper = options.hasTraceEventsWrapper;
@@ -83,12 +97,12 @@ export class WaterfallTools {
                 throw new Error('Could not automatically identify format from buffer');
             }
         }
-        
+
         const stream = new Blob([buf]).stream();
         const streamOptions = { ...options, format };
         if (isGz !== undefined) streamOptions.isGz = isGz;
         if (hasTraceEventsWrapper !== undefined) streamOptions.hasTraceEventsWrapper = hasTraceEventsWrapper;
-        
+
         return await this.loadStream(stream, streamOptions);
     }
 

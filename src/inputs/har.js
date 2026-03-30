@@ -52,6 +52,7 @@ export async function processHARFileNode(input, options = {}) {
     let stream = input;
     let isGz = options.isGz === true;
     let nodeFsStream = null;
+    let reader = null;
     let output = null;
 
     // Isomorphic workaround for Node 22 Web Stream premature event loop exit bug
@@ -61,7 +62,7 @@ export async function processHARFileNode(input, options = {}) {
         if (typeof input === 'string') {
             const fs = await import('node:fs');
             
-            const header = Buffer.alloc(2);
+            const header = new Uint8Array(2);
             try {
                 const fd = fs.openSync(input, 'r');
                 fs.readSync(fd, header, 0, 2, 0);
@@ -98,7 +99,7 @@ export async function processHARFileNode(input, options = {}) {
     };
     
     const pipeline = stream.pipeThrough(new TextDecoderStream());
-    const reader = pipeline.getReader();
+    reader = pipeline.getReader();
     
     while (true) {
         const { done, value } = await reader.read();
@@ -111,6 +112,7 @@ export async function processHARFileNode(input, options = {}) {
     } catch (e) {
         throw e;
     } finally {
+        if (reader) try { reader.releaseLock(); } catch (e) {}
         if (keepAlive) globalThis.clearInterval(keepAlive);
         if (nodeFsStream) nodeFsStream.destroy();
     }

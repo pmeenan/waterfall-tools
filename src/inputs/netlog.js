@@ -1183,6 +1183,7 @@ export async function processNetlogFileNode(input, options = {}) {
     let stream = input;
     let isGz = options.isGz === true;
     let nodeFsStream = null;
+    let reader = null;
 
     const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
 
@@ -1190,7 +1191,7 @@ export async function processNetlogFileNode(input, options = {}) {
         if (typeof input === 'string') {
             const fs = await import('node:fs');
             
-            const header = Buffer.alloc(2);
+            const header = new Uint8Array(2);
             let fd;
             try {
                 fd = fs.openSync(input, 'r');
@@ -1213,7 +1214,7 @@ export async function processNetlogFileNode(input, options = {}) {
 
         const decoder = new TextDecoderStream();
         const pipeline = stream.pipeThrough(decoder);
-        const reader = pipeline.getReader();
+        reader = pipeline.getReader();
 
         const netlog = new Netlog();
         let started = false;
@@ -1282,6 +1283,7 @@ export async function processNetlogFileNode(input, options = {}) {
     } catch (e) {
         throw e;
     } finally {
+        if (reader) try { reader.releaseLock(); } catch (e) {}
         if (keepAlive) globalThis.clearInterval(keepAlive);
         if (nodeFsStream) nodeFsStream.destroy();
     }

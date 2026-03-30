@@ -142,7 +142,7 @@ function decodeHuffman(buffer) {
             }
         }
     }
-    return Buffer.from(decoded).toString('utf8');
+    return new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(decoded));
 }
 
 export class QpackDecoder {

@@ -695,6 +695,7 @@ export async function processCDPFileNode(input, options = {}) {
     let stream = input;
     let isGz = options.isGz === true;
     let nodeFsStream = null;
+    let reader = null;
 
     const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
 
@@ -702,7 +703,7 @@ export async function processCDPFileNode(input, options = {}) {
         if (typeof input === 'string') {
             const fs = await import('node:fs');
             
-            const header = Buffer.alloc(2);
+            const header = new Uint8Array(2);
             let fd;
             try {
                 fd = fs.openSync(input, 'r');
@@ -739,7 +740,7 @@ export async function processCDPFileNode(input, options = {}) {
         };
         
         const pipeline = stream.pipeThrough(new TextDecoderStream());
-        const reader = pipeline.getReader();
+        reader = pipeline.getReader();
         
         while (true) {
             const { done, value } = await reader.read();
@@ -782,6 +783,7 @@ export async function processCDPFileNode(input, options = {}) {
     } catch (e) {
         throw e;
     } finally {
+        if (reader) try { reader.releaseLock(); } catch (e) {}
         if (keepAlive) globalThis.clearInterval(keepAlive);
         if (nodeFsStream) nodeFsStream.destroy();
     }
