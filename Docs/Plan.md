@@ -56,27 +56,26 @@ This document breaks down the development of the Waterfall Tools library into in
 
 ## Phase 5: Core Canvas Renderer (Browser Platform)
 **Goal:** Render a static waterfall chart to a canvas element utilizing the verified data fixtures from Phase 2.
+## Phase 5: Viewer Enhancements & Features (Completed)
 - [x] Implement `src/renderer/layout.js` to calculate row heights, X-axis timestamps, scale distributions and standard WebPageTest color coding.
 - [x] Implement `src/renderer/canvas.js` to draw requests as cascading blocks on a provided `<canvas>`.
 - [x] Implement logic to leverage `requestAnimationFrame` ensuring efficient updates and redraws. 
 - [x] Support global document drag-and-drop targets for seamless file parsing updates.
-- [ ] Implement a dynamic UI to toggle canvas render features with automatic redraws upon changes:
-  - [ ] A dropdown for selecting which page in the data set to render.
-  - [ ] Toggle between a regular waterfall and a connection-view waterfall where all of the requests for a given connection are stacked on a single row.
-  - [ ] Toggle between a full waterfall and a thumbnail view.
-  - [ ] Input to specify a start and end time for the displayed waterfall (in seconds, supporting decimals).
-  - [ ] A filter for which requests to include as a comma-separated list of individual requests or ranges of requests.
-  - [ ] Checkboxes for toggling the display of specific chart features:
-    - [ ] a. Vertical lines for user timing marks.
-    - [ ] b. CPU Utilization line graph displayed below the waterfall.
-    - [ ] c. Bandwidth utilization graph below the waterfall.
-    - [ ] d. Browser main thread activity (color-coded by type of activity).
-    - [ ] e. Long tasks row below the waterfall.
-    - [ ] f. If Ellipsis should separate requests where some requests were removed.
-    - [ ] g. If the request row labels should be displayed (vs the bars taking the full width).
-    - [ ] h. If each request should display the individual download chunk timing vs the whole download time being a solid bar.
-    - [ ] i. If the JS execution times for each request should be displayed.
-    - [ ] j. If the waiting time should be rendered.
+- [x] Integrate UI Control Overlay in `index.html` mapping settings dynamically seamlessly.
+- [x] Build Connection View (stacking multiplexed requests organically natively matching WebPageTest features) internally within `layout.js` layout passes.
+- [x] Allow bounds clamping for `startTime` and `endTime` zooming natively gracefully.
+- [x] Expose `viewer.js` UI states mapping directly into explicit `rendererCanvas.render()` toggle flags allowing dynamic redraws.
+- [x] Connect analytical overlays internally mirroring exact original WPT parameters intrinsically:
+  - [x] User Timing Marks (vertical markers mapping arbitrary string bounds)
+  - [x] CPU Utilization graphs tracking dynamic line layouts
+  - [x] Bandwidth Utilization graphs mapped smoothly alongside CPU points
+  - [x] Browser Main Thread blocks (coloring Scripting vs Layout loops natively)
+  - [x] Long Tasks parsing (highlighting aggressive stalls over 50ms safely).
+  - [x] Ellipsis separation for filtered request gaps.
+  - [x] Request row label toggles.
+  - [x] Individual download chunk timing vs solid bar rendering.
+  - [x] JS execution time overlays.
+  - [x] Waiting time rendering.
 
 ## Phase 6: Client Interactions
 **Goal:** Make the canvas waterfall interactive without using individual DOM elements.

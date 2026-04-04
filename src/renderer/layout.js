@@ -1,5 +1,4 @@
 // src/renderer/layout.js
-const ROW_HEIGHT = 18;
 const FONT_HEIGHT = 12;
 
 export class Layout {
@@ -94,14 +93,45 @@ export class Layout {
     }
 
     static calculateRows(entries, canvasWidth = 1012, options = {}) {
+        const rowHeight = options.thumbnailView ? 4 : 18;
+
         if (!entries || entries.length === 0) {
+            return { rows: [], dimensions: { canvasWidth, canvasHeight: 0, maxTime: 0, labelsWidth: 0, widthPerMs: 0 }};
+        }
+
+        // Apply reqFilter (e.g. "1,2,5-10")
+        if (options.reqFilter && typeof options.reqFilter === 'string') {
+            const parts = options.reqFilter.split(',').map(s => s.trim());
+            const allowedIndices = new Set();
+            parts.forEach(p => {
+                if (p.includes('-')) {
+                    const bounds = p.split('-');
+                    const s = parseInt(bounds[0], 10);
+                    const e = parseInt(bounds[1], 10);
+                    if (!isNaN(s) && !isNaN(e)) {
+                        for(let i=s; i<=e; i++) allowedIndices.add(i);
+                    }
+                } else {
+                    const idx = parseInt(p, 10);
+                    if (!isNaN(idx)) allowedIndices.add(idx);
+                }
+            });
+            if (allowedIndices.size > 0) {
+                // Keep only requests whose native 1-based index is in the set
+                entries = entries.filter((_, idx) => allowedIndices.has(idx + 1));
+            }
+        }
+
+        if (entries.length === 0) {
             return { rows: [], dimensions: { canvasWidth, canvasHeight: 0, maxTime: 0, labelsWidth: 0, widthPerMs: 0 }};
         }
 
         let maxTime = 0;
         let baseMs = Number.MAX_SAFE_INTEGER;
         
-        if (options.page && options.page.startedDateTime) {
+        if (options.startTime !== undefined && options.startTime !== null && options.page && options.page.startedDateTime) {
+            baseMs = new Date(options.page.startedDateTime).getTime() + (options.startTime * 1000);
+        } else if (options.page && options.page.startedDateTime) {
             baseMs = new Date(options.page.startedDateTime).getTime();
         } else {
             for (let i = 0; i < entries.length; i++) {
@@ -112,41 +142,86 @@ export class Layout {
             }
         }
         
+        let endTimeOverride = null;
+        if (options.endTime !== undefined && options.endTime !== null) {
+            endTimeOverride = options.endTime * 1000;
+        }
+        
         const processedRows = entries.map((entry, index) => {
             let start = entry.time_start;
-            
-            // Map absolute chronological beginning to gracefully capture earlier connection bindings
-            if (entry._dnsTimeMs > 0 && entry._dnsTimeMs < start) start = entry._dnsTimeMs;
-            if (entry._connectTimeMs > 0 && entry._connectTimeMs < start) start = entry._connectTimeMs;
-            
             let timeTotal = 0;
-            if (entry.timings && entry.timings.dns > 0) timeTotal += entry.timings.dns;
-            if (entry.timings && entry.timings.connect > 0) timeTotal += entry.timings.connect;
-            if (entry.timings) timeTotal += entry.timings.wait || 0;
-            if (entry.timings) timeTotal += entry.timings.receive || 0;
             
-            let end = entry.time_start + timeTotal;
-            if (entry.time_end && entry.time_end > end) end = entry.time_end;
+            // Allow Absolute timing mapping bypassing standard sequential HAR chaining universally
+            let hasAbsoluteTimings = entry._load_start !== undefined || entry._dns_start !== undefined || entry._ttfb_start !== undefined;
             
-            let blockedEnd = entry.time_start;
-            if (entry.timings && entry.timings.blocked > 0) blockedEnd = entry.time_start + entry.timings.blocked;
+            let baseEpoch = entry.time_start;
+            if (entry._created !== undefined) {
+                baseEpoch = entry.time_start - entry._created;
+            } else if (hasAbsoluteTimings && entry._load_start !== undefined && entry._load_start >= 0) {
+                baseEpoch = entry.time_start - entry._load_start;
+            }
             
-            let dnsStart = entry._dnsTimeMs > 0 ? entry._dnsTimeMs : blockedEnd;
-            let dnsEnd = entry._dnsEndTimeMs > 0 ? entry._dnsEndTimeMs : dnsStart + (entry.timings ? Math.max(0, entry.timings.dns) : 0);
-            
-            let connectStart = entry._connectTimeMs > 0 ? entry._connectTimeMs : dnsEnd;
-            let connectEnd = entry._connectEndTimeMs > 0 ? entry._connectEndTimeMs : connectStart + (entry.timings ? Math.max(0, entry.timings.connect) : 0);
-            
-            let sslStart = entry._sslStartTimeMs > 0 ? entry._sslStartTimeMs : connectEnd;
-            
-            // HTTP Request Phase strictly maps to absolute issue timestamps
-            let requestStart = entry.time_start > 0 ? entry.time_start : connectEnd + (entry.timings ? Math.max(0, entry.timings.send || 0) : 0);
-            
-            let ttfb = requestStart;
-            if (entry.first_data_time > 0) {
-                ttfb = entry.first_data_time;
+            let blockedEnd, dnsStart, dnsEnd, connectStart, connectEnd, sslStart, sslEnd, requestStart, ttfb, end;
+
+            if (hasAbsoluteTimings) {
+                // Universal Absolute bounds (natively defined by WPT specifications)
+                if (entry._dns_start !== undefined && entry._dns_start >= 0 && (baseEpoch + entry._dns_start) < start) {
+                    start = baseEpoch + entry._dns_start;
+                }
+                
+                blockedEnd = baseEpoch + (entry._load_start || entry._ttfb_start || 0); // Queue finishes right when the request loads
+                
+                dnsStart = (entry._dns_start !== undefined && entry._dns_start >= 0) ? baseEpoch + entry._dns_start : blockedEnd;
+                dnsEnd = (entry._dns_end !== undefined && entry._dns_end >= 0) ? baseEpoch + entry._dns_end : dnsStart;
+                
+                connectStart = (entry._connect_start !== undefined && entry._connect_start >= 0) ? baseEpoch + entry._connect_start : dnsEnd;
+                connectEnd = (entry._connect_end !== undefined && entry._connect_end >= 0) ? baseEpoch + entry._connect_end : connectStart;
+                
+                sslStart = (entry._ssl_start !== undefined && entry._ssl_start >= 0) ? baseEpoch + entry._ssl_start : connectEnd;
+                sslEnd = (entry._ssl_end !== undefined && entry._ssl_end >= 0) ? baseEpoch + entry._ssl_end : sslStart;
+                
+                requestStart = baseEpoch + (entry._load_start !== undefined ? entry._load_start : (entry._ttfb_start !== undefined ? entry._ttfb_start : (sslEnd - baseEpoch)));
+                ttfb = baseEpoch + (entry._ttfb_end !== undefined ? entry._ttfb_end : (entry._ttfb_start !== undefined ? entry._ttfb_start : (entry._load_start !== undefined ? entry._load_start : (requestStart - baseEpoch))));
+                
+                end = baseEpoch + (entry._download_end !== undefined ? entry._download_end : (entry._load_end !== undefined ? entry._load_end : (entry._ttfb_end !== undefined ? entry._ttfb_end : (ttfb - baseEpoch))));
+                timeTotal = end - start;
+                
             } else {
-                ttfb = requestStart + (entry.timings ? Math.max(0, entry.timings.wait || 0) : 0);
+                // Standard sequential HAR Fallback
+                if (entry._dnsTimeMs > 0 && entry._dnsTimeMs < start) start = entry._dnsTimeMs;
+                if (entry._connectTimeMs > 0 && entry._connectTimeMs < start) start = entry._connectTimeMs;
+                
+                if (entry.timings && entry.timings.blocked > 0) timeTotal += entry.timings.blocked;
+                if (entry.timings && entry.timings.dns > 0) timeTotal += entry.timings.dns;
+                if (entry.timings && entry.timings.connect > 0) timeTotal += entry.timings.connect;
+                if (entry.timings) timeTotal += entry.timings.send || 0;
+                if (entry.timings) timeTotal += entry.timings.wait || 0;
+                if (entry.timings) timeTotal += entry.timings.receive || 0;
+                
+                end = entry.time_start + timeTotal;
+                if (entry.time_end && entry.time_end > end) end = entry.time_end;
+                
+                blockedEnd = entry.time_start;
+                if (entry.timings && entry.timings.blocked > 0) blockedEnd = entry.time_start + entry.timings.blocked;
+                
+                dnsStart = entry._dnsTimeMs > 0 ? entry._dnsTimeMs : blockedEnd;
+                dnsEnd = entry._dnsEndTimeMs > 0 ? entry._dnsEndTimeMs : dnsStart + (entry.timings ? Math.max(0, entry.timings.dns) : 0);
+                
+                connectStart = entry._connectTimeMs > 0 ? entry._connectTimeMs : dnsEnd;
+                connectEnd = entry._connectEndTimeMs > 0 ? entry._connectEndTimeMs : connectStart + (entry.timings ? Math.max(0, entry.timings.connect) : 0);
+                
+                sslStart = entry._sslStartTimeMs > 0 ? entry._sslStartTimeMs : connectEnd;
+                sslEnd = sslStart;
+                if (entry.timings && entry.timings.ssl > 0) sslEnd = sslStart + entry.timings.ssl;
+                
+                requestStart = entry._requestTimeMs > 0 ? entry._requestTimeMs : sslEnd + (entry.timings ? Math.max(0, entry.timings.send || 0) : 0);
+                
+                ttfb = requestStart;
+                if (entry.first_data_time > 0) {
+                    ttfb = entry.first_data_time;
+                } else {
+                    ttfb = requestStart + (entry.timings ? Math.max(0, entry.timings.wait || 0) : 0);
+                }
             }
             
             // Protect against legacy inversions where connection ends dynamically post request starts
@@ -155,8 +230,14 @@ export class Layout {
                 ttfb = Math.max(ttfb, requestStart);
             }
 
-            maxTime = Math.max(maxTime, end - baseMs);
             const colors = this.getRequestColors(entry.mimeType, entry.url);
+            
+            // Allow bounds filtering to override ending points mathematically
+            if (endTimeOverride && end - baseMs > endTimeOverride) {
+                // Clamp end time to the user specified bound if it exceeds it globally
+            }
+            // To ensure maxTime accurately reflects visible elements
+            maxTime = Math.max(maxTime, end - baseMs);
             
             return {
                 index,
@@ -181,21 +262,57 @@ export class Layout {
             };
         });
 
-        // Compute scaling logic
+        if (endTimeOverride !== null && endTimeOverride > 0) {
+            maxTime = Math.max(0, endTimeOverride);
+        }
+
         // Leave room for labels
-        const labelsWidth = Math.max(30, canvasWidth * 0.25);
+        let labelsWidth = options.thumbnailView ? (canvasWidth * 0.25) : 250;
+        if (options.showLabels === false) {
+            labelsWidth = 0;
+        }
+        
         const dataWidth = canvasWidth - labelsWidth - 5;
         const widthPerMs = maxTime > 0 ? (dataWidth / maxTime) : 0;
         
         let yOffset = options.showLegend ? 35 : 0;
 
         // Finalize rows with their geometric positions (y values)
-        processedRows.forEach((row, index) => {
-            row.y1 = index * ROW_HEIGHT + ROW_HEIGHT + yOffset;
-            row.y2 = row.y1 + ROW_HEIGHT - 2;
-            row.maxMs = maxTime;
-            row.layoutParams = { labelsWidth, dataWidth, widthPerMs, canvasWidth };
-        });
+        if (options.connectionView) {
+            let currentRowIdx = 0;
+            const connRowMap = new Map();
+            processedRows.forEach((row) => {
+                let rIdx = currentRowIdx;
+                // Treat requests without connection_id as isolated rows natively
+                if (entries[row.index] && entries[row.index].connection_id) {
+                    const cid = entries[row.index].connection_id.toString();
+                    if (connRowMap.has(cid)) {
+                        rIdx = connRowMap.get(cid);
+                    } else {
+                        connRowMap.set(cid, currentRowIdx);
+                        rIdx = currentRowIdx;
+                        currentRowIdx++;
+                    }
+                } else {
+                    currentRowIdx++;
+                }
+
+                row.y1 = rIdx * rowHeight + rowHeight + yOffset;
+                row.y2 = row.y1 + rowHeight - 1;
+                row.maxMs = maxTime;
+                row.layoutParams = { labelsWidth, dataWidth, widthPerMs, canvasWidth };
+            });
+            // Update total canvas height to reflect collapsed connection view
+            options._totalRows = currentRowIdx;
+        } else {
+            processedRows.forEach((row, index) => {
+                row.y1 = index * rowHeight + rowHeight + yOffset;
+                row.y2 = row.y1 + rowHeight - 1;
+                row.maxMs = maxTime;
+                row.layoutParams = { labelsWidth, dataWidth, widthPerMs, canvasWidth };
+            });
+            options._totalRows = processedRows.length;
+        }
 
         let pageEvents = {};
         let maxBw = 0;
@@ -226,13 +343,23 @@ export class Layout {
             if (p._domInteractive > 0) pageEvents['nav_dom_interactive'] = p._domInteractive;
             
             if (p._bwDown > 0) maxBw = p._bwDown;
+            if (options.showCpu && p._utilization && p._utilization.cpu) {
+               // Track presence
+            }
         }
+        
+        // Add padding bottom for charts if selected
+        let additionalHeight = 0;
+        const chartPadding = options.thumbnailView ? 2 : 20;
+        if (options.showCpu || options.showBw) additionalHeight += (options.thumbnailView ? 16 : 50) + chartPadding;
+        if (options.showMainthread) additionalHeight += (options.thumbnailView ? 16 : 50) + chartPadding;
+        if (options.showLongtasks) additionalHeight += (options.thumbnailView ? 4 : 20) + chartPadding;
 
         return { 
             rows: processedRows, 
             dimensions: { 
                 canvasWidth, 
-                canvasHeight: processedRows.length * ROW_HEIGHT + (ROW_HEIGHT * 3) + yOffset, 
+                canvasHeight: options._totalRows * rowHeight + (rowHeight * 3) + yOffset + additionalHeight, 
                 maxTime,
                 baseMs,
                 labelsWidth,

@@ -10,6 +10,8 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
 
     let globalEarliestMs = Number.MAX_SAFE_INTEGER;
 
+    if (harLog._id) data._id = harLog._id;
+
     // Build pages
     if (harLog.pages && Array.isArray(harLog.pages)) {
         for (const p of harLog.pages) {
@@ -35,6 +37,7 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
             for (const key of Object.keys(p)) {
                 if (key.startsWith('_') && data.pages[p.id][key] === undefined) {
                     data.pages[p.id][key] = p[key];
+                    if (key === '_testId' && !data._id) data._id = p[key];
                 }
             }
         }
@@ -129,8 +132,8 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
                 }
             }
             
-            let firstDataTimeMs = entry._firstDataTimeMs > 0 ? entry._firstDataTimeMs : (timeMs + Math.max(0, entry.timings.dns, 0) + Math.max(0, entry.timings.connect, 0) + Math.max(0, entry.timings.send, 0) + Math.max(0, entry.timings.wait, 0));
-            let lastDataTimeMs = entry._lastDataTimeMs > 0 ? entry._lastDataTimeMs : firstDataTimeMs + Math.max(0, entry.timings.receive, 0);
+            let firstDataTimeMs = entry._firstDataTimeMs > 0 ? entry._firstDataTimeMs : (timeMs + Math.max(0, entry.timings.blocked || 0) + Math.max(0, entry.timings.dns || 0) + Math.max(0, entry.timings.connect || 0) + Math.max(0, entry.timings.send || 0) + Math.max(0, entry.timings.wait || 0));
+            let lastDataTimeMs = entry._lastDataTimeMs > 0 ? entry._lastDataTimeMs : firstDataTimeMs + Math.max(0, entry.timings.receive || 0);
 
             let bytesIn = entry._bytesIn !== undefined ? entry._bytesIn : (entry.response && entry.response.content ? entry.response.content.size : 0);
             

@@ -77,7 +77,40 @@ function processWPTView(viewData, runStr, cachedNum, har) {
     // Copy all metadata natively mapped into Extended Page object
     for (const key of Object.keys(viewData)) {
         if (key !== 'requests' && !bloatNames.has(key)) {
-            page['_' + key] = viewData[key];
+            if (key === 'utilization') {
+                const stdUtil = {};
+                for (const uKey of Object.keys(viewData.utilization)) {
+                    const uVal = viewData.utilization[uKey];
+                    let dataDict = null;
+                    let maxVal = 1;
+                    
+                    // WPT JSON format natively bundles [ {dataDict}, maxVal, avgVal ] OR { data: {dataDict}, max: maxVal, count: avgVal }
+                    if (Array.isArray(uVal) && uVal.length >= 2 && typeof uVal[0] === 'object' && !Array.isArray(uVal[0])) {
+                        dataDict = uVal[0];
+                        maxVal = Math.max(1, parseFloat(uVal[1]) || 1);
+                    } else if (uVal && typeof uVal === 'object' && uVal.data && typeof uVal.data === 'object') {
+                        dataDict = uVal.data;
+                        maxVal = Math.max(1, parseFloat(uVal.max) || 1);
+                    }
+                    
+                    if (dataDict) {
+                        const arr = [];
+                        for (const [tKey, dictVal] of Object.entries(dataDict)) {
+                            const metricVal = parseFloat(dictVal);
+                            const pct = (metricVal / maxVal) * 100.0;
+                            arr.push([parseFloat(tKey), pct]);
+                        }
+                        arr.sort((a, b) => a[0] - b[0]);
+                        arr.max = maxVal; // Preserve the original absolute max bounding cleanly
+                        stdUtil[uKey] = arr;
+                    } else {
+                        stdUtil[uKey] = uVal;
+                    }
+                }
+                page['_utilization'] = stdUtil;
+            } else {
+                page['_' + key] = viewData[key];
+            }
         }
     }
     har.log.pages.push(page);
@@ -114,7 +147,9 @@ function processWPTView(viewData, runStr, cachedNum, har) {
             }
             
             let reqStartedDateTime = startedDateTime;
-            if (req.load_start !== undefined) {
+            if (req.created !== undefined && req.created >= 0) {
+                reqStartedDateTime = new Date(dateUnix * 1000 + parseFloat(req.created)).toISOString();
+            } else if (req.load_start !== undefined) {
                 reqStartedDateTime = new Date(dateUnix * 1000 + parseFloat(req.load_start)).toISOString();
             }
 
@@ -239,6 +274,7 @@ export async function processWPTFileNode(input, options = {}) {
     // Utilize native AST interception avoiding massive object stacks reliably traversing manually dropping subsets dynamically natively
     const parser = new JSONParser({ 
         paths: [
+            '$.data.id',
             '$.data.runs.*.firstView', 
             '$.data.runs.*.repeatView', 
             '$.data.median.firstView', 
@@ -265,6 +301,11 @@ export async function processWPTFileNode(input, options = {}) {
         if (key === 'bwDown') {
             output.log._bwDown = value;
             return undefined;
+        }
+
+        if (key === 'id' && typeof value === 'string') {
+            if (!output.log._id) output.log._id = value;
+            return value;
         }
 
         // Intercept completed views accurately preventing parent AST accumulation correctly natively

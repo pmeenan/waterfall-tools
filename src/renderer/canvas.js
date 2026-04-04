@@ -56,12 +56,11 @@ export class WaterfallCanvas {
             if (!this.rawEntries || this.rawEntries.length === 0) return;
             
             const clientWidth = this.container.clientWidth;
-            const canvasWidth = Math.max(this.options.minWidth, clientWidth);
+            const minW = this.options.thumbnailView ? 0 : this.options.minWidth;
+            const canvasWidth = Math.max(minW, clientWidth);
             
-            const { rows, dimensions, pageEvents } = Layout.calculateRows(this.rawEntries, canvasWidth, {
-                showLegend: this.options.showLegend,
-                page: this.pageData
-            });
+            const layoutOptions = Object.assign({}, this.options, { page: this.pageData });
+            const { rows, dimensions, pageEvents } = Layout.calculateRows(this.rawEntries, canvasWidth, layoutOptions);
             
             this.draw(rows, dimensions, pageEvents);
         });
@@ -244,7 +243,7 @@ export class WaterfallCanvas {
             // Inherit structured relational time base preventing timeline disconnects intrinsically
             const baseStartMs = dimensions.baseMs || (rows.length > 0 ? rows[0].start : 0);
             const topOffset = rows.length > 0 && rows[0].y1 > 35 ? 35 : 0;
-            const rowHeight = 18;
+            const rowHeight = this.options.thumbnailView ? 4 : 18;
             
             // Determine primary document URL to identify cross-document iframes natively
             let mainDocUrl = '';
@@ -254,7 +253,7 @@ export class WaterfallCanvas {
             }
             
             // 3. Frame Borders and Dividers
-            this.ctx.strokeStyle = '#000000';
+            this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(192,192,192)' : '#000000';
             this.ctx.beginPath();
             this.ctx.rect(0, topOffset, dimensions.canvasWidth - 1, dimensions.canvasHeight - topOffset - 1);
             
@@ -271,9 +270,15 @@ export class WaterfallCanvas {
             const gridY1 = topOffset + rowHeight + 1;
             const gridY2 = dimensions.canvasHeight - rowHeight;
 
+            // Start Clipping for graph visualization rendering
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.rect(dimensions.labelsWidth, 0, dimensions.canvasWidth - dimensions.labelsWidth, dimensions.canvasHeight);
+            this.ctx.clip();
+
             // Safety: if maxTime is 0 or intervalMs is 0, skip grid drawing to prevent infinite loops
             if (dimensions.maxTime > 0 && intervalMs > 0) {
-                this.ctx.strokeStyle = 'rgb(192,192,192)';
+                this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(208,208,208)' : 'rgb(192,192,192)';
                 this.ctx.beginPath();
                 
                 for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
@@ -283,19 +288,23 @@ export class WaterfallCanvas {
                 }
                 this.ctx.stroke();
 
-                this.ctx.fillStyle = '#000';
-                this.ctx.font = '11px sans-serif';
-                this.ctx.textAlign = 'center';
+                if (!this.options.thumbnailView) {
+                    this.ctx.fillStyle = '#000';
+                    this.ctx.font = `11px sans-serif`;
+                    this.ctx.textAlign = 'center';
 
-                for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
-                    const x = Math.floor(xScaler(t)) + 0.5;
-                    const labelText = this.getTimeScaleLabel(t, intervalMs) + 's';
-                    this.ctx.fillText(labelText, x, topOffset + 14);
-                    this.ctx.fillText(labelText, x, dimensions.canvasHeight - rowHeight + 13);
+                    const timeOffsetMs = this.options.startTime ? this.options.startTime * 1000 : 0;
+                    const fontYOffset = 14;
+                    for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
+                        const x = Math.floor(xScaler(t)) + 0.5;
+                        const labelText = this.getTimeScaleLabel(t + timeOffsetMs, intervalMs) + 's';
+                        this.ctx.fillText(labelText, x, Math.max(fontYOffset, topOffset + fontYOffset));
+                        this.ctx.fillText(labelText, x, dimensions.canvasHeight - rowHeight + fontYOffset);
+                    }
                 }
             }
 
-            // 5. Page Event Lines (DOM loaded, LCP, Start Render)
+            // 5. Standard Page Event Lines (always drawn: DOM loaded, LCP, Start Render, etc.)
             const eventColors = {
                 'render': [40, 188, 0],
                 'lcp': [0, 128, 0],
@@ -308,36 +317,64 @@ export class WaterfallCanvas {
                 'aft': [255, 0, 0]
             };
             
-            Object.keys(pageEvents).forEach(eventName => {
-                const eventVal = pageEvents[eventName];
-                if (eventColors[eventName] && eventVal) {
-                    if (Array.isArray(eventVal)) {
-                        const startMs = eventVal[0];
-                        const endMs = eventVal[1];
-                        if (endMs > 0) {
-                            const x1 = Math.floor(xScaler(startMs));
-                            let x2 = Math.floor(xScaler(endMs));
-                            if (x1 === x2) x2 = x1 + 1; // Mimic WPT PHP forcing minimum 1px bounds increment
-                            
-                            this.ctx.fillStyle = `rgb(${eventColors[eventName].join(',')})`;
-                            // Note: PHP imagefilledrectangle bounds are inclusive (width = x2 - x1 + 1)
-                            this.ctx.fillRect(x1, topOffset + rowHeight + 1, (x2 - x1) + 1, dimensions.canvasHeight - topOffset - rowHeight - 2);
+            if (this.options.showPageMetrics !== false) {
+                Object.keys(pageEvents).forEach(eventName => {
+                    const eventVal = pageEvents[eventName];
+                    if (eventColors[eventName] && eventVal) {
+                        if (Array.isArray(eventVal)) {
+                            const startMs = eventVal[0];
+                            const endMs = eventVal[1];
+                            if (endMs > 0) {
+                                const x1 = Math.floor(xScaler(startMs));
+                                let x2 = Math.floor(xScaler(endMs));
+                                if (x1 === x2) x2 = x1 + 1; // Mimic WPT PHP forcing minimum 1px bounds increment
+                                
+                                this.ctx.fillStyle = `rgb(${eventColors[eventName].join(',')})`;
+                                // Note: PHP imagefilledrectangle bounds are inclusive (width = x2 - x1 + 1)
+                                this.ctx.fillRect(x1, topOffset + rowHeight + 1, (x2 - x1) + 1, dimensions.canvasHeight - topOffset - rowHeight - 2);
+                            }
+                        } else if (eventVal > 0) {
+                            const x = Math.floor(xScaler(eventVal)) + 0.5;
+                            this.ctx.strokeStyle = `rgb(${eventColors[eventName].join(',')})`;
+                            this.ctx.lineWidth = 2; // WPT draws exactly 2px metric indicator lines 
+                            this.ctx.beginPath();
+                            if (eventName === 'lcp') this.ctx.setLineDash([5, 5]);
+                            else this.ctx.setLineDash([]);
+                            this.ctx.moveTo(x, topOffset + rowHeight + 1);
+                            this.ctx.lineTo(x, dimensions.canvasHeight - 1);
+                            this.ctx.stroke();
+                            this.ctx.lineWidth = 1;
+                            this.ctx.setLineDash([]);
                         }
-                    } else if (eventVal > 0) {
-                        const x = Math.floor(xScaler(eventVal)) + 0.5;
-                        this.ctx.strokeStyle = `rgb(${eventColors[eventName].join(',')})`;
-                        this.ctx.lineWidth = 2; // WPT draws exactly 2px metric indicator lines 
-                        this.ctx.beginPath();
-                        if (eventName === 'lcp') this.ctx.setLineDash([5, 5]);
-                        else this.ctx.setLineDash([]);
-                        this.ctx.moveTo(x, topOffset + rowHeight + 1);
-                        this.ctx.lineTo(x, dimensions.canvasHeight - 1);
-                        this.ctx.stroke();
-                        this.ctx.lineWidth = 1;
-                        this.ctx.setLineDash([]);
                     }
-                }
-            });
+                });
+            }
+
+            // 5.5 User Timing Marks
+            if (this.options.showMarks !== false && this.pageData) {
+                // WPT uses RGB(105, 0, 158) for user timing marks
+                this.ctx.strokeStyle = 'rgb(105, 0, 158)';
+                this.ctx.lineWidth = 1;
+                
+                const drawMarks = (marksObj) => {
+                    if (!marksObj) return;
+                    Object.keys(marksObj).forEach(markName => {
+                        let markTimeMs = marksObj[markName];
+                        if (typeof markTimeMs === 'object' && markTimeMs.time) markTimeMs = markTimeMs.time;
+                        if (markTimeMs > 0 && markTimeMs <= dimensions.maxTime) {
+                            const x = Math.floor(xScaler(markTimeMs)) + 0.5;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(x, topOffset + rowHeight + 1);
+                            this.ctx.lineTo(x, dimensions.canvasHeight - 1);
+                            this.ctx.stroke();
+                        }
+                    });
+                };
+                
+                drawMarks(this.pageData._userTimes);
+                drawMarks(this.pageData._userTimingMeasures);
+                drawMarks(this.pageData._user_timing);
+            }
 
             // 6. Draw Requests
             this.ctx.textAlign = 'left';
@@ -356,22 +393,30 @@ export class WaterfallCanvas {
                 let eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
                 // Native mapping directly provides absolute layouts resolving all timings naturally without overrides
                 
-                const barHeight = row.y2 - row.y1 + 1;
-                const stateHeight = Math.max(2, Math.floor(barHeight / 2));
-                const stateY1 = row.y1 + Math.floor((barHeight - stateHeight) / 2);
+                let drawY1 = row.y1;
+                let drawY2 = row.y2;
+                
+                if (!this.options.thumbnailView) {
+                    drawY1 += 1;
+                    drawY2 -= 1;
+                }
+                
+                const reqBarHeight = drawY2 - drawY1 + 1;
+                const stateHeight = Math.max(2, Math.floor(reqBarHeight / 2));
+                const stateY1 = drawY1 + Math.floor((reqBarHeight - stateHeight) / 2);
                 const stateY2 = stateY1 + stateHeight - 1;
                 
-                const barY1 = row.y1 + 1;
-                const barY2 = row.y2 - 1;
+                const barY1 = drawY1;
+                const barY2 = Math.max(barY1 + 1, drawY2);
                 
                 // State lines (wait -> dns -> connect -> ssl)
-                if (sWait < sTtfb) this.drawBar(sWait, sTtfb, stateY1, stateY2, row.colors.wait, true);
+                if (this.options.showWait !== false && sWait < sTtfb) this.drawBar(sWait, sTtfb, stateY1, stateY2, row.colors.wait, true);
                 if (sDns < sDnsEnd) this.drawBar(sDns, sDnsEnd, stateY1, stateY2, row.colors.dns, true);
                 if (sConn < sConnEnd) this.drawBar(sConn, sConnEnd, stateY1, stateY2, row.colors.connect, true);
                 if (sSsl < sSslEnd) this.drawBar(sSsl, sSslEnd, stateY1, stateY2, row.colors.ssl, true);
                 
                 // Request bodies
-                if (row.chunks && row.chunks.length > 0) {
+                if (this.options.showChunks !== false && row.chunks && row.chunks.length > 0) {
                     // Trace bounds naturally mapped from row
                     let bgStart = xScaler(row.ttfbStart - baseStartMs);
                     let bgEndMs = Math.max(row.end, row.downloadEnd) - baseStartMs;
@@ -379,7 +424,7 @@ export class WaterfallCanvas {
                     const bgEnd = xScaler(bgEndMs);
                     this.drawBar(bgStart, Math.max(bgStart + 1, bgEnd), barY1, barY2, row.colors.ttfb, true);
                     
-                    let minMs = row.ttfbStart - baseStartMs;
+                    let minMs = row.downloadStart - baseStartMs;
                     let maxBw = dimensions.maxBw || 0;
                     
                     if (maxBw > 0) {
@@ -387,8 +432,15 @@ export class WaterfallCanvas {
                         row.chunks.forEach(chunk => {
                             if (chunk.ts !== undefined) {
                                 let cTs = chunk.ts;
+                                
                                 // Auto-detect unix absolute bounds
-                                if (cTs > 1000000000000) cTs -= baseStartMs;
+                                if (cTs > 1000000000000) {
+                                    cTs -= baseStartMs;
+                                } else {
+                                    // If chunks are relative, we must subtract the options.startTime explicit offset manually 
+                                    // since it was inherently added to baseStartMs natively.
+                                    cTs -= (this.options.startTime ? this.options.startTime * 1000 : 0);
+                                }
                                 
                                 let startMs = cTs;
                                 if (chunk.bytes !== undefined) {
@@ -399,6 +451,7 @@ export class WaterfallCanvas {
                                 }
                                 
                                 startMs = Math.max(minMs, startMs);
+                                cTs = Math.max(startMs, cTs);
                                 
                                 const chunkStartX = xScaler(startMs);
                                 const chunkEndX = xScaler(cTs);
@@ -409,7 +462,7 @@ export class WaterfallCanvas {
                     } else {
                         // When max bandwidth is not available, draw a solid download block
                         let firstChunkTs = minMs;
-                        if (row.chunks && row.chunks.length > 0 && row.chunks[0].ts !== undefined) {
+                        if (row.chunks[0].ts !== undefined) {
                             let cTs = row.chunks[0].ts;
                             if (cTs > 1000000000000) cTs -= baseStartMs;
                             firstChunkTs = Math.max(minMs, cTs);
@@ -433,45 +486,47 @@ export class WaterfallCanvas {
                 }
                 
                 // 7. Request timing label
-                let labelStr = Math.round(row.time) + ' ms';
-                if (row.status >= 300 || row.status < 0) {
-                    labelStr += ` (${row.status})`;
-                } else if (row.status === 0) {
-                    labelStr += ' (request canceled)';
-                }
-                
-                this.ctx.font = '11px sans-serif';
-                const metrics = this.ctx.measureText(labelStr);
-                const labelWidth = metrics.width;
-                
-                let labelX = eDownload + 5;
-                if (labelX + labelWidth > dimensions.canvasWidth) {
-                    labelX = sWait - 5 - labelWidth;
-                }
-                
-                if (labelX >= dimensions.labelsWidth) {
-                    // Opaque background layer perfectly blocking vertical grid lines
-                    const rectHeight = row.y2 - row.y1 + 1;
-                    
-                    if (row.status >= 400 || row.status === 0) {
-                        this.ctx.fillStyle = `rgb(${row.colors.error.join(',')})`;
-                        this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
-                    } else if (row.status >= 300 && row.status < 400 && row.status !== 304) {
-                        this.ctx.fillStyle = `rgb(${row.colors.warning.join(',')})`;
-                        this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
-                    } else {
-                        this.ctx.fillStyle = index % 2 === 1 ? "#f0f0f0" : "#ffffff";
-                        this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
+                if (!this.options.thumbnailView) {
+                    let labelStr = Math.round(row.time) + ' ms';
+                    if (row.status >= 300 || row.status < 0) {
+                        labelStr += ` (${row.status})`;
+                    } else if (row.status === 0) {
+                        labelStr += ' (request canceled)';
                     }
                     
-                    this.ctx.fillStyle = '#000';
-                    this.ctx.fillText(labelStr, labelX, row.y1 + 13);
+                    this.ctx.font = `11px sans-serif`;
+                    const metrics = this.ctx.measureText(labelStr);
+                    const labelWidth = metrics.width;
+                    
+                    let labelX = eDownload + 5;
+                    if (labelX + labelWidth > dimensions.canvasWidth) {
+                        labelX = sWait - 5 - labelWidth;
+                    }
+                    
+                    if (labelX >= dimensions.labelsWidth) {
+                        // Opaque background layer perfectly blocking vertical grid lines
+                        const rectHeight = row.y2 - row.y1 + 1;
+                        
+                        if (row.status >= 400 || row.status === 0) {
+                            this.ctx.fillStyle = `rgb(${row.colors.error.join(',')})`;
+                            this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
+                        } else if (row.status >= 300 && row.status < 400 && row.status !== 304) {
+                            this.ctx.fillStyle = `rgb(${row.colors.warning.join(',')})`;
+                            this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
+                        } else {
+                            this.ctx.fillStyle = index % 2 === 1 ? "#f0f0f0" : "#ffffff";
+                            this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
+                        }
+                        
+                        this.ctx.fillStyle = '#000';
+                        this.ctx.fillText(labelStr, labelX, row.y1 + 13);
+                    }
                 }
 
                 // JS Execution
-                if (row.jsTiming && row.jsTiming.length > 0) {
-                    const jsHeight = Math.max(2, Math.floor(barHeight * 0.5));
-                    const jsY1 = row.y1 + Math.floor((barHeight - jsHeight) / 2);
+                if (this.options.showJsTiming !== false && row.jsTiming && row.jsTiming.length > 0) {
+                    const jsHeight = Math.max(2, Math.floor(reqBarHeight * 0.5));
+                    const jsY1 = drawY1 + Math.floor((reqBarHeight - jsHeight) / 2);
                     const jsY2 = jsY1 + jsHeight - 1;
 
                     row.jsTiming.forEach(times => {
@@ -480,80 +535,408 @@ export class WaterfallCanvas {
                         this.drawBar(startX, endX, jsY1, jsY2, row.colors.js, false);
                     });
                 }
-
-                // URL Text Label
-                let textColor = '#000';
-                if (row.documentURL) {
-                    const reqDocUrl = row.documentURL.split('?')[0].split('#')[0];
-                    if (reqDocUrl && mainDocUrl && reqDocUrl !== mainDocUrl) {
-                        textColor = '#0000ff'; // Blue for distinct document contexts
-                    }
-                }
-                
-                let textX = 10;
-                
-                // Draw Render Blocking Indicator
-                if (row.renderBlocking === 'blocking') {
-                    const iconY = row.y1 + 2;
-                    const iconW = 14;
-                    
-                    // Orange warning circle
-                    this.ctx.fillStyle = '#ff9900';
-                    this.ctx.beginPath();
-                    this.ctx.arc(textX + iconW / 2, iconY + iconW / 2, iconW / 2, 0, 2 * Math.PI);
-                    this.ctx.fill();
-                    
-                    // White X cross lines
-                    this.ctx.strokeStyle = '#ffffff';
-                    this.ctx.lineWidth = 1.5;
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(textX + 4, iconY + 4);
-                    this.ctx.lineTo(textX + iconW - 4, iconY + iconW - 4);
-                    this.ctx.moveTo(textX + iconW - 4, iconY + 4);
-                    this.ctx.lineTo(textX + 4, iconY + iconW - 4);
-                    this.ctx.stroke();
-                    this.ctx.lineWidth = 1;
-
-                    textX += iconW + 4;
-                }
-
-                this.ctx.fillStyle = textColor;
-                const prefix = `${index + 1}. `;
-                let urlText = row.url || '';
-                
-                const prefixWidth = this.ctx.measureText(prefix).width;
-                const maxUrlWidth = dimensions.labelsWidth - textX - prefixWidth - 6; // 6px padding from line
-                
-                let currentUrlWidth = this.ctx.measureText(urlText).width;
-                if (currentUrlWidth > maxUrlWidth && urlText.length > 5 && maxUrlWidth > 10) {
-                    const avgCharWidth = currentUrlWidth / urlText.length;
-                    let targetLen = Math.floor(maxUrlWidth / avgCharWidth);
-                    
-                    if (targetLen > 3) targetLen -= 3;
-                    
-                    while (targetLen > 4) {
-                        const half = Math.floor((targetLen - 3) / 2);
-                        const testUrlText = urlText.substring(0, half) + '...' + urlText.substring(urlText.length - half);
-                        if (this.ctx.measureText(testUrlText).width <= maxUrlWidth) {
-                            urlText = testUrlText;
-                            break;
-                        }
-                        targetLen--;
-                    }
-                    if (targetLen <= 4 && urlText.length > 0) {
-                        let shortText = urlText.substring(0, Math.max(1, Math.floor(maxUrlWidth / avgCharWidth))) + '..';
-                        if (this.ctx.measureText(shortText).width > maxUrlWidth) shortText = '';
-                        urlText = shortText;
-                    }
-                }
-                
-                const labelText = prefix + urlText;
-                this.ctx.fillText(labelText, textX, row.y2 - 2);
             });
 
             // 7. Legend
-            if (rows.length > 0 && rows[0].y1 > 30) {
+            if (rows.length > 0 && rows[0].y1 > 30 && this.options.showLegend !== false) {
                 this.drawLegend(dimensions);
             }
+
+            // 8. Advanced Metrics Graphs (CPU, BW, Main Thread, Long Tasks)
+            let chartYOffset = rows.length * rowHeight + (rowHeight * 3) + topOffset;
+            if (this.options.connectionView && this.options._totalRows) {
+                chartYOffset = this.options._totalRows * rowHeight + (rowHeight * 3) + topOffset;
+            }
+
+            const page = this.pageData;
+            if (page) {
+                const drawChartFrame = (title, y, h, colorLine, line2Title, line2Color) => {
+                    this.ctx.restore(); // Briefly suspend clipping
+                    
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.fillRect(dimensions.labelsWidth, y, dimensions.canvasWidth - dimensions.labelsWidth, h);
+                    
+                    this.ctx.fillStyle = '#f0f0f0';
+                    const bandH = (h - 2) / 4;
+                    this.ctx.fillRect(dimensions.labelsWidth, y + 1, dimensions.canvasWidth - dimensions.labelsWidth, bandH);
+                    this.ctx.fillRect(dimensions.labelsWidth, y + 1 + bandH * 2, dimensions.canvasWidth - dimensions.labelsWidth, bandH);
+
+                    this.ctx.lineWidth = 1;
+                    this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(192,192,192)' : '#000000';
+                    this.ctx.strokeRect(dimensions.labelsWidth + 0.5, y + 0.5, dimensions.canvasWidth - dimensions.labelsWidth - 1, h - 1);
+                    
+                    if (dimensions.maxTime > 0 && typeof intervalMs !== 'undefined' && typeof xScaler !== 'undefined') {
+                        // Inherently propagate page event layouts matching waterfall architecture 
+                        if (typeof pageEvents !== 'undefined' && typeof eventColors !== 'undefined' && this.options.showPageMetrics !== false) {
+                            Object.keys(pageEvents).forEach(eventName => {
+                                const eventVal = pageEvents[eventName];
+                                if (eventColors[eventName] && eventVal) {
+                                    if (Array.isArray(eventVal)) {
+                                        const startMs = eventVal[0];
+                                        const endMs = eventVal[1];
+                                        if (endMs > 0) {
+                                            const x1 = Math.floor(xScaler(startMs));
+                                            let x2 = Math.floor(xScaler(endMs));
+                                            if (x1 === x2) x2 = x1 + 1;
+                                            if (x2 > dimensions.labelsWidth) {
+                                                this.ctx.fillStyle = `rgb(${eventColors[eventName].join(',')})`;
+                                                this.ctx.fillRect(Math.max(x1, dimensions.labelsWidth), y + 1, x2 - Math.max(x1, dimensions.labelsWidth) + 1, h - 2);
+                                            }
+                                        }
+                                    } else if (eventVal > 0) {
+                                        const x = Math.floor(xScaler(eventVal)) + 0.5;
+                                        if (x > dimensions.labelsWidth) {
+                                            this.ctx.strokeStyle = `rgb(${eventColors[eventName].join(',')})`;
+                                            this.ctx.lineWidth = 2;
+                                            this.ctx.beginPath();
+                                            if (eventName === 'lcp') this.ctx.setLineDash([5, 5]);
+                                            this.ctx.moveTo(x, y);
+                                            this.ctx.lineTo(x, y + h);
+                                            this.ctx.stroke();
+                                            this.ctx.lineWidth = 1;
+                                            this.ctx.setLineDash([]);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(208,208,208)' : 'rgb(192,192,192)';
+                        this.ctx.beginPath();
+                        for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
+                            const x = Math.floor(xScaler(t)) + 0.5;
+                            if (x > dimensions.labelsWidth) {
+                                this.ctx.moveTo(x, y);
+                                this.ctx.lineTo(x, y + h);
+                            }
+                        }
+                        this.ctx.stroke();
+                        this.ctx.strokeStyle = '#000000'; // reset
+                    }
+                    
+                    if (dimensions.labelsWidth > 0) {
+                        if (title) {
+                            this.ctx.fillStyle = '#333';
+                            const fontSize = this.options.thumbnailView ? 6 : 11;
+                            this.ctx.font = `${fontSize}px sans-serif`;
+                            this.ctx.textAlign = 'right';
+                            this.ctx.fillText(title, dimensions.labelsWidth - 10, y + (h / 2));
+                            
+                            if (colorLine) {
+                                this.ctx.beginPath();
+                                this.ctx.strokeStyle = colorLine;
+                                this.ctx.lineWidth = 2;
+                                const textWidth = this.ctx.measureText(title).width;
+                                const lineEx = dimensions.labelsWidth - 10 - textWidth - 5;
+                                const lineSx = Math.max(10, lineEx - 25);
+                                this.ctx.moveTo(lineSx, y + (h / 2) - 4);
+                                this.ctx.lineTo(lineEx, y + (h / 2) - 4);
+                                this.ctx.stroke();
+                            }
+                        }
+
+                        if (line2Title && line2Color) {
+                            this.ctx.fillStyle = '#333';
+                            const fontSize = this.options.thumbnailView ? 6 : 11;
+                            this.ctx.font = `${fontSize}px sans-serif`;
+                            this.ctx.textAlign = 'right';
+                            this.ctx.fillText(line2Title, dimensions.labelsWidth - 10, y + (h / 2) + 12);
+                            this.ctx.beginPath();
+                            this.ctx.strokeStyle = line2Color;
+                            this.ctx.lineWidth = 2;
+                            const textWidth = this.ctx.measureText(line2Title).width;
+                            const lineEx = dimensions.labelsWidth - 10 - textWidth - 5;
+                            const lineSx = Math.max(10, lineEx - 25);
+                            this.ctx.moveTo(lineSx, y + (h / 2) + 8);
+                            this.ctx.lineTo(lineEx, y + (h / 2) + 8);
+                            this.ctx.stroke();
+                        }
+                    }
+                    
+                    this.ctx.save();
+                    this.ctx.beginPath();
+                    this.ctx.rect(dimensions.labelsWidth, 0, dimensions.canvasWidth - dimensions.labelsWidth, dimensions.canvasHeight);
+                    this.ctx.clip();
+                };
+
+                const hasCpu = this.options.showCpu && page._utilization && page._utilization.cpu;
+                const hasBw = this.options.showBw && page._utilization && page._utilization.bw;
+                const chartPadding = this.options.thumbnailView ? 2 : 20;
+
+                // Draw CPU & BW Combined Loop
+                if (hasCpu || hasBw) {
+                    const blockHeight = this.options.thumbnailView ? 16 : 50;
+                    const cpuColor = 'rgb(255, 153, 0)'; // Orange
+                    const bwColor = 'rgb(255, 100, 100)'; // Red
+                    
+                    const cpuTitle = (hasCpu && !this.options.thumbnailView) ? 'CPU Utilization (%)' : null;
+                    const cpuLineColor = hasCpu ? cpuColor : null;
+                    
+                    let bwTitle = null;
+                    if (hasBw && !this.options.thumbnailView) {
+                        let maxBw = (Array.isArray(page._utilization.bw) && page._utilization.bw.max) ? page._utilization.bw.max : (page._bwDown || 0);
+                        if (maxBw > 0) {
+                            if (maxBw >= 1000) {
+                                let mbps = maxBw / 1000;
+                                bwTitle = `BW (0 - ${mbps % 1 === 0 ? mbps : mbps.toFixed(1)} mbps)`;
+                            } else {
+                                bwTitle = `BW (0 - ${maxBw} kbps)`;
+                            }
+                        } else {
+                            bwTitle = 'BW Utilization';
+                        }
+                    }
+                    const bwLineColor = hasBw ? bwColor : null;
+                    
+                    drawChartFrame(cpuTitle, chartYOffset, blockHeight, cpuLineColor, bwTitle, bwLineColor);
+                    
+                    if (hasCpu) {
+                        let rawCpu = page._utilization.cpu;
+                        if (typeof rawCpu === 'string') {
+                            try { rawCpu = JSON.parse(rawCpu); } catch (e) { rawCpu = []; }
+                        }
+                        if (Array.isArray(rawCpu) && rawCpu.length > 0 && typeof rawCpu[0] === 'object' && !Array.isArray(rawCpu[0])) {
+                            rawCpu = rawCpu[0];
+                        }
+                        
+                        let cpuData = [];
+                        if (Array.isArray(rawCpu)) cpuData = rawCpu;
+                        else if (typeof rawCpu === 'object' && rawCpu !== null) {
+                            for (const [key, val] of Object.entries(rawCpu)) {
+                                if (val && typeof val === 'object' && val.time !== undefined) cpuData.push(val);
+                                else cpuData.push({ time: parseFloat(key), value: parseFloat(val) });
+                            }
+                            cpuData.sort((a, b) => a.time - b.time);
+                        }
+                        
+                        this.ctx.beginPath();
+                        this.ctx.strokeStyle = cpuColor;
+                        this.ctx.lineWidth = 2;
+                        let firstCpu = true;
+                        if (cpuData.length > 0) {
+                            this.ctx.moveTo(dimensions.labelsWidth, chartYOffset + blockHeight);
+                            firstCpu = false;
+                        }
+                        cpuData.forEach(point => {
+                            let ts = point.time !== undefined ? point.time : (point.ts !== undefined ? point.ts : (Array.isArray(point) ? point[0] : null));
+                            let val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
+                            if (ts === null || val === null) return;
+                            
+                            let internalTs = ts;
+                            if (internalTs > 1000000000000000) internalTs = internalTs / 1000;
+                            if (internalTs > 1000000000 && internalTs < 1000000000000) internalTs = internalTs * 1000;
+                            if (internalTs > 1000000000000) internalTs -= baseStartMs;
+                            if (internalTs > dimensions.maxTime * 50) internalTs = internalTs / 1000; 
+                            
+                            const x = xScaler(internalTs);
+                            const y = chartYOffset + blockHeight - ((val || 0) * blockHeight / 100);
+                            
+                            if (internalTs >= 0 && internalTs <= dimensions.maxTime && isFinite(x) && isFinite(y)) {
+                                if (firstCpu) { this.ctx.moveTo(x, y); firstCpu = false; }
+                                else { this.ctx.lineTo(x, y); }
+                            }
+                        });
+                        this.ctx.stroke();
+                    }
+
+                    if (hasBw) {
+                        let rawBw = page._utilization.bw;
+                        if (typeof rawBw === 'string') {
+                            try { rawBw = JSON.parse(rawBw); } catch (e) { rawBw = []; }
+                        }
+                        if (Array.isArray(rawBw) && rawBw.length > 0 && typeof rawBw[0] === 'object' && !Array.isArray(rawBw[0])) {
+                            rawBw = rawBw[0];
+                        }
+                        
+                        let bwData = [];
+                        if (Array.isArray(rawBw)) bwData = rawBw;
+                        else if (typeof rawBw === 'object' && rawBw !== null) {
+                            for (const [key, val] of Object.entries(rawBw)) {
+                                if (val && typeof val === 'object' && val.time !== undefined) bwData.push(val);
+                                else bwData.push({ time: parseFloat(key), value: parseFloat(val) });
+                            }
+                            bwData.sort((a, b) => a.time - b.time);
+                        }
+                        
+                        this.ctx.beginPath();
+                        this.ctx.strokeStyle = bwColor;
+                        this.ctx.lineWidth = 2;
+                        let firstBw = true;
+                        if (bwData.length > 0) {
+                            this.ctx.moveTo(dimensions.labelsWidth, chartYOffset + blockHeight);
+                            firstBw = false;
+                        }
+                        bwData.forEach(point => {
+                            let ts = point.time !== undefined ? point.time : (point.ts !== undefined ? point.ts : (Array.isArray(point) ? point[0] : null));
+                            let val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
+                            if (ts === null || val === null) return;
+
+                            if (ts > 1000000000000000) ts = ts / 1000;
+                            if (ts > 1000000000 && ts < 1000000000000) ts = ts * 1000;
+                            if (ts > 1000000000000) ts -= baseStartMs;
+                            if (ts > dimensions.maxTime * 50) ts = ts / 1000; 
+                            
+                            const x = xScaler(ts);
+                            const y = chartYOffset + blockHeight - ((val || 0) * blockHeight / 100);
+                            
+                            if (ts >= 0 && ts <= dimensions.maxTime && isFinite(x) && isFinite(y)) {
+                                if (firstBw) { this.ctx.moveTo(x, y); firstBw = false; }
+                                else { this.ctx.lineTo(x, y); }
+                            }
+                        });
+                        this.ctx.stroke();
+                    }
+                    
+                    this.ctx.lineWidth = 1;
+                    chartYOffset += blockHeight + chartPadding;
+                }
+                
+                // Draw Main Thread & Long Tasks (WPT format often has browser_main_thread)
+                // Also track generic `_mainThreadEvents` we will add from chrome-trace.js
+                if (this.options.showMainthread) {
+                    const blockHeight = this.options.thumbnailView ? 16 : 50;
+                    const mtTitle = !this.options.thumbnailView ? 'Main Thread' : null;
+                    drawChartFrame(mtTitle, chartYOffset, blockHeight);
+                    
+                    const mtEvents = page._browser_main_thread || page._mainThreadEvents || [];
+                    mtEvents.forEach(evt => {
+                        let ts = evt.time;
+                        // Auto normalize format
+                        if (ts > 1000000000000) ts -= baseStartMs;
+                        if (ts < 0 || ts > dimensions.maxTime) return;
+                        
+                        const duration = evt.duration || 0;
+                        const src = evt.source || evt.type || '';
+                        
+                        let color = [200, 200, 200];
+                        if (src.toLowerCase().includes('script')) color = [255, 190, 80];
+                        else if (src.toLowerCase().includes('layout') || src.toLowerCase().includes('style')) color = [150, 100, 255];
+                        else if (src.toLowerCase().includes('paint')) color = [80, 200, 100];
+                        else if (src.toLowerCase().includes('parse')) color = [120, 180, 255];
+                        
+                        const sx = xScaler(ts);
+                        const ex = Math.max(sx + 1, xScaler(ts + duration));
+                        
+                        const padding = this.options.thumbnailView ? 0 : 10;
+                        this.ctx.fillRect(sx, chartYOffset + padding, ex - sx, blockHeight - (padding * 2));
+                    });
+                    
+                    chartYOffset += blockHeight + chartPadding;
+                }
+
+                if (this.options.showLongtasks) {
+                    const blockHeight = this.options.thumbnailView ? 4 : 20;
+                    const ltTitle = !this.options.thumbnailView ? 'Long Tasks (>50ms)' : null;
+                    drawChartFrame(ltTitle, chartYOffset, blockHeight);
+                    
+                    const mtEvents = page._browser_main_thread || page._mainThreadEvents || [];
+                    mtEvents.forEach(evt => {
+                        const duration = evt.duration || 0;
+                        if (duration >= 50) {
+                            let ts = evt.time;
+                            if (ts > 1000000000000) ts -= baseStartMs;
+                            if (ts < 0 || ts > dimensions.maxTime) return;
+                            
+                            const sx = xScaler(ts);
+                            const ex = Math.max(sx + 1, xScaler(ts + duration));
+                            
+                            this.ctx.fillStyle = `rgba(255, 0, 0, 0.6)`;
+                            const padding = this.options.thumbnailView ? 0 : 2;
+                            this.ctx.fillRect(sx, chartYOffset + padding, ex - sx, blockHeight - (padding * 2));
+                        }
+                    });
+                    
+                    chartYOffset += blockHeight + chartPadding;
+                }
+            }
+
+            // End graph clipping region
+            this.ctx.restore();
+
+            // 9. Draw URL Labels
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.rect(0, 0, Math.max(0, dimensions.labelsWidth - 2), dimensions.canvasHeight);
+            this.ctx.clip();
+
+            this.ctx.textAlign = 'left';
+            if (this.options.showLabels !== false) {
+                const fontSize = this.options.thumbnailView ? 4 : 11;
+                this.ctx.font = `${fontSize}px sans-serif`;
+                rows.forEach((row, index) => {
+                    // URL Text Label
+                    let textColor = '#000';
+                    if (row.documentURL) {
+                        const reqDocUrl = row.documentURL.split('?')[0].split('#')[0];
+                        if (reqDocUrl && mainDocUrl && reqDocUrl !== mainDocUrl) {
+                            textColor = '#0000ff'; // Blue for distinct document contexts
+                        }
+                    }
+                    
+                    let textX = 10;
+                    
+                    // Draw Render Blocking Indicator
+                    if (row.renderBlocking === 'blocking') {
+                        const iconW = this.options.thumbnailView ? 4 : 14;
+                        const iconY = this.options.thumbnailView ? row.y1 : row.y1 + 2;
+                        
+                        // Orange warning circle
+                        this.ctx.fillStyle = '#ff9900';
+                        this.ctx.beginPath();
+                        this.ctx.arc(textX + iconW / 2, iconY + iconW / 2, iconW / 2, 0, 2 * Math.PI);
+                        this.ctx.fill();
+                        
+                        // White X cross lines
+                        this.ctx.strokeStyle = '#ffffff';
+                        this.ctx.lineWidth = this.options.thumbnailView ? 0.5 : 1.5;
+                        const pad = this.options.thumbnailView ? 1 : 4;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(textX + pad, iconY + pad);
+                        this.ctx.lineTo(textX + iconW - pad, iconY + iconW - pad);
+                        this.ctx.moveTo(textX + iconW - pad, iconY + pad);
+                        this.ctx.lineTo(textX + pad, iconY + iconW - pad);
+                        this.ctx.stroke();
+                        this.ctx.lineWidth = 1;
+
+                        textX += iconW + 4;
+                    }
+
+                    this.ctx.fillStyle = textColor;
+                    const prefix = `${index + 1}. `;
+                    let urlText = row.url || '';
+                    
+                    const prefixWidth = this.ctx.measureText(prefix).width;
+                    const maxUrlWidth = dimensions.labelsWidth - textX - prefixWidth - 6; // 6px padding from line
+                    
+                    let currentUrlWidth = this.ctx.measureText(urlText).width;
+                    if (currentUrlWidth > maxUrlWidth && urlText.length > 5 && maxUrlWidth > 10) {
+                        const avgCharWidth = currentUrlWidth / urlText.length;
+                        let targetLen = Math.floor(maxUrlWidth / avgCharWidth);
+                        
+                        if (targetLen > 3) targetLen -= 3;
+                        
+                        while (targetLen > 4) {
+                            const half = Math.floor((targetLen - 3) / 2);
+                            const testUrlText = urlText.substring(0, half) + '...' + urlText.substring(urlText.length - half);
+                            if (this.ctx.measureText(testUrlText).width <= maxUrlWidth) {
+                                urlText = testUrlText;
+                                break;
+                            }
+                            targetLen--;
+                        }
+                        if (targetLen <= 4 && urlText.length > 0) {
+                            let shortText = urlText.substring(0, Math.max(1, Math.floor(maxUrlWidth / avgCharWidth))) + '..';
+                            if (this.ctx.measureText(shortText).width > maxUrlWidth) shortText = '';
+                            urlText = shortText;
+                        }
+                    }
+                    
+                    const labelText = prefix + urlText;
+                    const fontYOffset = this.options.thumbnailView ? 4 : 13;
+                    this.ctx.fillText(labelText, textX, row.y1 + fontYOffset);
+                });
+            }
+            
+            this.ctx.restore();
     }
 }

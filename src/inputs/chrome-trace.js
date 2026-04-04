@@ -75,10 +75,12 @@ export async function processChromeTraceFileNode(input, options = {}) {
 
         const netlog = new Netlog();
         const timeline_requests = {};
+        const main_thread_events = []; // For advanced UI timeline visualizations
         
         let start_time = null;
         let marked_start_time = null;
         let pageTimings = { onLoad: -1, onContentLoad: -1, _startRender: -1 };
+        let custom_user_marks = {};
 
         // Wall-clock epoch estimation: Chrome traces use CLOCK_MONOTONIC (system uptime)
         // for all ts values. We need a real UNIX epoch for HAR startedDateTime generation.
@@ -138,6 +140,16 @@ export async function processChromeTraceFileNode(input, options = {}) {
                     }
                     if (name.includes('firstContentfulPaint') || name === 'firstContentfulPaint') {
                         if (start_time !== null) pageTimings._startRender = (trace_event.ts - start_time) / 1000.0;
+                    }
+                    // Capture generic user marks (usually blink.user_timing)
+                    if (cat.includes('blink.user_timing') && start_time !== null && trace_event.ts >= start_time) {
+                        const standardIgnores = new Set(['navigationStart', 'domContentLoadedEventStart', 'domContentLoaded', 'loadEventStart', 'load', 'firstContentfulPaint', 'firstPaint', 'largestContentfulPaint::Candidate']);
+                        if (!standardIgnores.has(name) && !name.startsWith('requestStart')) {
+                            // Only capture instantaneous Marks (phase 'R', 'I' or just simple markers) or Starts
+                            if (trace_event.ph === 'R' || trace_event.ph === 'I' || trace_event.ph === 'b') {
+                                custom_user_marks[name] = (trace_event.ts - start_time) / 1000.0;
+                            }
+                        }
                     }
                 }
                 
@@ -206,6 +218,18 @@ export async function processChromeTraceFileNode(input, options = {}) {
                         } else if (name === 'Network.requestIntercepted' && data && data.overwrittenURL) {
                             req.overwrittenURL = data.overwrittenURL;
                         }
+                    }
+                }
+                
+                // 4. Main Thread Activity extraction
+                // `dur` is natively present on Complete (Ph: "X") events in micro-seconds natively
+                if ((cat === 'toplevel' || cat.includes('devtools.timeline') || cat.includes('v8') || cat.includes('blink')) && (trace_event.dur > 0 || trace_event.ph === 'X')) {
+                    if (trace_event.ts >= 0 && trace_event.name && !trace_event.name.includes('Resource')) {
+                        main_thread_events.push({
+                            _raw_ts: trace_event.ts,
+                            duration: trace_event.dur / 1000.0, // Convert us to ms
+                            source: trace_event.name
+                        });
                     }
                 }
             } catch (e) {
@@ -395,6 +419,19 @@ export async function processChromeTraceFileNode(input, options = {}) {
             if (pageTimings.onLoad > 0) page.pageTimings.onLoad = pageTimings.onLoad;
             if (pageTimings.onContentLoad > 0) page.pageTimings.onContentLoad = pageTimings.onContentLoad;
             if (pageTimings._startRender > 0) page.pageTimings._startRender = pageTimings._startRender;
+            if (Object.keys(custom_user_marks).length > 0) {
+                page._userTimes = custom_user_marks;
+            }
+            
+            // Map main thread events securely
+            page._mainThreadEvents = main_thread_events.map(evt => {
+                const offset_time_ms = (evt._raw_ts - base_time_microseconds) / 1000.0;
+                return {
+                    time: final_start_time + offset_time_ms,
+                    duration: evt.duration,
+                    source: evt.source
+                };
+            }).filter(evt => evt.duration >= 0.1); // Discard ultra micro-events natively reducing bloat overhead
         }
         
         if (options.debug) console.log(`[chrome-trace.js] Finished applying HAR generation successfully.`);
