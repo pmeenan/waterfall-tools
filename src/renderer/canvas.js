@@ -659,7 +659,8 @@ export class WaterfallCanvas {
                     
                     let bwTitle = null;
                     if (hasBw && !this.options.thumbnailView) {
-                        let maxBw = (Array.isArray(page._utilization.bw) && page._utilization.bw.max) ? page._utilization.bw.max : (page._bwDown || 0);
+                        let maxBw = page._utilization.bwMax || (Array.isArray(page._utilization.bw) && page._utilization.bw.max) ? (page._utilization.bwMax || page._utilization.bw.max) : (page._bwDown || 0);
+
                         if (maxBw > 0) {
                             if (maxBw >= 1000) {
                                 let mbps = maxBw / 1000;
@@ -698,10 +699,12 @@ export class WaterfallCanvas {
                         this.ctx.strokeStyle = cpuColor;
                         this.ctx.lineWidth = 2;
                         let firstCpu = true;
+                        let lastCpuX = dimensions.labelsWidth;
                         if (cpuData.length > 0) {
                             this.ctx.moveTo(dimensions.labelsWidth, chartYOffset + blockHeight);
                             firstCpu = false;
                         }
+                        
                         cpuData.forEach(point => {
                             let ts = point.time !== undefined ? point.time : (point.ts !== undefined ? point.ts : (Array.isArray(point) ? point[0] : null));
                             let val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
@@ -717,8 +720,15 @@ export class WaterfallCanvas {
                             const y = chartYOffset + blockHeight - ((val || 0) * blockHeight / 100);
                             
                             if (internalTs >= 0 && internalTs <= dimensions.maxTime && isFinite(x) && isFinite(y)) {
-                                if (firstCpu) { this.ctx.moveTo(x, y); firstCpu = false; }
-                                else { this.ctx.lineTo(x, y); }
+                                if (firstCpu) {
+                                    this.ctx.moveTo(x, y);
+                                    firstCpu = false;
+                                    lastCpuX = x;
+                                } else {
+                                    this.ctx.lineTo(lastCpuX, y);
+                                    this.ctx.lineTo(x, y);
+                                    lastCpuX = x;
+                                }
                             }
                         });
                         this.ctx.stroke();
@@ -747,10 +757,12 @@ export class WaterfallCanvas {
                         this.ctx.strokeStyle = bwColor;
                         this.ctx.lineWidth = 2;
                         let firstBw = true;
+                        let lastBwX = dimensions.labelsWidth;
                         if (bwData.length > 0) {
                             this.ctx.moveTo(dimensions.labelsWidth, chartYOffset + blockHeight);
                             firstBw = false;
                         }
+                        
                         bwData.forEach(point => {
                             let ts = point.time !== undefined ? point.time : (point.ts !== undefined ? point.ts : (Array.isArray(point) ? point[0] : null));
                             let val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
@@ -765,8 +777,15 @@ export class WaterfallCanvas {
                             const y = chartYOffset + blockHeight - ((val || 0) * blockHeight / 100);
                             
                             if (ts >= 0 && ts <= dimensions.maxTime && isFinite(x) && isFinite(y)) {
-                                if (firstBw) { this.ctx.moveTo(x, y); firstBw = false; }
-                                else { this.ctx.lineTo(x, y); }
+                                if (firstBw) {
+                                    this.ctx.moveTo(x, y);
+                                    firstBw = false;
+                                    lastBwX = x;
+                                } else {
+                                    this.ctx.lineTo(lastBwX, y);
+                                    this.ctx.lineTo(x, y);
+                                    lastBwX = x;
+                                }
                             }
                         });
                         this.ctx.stroke();
@@ -778,12 +797,12 @@ export class WaterfallCanvas {
                 
                 // Draw Main Thread & Long Tasks (WPT format often has browser_main_thread)
                 // Also track generic `_mainThreadEvents` we will add from chrome-trace.js
-                if (this.options.showMainthread) {
+                const mtEvents = page._browser_main_thread || page._mainThreadEvents || [];
+                if (this.options.showMainthread && mtEvents.length > 0) {
                     const blockHeight = this.options.thumbnailView ? 16 : 50;
                     const mtTitle = !this.options.thumbnailView ? 'Main Thread' : null;
                     drawChartFrame(mtTitle, chartYOffset, blockHeight);
                     
-                    const mtEvents = page._browser_main_thread || page._mainThreadEvents || [];
                     mtEvents.forEach(evt => {
                         let ts = evt.time;
                         // Auto normalize format
@@ -802,6 +821,7 @@ export class WaterfallCanvas {
                         const sx = xScaler(ts);
                         const ex = Math.max(sx + 1, xScaler(ts + duration));
                         
+                        this.ctx.fillStyle = `rgb(${color.join(',')})`;
                         const padding = this.options.thumbnailView ? 0 : 10;
                         this.ctx.fillRect(sx, chartYOffset + padding, ex - sx, blockHeight - (padding * 2));
                     });
@@ -809,7 +829,8 @@ export class WaterfallCanvas {
                     chartYOffset += blockHeight;
                 }
 
-                if (this.options.showLongtasks) {
+                const longTasks = page._longTasks || [];
+                if (this.options.showLongtasks && (longTasks.length > 0 || mtEvents.length > 0)) {
                     const blockHeight = this.options.thumbnailView ? 4 : 18;
                     const ltTitle = !this.options.thumbnailView ? 'Long Tasks' : null;
                     drawChartFrame(ltTitle, chartYOffset, blockHeight, null, null, null, false, false); // showBands = false, showGrid = false

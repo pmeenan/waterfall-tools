@@ -95,14 +95,44 @@ function processWPTView(viewData, runStr, cachedNum, har) {
                     
                     if (dataDict) {
                         const arr = [];
-                        for (const [tKey, dictVal] of Object.entries(dataDict)) {
-                            const metricVal = parseFloat(dictVal);
-                            const pct = (metricVal / maxVal) * 100.0;
-                            arr.push([parseFloat(tKey), pct]);
+                        let rawPts = Object.entries(dataDict).map(([k, v]) => ({ ts: parseFloat(k), val: parseFloat(v) }));
+                        rawPts.sort((a, b) => a.ts - b.ts);
+                        
+                        if (uKey === 'bw') {
+                            const wireBps = (har.log._bwDown || viewData.bwDown || 0) * 1000.0;
+                            const limit = wireBps > 0 ? wireBps : maxVal;
+                            
+                            let intervalMs = 100;
+                            if (rawPts.length > 1) {
+                                intervalMs = rawPts[1].ts - rawPts[0].ts;
+                                if (intervalMs <= 0) intervalMs = 100;
+                            }
+                            
+                            if (wireBps > 0) {
+                                for (let i = rawPts.length - 1; i >= 0; i--) {
+                                    if (rawPts[i].val > limit) {
+                                        let excess = rawPts[i].val - limit;
+                                        rawPts[i].val = limit;
+                                        if (i > 0) {
+                                            rawPts[i-1].val += excess;
+                                        } else {
+                                            rawPts.unshift({ ts: rawPts[0].ts - intervalMs, val: excess });
+                                            i++;
+                                        }
+                                    }
+                                }
+                                maxVal = limit;
+                            }
                         }
-                        arr.sort((a, b) => a[0] - b[0]);
-                        arr.max = maxVal; // Preserve the original absolute max bounding cleanly
+                        
+                        for (const pt of rawPts) {
+                            const pct = (pt.val / maxVal) * 100.0;
+                            arr.push([pt.ts, pct]);
+                        }
+                        
+                        arr.max = maxVal; // Preserve the original absolute max bounding cleanly (for Node)
                         stdUtil[uKey] = arr;
+                        stdUtil[uKey + 'Max'] = maxVal; // Safe property for Web Worker / structured cloning (for Browser)
                     } else {
                         stdUtil[uKey] = uVal;
                     }

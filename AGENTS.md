@@ -191,3 +191,8 @@ When working on this codebase, you must adhere to the following strict architect
 
 45. **Independent UI Control Interdependencies:**
     - Component layouts occasionally bundle multiple features conceptually spanning physical canvas layers together identically (for example, combining CPU Line algorithms inside Bandwidth Chart Frames). Ensure boolean conditional toggles strictly evaluate distinctly internally preventing hierarchical dependencies from unexpectedly swallowing orthogonal configuration branches unconditionally.
+
+46. **Context Mutation Independence:**
+    - **Canvas fillStyle Context**: Always explicitly set `ctx.fillStyle` or `ctx.strokeStyle` using the computed styling *immediately before* invoking HTML5 canvas geometry methods like `fillRect` or `stroke`. Neglecting to set the style assigns the previously lingering color state on the context (often the default `#000000` or `#ffffff`), effectively rendering data layers completely invisible or rendering incorrectly without raising console errors.
+
+47. **Stair-Stepped Utilization Graphs:** When drawing utilization graphs (like CPU and Bandwidth) in the waterfall canvas renderer, the values represent the utilization over the *previous* time window, rather than an instantaneous measurement. Therefore, these graphs must be drawn using a stair-stepped line generation logic (drawing to the new value at the previous time stamp, and then drawing a horizontal line to the new time stamp) to accurately reflect the original reporting window natively preventing skewed diagonal interpolations.

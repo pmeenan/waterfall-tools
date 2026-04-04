@@ -350,9 +350,17 @@ export class Layout {
         
         // Add padding bottom for charts if selected
         let additionalHeight = 0;
-        if (options.showCpu || options.showBw) additionalHeight += (options.thumbnailView ? 16 : 50);
-        if (options.showMainthread) additionalHeight += (options.thumbnailView ? 16 : 50);
-        if (options.showLongtasks) additionalHeight += (options.thumbnailView ? 4 : 18);
+        const p = options.page || {};
+        const hasCpu = options.showCpu && p._utilization && p._utilization.cpu;
+        const hasBw = options.showBw && p._utilization && p._utilization.bw;
+        const mtEvents = p._browser_main_thread || p._mainThreadEvents || [];
+        const hasMainthread = options.showMainthread && mtEvents.length > 0;
+        const longTasks = p._longTasks || [];
+        const hasLongTasks = options.showLongtasks && (longTasks.length > 0 || mtEvents.length > 0);
+
+        if (hasCpu || hasBw) additionalHeight += (options.thumbnailView ? 16 : 50);
+        if (hasMainthread) additionalHeight += (options.thumbnailView ? 16 : 50);
+        if (hasLongTasks) additionalHeight += (options.thumbnailView ? 4 : 18);
 
         return { 
             rows: processedRows, 
