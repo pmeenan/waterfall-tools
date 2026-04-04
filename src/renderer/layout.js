@@ -371,7 +371,8 @@ export class Layout {
                 baseMs,
                 labelsWidth,
                 widthPerMs,
-                maxBw
+                maxBw,
+                totalRows: options._totalRows
             },
             pageEvents
         };

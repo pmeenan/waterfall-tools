@@ -569,6 +569,13 @@ export class Netlog {
             entry.priority = params.priority;
             if (entry.initial_priority === undefined) entry.initial_priority = params.priority;
         }
+        
+        if (params.source_dependency && params.source_dependency.id !== undefined) {
+             if (name === 'HTTP_STREAM_REQUEST_BOUND_TO_QUIC_SESSION') {
+                 entry.quic_session = params.source_dependency.id;
+             }
+        }
+        
         if (params.method !== undefined) entry.method = params.method;
         if (params.url !== undefined) entry.url = params.url.split('#')[0];
 
@@ -736,6 +743,27 @@ export class Netlog {
                         }
                     }
                 }
+
+                if (request.stream_id !== undefined && request.quic_session === undefined && request.url) {
+                    for (const [quicSessionId, quicSession] of Object.entries(this.netlog.quic_session || {})) {
+                        if (quicSession.host !== undefined) {
+                            const sessionHost = quicSession.host.split(':')[0];
+                            if (quicSession.stream && quicSession.stream[request.stream_id] && sessionHost === requestHost &&
+                                request.request_headers && quicSession.stream[request.stream_id].request_headers) {
+                                
+                                const stream = quicSession.stream[request.stream_id];
+                                let requestPath = null, streamPath = null;
+                                for (const h of request.request_headers) if (h.startsWith(':path:')) { requestPath = h; break; }
+                                for (const h of stream.request_headers) if (h.startsWith(':path:')) { streamPath = h; break; }
+
+                                if (requestPath && requestPath === streamPath) {
+                                    request.quic_session = quicSessionId;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             if (request.h2_session !== undefined && this.netlog.h2_session[request.h2_session]) {
@@ -758,6 +786,22 @@ export class Netlog {
                             else request.priority = 'Lowest';
                         }
                     }
+                    if (request.first_byte === undefined && stream.first_byte !== undefined) request.first_byte = stream.first_byte;
+                    if (request.end === undefined && stream.end !== undefined) request.end = stream.end;
+                    if (stream.bytes_in > request.bytes_in) {
+                        request.bytes_in = stream.bytes_in;
+                        request.chunks = stream.chunks ? JSON.parse(JSON.stringify(stream.chunks)) : [];
+                    }
+                }
+            }
+
+            if (request.quic_session !== undefined && this.netlog.quic_session[request.quic_session]) {
+                const quicSession = this.netlog.quic_session[request.quic_session];
+                if (quicSession.socket !== undefined) request.socket = quicSession.socket;
+                if (request.stream_id !== undefined && quicSession.stream && quicSession.stream[request.stream_id]) {
+                    const stream = quicSession.stream[request.stream_id];
+                    if (stream.request_headers !== undefined) request.request_headers = stream.request_headers;
+                    if (stream.response_headers !== undefined) request.response_headers = stream.response_headers;
                     if (request.first_byte === undefined && stream.first_byte !== undefined) request.first_byte = stream.first_byte;
                     if (request.end === undefined && stream.end !== undefined) request.end = stream.end;
                     if (stream.bytes_in > request.bytes_in) {
@@ -1163,6 +1207,14 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
                 _chunks_in: req.chunks_in || [],
                 _chunks_out: req.chunks_out || []
             };
+
+            const connId = req.quic_session ? req.quic_session.toString() : 
+                           (req.h2_session ? req.h2_session.toString() : 
+                           (req.socket ? req.socket.toString() : 
+                           (req.connection_id ? req.connection_id.toString() : undefined)));
+            if (connId !== undefined) {
+                entry.connection = connId;
+            }
 
             for (const key of Object.keys(req)) {
                 if (key !== 'encoded_body') {

@@ -89,6 +89,10 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
             
             // Infer Connection
             let connId = entry.connection ? entry.connection.toString() : null;
+            if (!connId && entry._socket !== undefined && entry._socket !== -1 && entry._socket !== "-1") connId = entry._socket.toString();
+            if (!connId && entry._connectionId !== undefined && entry._connectionId !== -1 && entry._connectionId !== "-1") connId = entry._connectionId.toString();
+            if (!connId && entry._connectionIdentifier !== undefined && entry._connectionIdentifier !== -1 && entry._connectionIdentifier !== "-1") connId = entry._connectionIdentifier.toString();
+            
             if (entry.timings && entry.timings.connect > 0 || (entry._connectTimeMs > 0 && entry._connectEndTimeMs > 0)) {
                 if (!connId) connId = `conn_${reqId}`;
                 

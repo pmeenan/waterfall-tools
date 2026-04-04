@@ -226,24 +226,30 @@ export class WaterfallCanvas {
         this.ctx.fillStyle = "#ffffff";
         this.ctx.fillRect(0, 0, dimensions.canvasWidth, dimensions.canvasHeight);
 
+            // Inherit structured relational time base preventing timeline disconnects intrinsically
+            const baseStartMs = dimensions.baseMs || (rows.length > 0 ? rows[0].start : 0);
+            const topOffset = rows.length > 0 && rows[0].y1 > 35 ? 35 : 0;
+            const rowHeight = this.options.thumbnailView ? 4 : 18;
+
             // 2. Draw row backgrounds
-            rows.forEach((row, index) => {
+            const numActualRows = dimensions.totalRows;
+            for (let rIdx = 0; rIdx < numActualRows; rIdx++) {
+                if (rIdx % 2 === 1) {
+                    this.ctx.fillStyle = "#f0f0f0";
+                    const y1 = rIdx * rowHeight + rowHeight + topOffset;
+                    this.ctx.fillRect(0, y1, dimensions.canvasWidth, rowHeight);
+                }
+            }
+
+            rows.forEach((row) => {
                 if (row.status >= 400 || row.status === 0) {
                     this.ctx.fillStyle = `rgb(${row.colors.error.join(',')})`;
                     this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, row.y2 - row.y1 + 1);
                 } else if (row.status >= 300 && row.status < 400 && row.status !== 304) {
                     this.ctx.fillStyle = `rgb(${row.colors.warning.join(',')})`;
                     this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, row.y2 - row.y1 + 1);
-                } else if (index % 2 === 1) {
-                    this.ctx.fillStyle = "#f0f0f0";
-                    this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, row.y2 - row.y1 + 1);
                 }
             });
-
-            // Inherit structured relational time base preventing timeline disconnects intrinsically
-            const baseStartMs = dimensions.baseMs || (rows.length > 0 ? rows[0].start : 0);
-            const topOffset = rows.length > 0 && rows[0].y1 > 35 ? 35 : 0;
-            const rowHeight = this.options.thumbnailView ? 4 : 18;
             
             // Determine primary document URL to identify cross-document iframes natively
             let mainDocUrl = '';
@@ -267,7 +273,7 @@ export class WaterfallCanvas {
             const intervalMs = this.getTimeScaleInterval(dimensions.maxTime, targetCount);
             const xScaler = (ms) => Math.floor(dimensions.labelsWidth + (ms * dimensions.widthPerMs));
             
-            const requestBottomY = (this.options.connectionView && this.options._totalRows ? this.options._totalRows : rows.length) * rowHeight + rowHeight + topOffset;
+            const requestBottomY = dimensions.totalRows * rowHeight + rowHeight + topOffset;
             const gridY1 = topOffset + rowHeight + 1;
             const gridY2 = requestBottomY;
 
@@ -365,10 +371,7 @@ export class WaterfallCanvas {
 
             // 5.8 Time Scale Labels (Rendered last so they draw on top of lines, with opaque backgrounds)
             if (!this.options.thumbnailView && dimensions.maxTime > 0 && intervalMs > 0) {
-                let bottomScaleY = rows.length * rowHeight + rowHeight + topOffset;
-                if (this.options.connectionView && this.options._totalRows) {
-                    bottomScaleY = this.options._totalRows * rowHeight + rowHeight + topOffset;
-                }
+                let bottomScaleY = dimensions.totalRows * rowHeight + rowHeight + topOffset;
 
                 // Fill opaque white background specifically for the bottom time scale row
                 const fillX = Math.floor(dimensions.labelsWidth) + 1;
@@ -393,8 +396,7 @@ export class WaterfallCanvas {
                     this.ctx.fillText(labelText, x, bottomScaleY + fontYOffset);
                 }
             }
-
-            // 6. Draw Requests
+            // 6. Draw Requests - Pass 1: State lines and TTFB Backgrounds
             this.ctx.textAlign = 'left';
 
             rows.forEach((row, index) => {
@@ -407,9 +409,6 @@ export class WaterfallCanvas {
                 let sSslEnd = xScaler(row.sslEnd - baseStartMs);
                 let sTtfb = xScaler(row.ttfbStart - baseStartMs);
                 let sTtfbEnd = xScaler(row.ttfbEnd - baseStartMs);
-                let sDownload = xScaler(row.downloadStart - baseStartMs);
-                let eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
-                // Native mapping directly provides absolute layouts resolving all timings naturally without overrides
                 
                 let drawY1 = row.y1;
                 let drawY2 = row.y2;
@@ -428,44 +427,112 @@ export class WaterfallCanvas {
                 const barY2 = Math.max(barY1 + 1, drawY2);
                 
                 // State lines (wait -> dns -> connect -> ssl)
-                if (this.options.showWait !== false && sWait < sTtfb) this.drawBar(sWait, sTtfb, stateY1, stateY2, row.colors.wait, true);
+                if (this.options.showWait !== false && !this.options.connectionView && sWait < sTtfb) this.drawBar(sWait, sTtfb, stateY1, stateY2, row.colors.wait, true);
                 if (sDns < sDnsEnd) this.drawBar(sDns, sDnsEnd, stateY1, stateY2, row.colors.dns, true);
                 if (sConn < sConnEnd) this.drawBar(sConn, sConnEnd, stateY1, stateY2, row.colors.connect, true);
                 if (sSsl < sSslEnd) this.drawBar(sSsl, sSslEnd, stateY1, stateY2, row.colors.ssl, true);
                 
-                // Request bodies
-                if (this.options.showChunks !== false && row.chunks && row.chunks.length > 0) {
-                    // Trace bounds naturally mapped from row
-                    let bgStart = xScaler(row.ttfbStart - baseStartMs);
-                    let bgEndMs = Math.max(row.end, row.downloadEnd) - baseStartMs;
+                // TTFB block (specifically limited to TTFB duration natively without expanding)
+                if (sTtfb < sTtfbEnd) {
+                    this.drawBar(sTtfb, sTtfbEnd, barY1, barY2, row.colors.ttfb, true);
+                }
+            });
+
+            // 6. Draw Requests - Pass 2: Downloads & Overlaps
+            const solidDownloadsByRow = new Map();
+            rows.forEach((row, index) => {
+                const hasBandwidth = dimensions.maxBw && dimensions.maxBw > 0;
+                const hasChunks = row.chunks && row.chunks.length > 0;
+                // If chunk timings and bandwidth are available, always use them
+                const useChunks = hasChunks && (hasBandwidth || this.options.showChunks !== false);
+                
+                if (!useChunks) {
+                    const rowKey = row.y1;
+                    if (!solidDownloadsByRow.has(rowKey)) solidDownloadsByRow.set(rowKey, []);
                     
-                    const bgEnd = xScaler(bgEndMs);
-                    this.drawBar(bgStart, Math.max(bgStart + 1, bgEnd), barY1, barY2, row.colors.ttfb, true);
+                    let sDownload = xScaler(row.downloadStart - baseStartMs);
+                    let eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
                     
+                    if (sDownload < eDownload) {
+                        solidDownloadsByRow.get(rowKey).push({ row, sDownload, eDownload, colors: row.colors.download });
+                    }
+                }
+            });
+
+            // Draw solid downloads natively with 3px time-slicing for overlapping streams
+            for (const [y1, downloads] of solidDownloadsByRow.entries()) {
+                if (downloads.length === 0) continue;
+                
+                let drawY1 = y1;
+                let drawY2 = y1 + rowHeight - 1;
+                if (!this.options.thumbnailView) {
+                    drawY1 += 1;
+                    drawY2 -= 1;
+                }
+                const barY1 = drawY1;
+                const barY2 = Math.max(barY1 + 1, drawY2);
+                
+                if (downloads.length === 1 || !this.options.connectionView) {
+                    downloads.forEach(dl => {
+                        this.drawBar(dl.sDownload, dl.eDownload, barY1, barY2, dl.colors, true);
+                    });
+                    continue;
+                }
+                
+                const minX = Math.floor(Math.min(...downloads.map(dl => dl.sDownload)));
+                const maxX = Math.ceil(Math.max(...downloads.map(dl => dl.eDownload)));
+                
+                // Track drawn bounds mathematically avoiding overlap completely by interleaving
+                for (let x = minX; x <= maxX; x += 3) {
+                    const active = downloads.filter(dl => (x + 3) > dl.sDownload && x < dl.eDownload);
+                    if (active.length > 0) {
+                        // Alternate proportionally across active streams
+                        const activeIdx = Math.floor(x / 3) % active.length;
+                        const dl = active[activeIdx];
+                        
+                        const drawStartX = Math.max(x, dl.sDownload);
+                        const drawEndX = Math.min(x + 3, dl.eDownload);
+                        
+                        this.drawBar(drawStartX, drawEndX, barY1, barY2, dl.colors, true);
+                    }
+                }
+            }
+
+            // 6. Draw Requests - Pass 3: Chunked Downloads + Labels + JS
+            rows.forEach((row, index) => {
+                let sWait = xScaler(row.start - baseStartMs);
+                let eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
+                
+                let drawY1 = row.y1;
+                let drawY2 = row.y2;
+                if (!this.options.thumbnailView) {
+                    drawY1 += 1;
+                    drawY2 -= 1;
+                }
+                const reqBarHeight = drawY2 - drawY1 + 1;
+                const barY1 = drawY1;
+                const barY2 = Math.max(barY1 + 1, drawY2);
+                
+                const hasBandwidth = dimensions.maxBw && dimensions.maxBw > 0;
+                const hasChunks = row.chunks && row.chunks.length > 0;
+                // If chunk timings and bandwidth are available, always use them
+                const useChunks = hasChunks && (hasBandwidth || this.options.showChunks !== false);
+                
+                if (useChunks) {
                     let minMs = row.downloadStart - baseStartMs;
                     let maxBw = dimensions.maxBw || 0;
                     
                     if (maxBw > 0) {
-                        // Overlay chunks
                         row.chunks.forEach(chunk => {
                             if (chunk.ts !== undefined) {
                                 let cTs = chunk.ts;
-                                
-                                // Auto-detect unix absolute bounds
-                                if (cTs > 1000000000000) {
-                                    cTs -= baseStartMs;
-                                } else {
-                                    // If chunks are relative, we must subtract the options.startTime explicit offset manually 
-                                    // since it was inherently added to baseStartMs natively.
-                                    cTs -= (this.options.startTime ? this.options.startTime * 1000 : 0);
-                                }
+                                if (cTs > 1000000000000) cTs -= baseStartMs;
+                                else cTs -= (this.options.startTime ? this.options.startTime * 1000 : 0);
                                 
                                 let startMs = cTs;
                                 if (chunk.bytes !== undefined) {
                                     const chunkTime = chunk.bytes / (maxBw / 8.0);
-                                    if (chunkTime > 0) {
-                                        startMs -= chunkTime;
-                                    }
+                                    if (chunkTime > 0) startMs -= chunkTime;
                                 }
                                 
                                 startMs = Math.max(minMs, startMs);
@@ -473,38 +540,24 @@ export class WaterfallCanvas {
                                 
                                 const chunkStartX = xScaler(startMs);
                                 const chunkEndX = xScaler(cTs);
-                                
                                 this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
                             }
                         });
                     } else {
-                        // When max bandwidth is not available, draw a solid download block
                         let firstChunkTs = minMs;
                         if (row.chunks[0].ts !== undefined) {
                             let cTs = row.chunks[0].ts;
                             if (cTs > 1000000000000) cTs -= baseStartMs;
                             firstChunkTs = Math.max(minMs, cTs);
                         }
-                        
                         const chunkStartX = xScaler(firstChunkTs);
-                        const chunkEndX = xScaler(bgEndMs);
-                        
+                        const chunkEndX = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
                         this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
-                    }
-                } else {
-                    if (sTtfb < sTtfbEnd) {
-                        this.drawBar(sTtfb, sTtfbEnd, barY1, barY2, row.colors.ttfb, true);
-                    } else if (sTtfb === sTtfbEnd && sTtfb < sDownload) {
-                        this.drawBar(sTtfb, sDownload, barY1, barY2, row.colors.ttfb, true);
-                    }
-                    
-                    if (sDownload < eDownload) {
-                        this.drawBar(sDownload, eDownload, barY1, barY2, row.colors.download, true);
                     }
                 }
                 
                 // 7. Request timing label
-                if (!this.options.thumbnailView) {
+                if (!this.options.thumbnailView && !this.options.connectionView) {
                     let labelStr = Math.round(row.time) + ' ms';
                     if (row.status >= 300 || row.status < 0) {
                         labelStr += ` (${row.status})`;
@@ -522,9 +575,7 @@ export class WaterfallCanvas {
                     }
                     
                     if (labelX >= dimensions.labelsWidth) {
-                        // Opaque background layer perfectly blocking vertical grid lines
                         const rectHeight = row.y2 - row.y1 + 1;
-                        
                         if (row.status >= 400 || row.status === 0) {
                             this.ctx.fillStyle = `rgb(${row.colors.error.join(',')})`;
                             this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
@@ -532,7 +583,8 @@ export class WaterfallCanvas {
                             this.ctx.fillStyle = `rgb(${row.colors.warning.join(',')})`;
                             this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
                         } else {
-                            this.ctx.fillStyle = index % 2 === 1 ? "#f0f0f0" : "#ffffff";
+                            const rIdx = Math.round((row.y1 - topOffset - rowHeight) / rowHeight);
+                            this.ctx.fillStyle = rIdx % 2 === 1 ? "#f0f0f0" : "#ffffff";
                             this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
                         }
                         
@@ -542,7 +594,7 @@ export class WaterfallCanvas {
                 }
 
                 // JS Execution
-                if (this.options.showJsTiming !== false && row.jsTiming && row.jsTiming.length > 0) {
+                if (this.options.showJsTiming !== false && !this.options.connectionView && row.jsTiming && row.jsTiming.length > 0) {
                     const jsHeight = Math.max(2, Math.floor(reqBarHeight * 0.5));
                     const jsY1 = drawY1 + Math.floor((reqBarHeight - jsHeight) / 2);
                     const jsY2 = jsY1 + jsHeight - 1;
@@ -561,10 +613,7 @@ export class WaterfallCanvas {
             }
 
             // 8. Advanced Metrics Graphs (CPU, BW, Main Thread, Long Tasks)
-            let chartYOffset = rows.length * rowHeight + (rowHeight * 2) + topOffset;
-            if (this.options.connectionView && this.options._totalRows) {
-                chartYOffset = this.options._totalRows * rowHeight + (rowHeight * 2) + topOffset;
-            }
+            let chartYOffset = dimensions.totalRows * rowHeight + (rowHeight * 2) + topOffset;
 
             const page = this.pageData;
             if (page) {
@@ -652,7 +701,7 @@ export class WaterfallCanvas {
                 if (hasCpu || hasBw) {
                     const blockHeight = this.options.thumbnailView ? 16 : 50;
                     const cpuColor = 'rgb(255, 153, 0)'; // Orange
-                    const bwColor = 'rgb(255, 100, 100)'; // Red
+                    const bwColor = 'rgb(0, 128, 0)'; // Dark Green
                     
                     const cpuTitle = (hasCpu && !this.options.thumbnailView) ? 'CPU Utilization (%)' : null;
                     const cpuLineColor = hasCpu ? cpuColor : null;
@@ -906,7 +955,16 @@ export class WaterfallCanvas {
             if (this.options.showLabels !== false) {
                 const fontSize = this.options.thumbnailView ? 4 : 11;
                 this.ctx.font = `${fontSize}px sans-serif`;
+                
+                let renderedConnectionRows = new Set();
+                let connectionDisplayIndex = 1;
+                
                 rows.forEach((row, index) => {
+                    if (this.options.connectionView) {
+                        if (renderedConnectionRows.has(row.y1)) return;
+                        renderedConnectionRows.add(row.y1);
+                    }
+
                     // URL Text Label
                     let textColor = '#000';
                     if (row.documentURL) {
@@ -945,8 +1003,11 @@ export class WaterfallCanvas {
                     }
 
                     this.ctx.fillStyle = textColor;
-                    const prefix = `${index + 1}. `;
+                    const prefix = this.options.connectionView ? `${connectionDisplayIndex++}. ` : `${index + 1}. `;
                     let urlText = row.url || '';
+                    if (this.options.connectionView) {
+                        urlText = urlText.split(' - ')[0];
+                    }
                     
                     const prefixWidth = this.ctx.measureText(prefix).width;
                     const maxUrlWidth = dimensions.labelsWidth - textX - prefixWidth - 6; // 6px padding from line
