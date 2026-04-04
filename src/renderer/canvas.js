@@ -267,8 +267,9 @@ export class WaterfallCanvas {
             const intervalMs = this.getTimeScaleInterval(dimensions.maxTime, targetCount);
             const xScaler = (ms) => Math.floor(dimensions.labelsWidth + (ms * dimensions.widthPerMs));
             
+            const requestBottomY = (this.options.connectionView && this.options._totalRows ? this.options._totalRows : rows.length) * rowHeight + rowHeight + topOffset;
             const gridY1 = topOffset + rowHeight + 1;
-            const gridY2 = dimensions.canvasHeight - rowHeight;
+            const gridY2 = requestBottomY;
 
             // Start Clipping for graph visualization rendering
             this.ctx.save();
@@ -288,20 +289,6 @@ export class WaterfallCanvas {
                 }
                 this.ctx.stroke();
 
-                if (!this.options.thumbnailView) {
-                    this.ctx.fillStyle = '#000';
-                    this.ctx.font = `11px sans-serif`;
-                    this.ctx.textAlign = 'center';
-
-                    const timeOffsetMs = this.options.startTime ? this.options.startTime * 1000 : 0;
-                    const fontYOffset = 14;
-                    for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
-                        const x = Math.floor(xScaler(t)) + 0.5;
-                        const labelText = this.getTimeScaleLabel(t + timeOffsetMs, intervalMs) + 's';
-                        this.ctx.fillText(labelText, x, Math.max(fontYOffset, topOffset + fontYOffset));
-                        this.ctx.fillText(labelText, x, dimensions.canvasHeight - rowHeight + fontYOffset);
-                    }
-                }
             }
 
             // 5. Standard Page Event Lines (always drawn: DOM loaded, LCP, Start Render, etc.)
@@ -331,7 +318,7 @@ export class WaterfallCanvas {
                                 
                                 this.ctx.fillStyle = `rgb(${eventColors[eventName].join(',')})`;
                                 // Note: PHP imagefilledrectangle bounds are inclusive (width = x2 - x1 + 1)
-                                this.ctx.fillRect(x1, topOffset + rowHeight + 1, (x2 - x1) + 1, dimensions.canvasHeight - topOffset - rowHeight - 2);
+                                this.ctx.fillRect(x1, topOffset + rowHeight + 1, (x2 - x1) + 1, requestBottomY - topOffset - rowHeight - 1);
                             }
                         } else if (eventVal > 0) {
                             const x = Math.floor(xScaler(eventVal)) + 0.5;
@@ -341,7 +328,7 @@ export class WaterfallCanvas {
                             if (eventName === 'lcp') this.ctx.setLineDash([5, 5]);
                             else this.ctx.setLineDash([]);
                             this.ctx.moveTo(x, topOffset + rowHeight + 1);
-                            this.ctx.lineTo(x, dimensions.canvasHeight - 1);
+                            this.ctx.lineTo(x, requestBottomY);
                             this.ctx.stroke();
                             this.ctx.lineWidth = 1;
                             this.ctx.setLineDash([]);
@@ -365,7 +352,7 @@ export class WaterfallCanvas {
                             const x = Math.floor(xScaler(markTimeMs)) + 0.5;
                             this.ctx.beginPath();
                             this.ctx.moveTo(x, topOffset + rowHeight + 1);
-                            this.ctx.lineTo(x, dimensions.canvasHeight - 1);
+                            this.ctx.lineTo(x, requestBottomY);
                             this.ctx.stroke();
                         }
                     });
@@ -374,6 +361,37 @@ export class WaterfallCanvas {
                 drawMarks(this.pageData._userTimes);
                 drawMarks(this.pageData._userTimingMeasures);
                 drawMarks(this.pageData._user_timing);
+            }
+
+            // 5.8 Time Scale Labels (Rendered last so they draw on top of lines, with opaque backgrounds)
+            if (!this.options.thumbnailView && dimensions.maxTime > 0 && intervalMs > 0) {
+                let bottomScaleY = rows.length * rowHeight + rowHeight + topOffset;
+                if (this.options.connectionView && this.options._totalRows) {
+                    bottomScaleY = this.options._totalRows * rowHeight + rowHeight + topOffset;
+                }
+
+                // Fill opaque white background specifically for the bottom time scale row
+                const fillX = Math.floor(dimensions.labelsWidth) + 1;
+                const fillW = dimensions.canvasWidth - fillX - 1;
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillRect(fillX, bottomScaleY, fillW, rowHeight - 1);
+
+                this.ctx.fillStyle = '#000';
+                this.ctx.font = `11px sans-serif`;
+                this.ctx.textAlign = 'center';
+
+                const timeOffsetMs = this.options.startTime ? this.options.startTime * 1000 : 0;
+                const fontYOffset = 14;
+                for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
+                    const x = Math.floor(xScaler(t)) + 0.5;
+                    const labelText = this.getTimeScaleLabel(t + timeOffsetMs, intervalMs) + 's';
+                    
+                    // Top scale label
+                    this.ctx.fillText(labelText, x, Math.max(fontYOffset, topOffset + fontYOffset));
+                    
+                    // Bottom scale label
+                    this.ctx.fillText(labelText, x, bottomScaleY + fontYOffset);
+                }
             }
 
             // 6. Draw Requests
@@ -543,64 +561,32 @@ export class WaterfallCanvas {
             }
 
             // 8. Advanced Metrics Graphs (CPU, BW, Main Thread, Long Tasks)
-            let chartYOffset = rows.length * rowHeight + (rowHeight * 3) + topOffset;
+            let chartYOffset = rows.length * rowHeight + (rowHeight * 2) + topOffset;
             if (this.options.connectionView && this.options._totalRows) {
-                chartYOffset = this.options._totalRows * rowHeight + (rowHeight * 3) + topOffset;
+                chartYOffset = this.options._totalRows * rowHeight + (rowHeight * 2) + topOffset;
             }
 
             const page = this.pageData;
             if (page) {
-                const drawChartFrame = (title, y, h, colorLine, line2Title, line2Color) => {
+                const drawChartFrame = (title, y, h, colorLine, line2Title, line2Color, showBands = true, showGrid = true) => {
                     this.ctx.restore(); // Briefly suspend clipping
                     
                     this.ctx.fillStyle = '#ffffff';
                     this.ctx.fillRect(dimensions.labelsWidth, y, dimensions.canvasWidth - dimensions.labelsWidth, h);
                     
-                    this.ctx.fillStyle = '#f0f0f0';
-                    const bandH = (h - 2) / 4;
-                    this.ctx.fillRect(dimensions.labelsWidth, y + 1, dimensions.canvasWidth - dimensions.labelsWidth, bandH);
-                    this.ctx.fillRect(dimensions.labelsWidth, y + 1 + bandH * 2, dimensions.canvasWidth - dimensions.labelsWidth, bandH);
+                    if (showBands !== false) {
+                        this.ctx.fillStyle = '#f0f0f0';
+                        const bandH = (h - 2) / 4;
+                        this.ctx.fillRect(dimensions.labelsWidth, y + 1, dimensions.canvasWidth - dimensions.labelsWidth, bandH);
+                        this.ctx.fillRect(dimensions.labelsWidth, y + 1 + bandH * 2, dimensions.canvasWidth - dimensions.labelsWidth, bandH);
+                    }
 
                     this.ctx.lineWidth = 1;
                     this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(192,192,192)' : '#000000';
                     this.ctx.strokeRect(dimensions.labelsWidth + 0.5, y + 0.5, dimensions.canvasWidth - dimensions.labelsWidth - 1, h - 1);
                     
-                    if (dimensions.maxTime > 0 && typeof intervalMs !== 'undefined' && typeof xScaler !== 'undefined') {
-                        // Inherently propagate page event layouts matching waterfall architecture 
-                        if (typeof pageEvents !== 'undefined' && typeof eventColors !== 'undefined' && this.options.showPageMetrics !== false) {
-                            Object.keys(pageEvents).forEach(eventName => {
-                                const eventVal = pageEvents[eventName];
-                                if (eventColors[eventName] && eventVal) {
-                                    if (Array.isArray(eventVal)) {
-                                        const startMs = eventVal[0];
-                                        const endMs = eventVal[1];
-                                        if (endMs > 0) {
-                                            const x1 = Math.floor(xScaler(startMs));
-                                            let x2 = Math.floor(xScaler(endMs));
-                                            if (x1 === x2) x2 = x1 + 1;
-                                            if (x2 > dimensions.labelsWidth) {
-                                                this.ctx.fillStyle = `rgb(${eventColors[eventName].join(',')})`;
-                                                this.ctx.fillRect(Math.max(x1, dimensions.labelsWidth), y + 1, x2 - Math.max(x1, dimensions.labelsWidth) + 1, h - 2);
-                                            }
-                                        }
-                                    } else if (eventVal > 0) {
-                                        const x = Math.floor(xScaler(eventVal)) + 0.5;
-                                        if (x > dimensions.labelsWidth) {
-                                            this.ctx.strokeStyle = `rgb(${eventColors[eventName].join(',')})`;
-                                            this.ctx.lineWidth = 2;
-                                            this.ctx.beginPath();
-                                            if (eventName === 'lcp') this.ctx.setLineDash([5, 5]);
-                                            this.ctx.moveTo(x, y);
-                                            this.ctx.lineTo(x, y + h);
-                                            this.ctx.stroke();
-                                            this.ctx.lineWidth = 1;
-                                            this.ctx.setLineDash([]);
-                                        }
-                                    }
-                                }
-                            });
-                        }
-
+                    
+                    if (showGrid !== false && dimensions.maxTime > 0 && typeof intervalMs !== 'undefined' && typeof xScaler !== 'undefined') {
                         this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(208,208,208)' : 'rgb(192,192,192)';
                         this.ctx.beginPath();
                         for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
@@ -661,7 +647,6 @@ export class WaterfallCanvas {
 
                 const hasCpu = this.options.showCpu && page._utilization && page._utilization.cpu;
                 const hasBw = this.options.showBw && page._utilization && page._utilization.bw;
-                const chartPadding = this.options.thumbnailView ? 2 : 20;
 
                 // Draw CPU & BW Combined Loop
                 if (hasCpu || hasBw) {
@@ -788,7 +773,7 @@ export class WaterfallCanvas {
                     }
                     
                     this.ctx.lineWidth = 1;
-                    chartYOffset += blockHeight + chartPadding;
+                    chartYOffset += blockHeight;
                 }
                 
                 // Draw Main Thread & Long Tasks (WPT format often has browser_main_thread)
@@ -821,32 +806,69 @@ export class WaterfallCanvas {
                         this.ctx.fillRect(sx, chartYOffset + padding, ex - sx, blockHeight - (padding * 2));
                     });
                     
-                    chartYOffset += blockHeight + chartPadding;
+                    chartYOffset += blockHeight;
                 }
 
                 if (this.options.showLongtasks) {
-                    const blockHeight = this.options.thumbnailView ? 4 : 20;
-                    const ltTitle = !this.options.thumbnailView ? 'Long Tasks (>50ms)' : null;
-                    drawChartFrame(ltTitle, chartYOffset, blockHeight);
+                    const blockHeight = this.options.thumbnailView ? 4 : 18;
+                    const ltTitle = !this.options.thumbnailView ? 'Long Tasks' : null;
+                    drawChartFrame(ltTitle, chartYOffset, blockHeight, null, null, null, false, false); // showBands = false, showGrid = false
                     
-                    const mtEvents = page._browser_main_thread || page._mainThreadEvents || [];
-                    mtEvents.forEach(evt => {
-                        const duration = evt.duration || 0;
-                        if (duration >= 50) {
-                            let ts = evt.time;
-                            if (ts > 1000000000000) ts -= baseStartMs;
-                            if (ts < 0 || ts > dimensions.maxTime) return;
-                            
-                            const sx = xScaler(ts);
-                            const ex = Math.max(sx + 1, xScaler(ts + duration));
-                            
-                            this.ctx.fillStyle = `rgba(255, 0, 0, 0.6)`;
-                            const padding = this.options.thumbnailView ? 0 : 2;
-                            this.ctx.fillRect(sx, chartYOffset + padding, ex - sx, blockHeight - (padding * 2));
-                        }
-                    });
+                    let startEventTs = 0;
+                    if (page._firstContentfulPaint > 0) startEventTs = page._firstContentfulPaint;
+                    else if (page._render > 0) startEventTs = page._render;
                     
-                    chartYOffset += blockHeight + chartPadding;
+                    let startEventX = Math.floor(xScaler(startEventTs));
+                    
+                    if (startEventX < dimensions.canvasWidth) {
+                        // Draw Interactive Background (Green) from FCP onwards
+                        this.ctx.fillStyle = 'rgb(178, 234, 148)';
+                        const startX = Math.max(dimensions.labelsWidth + 1, startEventX);
+                        this.ctx.fillRect(startX, chartYOffset + 1, dimensions.canvasWidth - startX, blockHeight - 2);
+                    }
+                    
+                    const longTasks = page._longTasks || [];
+                    if (longTasks.length > 0) {
+                        longTasks.forEach(period => {
+                            const sx = Math.floor(xScaler(period[0]));
+                            const ex = Math.floor(Math.max(sx + 1, xScaler(period[1])));
+                            
+                            if (ex > dimensions.labelsWidth) {
+                                const drawSx = Math.max(dimensions.labelsWidth + 1, startEventX, sx);
+                                const drawEx = Math.min(dimensions.canvasWidth - 1, ex);
+                                
+                                if (drawEx > drawSx) {
+                                    this.ctx.fillStyle = 'rgb(255, 82, 62)'; // Blocked (Red/Orange)
+                                    this.ctx.fillRect(drawSx, chartYOffset + 1, drawEx - drawSx, blockHeight - 2);
+                                }
+                            }
+                        });
+                    } else {
+                        const mtEvents = page._browser_main_thread || page._mainThreadEvents || [];
+                        mtEvents.forEach(evt => {
+                            const duration = evt.duration || 0;
+                            if (duration >= 50) {
+                                let ts = evt.time;
+                                if (ts > 1000000000000) ts -= baseStartMs;
+                                if (ts < 0 || ts > dimensions.maxTime) return;
+                                
+                                const sx = Math.floor(xScaler(ts));
+                                const ex = Math.floor(Math.max(sx + 1, xScaler(ts + duration)));
+                                
+                                if (ex > dimensions.labelsWidth) {
+                                    const drawSx = Math.max(dimensions.labelsWidth + 1, startEventX, sx);
+                                    const drawEx = Math.min(dimensions.canvasWidth - 1, ex);
+                                    
+                                    if (drawEx > drawSx) {
+                                        this.ctx.fillStyle = 'rgb(255, 82, 62)'; // Blocked (Red/Orange)
+                                        this.ctx.fillRect(drawSx, chartYOffset + 1, drawEx - drawSx, blockHeight - 2);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    chartYOffset += blockHeight;
                 }
             }
 

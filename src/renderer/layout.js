@@ -350,16 +350,15 @@ export class Layout {
         
         // Add padding bottom for charts if selected
         let additionalHeight = 0;
-        const chartPadding = options.thumbnailView ? 2 : 20;
-        if (options.showCpu || options.showBw) additionalHeight += (options.thumbnailView ? 16 : 50) + chartPadding;
-        if (options.showMainthread) additionalHeight += (options.thumbnailView ? 16 : 50) + chartPadding;
-        if (options.showLongtasks) additionalHeight += (options.thumbnailView ? 4 : 20) + chartPadding;
+        if (options.showCpu || options.showBw) additionalHeight += (options.thumbnailView ? 16 : 50);
+        if (options.showMainthread) additionalHeight += (options.thumbnailView ? 16 : 50);
+        if (options.showLongtasks) additionalHeight += (options.thumbnailView ? 4 : 18);
 
         return { 
             rows: processedRows, 
             dimensions: { 
                 canvasWidth, 
-                canvasHeight: options._totalRows * rowHeight + (rowHeight * 3) + yOffset + additionalHeight, 
+                canvasHeight: options._totalRows * rowHeight + (rowHeight * 2) + yOffset + additionalHeight, 
                 maxTime,
                 baseMs,
                 labelsWidth,

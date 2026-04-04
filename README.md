@@ -93,8 +93,35 @@ await wt.loadUrl('https://example.com/trace.json.gz');
 // The engine targets a parent container div and natively generates & manages its own internal `<canvas>`
 const containerElement = document.getElementById('waterfall-container');
 
+// You can retrieve the default configuration options logically:
+const defaultOptions = WaterfallTools.getDefaultOptions();
+console.log(defaultOptions);
+/*
+{
+    pageId: null,             // Specific page to render (defaults to the first page)
+    connectionView: false,    // Render the connection view rather than the waterfall
+    thumbnailView: false,     // Render a minimal thumbnail view
+    minWidth: 0,              // Minimum canvas width in pixels
+    startTime: null,          // Float, start time in seconds to clip the view
+    endTime: null,            // Float, end time in seconds to clip the view
+    reqFilter: '',            // String to filter specific request IDs
+    showPageMetrics: true,    // Render horizontal page metric lines
+    showMarks: false,         // Render user timing marks
+    showCpu: false,           // Render the CPU utilization graph
+    showBw: false,            // Render the Bandwidth graph
+    showMainthread: true,     // Render main thread activity blocks
+    showLongtasks: true,      // Render long task warnings
+    showMissing: false,       // Render ellipsis for missing requests
+    showLabels: true,         // Render text labels on rows
+    showChunks: true,         // Show individual download chunks
+    showJsTiming: true,       // Highlight JS execution timings
+    showWait: true,           // Render the wait time (TTFB) blocks
+    showLegend: true          // Render the bottom legend
+}
+*/
+
 // Instantiate the renderer completely mapped and scaled automagically natively:
-await wt.renderTo(containerElement, { minWidth: 800, showLegend: true });
+await wt.renderTo(containerElement, Object.assign({}, defaultOptions, { minWidth: 800 }));
 ```
 
 ## CLI Interface

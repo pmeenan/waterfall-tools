@@ -366,6 +366,34 @@ export class WaterfallTools {
         };
     }
 
+    /**
+     * Gets the default UI visualization layout options.
+     * @returns {Object} Defaults configuration
+     */
+    static getDefaultOptions() {
+        return {
+            pageId: null,
+            connectionView: false,
+            thumbnailView: false,
+            minWidth: 0,
+            startTime: null,
+            endTime: null,
+            reqFilter: '',
+            showPageMetrics: true,
+            showMarks: false,
+            showCpu: false,
+            showBw: false,
+            showMainthread: true,
+            showLongtasks: true,
+            showMissing: false,
+            showLabels: true,
+            showChunks: true,
+            showJsTiming: true,
+            showWait: true,
+            showLegend: true
+        };
+    }
+
     async renderTo(container, options = {}) {
         // Dynamically load browser-only render implementations keeping Node targets pure
         const { WaterfallCanvas } = await import('../renderer/canvas.js');

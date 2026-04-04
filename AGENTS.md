@@ -89,6 +89,7 @@ When working on this codebase, you must adhere to the following strict architect
     - All format processors accept `input` generic signatures (`processXNode(input, options)`) uniformly supporting either file paths or raw `Readable` streams gracefully.
     - The main `Conductor` artifact represents the central class and exposes `processFile` and `processStream` methods bridging inputs systematically.
     - The root unified CLI resides at `bin/waterfall-tools.js` wrapping the `Conductor` logic securely for global terminal access across formats natively while automatically discovering matching `keylog` inputs implicitly.
+    - **API Documentation**: Whenever you modify APIs (such as `waterfall-tools.js` methods or rendering parameters like `renderTo()` default options), you MUST comprehensively document these modifications structurally inside the `README.md` and explicitly note them within this `AGENTS.md` context log ensuring future AI Agents seamlessly identify the exposed signatures.
 
 19. **Output Processors (Headless):**
     - The `simple-json` output processor (`src/outputs/simple-json.js`) provides a strictly 1D array mapping of `ExtendedHAR` request entries. It collapses deep `request` and `response` object trees into simple top-level properties (e.g. `url`, `method`, `status`, `ttfb_ms`) natively suitable for generic JavaScript iterators.

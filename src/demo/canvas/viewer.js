@@ -28,6 +28,19 @@ const uiShowWait = document.getElementById('ui-show-wait');
 
 let rendererCanvas = null;
 
+// Initialize UI with defaults
+const defaultOptions = WaterfallTools.getDefaultOptions();
+uiShowPageMetrics.checked = defaultOptions.showPageMetrics;
+uiShowMarks.checked = defaultOptions.showMarks;
+uiShowCpu.checked = defaultOptions.showCpu;
+uiShowBw.checked = defaultOptions.showBw;
+uiShowMainthread.checked = defaultOptions.showMainthread;
+uiShowLongtasks.checked = defaultOptions.showLongtasks;
+uiShowMissing.checked = defaultOptions.showMissing;
+uiShowLabels.checked = defaultOptions.showLabels;
+uiShowChunks.checked = defaultOptions.showChunks;
+uiShowJs.checked = defaultOptions.showJsTiming;
+uiShowWait.checked = defaultOptions.showWait;
 // Use native Web Stream directly
 async function fileToReadable(file) {
     return file.stream();
