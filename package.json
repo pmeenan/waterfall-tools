@@ -17,7 +17,9 @@
     "test": "vitest",
     "build": "vite build",
     "dev:demo": "vite --config vite.demo.config.js",
-    "build:demo": "vite build --config vite.demo.config.js"
+    "build:demo": "vite build --config vite.demo.config.js",
+    "dev:viewer": "vite --config vite.viewer.config.js",
+    "build:viewer": "vite build --config vite.viewer.config.js"
   },
   "repository": {
     "type": "git",

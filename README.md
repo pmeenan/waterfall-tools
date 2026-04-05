@@ -116,7 +116,8 @@ console.log(defaultOptions);
     showChunks: true,         // Show individual download chunks
     showJsTiming: true,       // Highlight JS execution timings
     showWait: true,           // Render the wait time (TTFB) blocks
-    showLegend: true          // Render the bottom legend
+    showLegend: true,         // Render the bottom legend
+    thumbMaxReqs: 100         // Maximum requests to draw when thumbnailView=true (0 disables truncation)
 }
 */
 
@@ -129,6 +130,36 @@ await wt.renderTo(containerElement, Object.assign({}, defaultOptions, { minWidth
 The `WaterfallTools.renderTo(containerElement, options)` API is the standard and fully supported mechanism for embedding Waterfall Tools directly into any generic webpage. 
 
 By passing your target DOM container and your preferred options (which can include callbacks for interactivity), you can easily drop a robust, high-performance canvas-based waterfall directly into your own applications. This unified approach formally supersedes the need for any separate or legacy `div-embed.js` bootstrapping utilities.
+
+## Standalone Viewer UI
+
+The library includes a pre-built, production-ready standalone viewer application. This is ideal for distributing as a static HTML page, embedding cleanly via an `iframe`, or using as a dedicated full-page waterfall tool without building your own UI.
+If you load a HAR file containing multiple testing iterations (such as WebPageTest's First and Repeat views), the viewer will automatically present an interactive mathematical **Thumbnail Grid View** cleanly surfacing the respective Paint metrics, load times, and request counts before drilling into specific traces.
+
+### Using the Viewer
+
+You can dynamically configure the viewer using URL query parameters that identically map to the configuration options available in `WaterfallTools.getDefaultOptions()`. The viewer seamlessly tracks states natively using the browser's **History API**, enabling smooth "Back" and "Forward" navigation across nested waterfalls and thumbnail overviews.
+
+```
+https://your-domain.com/viewer/?src=https://example.com/trace.json.gz&showCpu=false&viewType=connection
+```
+
+Alternatively, if no `src` parameter is provided, the viewer automatically presents a clean drag-and-drop file upload interface.
+
+### Iframe Programmatic API
+
+When embedding the viewer within an iframe, the app globally exposes an API to inject buffers natively without routing payloads via URL strings:
+
+```html
+<iframe id="waterfall-iframe" src="/dist/viewer/index.html"></iframe>
+<script>
+    // Example: Passing an intercepted ArrayBuffer directly into the viewer iframe
+    document.getElementById('waterfall-iframe').contentWindow.WaterfallViewer.loadData(arrayBuffer);
+    
+    // Example: Re-rendering with explicit bounds
+    document.getElementById('waterfall-iframe').contentWindow.WaterfallViewer.updateOptions({ showCpu: true });
+</script>
+```
 
 ## CLI Interface
 
@@ -158,6 +189,15 @@ npm run test
 ```bash
 # Builds standardized Universal Module Definitions (UMD) & pure ESModules natively into `/dist`
 npm run build
+```
+
+### Compile Standalone Viewer UI
+```bash
+# Formats and bundles the embeddable standalone app natively into `/dist/viewer/`
+npm run build:viewer
+
+# Start local server to preview viewer wrapper natively
+npm run dev:viewer
 ```
 
 ### Utilizing Local Demos (Canvas Viewers)

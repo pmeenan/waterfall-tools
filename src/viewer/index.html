@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waterfall Viewer</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div id="loading" class="hidden">
+        <div class="spinner"></div>
+        <p id="loading-text">Loading...</p>
+    </div>
+
+    <!-- Upload fallback when no remote file is specified -->
+    <div id="drop-zone" class="hidden">
+        <div class="upload-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <h2>Drag & Drop File</h2>
+            <p>Select or drop a HAR, Netlog, Trace, PCAP, or JSON file</p>
+            <button id="upload-btn">Browse Files</button>
+            <input type="file" id="file-input" multiple class="hidden">
+        </div>
+    </div>
+
+    <div id="tile-view" class="hidden">
+        <header class="viewer-header">
+            <h1 id="tile-view-title">Network Trace Runs</h1>
+            <div style="width:30px"></div>
+        </header>
+        <div id="tile-grid"></div>
+    </div>
+
+    <div id="canvas-container" class="hidden">
+        <header class="viewer-header">
+            <button id="btn-back-tiles" class="hidden">🔙 Back to Runs</button>
+            <h1 id="viewer-title">Waterfall Viewer</h1>
+            <button id="btn-settings">⚙️ Options</button>
+        </header>
+        <div id="waterfall-view"></div>
+    </div>
+
+    <div id="settings-overlay" class="hidden">
+        <div class="settings-modal" id="settings-modal-content">
+            <div class="settings-header">
+                <h2>Waterfall Options</h2>
+                <button id="btn-settings-close">❌</button>
+            </div>
+            <div class="settings-body">
+                <div class="view-mode-toggle" style="margin-bottom: 15px;">
+                    <strong>View Mode:</strong><br/>
+                    <label style="display:inline-block; margin-right: 15px;"><input type="radio" name="ui-view-type" value="waterfall" checked> Waterfall</label>
+                    <label style="display:inline-block;"><input type="radio" name="ui-view-type" value="connection"> Connection</label>
+                </div>
+                <div class="settings-separator"></div>
+                <h4>Rendering Features</h4>
+                <div class="settings-grid">
+                    <label><input type="checkbox" id="ui-show-page-metrics" checked> Page Metrics (Lines)</label>
+                    <label><input type="checkbox" id="ui-show-marks"> User Timing Marks</label>
+                    <label><input type="checkbox" id="ui-show-cpu"> CPU Utilization</label>
+                    <label><input type="checkbox" id="ui-show-bw"> Bandwidth Graph</label>
+                    <label><input type="checkbox" id="ui-show-mainthread" checked> Main Thread Activity</label>
+                    <label><input type="checkbox" id="ui-show-longtasks" checked> Long Tasks</label>
+                    <label><input type="checkbox" id="ui-show-missing"> Ellipsis (Missing reqs)</label>
+                    <label><input type="checkbox" id="ui-show-labels" checked> Row Labels</label>
+                    <label><input type="checkbox" id="ui-show-chunks" checked> Chunk Timing</label>
+                    <label><input type="checkbox" id="ui-show-js" checked> JS Execution Time</label>
+                    <label><input type="checkbox" id="ui-show-wait" checked> Wait Time (white)</label>
+                    <label><input type="checkbox" id="ui-show-legend" checked> Legend</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./viewer.js"></script>
+</body>
+</html>

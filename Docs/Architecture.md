@@ -100,8 +100,9 @@ graph TD
 │   ├── core/               # Shared logic, schemas, and main library conductor
 │   │   ├── har-types.js    # Extended HAR conventions
 │   │   └── conductor.js    # Main API interface
-│   ├── demo/               # Showcase frontend applications
-│   │   └── canvas/         # Drag-and-drop interactive viewer
+│   ├── viewer/             # Self-contained, full-featured standalone frontend UI
+│   │   ├── index.html      # Main presentation container
+│   │   └── viewer.js       # App controller handling loading, drag-and-drop, and history API
 │   ├── platforms/          # Environment-specific implementations (e.g., File I/O vs Fetch)
 │   │   ├── browser/
 │   │   └── node/

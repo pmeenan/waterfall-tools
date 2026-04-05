@@ -93,14 +93,18 @@ This document breaks down the development of the Waterfall Tools library into in
 
 ## Phase 8: Stand-alone Viewer UI
 **Goal:** Create a full stand-alone viewer UI that functions independently via a main HTML page or embedded in an iframe.
-- [ ] Create a main HTML page (`src/viewer/index.html` or similar) for the stand-alone viewer.
-- [ ] Implement query parameter parsing to accept a `src` parameter containing the URL for a data file to load.
-- [ ] If a `src` is provided, display a loading UI to provide feedback while fetching data, transitioning directly into the waterfall view once processed.
-- [ ] If no `src` is provided, display a UI similar to the canvas demo allowing users to load a file manually via an input button or drag/drop.
-- [ ] Architect the UI starting with a simple canvas rendering of the waterfall, keeping the structure flexible enough for future feature expansions.
-- [ ] Map all supported Waterfall renderer options to individual query parameters so they can be explicitly configured via URL.
-- [ ] Ensure the HTML page operates correctly both as a completely stand-alone viewer (served over HTTP or loaded from a local `file://` URI) and when embedded inside an iframe.
-- [ ] Expose a JavaScript API from the viewer so that when embedded in an iframe, the hosting page can programmatically "load" data (using any supported loading method) and have the UI run seamlessly as if the file was loaded natively via the `src` parameter.
+- [x] Create a main HTML page (`src/viewer/index.html` or similar) for the stand-alone viewer.
+- [x] Implement query parameter parsing to accept a `src` parameter containing the URL for a data file to load.
+- [x] If a `src` is provided, display a loading UI to provide feedback while fetching data, transitioning directly into the waterfall view once processed.
+- [x] If no `src` is provided, display a UI similar to the canvas demo allowing users to load a file manually via an input button or drag/drop.
+- [x] Architect the UI starting with a simple canvas rendering of the waterfall, keeping the structure flexible enough for future feature expansions.
+- [x] Map all supported Waterfall renderer options to individual query parameters so they can be explicitly configured via URL.
+- [x] Ensure the HTML page operates correctly both as a completely stand-alone viewer (served over HTTP or loaded from a local `file://` URI) and when embedded inside an iframe.
+- [x] Expose a JavaScript API from the viewer so that when embedded in an iframe, the hosting page can programmatically "load" data (using any supported loading method) and have the UI run seamlessly as if the file was loaded natively via the `src` parameter.
+- [x] Build a dedicated multi-page thumbnail grid view (`tileView`) automatically surfacing metrics (Load, FCP, LCP, Bytes) alongside mini-waterfalls for inputs tracing multiple runs.
+- [x] Implement scalable request truncation rendering (`thumbMaxReqs`) utilizing a custom native HTML5 `<canvas>` "torn page" vector overlay to highlight sliced data elegantly without destroying the layout loop limits.
+- [x] Add true browser `History API` tracking allowing users to easily traverse back and forward across `tileView` and active waterfall pages using their native browser actions safely.
+- [x] Polish settings overlay and Viewer UI styling strictly deploying native vanilla CSS components matching a premium presentation.
 
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.

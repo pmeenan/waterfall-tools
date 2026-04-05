@@ -122,6 +122,20 @@ export class Layout {
             }
         }
 
+        let thumbMaxReqs = options.thumbMaxReqs;
+        if (thumbMaxReqs === undefined) {
+            thumbMaxReqs = 100;
+        }
+
+        if (options.thumbnailView && thumbMaxReqs > 0 && entries.length > thumbMaxReqs) {
+            const half = Math.floor(thumbMaxReqs / 2);
+            const remaining = thumbMaxReqs - half;
+            
+            const firstHalf = entries.slice(0, half);
+            const lastHalf = entries.slice(entries.length - remaining);
+            entries = [...firstHalf, { _isTornEdge: true }, ...lastHalf];
+        }
+
         if (entries.length === 0) {
             return { rows: [], dimensions: { canvasWidth, canvasHeight: 0, maxTime: 0, labelsWidth: 0, widthPerMs: 0 }};
         }
@@ -148,6 +162,17 @@ export class Layout {
         }
         
         const processedRows = entries.map((entry, index) => {
+            if (entry._isTornEdge) {
+                return {
+                    index,
+                    isTornEdge: true,
+                    status: 200,
+                    start: 0,
+                    end: 0,
+                    colors: { warning: [0,0,0], error: [0,0,0] }
+                };
+            }
+            
             let start = entry.time_start;
             let timeTotal = 0;
             
@@ -275,7 +300,7 @@ export class Layout {
         const dataWidth = canvasWidth - labelsWidth - 5;
         const widthPerMs = maxTime > 0 ? (dataWidth / maxTime) : 0;
         
-        let yOffset = options.showLegend ? 35 : 0;
+        let yOffset = (options.showLegend && !options.thumbnailView) ? 35 : 0;
 
         // Finalize rows with their geometric positions (y values)
         if (options.connectionView) {
@@ -283,35 +308,39 @@ export class Layout {
             const connRowMap = new Map();
             processedRows.forEach((row) => {
                 let rIdx = currentRowIdx;
+                let units = row.isTornEdge ? 4 : 1;
                 // Treat requests without connection_id as isolated rows natively
-                if (entries[row.index] && entries[row.index].connection_id) {
+                if (entries[row.index] && entries[row.index].connection_id && !row.isTornEdge) {
                     const cid = entries[row.index].connection_id.toString();
                     if (connRowMap.has(cid)) {
                         rIdx = connRowMap.get(cid);
                     } else {
                         connRowMap.set(cid, currentRowIdx);
                         rIdx = currentRowIdx;
-                        currentRowIdx++;
+                        currentRowIdx += units;
                     }
                 } else {
-                    currentRowIdx++;
+                    currentRowIdx += units;
                 }
 
                 row.y1 = rIdx * rowHeight + rowHeight + yOffset;
-                row.y2 = row.y1 + rowHeight - 1;
+                row.y2 = row.y1 + (rowHeight * units) - 1;
                 row.maxMs = maxTime;
                 row.layoutParams = { labelsWidth, dataWidth, widthPerMs, canvasWidth };
             });
             // Update total canvas height to reflect collapsed connection view
             options._totalRows = currentRowIdx;
         } else {
+            let currentRowIdx = 0;
             processedRows.forEach((row, index) => {
-                row.y1 = index * rowHeight + rowHeight + yOffset;
-                row.y2 = row.y1 + rowHeight - 1;
+                let units = row.isTornEdge ? 4 : 1;
+                row.y1 = currentRowIdx * rowHeight + rowHeight + yOffset;
+                row.y2 = row.y1 + (rowHeight * units) - 1;
                 row.maxMs = maxTime;
                 row.layoutParams = { labelsWidth, dataWidth, widthPerMs, canvasWidth };
+                currentRowIdx += units;
             });
-            options._totalRows = processedRows.length;
+            options._totalRows = currentRowIdx;
         }
 
         let pageEvents = {};

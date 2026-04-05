@@ -138,6 +138,18 @@ function processWPTView(viewData, runStr, cachedNum, har) {
                     }
                 }
                 page['_utilization'] = stdUtil;
+            } else if (key === 'chromeUserTiming' && Array.isArray(viewData[key])) {
+                viewData[key].forEach(event => {
+                    if (event.name && event.time !== undefined) {
+                        if (event.name === 'LargestContentfulPaint' && !page['_LargestContentfulPaint']) {
+                            page['_LargestContentfulPaint'] = event.time;
+                        }
+                        if (event.name === 'firstContentfulPaint' && !page['_firstContentfulPaint']) {
+                            page['_firstContentfulPaint'] = event.time;
+                        }
+                    }
+                });
+                page['_' + key] = viewData[key];
             } else {
                 page['_' + key] = viewData[key];
             }

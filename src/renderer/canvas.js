@@ -328,16 +328,52 @@ export class WaterfallCanvas {
             const rowHeight = this.options.thumbnailView ? 4 : 18;
 
             // 2. Draw row backgrounds
-            const numActualRows = dimensions.totalRows;
-            for (let rIdx = 0; rIdx < numActualRows; rIdx++) {
-                if (rIdx % 2 === 1) {
-                    this.ctx.fillStyle = "#f0f0f0";
-                    const y1 = rIdx * rowHeight + rowHeight + topOffset;
-                    this.ctx.fillRect(0, y1, dimensions.canvasWidth, rowHeight);
-                }
-            }
-
+            const drawnYSet = new Set();
             rows.forEach((row) => {
+                if (row.isTornEdge) {
+                    // Draw Vector Tear Background
+                    const yMid = row.y1 + (row.y2 - row.y1) / 2;
+                    const tearHeight = this.options.thumbnailView ? 2 : 4;
+                    const segments = 45; // high jagged density
+                    const segmentWidth = dimensions.canvasWidth / segments;
+                    
+                    this.ctx.fillStyle = '#fafafa';
+                    this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, row.y2 - row.y1 + 1);
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, yMid - tearHeight);
+                    
+                    for (let s = 1; s <= segments; s++) {
+                        const nextX = s * segmentWidth;
+                        const nextY = yMid + (s % 2 === 0 ? -tearHeight : tearHeight);
+                        this.ctx.lineTo(nextX, nextY);
+                    }
+                    this.ctx.strokeStyle = '#cccccc';
+                    this.ctx.lineWidth = 1;
+                    this.ctx.stroke();
+                    
+                    // add slight shadow underneath
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, yMid - tearHeight + 1);
+                    for (let s = 1; s <= segments; s++) {
+                        const nextX = s * segmentWidth;
+                        const nextY = yMid + (s % 2 === 0 ? -tearHeight : tearHeight) + 1;
+                        this.ctx.lineTo(nextX, nextY);
+                    }
+                    this.ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+                    this.ctx.stroke();
+                    return;
+                }
+
+                if (!drawnYSet.has(row.y1)) {
+                    drawnYSet.add(row.y1);
+                    const logicalIdx = Math.round((row.y1 - topOffset - rowHeight) / rowHeight);
+                    if (logicalIdx % 2 === 1) {
+                        this.ctx.fillStyle = "#f0f0f0";
+                        this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, rowHeight);
+                    }
+                }
+
                 if (row.status >= 400 || row.status === 0) {
                     this.ctx.fillStyle = `rgb(${row.colors.error.join(',')})`;
                     this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, row.y2 - row.y1 + 1);
@@ -496,6 +532,8 @@ export class WaterfallCanvas {
             this.ctx.textAlign = 'left';
 
             rows.forEach((row, index) => {
+                if (row.isTornEdge) return;
+                
                 let sWait = xScaler(row.start - baseStartMs);
                 let sDns = xScaler(row.dnsStart - baseStartMs);
                 let sDnsEnd = xScaler(row.dnsEnd - baseStartMs);
@@ -537,6 +575,7 @@ export class WaterfallCanvas {
             // 6. Draw Requests - Pass 2: Downloads & Overlaps
             const solidDownloadsByRow = new Map();
             rows.forEach((row, index) => {
+                if (row.isTornEdge) return;
                 const hasBandwidth = dimensions.maxBw && dimensions.maxBw > 0;
                 const hasChunks = row.chunks && row.chunks.length > 0;
                 // If chunk timings and bandwidth are available, always use them
@@ -596,6 +635,7 @@ export class WaterfallCanvas {
 
             // 6. Draw Requests - Pass 3: Chunked Downloads + Labels + JS
             rows.forEach((row, index) => {
+                if (row.isTornEdge) return;
                 let sWait = xScaler(row.start - baseStartMs);
                 let eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
                 
@@ -704,7 +744,7 @@ export class WaterfallCanvas {
             });
 
             // 7. Legend
-            if (rows.length > 0 && rows[0].y1 > 30 && this.options.showLegend !== false) {
+            if (rows.length > 0 && rows[0].y1 > 30 && this.options.showLegend !== false && !this.options.thumbnailView) {
                 this.drawLegend(dimensions);
             }
 
