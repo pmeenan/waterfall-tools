@@ -287,6 +287,12 @@ export class WaterfallTools {
             }
         }
 
+        if (resourceType === 'lighthouse' && pageData._lighthouse) {
+            const str = pageData._lighthouse;
+            const url = `data:text/html;charset=utf-8,${encodeURIComponent(str)}`;
+            return { url, mimeType: 'text/html' };
+        }
+
         if (!this.data._opfsStorage || !this.data._zipFiles) {
             console.warn(`[getPageResource] Aborting: Missing _opfsStorage (${!!this.data._opfsStorage}) or _zipFiles (${!!this.data._zipFiles})`);
             return null;
@@ -323,7 +329,13 @@ export class WaterfallTools {
             mimeType = 'application/vnd.tcpdump.pcap';
         } else if (resourceType === 'lighthouse') {
             const lhFile = `${runNum}${cachedStr}_lighthouse.html`;
+            const lhGzFile = `${runNum}${cachedStr}_lighthouse.html.gz`;
+            const genericLhFile = 'lighthouse.html';
+            const genericLhGzFile = 'lighthouse.html.gz';
             targetFile = this.data._zipFiles.find(f => f === lhFile || f.endsWith(`/${lhFile}`));
+            if (!targetFile) targetFile = this.data._zipFiles.find(f => f === lhGzFile || f.endsWith(`/${lhGzFile}`));
+            if (!targetFile) targetFile = this.data._zipFiles.find(f => f === genericLhFile || f.endsWith(`/${genericLhFile}`));
+            if (!targetFile) targetFile = this.data._zipFiles.find(f => f === genericLhGzFile || f.endsWith(`/${genericLhGzFile}`));
             mimeType = 'text/html';
         }
 
@@ -335,10 +347,14 @@ export class WaterfallTools {
         const zip = new ZipReader(this.data._opfsStorage);
         await zip.init();
         console.log(`[getPageResource] zip init resolved. fetching stream for ${targetFile}`);
-        const stream = await zip.getFileStream(targetFile);
+        let stream = await zip.getFileStream(targetFile);
         if (!stream) {
             console.warn(`[getPageResource] getFileStream returned null for target: ${targetFile}`);
             return null;
+        }
+
+        if (resourceType === 'lighthouse' && targetFile.endsWith('.gz') && typeof DecompressionStream !== 'undefined') {
+            stream = stream.pipeThrough(new DecompressionStream('gzip'));
         }
 
         const reader = stream.getReader();

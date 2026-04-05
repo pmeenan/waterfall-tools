@@ -15,7 +15,11 @@ const ui = {
     btnSettings: document.getElementById('btn-settings'),
     settingsOverlay: document.getElementById('settings-overlay'),
     btnSettingsClose: document.getElementById('btn-settings-close'),
-    viewerTitle: document.getElementById('viewer-title')
+    viewerTitle: document.getElementById('viewer-title'),
+    tabLighthouse: document.getElementById('tab-lighthouse'),
+    lighthouseView: document.getElementById('lighthouse-view'),
+    lighthouseFrame: document.getElementById('lighthouse-frame'),
+    viewerTabs: document.getElementById('viewer-tabs')
 };
 
 let waterfallTool = null;
@@ -236,6 +240,26 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
                 ui.viewerTitle.textContent = `Waterfall`;
             }
         }
+    }
+
+    // Reset tabs
+    document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
+    const waterfallTab = document.querySelector('.viewer-tab[data-tab-id="waterfall"]');
+    if (waterfallTab) waterfallTab.classList.add('active');
+    ui.waterfallView.classList.remove('hidden');
+    if (ui.lighthouseView) ui.lighthouseView.classList.add('hidden');
+    if (ui.tabLighthouse) ui.tabLighthouse.classList.add('hidden');
+    if (ui.lighthouseFrame) ui.lighthouseFrame.src = 'about:blank';
+
+    try {
+        const lhResource = await waterfallTool.getPageResource(pageId, 'lighthouse');
+        if (lhResource && lhResource.url && ui.tabLighthouse) {
+            ui.tabLighthouse.classList.remove('hidden');
+            ui.lighthouseFrame.src = lhResource.url;
+            activeBlobUrls.push(lhResource.url);
+        }
+    } catch (e) {
+        console.warn(`[viewer.js] Failed to fetch lighthouse HTML for ${pageId}:`, e);
     }
 
     rendererCanvas = await waterfallTool.renderTo(ui.waterfallView, renderOptions);
@@ -462,6 +486,29 @@ async function initViewer() {
             });
         }
     });
+
+    // Tab switching bindings
+    if (ui.viewerTabs) {
+        ui.viewerTabs.addEventListener('click', (e) => {
+            const tab = e.target.closest('.viewer-tab');
+            if (!tab || tab.classList.contains('hidden')) return;
+
+            document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const tabId = tab.dataset.tabId;
+            ui.waterfallView.classList.add('hidden');
+            if (ui.lighthouseView) ui.lighthouseView.classList.add('hidden');
+
+            if (tabId === 'waterfall') {
+                ui.waterfallView.classList.remove('hidden');
+                // Ensure canvas resizes properly if needed
+                if (rendererCanvas) window.dispatchEvent(new Event('resize'));
+            } else if (tabId === 'lighthouse') {
+                if (ui.lighthouseView) ui.lighthouseView.classList.remove('hidden');
+            }
+        });
+    }
 
     // History API bindings
     window.addEventListener('popstate', (e) => {

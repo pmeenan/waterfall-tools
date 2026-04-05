@@ -63,10 +63,16 @@
                 <div class="viewer-tab active" data-tab-id="waterfall">
                     <span id="viewer-title" class="tab-title">Waterfall</span>
                 </div>
+                <div class="viewer-tab hidden" data-tab-id="lighthouse" id="tab-lighthouse">
+                    <span class="tab-title">Lighthouse</span>
+                </div>
             </div>
             <button id="btn-settings">⚙️ Options</button>
         </header>
         <div id="waterfall-view" class="tab-content active"></div>
+        <div id="lighthouse-view" class="tab-content hidden" style="width: 100%; height: 100%; background: #fff;">
+            <iframe id="lighthouse-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
     </div>
 
     <div id="settings-overlay" class="hidden">

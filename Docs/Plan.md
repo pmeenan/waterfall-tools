@@ -61,6 +61,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Implement logic to leverage `requestAnimationFrame` ensuring efficient updates and redraws. 
 - [x] Support global document drag-and-drop targets for seamless file parsing updates.
 - [x] Integrate UI Control Overlay in `index.html` mapping settings dynamically seamlessly.
+- [x] Include Lighthouse HTML iframe integration inside the viewer organically tied to extended HAR structures.
 - [x] Build Connection View (stacking multiplexed requests organically natively matching WebPageTest features) internally within `layout.js` layout passes.
 - [x] Allow bounds clamping for `startTime` and `endTime` zooming natively gracefully.
 - [x] Expose `viewer.js` UI states mapping directly into explicit `rendererCanvas.render()` toggle flags allowing dynamic redraws.
