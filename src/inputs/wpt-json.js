@@ -9,8 +9,9 @@ import { buildWaterfallDataFromHar } from '../core/har-converter.js';
  * @param {Object} rawData - The parsed WebPageTest JSON payload
  * @returns {import('../core/har-types.js').ExtendedHAR}
  */
-export function normalizeWPT(rawData) {
-    const har = {
+// Exported so wptagent.js can construct the single unified HAR locally
+export function getBaseWptHar() {
+    return {
         log: {
             version: '1.2',
             creator: {
@@ -21,6 +22,10 @@ export function normalizeWPT(rawData) {
             entries: []
         }
     };
+}
+
+export function normalizeWPT(rawData) {
+    const har = getBaseWptHar();
 
     const data = rawData.data || rawData;
 
@@ -412,3 +417,48 @@ export async function processWPTFileNode(input, options = {}) {
 
     return buildWaterfallDataFromHar(output.log, 'wpt');
 }
+
+/**
+ * Processes a flat WPT json stream typically found in wptagent devtools_requests.json.gz files directly.
+ * Appends into a shared HAR output.
+ */
+export async function processWPTFlatStreamNode(input, runStr, cachedNum, outputHar, options = {}) {
+    const { JSONParser } = await import('@streamparser/json');
+
+    let stream = input;
+    if (options.isGz) {
+        stream = stream.pipeThrough(new DecompressionStream('gzip'));
+    }
+
+    const viewData = {};
+    const parser = new JSONParser({ 
+        paths: ['$.pageData', '$.requests'], 
+        keepStack: false
+    });
+
+    parser.onValue = ({ value, key }) => {
+        if (key === 'pageData') {
+            Object.assign(viewData, value);
+            return undefined;
+        } else if (key === 'requests') {
+            viewData.requests = value;
+            processWPTView(viewData, runStr, cachedNum, outputHar);
+            return undefined;
+        }
+        return value;
+    };
+
+    const pipeline = stream.pipeThrough(new TextDecoderStream());
+    const reader = pipeline.getReader();
+
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            parser.write(value);
+        }
+    } finally {
+        reader.releaseLock();
+    }
+}
+

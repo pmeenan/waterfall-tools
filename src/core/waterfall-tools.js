@@ -1,7 +1,9 @@
 import { identifyFormat, identifyFormatFromBuffer, parsers } from '../inputs/orchestrator.js';
+import { cleanupOrphans } from '../platforms/storage.js';
 
 export class WaterfallTools {
     constructor() {
+        this.instanceId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.floor(Math.random() * 1000000000).toString();
         this.data = {
             metadata: {},
             pages: {},
@@ -10,6 +12,18 @@ export class WaterfallTools {
             quic_connections: {},
             dns: {}
         };
+
+        // Fire asynchronous background cleanup garbage collecting orphaned lock processes cleanly
+        cleanupOrphans().catch(() => {});
+    }
+
+    /**
+     * Cleans up managed resources, dropping associated file handlers safely natively
+     */
+    async destroy() {
+        if (this.data && this.data._opfsStorage && typeof this.data._opfsStorage.destroy === 'function') {
+            await this.data._opfsStorage.destroy();
+        }
     }
 
     /**
@@ -33,6 +47,7 @@ export class WaterfallTools {
             throw new Error(`No parser registered for format: ${format}`);
         }
         
+        options.instanceId = this.instanceId;
         this.data = await parser(filePath, options);
         return this;
     }
@@ -54,6 +69,7 @@ export class WaterfallTools {
             throw new Error(`No parser registered for format: ${format}`);
         }
         
+        options.instanceId = this.instanceId;
         this.data = await parser(stream, options);
         return this;
     }
@@ -99,7 +115,7 @@ export class WaterfallTools {
         }
 
         const stream = new Blob([buf]).stream();
-        const streamOptions = { ...options, format };
+        const streamOptions = { ...options, format, instanceId: this.instanceId };
         if (isGz !== undefined) streamOptions.isGz = isGz;
         if (hasTraceEventsWrapper !== undefined) streamOptions.hasTraceEventsWrapper = hasTraceEventsWrapper;
 

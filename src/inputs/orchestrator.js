@@ -4,6 +4,7 @@ import { processCDPFileNode } from './cdp.js';
 import { processChromeTraceFileNode } from './chrome-trace.js';
 import { processNetlogFileNode } from './netlog.js';
 import { processTcpdumpNode } from './tcpdump.js';
+import { processWptagentZip } from './wptagent.js';
 
 export const parsers = {
     'har': processHARFileNode,
@@ -11,7 +12,8 @@ export const parsers = {
     'cdp': processCDPFileNode,
     'chrome-trace': processChromeTraceFileNode,
     'netlog': processNetlogFileNode,
-    'tcpdump': processTcpdumpNode
+    'tcpdump': processTcpdumpNode,
+    'wptagent': processWptagentZip
 };
 
 function isGzip(buf) {
@@ -151,6 +153,14 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
                 resolve(buf);
             }
         });
+    }
+
+    // Check for ZIP magic bytes (PK\x03\x04)
+    if (textBuf.length >= 4) {
+        const magic = readUint32BE(textBuf, 0);
+        if (magic === 0x504b0304) {
+            return { format: 'wptagent', isGz: false };
+        }
     }
 
     // Check for PCAP/PCAPNG magic bytes using DataView-free integer reads

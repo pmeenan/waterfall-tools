@@ -42,6 +42,7 @@ When working on this codebase, you must adhere to the following strict architect
 8. **Sample Assets Organization:**
    - Store all sample files for respective data formats cleanly partitioned within the `Sample/Data/` root (e.g., `Sample/Data/HAR/sourceA`, `Sample/Data/ChromeTrace/site1`).
    - If writing or utilizing reference parsing implementations (like exploratory Python scripts decoding specific unmapped formats), place them explicitly in `Sample/Implementations/` mapped by format folders inherently.
+   - **Wptagent Testing:** Note that `Sample/Data/wptagent/roadtrip-wptagent.zip` defines a comprehensive reference payload explicitly testing all currently collectable file types natively alongside multiplexed first & repeat view iterations securely.
 
 9. **Target Environments (Evergreen Browsers & Node):**
    - The minimal baseline for Javascript execution and Web API usage are the **latest stable versions of Chrome, Firefox, Safari, and Node.js**. 
@@ -99,7 +100,12 @@ When working on this codebase, you must adhere to the following strict architect
     - Standard Node modules (`fs`, `zlib`, `crypto`) are securely dynamically imported matching isolated backend targets effectively avoiding breaking native browser rollup configurations intrinsically inherently.
     - The frontend integration natively converts standard Browser `File` objects securely matching `Blob.stream()` cleanly immediately skipping any heavy Vite polyfill requirements previously needed natively.
 
-21. **Renderer Timestamp Mapping:**
+21. **Wptagent Formatting & OPFS Storage Contexts:**
+    - The new `wptagent` standard explicitly wraps massive traces (Netlogs, CDPs) alongside standard network requests securely packaged inside ZIP containers.
+    - Parsers MUST rigorously digest Zips utilizing the isolated `BrowserStorage` wrapper mapping universally to `Origin Private File System` (OPFS) and native `Web Locks API` bounds ensuring single-tab garbage collection prevents orphaned lock cascades naturally without utilizing Shared Workers.
+    - Currently, only the standard `testinfo.json` and `[run]_devtools_requests.json.gz` network elements unbox intrinsically. The unified `output.log._zipFiles` dynamically stores the extracted array payload denoting all untouched internal zip paths natively (e.g. `1_trace.json.gz`, `1_bodies.zip`) allowing downstream integrations or future AI Agents specifically seeking granular raw data elements (Trace events, image frames) native access securely directly from the persisted `_opfsStorage` buffer pointer later.
+
+22. **Renderer Timestamp Mapping:**
     - The Extended HAR standard explicitly leverages absolute ISO strings for `startedDateTime`. However, internal renderer states (like `canvas.js` drawing timelines) must strictly normalize all entry timings to **relative millisecond offsets** calculated off the earliest absolute `startedDateTime` in the entire collection. Failing to normalize to a zero-point relative index will cause `requestAnimationFrame` canvas loops calculating timestamp grids to iterate trillions of times, instantly crashing the browser tab.
     - **Crucially:** When synthesizing Chrome Traces utilizing `devtools.timeline` elements as a fallback (due to missing `netlog` configurations), standard `.ts` representations frequently encode absolute `CLOCK_MONOTONIC` system uptimes (e.g. `89,356,270,953` ms). Parsers MUST correctly extract the absolute minimum baseline `requestTime` globally and subtract it strictly from all bounds gracefully ensuring relative zero-indexing.
 
