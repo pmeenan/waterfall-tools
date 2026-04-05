@@ -11,6 +11,7 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
     let globalEarliestMs = Number.MAX_SAFE_INTEGER;
 
     if (harLog._id) data._id = harLog._id;
+    if (harLog._zipFiles) data._zipFiles = harLog._zipFiles;
 
     // Build pages
     if (harLog.pages && Array.isArray(harLog.pages)) {

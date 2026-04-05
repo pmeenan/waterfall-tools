@@ -1,4 +1,5 @@
 import { identifyFormat, identifyFormatFromBuffer, parsers } from '../inputs/orchestrator.js';
+import { ZipReader } from '../inputs/utilities/zip.js';
 import { cleanupOrphans } from '../platforms/storage.js';
 
 export class WaterfallTools {
@@ -258,6 +259,112 @@ export class WaterfallTools {
              delete req.body; // strip body specifically
         }
         return req;
+    }
+
+    /**
+     * Gets an Object URL or raw buffer for a specific raw asset dynamically (e.g., screenshot, trace).
+     * Automatically retrieves assets securely natively from HAR mapping or generic OPFS extraction instances securely.
+     * @param {string} pageId 
+     * @param {string} resourceType - 'screenshot', 'trace', 'netlog', 'tcpdump', 'lighthouse'
+     * @returns {Promise<{ url?: string, buffer?: Uint8Array, mimeType: string } | null>} 
+     */
+    async getPageResource(pageId, resourceType = 'screenshot') {
+        const pageData = this.getPage(pageId);
+        if (!pageData) {
+            console.warn(`[getPageResource] pageData not found for ${pageId}`);
+            return null;
+        }
+        
+        console.log(`[getPageResource] Evaluated mapping bounds for ${pageId} - Run: ${pageData._run}, Cached: ${pageData._cached}`);
+
+        if (resourceType === 'screenshot' && pageData._screenshot) {
+            const str = pageData._screenshot;
+            if (str.startsWith('data:image/')) {
+                return { url: str, mimeType: str.substring(5, str.indexOf(';')) };
+            } else {
+                const url = `data:image/jpeg;base64,${str}`;
+                return { url, mimeType: 'image/jpeg' };
+            }
+        }
+
+        if (!this.data._opfsStorage || !this.data._zipFiles) {
+            console.warn(`[getPageResource] Aborting: Missing _opfsStorage (${!!this.data._opfsStorage}) or _zipFiles (${!!this.data._zipFiles})`);
+            return null;
+        }
+
+        const runNum = pageData._run || '1';
+        const cachedStr = pageData._cached ? '_Cached' : '';
+
+        let targetFile = null;
+        let mimeType = 'application/octet-stream';
+
+        if (resourceType === 'screenshot') {
+            const jpgFile = `${runNum}${cachedStr}_screen.jpg`;
+            const pngFile = `${runNum}${cachedStr}_screen.png`;
+            console.log(`[getPageResource] Searching archive for '${jpgFile}' or '${pngFile}'`);
+            targetFile = this.data._zipFiles.find(f => f === jpgFile || f.endsWith(`/${jpgFile}`));
+            mimeType = 'image/jpeg';
+            if (!targetFile) {
+                targetFile = this.data._zipFiles.find(f => f === pngFile || f.endsWith(`/${pngFile}`));
+                if (targetFile) mimeType = 'image/png';
+            }
+            console.log(`[getPageResource] Found targetFile mapping natively:`, targetFile || 'null');
+        } else if (resourceType === 'trace') {
+            const traceFile = `${runNum}${cachedStr}_trace.json.gz`;
+            targetFile = this.data._zipFiles.find(f => f === traceFile || f.endsWith(`/${traceFile}`));
+            mimeType = 'application/json';
+        } else if (resourceType === 'netlog') {
+            const netlogFile = `${runNum}${cachedStr}_netlog.json.gz`;
+            targetFile = this.data._zipFiles.find(f => f === netlogFile || f.endsWith(`/${netlogFile}`));
+            mimeType = 'application/json';
+        } else if (resourceType === 'tcpdump') {
+            const pcapFile = `${runNum}${cachedStr}_tcpdump.cap.gz`;
+            targetFile = this.data._zipFiles.find(f => f === pcapFile || f.endsWith(`/${pcapFile}`));
+            mimeType = 'application/vnd.tcpdump.pcap';
+        } else if (resourceType === 'lighthouse') {
+            const lhFile = `${runNum}${cachedStr}_lighthouse.html`;
+            targetFile = this.data._zipFiles.find(f => f === lhFile || f.endsWith(`/${lhFile}`));
+            mimeType = 'text/html';
+        }
+
+        if (!targetFile) {
+            console.warn(`[getPageResource] Resource file not found in ZIP array for ${pageId}`);
+            return null;
+        }
+
+        const zip = new ZipReader(this.data._opfsStorage);
+        await zip.init();
+        console.log(`[getPageResource] zip init resolved. fetching stream for ${targetFile}`);
+        const stream = await zip.getFileStream(targetFile);
+        if (!stream) {
+            console.warn(`[getPageResource] getFileStream returned null for target: ${targetFile}`);
+            return null;
+        }
+
+        const reader = stream.getReader();
+        const chunks = [];
+        let totalLen = 0;
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            totalLen += value.length;
+        }
+        
+        if (typeof Blob !== 'undefined' && typeof URL !== 'undefined') {
+            const blob = new Blob(chunks, { type: mimeType });
+            return { url: URL.createObjectURL(blob), mimeType };
+        }
+        
+        const fullArr = new Uint8Array(totalLen);
+        let offset = 0;
+        for (const c of chunks) {
+            fullArr.set(c, offset);
+            offset += c.length;
+        }
+        
+        return { buffer: fullArr, mimeType };
     }
 
     /**

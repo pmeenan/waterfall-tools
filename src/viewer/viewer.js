@@ -20,6 +20,7 @@ const ui = {
 
 let waterfallTool = null;
 let rendererCanvas = null;
+let activeBlobUrls = [];
 
 function showLoading(text = 'Loading...') {
     ui.loadingText.textContent = text;
@@ -102,6 +103,9 @@ async function renderTiles(pushHistory = true) {
     ui.tileGrid.innerHTML = '';
     const pageKeys = Object.keys(waterfallTool.data.pages);
 
+    activeBlobUrls.forEach(url => URL.revokeObjectURL(url));
+    activeBlobUrls = [];
+
     for (const pageId of pageKeys) {
         const pageData = waterfallTool.getPage(pageId, { includeRequests: true });
         let bytesIn = pageData._bytesIn;
@@ -119,10 +123,34 @@ async function renderTiles(pushHistory = true) {
         const tile = document.createElement('div');
         tile.className = 'page-tile';
         
+        let imgUrl = null;
+        
+        try {
+            console.log(`[viewer.js] Requesting screenshot for ${pageId}...`);
+            const resource = await waterfallTool.getPageResource(pageId, 'screenshot');
+            console.log(`[viewer.js] Resource resolved for ${pageId}:`, resource ? resource.mimeType : 'null');
+            if (resource && resource.url) {
+                imgUrl = resource.url;
+                activeBlobUrls.push(imgUrl);
+            }
+        } catch (e) {
+            console.error(`[viewer.js] Failed to load screenshot for ${pageId}:`, e);
+        }
+
+        const topContainer = document.createElement('div');
+        topContainer.className = 'tile-top';
+        
+        const titleContainer = document.createElement('div');
+        titleContainer.className = 'tile-title';
+        titleContainer.innerHTML = `<h3>${pageData.title || pageData._URL || pageId}</h3>`;
+        topContainer.appendChild(titleContainer);
+
+        const splitBody = document.createElement('div');
+        splitBody.className = 'tile-split-body';
+
         const details = document.createElement('div');
         details.className = 'tile-details';
         details.innerHTML = `
-            <h3>${pageData.title || pageData._URL || pageId}</h3>
             <div class="tile-metrics">
                 ${getMetricItemHtml('Load Time', humanizeMs(pageData._loadTime))}
                 ${getMetricItemHtml('FCP', humanizeMs(pageData._firstContentfulPaint))}
@@ -132,11 +160,27 @@ async function renderTiles(pushHistory = true) {
                 ${getMetricItemHtml('Bytes', humanizeBytes(bytesIn))}
             </div>
         `;
-        tile.appendChild(details);
+        splitBody.appendChild(details);
 
+        if (imgUrl) {
+             const screenshotDiv = document.createElement('div');
+             screenshotDiv.className = 'tile-screenshot';
+             screenshotDiv.innerHTML = `<img src="${imgUrl}" alt="Screenshot">`;
+             splitBody.appendChild(screenshotDiv);
+             splitBody.classList.add('has-screenshot');
+             tile.classList.add('has-screenshot');
+        }
+
+        topContainer.appendChild(splitBody);
+
+        tile.appendChild(topContainer);
+
+        const thumbWrapper = document.createElement('div');
+        thumbWrapper.className = 'tile-thumbnail-wrapper';
         const thumbContainer = document.createElement('div');
         thumbContainer.className = 'tile-thumbnail';
-        tile.appendChild(thumbContainer);
+        thumbWrapper.appendChild(thumbContainer);
+        tile.appendChild(thumbWrapper);
 
         ui.tileGrid.appendChild(tile);
 

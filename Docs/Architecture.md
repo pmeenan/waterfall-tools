@@ -144,6 +144,9 @@ Example:
 }
 ```
 
+### Multi-File Archives & OPFS Integration
+When processing complex multi-asset packages natively encapsulating several files uniquely (e.g., `wptagent` ZIP archives chaining JSON traces, netlogs, and screenshots), parsers MUST mitigate memory bloat forcefully. The architecture seamlessly utilizes the Web **Origin Private File System (OPFS)** natively paired dynamically with the `Web Locks API`. This bridges native unzipped file assets precisely through `data._opfsStorage` and `data._zipFiles` boundaries inherently, granting the main library unified mechanisms (`getPageResource()`) to securely map isolated Blob URLs natively to images or raw string chunks efficiently dynamically on-demand, without permanently unpacking and exhausting available RAM natively.
+
 ## Rendering Engine
 The renderer uses the native HTML5 `<canvas>` API rather than the DOM (e.g., creating hundreds of `<div>` tags) to ensure that rendering thousands of requests doesn't cause browser layout trashing. The canvas engine is completely autonomous, instantiated against a parent container div where it utilizes native `ResizeObserver` instances to self-recalculate structural geometric bounds responsive to viewport changes perfectly. Interaction is handled by maintaining a spatial index of drawn elements and mapping mouse coordinates to data entries. Application logic overrides can be supplied via robust hook events system injected into the render core. It natively supports specialized rendering modes (e.g., **Connection View** for multiplexing visualization, or **Thumbnail View** for dense overviews) configurable via standard render option primitives. Since HAR files can natively contain multiple pages (such as First View and Repeat View runs from WebPageTest), the rendering engine assumes callers actively filter the global pool of request entries to specifically match only the single active page ID before passing them to the rendering loop natively.
 

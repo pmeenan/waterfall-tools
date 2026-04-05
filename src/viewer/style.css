@@ -345,10 +345,11 @@ body, html {
 }
 
 #tile-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1.5rem;
     padding: 2rem;
+    align-items: flex-start;
 }
 
 .page-tile {
@@ -361,6 +362,8 @@ body, html {
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
+    flex: 0 0 auto;
+    width: 280px;
 }
 
 .page-tile:hover {
@@ -369,26 +372,82 @@ body, html {
     border-color: var(--primary-color);
 }
 
+.page-tile.has-screenshot {
+    width: fit-content;
+    min-width: 520px;
+}
+
+@media (max-width: 640px) {
+    .page-tile.has-screenshot {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+.tile-thumbnail-wrapper {
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    background: #fff;
+    padding: 10px 0;
+}
+
 .tile-thumbnail {
     width: 100%;
+    max-width: 250px;
     height: auto;
     min-height: 100px;
-    background: #fff;
-    border-top: 1px solid var(--border-color);
 }
 
-.tile-details {
+.tile-top {
+    display: flex;
+    flex-direction: column;
+}
+
+.tile-title {
     padding: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-.tile-details h3 {
-    margin: 0 0 1rem 0;
+.tile-title h3 {
+    margin: 0;
     font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 0.5rem;
+}
+
+.tile-split-body {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.tile-details {
+    padding: 1rem;
+    flex: 0 0 auto;
+    width: 220px;
+    min-width: 0;
+}
+
+.tile-screenshot {
+    padding: 1rem;
+    padding-left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile-screenshot img {
+    max-width: 250px;
+    max-height: 250px;
+    object-fit: contain;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .tile-metrics {
@@ -398,9 +457,17 @@ body, html {
     font-size: 0.85rem;
 }
 
+.tile-split-body.has-screenshot .tile-metrics {
+    grid-template-columns: 1fr;
+}
+
 .metric-item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px dotted #e0e0e0;
+    padding: 2px 0;
 }
 
 .metric-label {

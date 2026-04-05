@@ -82,6 +82,20 @@ const wt = new WaterfallTools();
 await wt.loadUrl('https://example.com/trace.json.gz');
 ```
 
+### Retrieving Extracted Assets (Screenshots, Traces)
+
+The library provides an isomorphic abstraction to fetch unboxed files or embedded Base64 strings generically across Node.js (`{buffer}`) and Web Browsers (`{url}`). This securely prevents memory bloat by pulling assets specifically mapped off ZIP `_opfsStorage` architectures efficiently when needed rather than ballooning JSON state natively!
+
+```javascript
+// Automatically fetches `1_screen.jpg` extracted bounds mapping off `page_1_0_1` 
+// Can fetch 'screenshot', 'trace', 'netlog', 'lighthouse', etc.
+const resource = await wt.getPageResource('page_1_0_1', 'screenshot');
+if (resource) {
+    if (resource.url) console.log('Blob URL dynamically injected mapping to Image tags:', resource.url);
+    if (resource.buffer) console.log('Node.js UInt8Array extracted cleanly out of filesystem');
+}
+```
+
 ### Visualizing using the View Engine (Browser Context)
 
 ```javascript

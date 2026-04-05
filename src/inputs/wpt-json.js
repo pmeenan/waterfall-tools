@@ -65,7 +65,9 @@ function processWPTView(viewData, runStr, cachedNum, har) {
             onLoad: viewData.docTime !== undefined ? viewData.docTime : -1,
             onContentLoad: -1,
             _startRender: viewData.render !== undefined ? viewData.render : -1
-        }
+        },
+        _run: parseInt(runStr, 10),
+        _cached: cachedNum
     };
     
     const bloatNames = new Set([
