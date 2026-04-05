@@ -106,9 +106,13 @@ export async function processWptagentZip(input, options = {}) {
     const fileList = zip.getFileList();
     outputHar.log._zipFiles = fileList;
 
-    if (fileList.includes('testinfo.json')) {
-        const stream = await zip.getFileStream('testinfo.json');
+    const testinfoFile = fileList.includes('testinfo.json') ? 'testinfo.json' : (fileList.includes('testinfo.json.gz') ? 'testinfo.json.gz' : null);
+    if (testinfoFile) {
+        let stream = await zip.getFileStream(testinfoFile);
         if (stream) {
+            if (testinfoFile.endsWith('.gz') && typeof DecompressionStream !== 'undefined') {
+                stream = stream.pipeThrough(new DecompressionStream('gzip'));
+            }
             const pipeline = stream.pipeThrough(new TextDecoderStream());
             const reader = pipeline.getReader();
             let text = '';

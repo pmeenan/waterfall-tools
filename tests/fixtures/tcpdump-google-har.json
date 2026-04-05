@@ -1,0 +1,3556 @@
+{
+  "log": {
+    "version": "1.2",
+    "creator": {
+      "name": "waterfall-tools",
+      "version": "0.2.0"
+    },
+    "pages": [
+      {
+        "id": "page_0",
+        "title": "https://ogads-pa.clients6.google.com/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/GetAsyncData",
+        "startedDateTime": "SCRUBBED",
+        "pageTimings": {}
+      }
+    ],
+    "entries": [
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "strict-transport-security",
+              "value": "max-age=31536000"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            }
+          ],
+          "content": {
+            "size": 55479,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 55479
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_dnsTimeMs": 1774566229053.918,
+        "_dnsEndTimeMs": 1774566229054.3162,
+        "_connectTimeMs": 1774566229106.035,
+        "_connectEndTimeMs": 1774566229132.7441,
+        "_sslStartTimeMs": 1774566229106.035,
+        "_load_start": 122,
+        "_dns_start": 0,
+        "_dns_end": 0,
+        "_connect_start": 52,
+        "_connect_end": 78,
+        "_ssl_start": 52,
+        "_ssl_end": 122,
+        "_ttfb_start": 122,
+        "_ttfb_end": 122,
+        "_download_start": 122,
+        "_download_end": 138,
+        "_all_end": 138
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "content": {
+            "size": 1330,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 1330
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 238,
+        "_ttfb_start": 238,
+        "_ttfb_end": 238,
+        "_download_start": 238,
+        "_download_end": 238,
+        "_all_end": 238
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "content": {
+            "size": 365017,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 365017
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 264,
+        "_ttfb_start": 264,
+        "_ttfb_end": 264,
+        "_download_start": 264,
+        "_download_end": 434,
+        "_all_end": 434
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "content": {
+            "size": 660,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 660
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 383,
+        "_ttfb_start": 383,
+        "_ttfb_end": 383,
+        "_download_start": 383,
+        "_download_end": 383,
+        "_all_end": 383
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/googlesans/v29/4UaGrENHsxJlGDuGo1OIlL3Owp4.woff2",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "x-browser-channel",
+              "value": "stable"
+            },
+            {
+              "name": "x-browser-year",
+              "value": "2026"
+            },
+            {
+              "name": "x-browser-validation",
+              "value": "YNlkKoXhrvHWcL9Xp4lI0xxmtR8="
+            },
+            {
+              "name": "x-browser-copyright",
+              "value": "Copyright 2026 Google LLC. All Rights reserved."
+            },
+            {
+              "name": "x-client-data",
+              "value": "CN/4ygE="
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "font"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "priority",
+              "value": "u=0"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "access-control-allow-origin",
+              "value": "*"
+            },
+            {
+              "name": "server",
+              "value": "sffe"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "date",
+              "value": "Thu, 26 Mar 2026 13:38:29 GMT"
+            },
+            {
+              "name": "expires",
+              "value": "Fri, 26 Mar 2027 13:38:29 GMT"
+            },
+            {
+              "name": "timing-allow-origin",
+              "value": "*"
+            },
+            {
+              "name": "content-length",
+              "value": "15436"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "last-modified",
+              "value": "Mon, 16 Oct 2017 17:32:55 GMT"
+            },
+            {
+              "name": "content-type",
+              "value": "font/woff2"
+            },
+            {
+              "name": "date",
+              "value": "Thu, 26 Mar 2026 15:01:35 GMT"
+            },
+            {
+              "name": "content-length",
+              "value": "Fri, 26 Mar 2027 15:01:35 GMT"
+            },
+            {
+              "name": "cache-control",
+              "value": "public, max-age=31536000"
+            },
+            {
+              "name": "age",
+              "value": "28934"
+            },
+            {
+              "name": "last-modified",
+              "value": "Mon, 16 Oct 2017 17:33:12 GMT"
+            },
+            {
+              "name": "age",
+              "value": "126931"
+            },
+            {
+              "name": "last-modified",
+              "value": "Tue, 23 Feb 2021 01:47:39 GMT"
+            }
+          ],
+          "content": {
+            "size": 39516,
+            "mimeType": "font/woff2",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 39516
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c08:0:0:0:5e",
+        "connection": "2600:1900:4090:1d:0:1:0:0:46807-2607:f8b0:4004:c08:0:0:0:5e:443",
+        "_protocol": "QUIC",
+        "_load_start": 408,
+        "_ttfb_start": 408,
+        "_ttfb_end": 412,
+        "_download_start": 412,
+        "_download_end": 449,
+        "_all_end": 449
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmWUlfBBc4.woff2",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "x-browser-channel",
+              "value": "stable"
+            },
+            {
+              "name": "x-browser-year",
+              "value": "2026"
+            },
+            {
+              "name": "x-browser-validation",
+              "value": "YNlkKoXhrvHWcL9Xp4lI0xxmtR8="
+            },
+            {
+              "name": "x-browser-copyright",
+              "value": "Copyright 2026 Google LLC. All Rights reserved."
+            },
+            {
+              "name": "x-client-data",
+              "value": "CN/4ygE="
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "font"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "priority",
+              "value": "u=0"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "access-control-allow-origin",
+              "value": "*"
+            },
+            {
+              "name": "content-security-policy-report-only",
+              "value": "require-trusted-types-for 'script'; report-uri https://csp.withgoogle.com/csp/apps-themes"
+            },
+            {
+              "name": "cross-origin-resource-policy",
+              "value": "cross-origin"
+            },
+            {
+              "name": "cross-origin-opener-policy",
+              "value": "same-origin; report-to=\"apps-themes\""
+            },
+            {
+              "name": "report-to",
+              "value": "{\"group\":\"apps-themes\",\"max_age\":2592000,\"endpoints\":[{\"url\":\"https://csp.withgoogle.com/csp/report-to/apps-themes\"}]}"
+            },
+            {
+              "name": "timing-allow-origin",
+              "value": "*"
+            },
+            {
+              "name": "content-length",
+              "value": "15436"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "server",
+              "value": "sffe"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "date",
+              "value": "Thu, 26 Mar 2026 15:01:35 GMT"
+            },
+            {
+              "name": "content-length",
+              "value": "Fri, 26 Mar 2027 15:01:35 GMT"
+            },
+            {
+              "name": "cache-control",
+              "value": "public, max-age=31536000"
+            },
+            {
+              "name": "age",
+              "value": "28934"
+            },
+            {
+              "name": "last-modified",
+              "value": "Mon, 16 Oct 2017 17:33:12 GMT"
+            },
+            {
+              "name": "content-type",
+              "value": "font/woff2"
+            },
+            {
+              "name": "alt-svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "content": {
+            "size": 15436,
+            "mimeType": "font/woff2",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 15436
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c08:0:0:0:5e",
+        "connection": "2600:1900:4090:1d:0:1:0:0:46807-2607:f8b0:4004:c08:0:0:0:5e:443",
+        "_protocol": "QUIC",
+        "_load_start": 413,
+        "_ttfb_start": 413,
+        "_ttfb_end": 424,
+        "_download_start": 424,
+        "_download_end": 432,
+        "_all_end": 432
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "x-browser-channel",
+              "value": "stable"
+            },
+            {
+              "name": "x-browser-year",
+              "value": "2026"
+            },
+            {
+              "name": "x-browser-validation",
+              "value": "YNlkKoXhrvHWcL9Xp4lI0xxmtR8="
+            },
+            {
+              "name": "x-browser-copyright",
+              "value": "Copyright 2026 Google LLC. All Rights reserved."
+            },
+            {
+              "name": "x-client-data",
+              "value": "CN/4ygE="
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "font"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "priority",
+              "value": "u=0"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "access-control-allow-origin",
+              "value": "*"
+            },
+            {
+              "name": "last-modified",
+              "value": "Mon, 16 Oct 2017 17:32:55 GMT"
+            },
+            {
+              "name": "content-type",
+              "value": "font/woff2"
+            },
+            {
+              "name": "alt-svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            },
+            {
+              "name": "content-length",
+              "value": "39516"
+            },
+            {
+              "name": "timing-allow-origin",
+              "value": "*"
+            },
+            {
+              "name": "date",
+              "value": "Wed, 25 Mar 2026 11:48:18 GMT"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "Thu, 25 Mar 2027 11:48:18 GMT"
+            },
+            {
+              "name": "age",
+              "value": "126931"
+            },
+            {
+              "name": "last-modified",
+              "value": "Tue, 23 Feb 2021 01:47:39 GMT"
+            },
+            {
+              "name": "content-length",
+              "value": "15436"
+            },
+            {
+              "name": "cache-control",
+              "value": "public, max-age=31536000"
+            },
+            {
+              "name": "date",
+              "value": "Thu, 26 Mar 2026 15:01:35 GMT"
+            },
+            {
+              "name": "content-length",
+              "value": "Fri, 26 Mar 2027 15:01:35 GMT"
+            },
+            {
+              "name": "age",
+              "value": "28934"
+            },
+            {
+              "name": "last-modified",
+              "value": "Mon, 16 Oct 2017 17:33:12 GMT"
+            }
+          ],
+          "content": {
+            "size": 15344,
+            "mimeType": "font/woff2",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 15344
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c08:0:0:0:5e",
+        "connection": "2600:1900:4090:1d:0:1:0:0:46807-2607:f8b0:4004:c08:0:0:0:5e:443",
+        "_protocol": "QUIC",
+        "_dnsTimeMs": 1774566229328.6929,
+        "_dnsEndTimeMs": 1774566229329.9192,
+        "_connectTimeMs": 1774566229390.6838,
+        "_connectEndTimeMs": 1774566229402.98,
+        "_sslStartTimeMs": 1774566229390.6838,
+        "_load_start": 403,
+        "_dns_start": 274,
+        "_dns_end": 276,
+        "_connect_start": 336,
+        "_connect_end": 349,
+        "_ssl_start": 336,
+        "_ssl_end": 403,
+        "_ttfb_start": 403,
+        "_ttfb_end": 404,
+        "_download_start": 404,
+        "_download_end": 424,
+        "_all_end": 424
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.gstatic.com/og/_/js/k=og.asy.en_US.fh17Jb9Is2A.2019.O/rt=j/m=_ac,_awd,ada,lldp,qads,abld/exm=/d=1/ed=1/rs=AA2YrTuSzwr9n3ULMyPU3yXllcHG7SQxjA",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "x-browser-channel",
+              "value": "stable"
+            },
+            {
+              "name": "x-browser-year",
+              "value": "2026"
+            },
+            {
+              "name": "x-browser-validation",
+              "value": "YNlkKoXhrvHWcL9Xp4lI0xxmtR8="
+            },
+            {
+              "name": "x-browser-copyright",
+              "value": "Copyright 2026 Google LLC. All Rights reserved."
+            },
+            {
+              "name": "x-client-data",
+              "value": "CN/4ygE="
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "no-cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "script"
+            },
+            {
+              "name": "sec-fetch-storage-access",
+              "value": "active"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "content-security-policy-report-only",
+              "value": "require-trusted-types-for 'script'; report-uri https://csp.withgoogle.com/csp/one-google-eng"
+            },
+            {
+              "name": "cross-origin-resource-policy",
+              "value": "cross-origin"
+            },
+            {
+              "name": "cross-origin-opener-policy",
+              "value": "same-origin; report-to=\"one-google-eng\""
+            },
+            {
+              "name": "report-to",
+              "value": "{\"group\":\"one-google-eng\",\"max_age\":2592000,\"endpoints\":[{\"url\":\"https://csp.withgoogle.com/csp/report-to/one-google-eng\"}]}"
+            },
+            {
+              "name": "content-length",
+              "value": "81236"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "server",
+              "value": "sffe"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "date",
+              "value": "Mon, 23 Mar 2026 11:56:15 GMT"
+            },
+            {
+              "name": "expires",
+              "value": "Tue, 23 Mar 2027 11:56:15 GMT"
+            },
+            {
+              "name": "cache-control",
+              "value": "public, max-age=31536000"
+            },
+            {
+              "name": "last-modified",
+              "value": "Sun, 22 Mar 2026 01:34:12 GMT"
+            },
+            {
+              "name": "content-type",
+              "value": "text/javascript; charset=UTF-8"
+            },
+            {
+              "name": "vary",
+              "value": "Accept-Encoding, Origin"
+            },
+            {
+              "name": "age",
+              "value": "299254"
+            }
+          ],
+          "content": {
+            "size": 81236,
+            "mimeType": "text/javascript",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 81236
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c21:0:0:0:5e",
+        "connection": "2600:1900:4090:1d:0:1:0:0:40738-2607:f8b0:4004:c21:0:0:0:5e:443",
+        "_protocol": "TCP",
+        "_dnsTimeMs": 1774566229374.6282,
+        "_dnsEndTimeMs": 1774566229378.248,
+        "_connectTimeMs": 1774566229415.273,
+        "_connectEndTimeMs": 1774566229415.954,
+        "_sslStartTimeMs": 1774566229514.843,
+        "_load_start": 481,
+        "_dns_start": 320,
+        "_dns_end": 324,
+        "_connect_start": 361,
+        "_connect_end": 362,
+        "_ssl_start": 460,
+        "_ttfb_start": 481,
+        "_ttfb_end": 482,
+        "_download_start": 482,
+        "_download_end": 526,
+        "_all_end": 526
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.gstatic.com/og/_/ss/k=og.asy.td_rzgIyaAQ.L.W.O/m=ll_tdm,adcgm3,ll_fw,abld/excm=/d=1/ed=1/ct=zgms/rs=AA2YrTtoa50IX0QtFtEg6_eOzsn1KDMaLg",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "accept",
+              "value": "text/css,*/*;q=0.1"
+            },
+            {
+              "name": "x-browser-channel",
+              "value": "stable"
+            },
+            {
+              "name": "x-browser-year",
+              "value": "2026"
+            },
+            {
+              "name": "x-browser-validation",
+              "value": "YNlkKoXhrvHWcL9Xp4lI0xxmtR8="
+            },
+            {
+              "name": "x-browser-copyright",
+              "value": "Copyright 2026 Google LLC. All Rights reserved."
+            },
+            {
+              "name": "x-client-data",
+              "value": "CN/4ygE="
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "no-cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "style"
+            },
+            {
+              "name": "sec-fetch-storage-access",
+              "value": "active"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "priority",
+              "value": "u=4"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "content-security-policy-report-only",
+              "value": "require-trusted-types-for 'script'; report-uri https://csp.withgoogle.com/csp/one-google-eng"
+            },
+            {
+              "name": "cross-origin-resource-policy",
+              "value": "cross-origin"
+            },
+            {
+              "name": "cross-origin-opener-policy",
+              "value": "same-origin; report-to=\"one-google-eng\""
+            },
+            {
+              "name": "report-to",
+              "value": "{\"group\":\"one-google-eng\",\"max_age\":2592000,\"endpoints\":[{\"url\":\"https://csp.withgoogle.com/csp/report-to/one-google-eng\"}]}"
+            },
+            {
+              "name": "content-length",
+              "value": "1582"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "server",
+              "value": "sffe"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "date",
+              "value": "Sat, 21 Mar 2026 21:42:23 GMT"
+            },
+            {
+              "name": "expires",
+              "value": "Sun, 21 Mar 2027 21:42:23 GMT"
+            },
+            {
+              "name": "cache-control",
+              "value": "public, max-age=31536000"
+            },
+            {
+              "name": "last-modified",
+              "value": "Thu, 05 Mar 2026 02:28:38 GMT"
+            },
+            {
+              "name": "content-type",
+              "value": "text/css; charset=UTF-8"
+            },
+            {
+              "name": "vary",
+              "value": "Accept-Encoding, Origin"
+            },
+            {
+              "name": "age",
+              "value": "436886"
+            }
+          ],
+          "content": {
+            "size": 1582,
+            "mimeType": "text/css",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 1582
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c21:0:0:0:5e",
+        "connection": "2600:1900:4090:1d:0:1:0:0:40738-2607:f8b0:4004:c21:0:0:0:5e:443",
+        "_protocol": "TCP",
+        "_load_start": 594,
+        "_ttfb_start": 594,
+        "_ttfb_end": 596,
+        "_download_start": 596,
+        "_download_end": 596,
+        "_all_end": 596
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "strict-transport-security",
+              "value": "max-age=31536000"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            }
+          ],
+          "content": {
+            "size": 112,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 112
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 604,
+        "_ttfb_start": 604,
+        "_ttfb_end": 604,
+        "_download_start": 604,
+        "_download_end": 608,
+        "_all_end": 608
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-length",
+              "value": "0"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 646,
+        "_ttfb_start": 646,
+        "_ttfb_end": 646,
+        "_download_start": 646,
+        "_download_end": 648,
+        "_all_end": 648
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-length",
+              "value": "0"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 696,
+        "_ttfb_start": 696,
+        "_ttfb_end": 696,
+        "_download_start": 696,
+        "_download_end": 697,
+        "_all_end": 697
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-length",
+              "value": "0"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 916,
+        "_ttfb_start": 916,
+        "_ttfb_end": 916,
+        "_download_start": 916,
+        "_download_end": 916,
+        "_all_end": 916
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "content": {
+            "size": 40818,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 40818
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 996,
+        "_ttfb_start": 996,
+        "_ttfb_end": 996,
+        "_download_start": 996,
+        "_download_end": 1003,
+        "_all_end": 1003
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "content": {
+            "size": 1359,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 1359
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1003,
+        "_ttfb_start": 1003,
+        "_ttfb_end": 1003,
+        "_download_start": 1003,
+        "_download_end": 1003,
+        "_all_end": 1003
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "strict-transport-security",
+              "value": "max-age=31536000"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1021,
+        "_ttfb_start": 1021,
+        "_ttfb_end": 1021,
+        "_download_start": 1021,
+        "_download_end": 1021,
+        "_all_end": 1021
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "content": {
+            "size": 2159,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 2159
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1203,
+        "_ttfb_start": 1203,
+        "_ttfb_end": 1203,
+        "_download_start": 1203,
+        "_download_end": 1204,
+        "_all_end": 1204
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-length",
+              "value": "0"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1212,
+        "_ttfb_start": 1212,
+        "_ttfb_end": 1212,
+        "_download_start": 1212,
+        "_download_end": 1213,
+        "_all_end": 1213
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-length",
+              "value": "0"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1215,
+        "_ttfb_start": 1215,
+        "_ttfb_end": 1215,
+        "_download_start": 1215,
+        "_download_end": 1215,
+        "_all_end": 1215
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "strict-transport-security",
+              "value": "max-age=31536000"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            }
+          ],
+          "content": {
+            "size": 1899,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 1899
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1237,
+        "_ttfb_start": 1237,
+        "_ttfb_end": 1237,
+        "_download_start": 1237,
+        "_download_end": 1240,
+        "_all_end": 1240
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "strict-transport-security",
+              "value": "max-age=31536000"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            }
+          ],
+          "content": {
+            "size": 112,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 112
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1260,
+        "_ttfb_start": 1260,
+        "_ttfb_end": 1260,
+        "_download_start": 1260,
+        "_download_end": 1265,
+        "_all_end": 1265
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "content": {
+            "size": 358,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 358
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1273,
+        "_ttfb_start": 1273,
+        "_ttfb_end": 1273,
+        "_download_start": 1273,
+        "_download_end": 1273,
+        "_all_end": 1273
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "content": {
+            "size": 75680,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 75680
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1295,
+        "_ttfb_start": 1295,
+        "_ttfb_end": 1295,
+        "_download_start": 1295,
+        "_download_end": 1318,
+        "_all_end": 1318
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "content": {
+            "size": 54992,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 54992
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1305,
+        "_ttfb_start": 1305,
+        "_ttfb_end": 1305,
+        "_download_start": 1305,
+        "_download_end": 1329,
+        "_all_end": 1329
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-length",
+              "value": "0"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1379,
+        "_ttfb_start": 1379,
+        "_ttfb_end": 1379,
+        "_download_start": 1379,
+        "_download_end": 1380,
+        "_all_end": 1380
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.gstatic.com/images/branding/searchlogo/ico/favicon.ico",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "accept",
+              "value": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+            },
+            {
+              "name": "x-browser-channel",
+              "value": "stable"
+            },
+            {
+              "name": "x-browser-year",
+              "value": "2026"
+            },
+            {
+              "name": "x-browser-validation",
+              "value": "YNlkKoXhrvHWcL9Xp4lI0xxmtR8="
+            },
+            {
+              "name": "x-browser-copyright",
+              "value": "Copyright 2026 Google LLC. All Rights reserved."
+            },
+            {
+              "name": "x-client-data",
+              "value": "CN/4ygE="
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "no-cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "image"
+            },
+            {
+              "name": "sec-fetch-storage-access",
+              "value": "active"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "cross-origin-resource-policy",
+              "value": "cross-origin"
+            },
+            {
+              "name": "cross-origin-opener-policy-report-only",
+              "value": "same-origin; report-to=\"static-on-bigtable\""
+            },
+            {
+              "name": "report-to",
+              "value": "{\"group\":\"static-on-bigtable\",\"max_age\":2592000,\"endpoints\":[{\"url\":\"https://csp.withgoogle.com/csp/report-to/static-on-bigtable\"}]}"
+            },
+            {
+              "name": "content-length",
+              "value": "1345"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "content-encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "server",
+              "value": "sffe"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "date",
+              "value": "Sat, 21 Mar 2026 21:29:12 GMT"
+            },
+            {
+              "name": "expires",
+              "value": "Sun, 21 Mar 2027 21:29:12 GMT"
+            },
+            {
+              "name": "cache-control",
+              "value": "public, max-age=31536000"
+            },
+            {
+              "name": "last-modified",
+              "value": "Fri, 16 May 2025 22:08:00 GMT"
+            },
+            {
+              "name": "content-type",
+              "value": "image/x-icon"
+            },
+            {
+              "name": "vary",
+              "value": "Accept-Encoding"
+            },
+            {
+              "name": "age",
+              "value": "437678"
+            }
+          ],
+          "content": {
+            "size": 1345,
+            "mimeType": "image/x-icon",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 1345
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c21:0:0:0:5e",
+        "connection": "2600:1900:4090:1d:0:1:0:0:40738-2607:f8b0:4004:c21:0:0:0:5e:443",
+        "_protocol": "TCP",
+        "_load_start": 1475,
+        "_ttfb_start": 1475,
+        "_ttfb_end": 1476,
+        "_download_start": 1476,
+        "_download_end": 1477,
+        "_all_end": 1477
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/shared_dict/homepage/ad242c0172988d1d21e98287467bb858af0b9d28dca10cadf2824d2ab4004779.dict",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "downlink",
+              "value": "10"
+            },
+            {
+              "name": "sec-ch-ua-full-version-list",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146.0.0.0\", \"Google Chrome\";v=\"146.0.0.0\""
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "sec-ch-ua-bitness",
+              "value": "\"64\""
+            },
+            {
+              "name": "sec-ch-ua-model",
+              "value": "\"Model\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "sec-ch-ua-form-factors",
+              "value": "\"Desktop\""
+            },
+            {
+              "name": "sec-ch-ua-wow64",
+              "value": "?0"
+            },
+            {
+              "name": "sec-ch-ua-arch",
+              "value": "\"x86\""
+            },
+            {
+              "name": "sec-ch-ua-full-version",
+              "value": "\"146.0.7680.164\""
+            },
+            {
+              "name": "sec-ch-prefers-color-scheme",
+              "value": "light"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "rtt",
+              "value": "50"
+            },
+            {
+              "name": "sec-ch-ua-platform-version",
+              "value": "\"0\""
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "x-browser-channel",
+              "value": "stable"
+            },
+            {
+              "name": "x-browser-year",
+              "value": "2026"
+            },
+            {
+              "name": "x-browser-validation",
+              "value": "YNlkKoXhrvHWcL9Xp4lI0xxmtR8="
+            },
+            {
+              "name": "x-browser-copyright",
+              "value": "Copyright 2026 Google LLC. All Rights reserved."
+            },
+            {
+              "name": "x-client-data",
+              "value": "CN/4ygE="
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "same-origin"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "priority",
+              "value": "u=4, i"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "content-security-policy",
+              "value": "require-trusted-types-for 'script'; report-uri https://csp.withgoogle.com/csp/search-dictionary-policy"
+            },
+            {
+              "name": "cross-origin-resource-policy",
+              "value": "same-origin"
+            },
+            {
+              "name": "cross-origin-opener-policy",
+              "value": "same-origin; report-to=\"search-dictionary-policy\""
+            },
+            {
+              "name": "report-to",
+              "value": "{\"group\":\"search-dictionary-policy\",\"max_age\":2592000,\"endpoints\":[{\"url\":\"https://csp.withgoogle.com/csp/report-to/search-dictionary-policy\"}]}"
+            },
+            {
+              "name": "content-length",
+              "value": "47572"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "use-as-dictionary",
+              "value": "match=\"/*\""
+            },
+            {
+              "name": "server",
+              "value": "sffe"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "date",
+              "value": "Thu, 26 Mar 2026 19:42:16 GMT"
+            },
+            {
+              "name": "expires",
+              "value": "Fri, 26 Mar 2027 19:42:16 GMT"
+            },
+            {
+              "name": "cache-control",
+              "value": "public, max-age=31536000"
+            },
+            {
+              "name": "last-modified",
+              "value": "Sun, 01 Mar 2026 13:00:00 GMT"
+            },
+            {
+              "name": "content-type",
+              "value": "text/plain"
+            },
+            {
+              "name": "vary",
+              "value": "Accept-Encoding"
+            },
+            {
+              "name": "age",
+              "value": "12094"
+            },
+            {
+              "name": "alt-svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "content": {
+            "size": 47572,
+            "mimeType": "text/plain",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 47572
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:41242",
+        "_protocol": "QUIC",
+        "_connectTimeMs": 1774566230481.102,
+        "_connectEndTimeMs": 1774566230503.977,
+        "_sslStartTimeMs": 1774566230481.102,
+        "_load_start": 1473,
+        "_connect_start": 1427,
+        "_connect_end": 1450,
+        "_ssl_start": 1427,
+        "_ssl_end": 1473,
+        "_ttfb_start": 1473,
+        "_ttfb_end": 1475,
+        "_download_start": 1475,
+        "_download_end": 1500,
+        "_all_end": 1500
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "OPTIONS",
+          "url": "https://ogads-pa.clients6.google.com/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/GetAsyncData",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "access-control-request-method",
+              "value": "POST"
+            },
+            {
+              "name": "access-control-request-headers",
+              "value": "content-type,x-goog-api-key,x-user-agent"
+            },
+            {
+              "name": "origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "same-site"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "access-control-allow-origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "vary",
+              "value": "origin"
+            },
+            {
+              "name": "vary",
+              "value": "referer"
+            },
+            {
+              "name": "vary",
+              "value": "x-origin"
+            },
+            {
+              "name": "access-control-allow-credentials",
+              "value": "true"
+            },
+            {
+              "name": "access-control-allow-methods",
+              "value": "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT"
+            },
+            {
+              "name": "access-control-allow-headers",
+              "value": "content-type,x-goog-api-key,x-user-agent"
+            },
+            {
+              "name": "access-control-max-age",
+              "value": "3600"
+            },
+            {
+              "name": "date",
+              "value": "Thu, 26 Mar 2026 23:03:50 GMT"
+            },
+            {
+              "name": "content-type",
+              "value": "text/html"
+            },
+            {
+              "name": "server",
+              "value": "ESF"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "x-frame-options",
+              "value": "SAMEORIGIN"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "server-timing",
+              "value": "gfet4t7; dur=46"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "text/html",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c23:0:0:0:5f",
+        "connection": "2600:1900:4090:1d:0:1:0:0:56358-2607:f8b0:4004:c23:0:0:0:5f:443",
+        "_protocol": "TCP",
+        "_dnsTimeMs": 1774566230396.012,
+        "_dnsEndTimeMs": 1774566230399.363,
+        "_connectTimeMs": 1774566230457.649,
+        "_connectEndTimeMs": 1774566230458.2778,
+        "_sslStartTimeMs": 1774566230619.89,
+        "_load_start": 1588,
+        "_dns_start": 1342,
+        "_dns_end": 1345,
+        "_connect_start": 1403,
+        "_connect_end": 1404,
+        "_ssl_start": 1565,
+        "_ttfb_start": 1588,
+        "_ttfb_end": 1635,
+        "_download_start": 1635,
+        "_download_end": 1635,
+        "_all_end": 1635
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "POST",
+          "url": "https://ogads-pa.clients6.google.com/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/GetAsyncData",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-length",
+              "value": "78"
+            },
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyCbsbvGCe7C9mCtdaTycZB2eUFuzsYKG_E"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "x-user-agent",
+              "value": "grpc-web-javascript/0.1"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "content-type",
+              "value": "application/json+protobuf"
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "x-browser-channel",
+              "value": "stable"
+            },
+            {
+              "name": "x-browser-year",
+              "value": "2026"
+            },
+            {
+              "name": "x-browser-validation",
+              "value": "YNlkKoXhrvHWcL9Xp4lI0xxmtR8="
+            },
+            {
+              "name": "x-browser-copyright",
+              "value": "Copyright 2026 Google LLC. All Rights reserved."
+            },
+            {
+              "name": "x-client-data",
+              "value": "CN/4ygE="
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "same-site"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "cookie",
+              "value": "__Secure-STRP=AEEP7gIUWzSWoe4n-s-CQn5sqfyzAF9Vo7Srd22fVlnvsec_86WRsfYqcjoaEzIH4seNN8vP3Hze5bsB3xD376cm1sy9Kv-hpA"
+            },
+            {
+              "name": "cookie",
+              "value": "AEC=AaJma5v7u1lkjbEOp2Qfzlg1jqswDQRMsq6KnfcByYk-jmCdLvzjm2THv9Q"
+            },
+            {
+              "name": "cookie",
+              "value": "__Secure-BUCKET=CKwC"
+            },
+            {
+              "name": "cookie",
+              "value": "NID=530=euC5JoxwQLxT8zYU5gD-9KSiei7EWgY6iAPn1W6uRD3cntz-LkIRbdUg6C-4vF1ZngZINN8knj5N0ZDjBg4lL5EzEfYyNOGyFaMpLs8e2rlPm9GYJTEfey1SkHfjmJfOStI8TZn1pdKfwEK8tbTziA_Ra5gaYGFxCr6lA_dhIfkZjygr4qI74nPXTvIjrqm6JCbQXtDqqYSqAntwVPm1z1OfU30cutbhCxC5SAecR8RpAAW8xN8"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/json+protobuf; charset=UTF-8"
+            },
+            {
+              "name": "strict-transport-security",
+              "value": "max-age=10886400; includeSubdomains"
+            },
+            {
+              "name": "vary",
+              "value": "Origin"
+            },
+            {
+              "name": "vary",
+              "value": "X-Origin"
+            },
+            {
+              "name": "vary",
+              "value": "Referer"
+            },
+            {
+              "name": "content-encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "date",
+              "value": "Thu, 26 Mar 2026 23:03:50 GMT"
+            },
+            {
+              "name": "server",
+              "value": "ESF"
+            },
+            {
+              "name": "content-length",
+              "value": "30"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "x-frame-options",
+              "value": "SAMEORIGIN"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "access-control-allow-origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "access-control-allow-credentials",
+              "value": "true"
+            },
+            {
+              "name": "access-control-expose-headers",
+              "value": "x-google-eom,vary,vary,vary,content-encoding,date,server,content-length"
+            },
+            {
+              "name": "server-timing",
+              "value": "gfet4t7; dur=79"
+            }
+          ],
+          "content": {
+            "size": 285,
+            "mimeType": "application/json+protobuf",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 285
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c23:0:0:0:5f",
+        "connection": "2600:1900:4090:1d:0:1:0:0:56364-2607:f8b0:4004:c23:0:0:0:5f:443",
+        "_protocol": "TCP",
+        "_connectTimeMs": 1774566230714.333,
+        "_connectEndTimeMs": 1774566230714.9092,
+        "_sslStartTimeMs": 1774566230766.1382,
+        "_load_start": 1721,
+        "_connect_start": 1660,
+        "_connect_end": 1660,
+        "_ssl_start": 1712,
+        "_ttfb_start": 1721,
+        "_ttfb_end": 1801,
+        "_download_start": 1801,
+        "_download_end": 1801,
+        "_all_end": 1801
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "OPTIONS",
+          "url": "https://play.google.com/log?format=json&hasfast=true",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "access-control-request-method",
+              "value": "POST"
+            },
+            {
+              "name": "access-control-request-headers",
+              "value": "content-encoding,content-type"
+            },
+            {
+              "name": "origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "same-site"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "access-control-allow-origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "access-control-allow-methods",
+              "value": "GET, POST, OPTIONS"
+            },
+            {
+              "name": "access-control-max-age",
+              "value": "86400"
+            },
+            {
+              "name": "access-control-allow-credentials",
+              "value": "true"
+            },
+            {
+              "name": "access-control-allow-headers",
+              "value": "X-Playlog-Web,authorization,content-encoding,content-type,origin"
+            },
+            {
+              "name": "content-type",
+              "value": "text/plain; charset=UTF-8"
+            },
+            {
+              "name": "date",
+              "value": "Thu, 26 Mar 2026 23:03:51 GMT"
+            },
+            {
+              "name": "server",
+              "value": "Playlog"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "x-frame-options",
+              "value": "SAMEORIGIN"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "text/plain",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c25:0:0:0:8a",
+        "connection": "2600:1900:4090:1d:0:1:0:0:42948-2607:f8b0:4004:c25:0:0:0:8a:443",
+        "_protocol": "TCP",
+        "_dnsTimeMs": 1774566231382.2588,
+        "_dnsEndTimeMs": 1774566231387.879,
+        "_connectTimeMs": 1774566231415.89,
+        "_connectEndTimeMs": 1774566231416.444,
+        "_sslStartTimeMs": 1774566231469.795,
+        "_load_start": 2419,
+        "_dns_start": 2328,
+        "_dns_end": 2333,
+        "_connect_start": 2361,
+        "_connect_end": 2362,
+        "_ssl_start": 2415,
+        "_ttfb_start": 2419,
+        "_ttfb_end": 2500,
+        "_download_start": 2500,
+        "_download_end": 2500,
+        "_all_end": 2500
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "POST",
+          "url": "https://play.google.com/log?format=json&hasfast=true",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-length",
+              "value": "371"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "content-encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "content-type",
+              "value": "application/binary"
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "x-browser-channel",
+              "value": "stable"
+            },
+            {
+              "name": "x-browser-year",
+              "value": "2026"
+            },
+            {
+              "name": "x-browser-validation",
+              "value": "YNlkKoXhrvHWcL9Xp4lI0xxmtR8="
+            },
+            {
+              "name": "x-browser-copyright",
+              "value": "Copyright 2026 Google LLC. All Rights reserved."
+            },
+            {
+              "name": "x-client-data",
+              "value": "CN/4ygE="
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "same-site"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "cookie",
+              "value": "__Secure-STRP=AEEP7gIUWzSWoe4n-s-CQn5sqfyzAF9Vo7Srd22fVlnvsec_86WRsfYqcjoaEzIH4seNN8vP3Hze5bsB3xD376cm1sy9Kv-hpA"
+            },
+            {
+              "name": "cookie",
+              "value": "AEC=AaJma5v7u1lkjbEOp2Qfzlg1jqswDQRMsq6KnfcByYk-jmCdLvzjm2THv9Q"
+            },
+            {
+              "name": "cookie",
+              "value": "__Secure-BUCKET=CKwC"
+            },
+            {
+              "name": "cookie",
+              "value": "NID=530=euC5JoxwQLxT8zYU5gD-9KSiei7EWgY6iAPn1W6uRD3cntz-LkIRbdUg6C-4vF1ZngZINN8knj5N0ZDjBg4lL5EzEfYyNOGyFaMpLs8e2rlPm9GYJTEfey1SkHfjmJfOStI8TZn1pdKfwEK8tbTziA_Ra5gaYGFxCr6lA_dhIfkZjygr4qI74nPXTvIjrqm6JCbQXtDqqYSqAntwVPm1z1OfU30cutbhCxC5SAecR8RpAAW8xN8"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "access-control-allow-origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "cross-origin-resource-policy",
+              "value": "cross-origin"
+            },
+            {
+              "name": "access-control-allow-credentials",
+              "value": "true"
+            },
+            {
+              "name": "access-control-allow-headers",
+              "value": "X-Playlog-Web"
+            },
+            {
+              "name": "content-type",
+              "value": "text/plain; charset=UTF-8"
+            },
+            {
+              "name": "content-encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "date",
+              "value": "Thu, 26 Mar 2026 23:03:51 GMT"
+            },
+            {
+              "name": "server",
+              "value": "Playlog"
+            },
+            {
+              "name": "content-length",
+              "value": "131"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "x-frame-options",
+              "value": "SAMEORIGIN"
+            }
+          ],
+          "content": {
+            "size": 382,
+            "mimeType": "text/plain",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 382
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2607:f8b0:4004:c25:0:0:0:8a",
+        "connection": "2600:1900:4090:1d:0:1:0:0:42956-2607:f8b0:4004:c25:0:0:0:8a:443",
+        "_protocol": "TCP",
+        "_connectTimeMs": 1774566231574.0671,
+        "_connectEndTimeMs": 1774566231574.6282,
+        "_sslStartTimeMs": 1774566231624.9858,
+        "_load_start": 2579,
+        "_connect_start": 2520,
+        "_connect_end": 2520,
+        "_ssl_start": 2571,
+        "_ttfb_start": 2579,
+        "_ttfb_end": 2642,
+        "_download_start": 2642,
+        "_download_end": 2642,
+        "_all_end": 2642
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "http://169.254.169.254/computeMetadata/v1/?recursive=true&alt=json&wait_for_change=true&last_etag=8d643c09f4272d62&timeout_sec=60",
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Host",
+              "value": "169.254.169.254"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Go-http-client/1.1"
+            },
+            {
+              "name": "Metadata-Flavor",
+              "value": "Google"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Metadata-Flavor",
+              "value": "Google"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "ETag",
+              "value": "8d643c09f4272d62"
+            },
+            {
+              "name": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "Date",
+              "value": "Thu, 26 Mar 2026 23:03:52 GMT"
+            },
+            {
+              "name": "Server",
+              "value": "Metadata Server for VM"
+            },
+            {
+              "name": "Content-Length",
+              "value": "8464"
+            },
+            {
+              "name": "X-XSS-Protection",
+              "value": "0"
+            },
+            {
+              "name": "X-Frame-Options",
+              "value": "SAMEORIGIN"
+            }
+          ],
+          "content": {
+            "size": 8464,
+            "mimeType": "application/json",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 8464
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "10.20.0.3",
+        "connection": "10.20.0.3:48326-169.254.169.254:80",
+        "_protocol": "TCP",
+        "_connectTimeMs": null,
+        "_connectEndTimeMs": null,
+        "_sslStartTimeMs": 1774566232540.584,
+        "_load_start": 3532,
+        "_ssl_start": 3486,
+        "_ttfb_start": 3532,
+        "_ttfb_end": 3486,
+        "_download_start": 3486,
+        "_download_end": 3486,
+        "_all_end": 3486
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "http://169.254.169.254/computeMetadata/v1/?alt=json&last_etag=8d643c09f4272d62&recursive=true&timeout_sec=60&wait_for_change=true",
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Host",
+              "value": "169.254.169.254"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Go-http-client/1.1"
+            },
+            {
+              "name": "Metadata-Flavor",
+              "value": "Google"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Metadata-Flavor",
+              "value": "Google"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "ETag",
+              "value": "8d643c09f4272d62"
+            },
+            {
+              "name": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "Date",
+              "value": "Thu, 26 Mar 2026 23:03:54 GMT"
+            },
+            {
+              "name": "Server",
+              "value": "Metadata Server for VM"
+            },
+            {
+              "name": "Content-Length",
+              "value": "8464"
+            },
+            {
+              "name": "X-XSS-Protection",
+              "value": "0"
+            },
+            {
+              "name": "X-Frame-Options",
+              "value": "SAMEORIGIN"
+            }
+          ],
+          "content": {
+            "size": 8464,
+            "mimeType": "application/json",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 8464
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "10.20.0.3",
+        "connection": "10.20.0.3:48444-169.254.169.254:80",
+        "_protocol": "TCP",
+        "_connectTimeMs": null,
+        "_connectEndTimeMs": null,
+        "_sslStartTimeMs": 1774566234048.136,
+        "_load_start": 5040,
+        "_ssl_start": 4994,
+        "_ttfb_start": 5040,
+        "_ttfb_end": 4994,
+        "_download_start": 4994,
+        "_download_end": 4994,
+        "_all_end": 4994
+      }
+    ]
+  }
+}
