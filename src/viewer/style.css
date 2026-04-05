@@ -313,10 +313,29 @@ body, html {
     flex-direction: column;
 }
 
-#waterfall-view {
+.tabs-body {
     flex: 1;
+    position: relative;
+    width: 100%;
+}
+
+.tab-content {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
     overflow: auto;
     background: #ffffff;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.tab-content.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 2;
 }
 
 #btn-back-tiles, #btn-settings {

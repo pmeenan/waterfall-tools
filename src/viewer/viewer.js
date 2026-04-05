@@ -246,8 +246,10 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
     const waterfallTab = document.querySelector('.viewer-tab[data-tab-id="waterfall"]');
     if (waterfallTab) waterfallTab.classList.add('active');
-    ui.waterfallView.classList.remove('hidden');
-    if (ui.lighthouseView) ui.lighthouseView.classList.add('hidden');
+    
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    ui.waterfallView.classList.add('active');
+
     if (ui.tabLighthouse) ui.tabLighthouse.classList.add('hidden');
     if (ui.lighthouseFrame) ui.lighthouseFrame.src = 'about:blank';
 
@@ -497,15 +499,14 @@ async function initViewer() {
             tab.classList.add('active');
 
             const tabId = tab.dataset.tabId;
-            ui.waterfallView.classList.add('hidden');
-            if (ui.lighthouseView) ui.lighthouseView.classList.add('hidden');
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
 
             if (tabId === 'waterfall') {
-                ui.waterfallView.classList.remove('hidden');
+                ui.waterfallView.classList.add('active');
                 // Ensure canvas resizes properly if needed
                 if (rendererCanvas) window.dispatchEvent(new Event('resize'));
             } else if (tabId === 'lighthouse') {
-                if (ui.lighthouseView) ui.lighthouseView.classList.remove('hidden');
+                if (ui.lighthouseView) ui.lighthouseView.classList.add('active');
             }
         });
     }
