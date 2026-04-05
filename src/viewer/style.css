@@ -68,62 +68,148 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 4px dashed transparent;
     transition: all 0.2s ease;
-    background-color: #fafafa;
+    background-color: #f5f5f5;
 }
 
-#drop-zone.drag-active {
-    background-color: var(--drop-bg-active);
-    border-color: var(--primary-color);
-    box-shadow: inset 0 0 20px rgba(0, 102, 204, 0.1);
-}
-
-.upload-content {
-    text-align: center;
+.landing-content {
+    width: 90%;
+    max-width: 900px;
     padding: 3rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    border: 1px solid var(--border-color);
-    max-width: 400px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    text-align: center;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #ffffff, #f9f9f9);
+    z-index: 10;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
 }
 
-#drop-zone.drag-active .upload-content {
-    transform: scale(1.05);
-    box-shadow: 0 8px 24px rgba(0, 102, 204, 0.2);
+#drop-zone.drag-active .landing-content {
+    border: 2px dashed var(--primary-color);
+    background: #e9f5ff;
+    transform: scale(1.02);
+    box-shadow: 0 15px 40px rgba(0, 102, 204, 0.2);
+}
+
+.landing-content h2 {
+    font-size: 2.5rem;
+    color: #1a1a1a;
+    font-weight: 800;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.tagline {
+    font-size: 1.25rem;
+    color: #555;
+    margin-bottom: 2.5rem;
+}
+
+.features {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.featureCard {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    flex: 1;
+    text-align: left;
+    border: 1px solid var(--border-color);
+}
+
+.featureCard h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+.featureCard p {
+    color: #666;
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.upload-section {
+    background: #fafafa;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 2px dashed #ccc;
+    margin-bottom: 2rem;
+    transition: border-color 0.2s;
+}
+
+#drop-zone.drag-active .upload-section {
     border-color: var(--primary-color);
 }
 
-.upload-content svg {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+.upload-hint {
+    font-size: 1.1rem;
+    color: #444;
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
 }
 
-.upload-content h2 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.5rem;
-}
-
-.upload-content p {
-    color: #666;
-    margin: 0 0 1.5rem 0;
+.sub-hint {
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 1rem;
+    margin-bottom: 0;
 }
 
 #upload-btn {
+    padding: 14px 32px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    cursor: pointer;
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    border-radius: 8px;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 102, 204, 0.3);
 }
 
 #upload-btn:hover {
     background-color: var(--hover-color);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0, 102, 204, 0.4);
+}
+
+#upload-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 102, 204, 0.3);
+}
+
+.external-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.github-link {
+    text-decoration: none;
+    color: #fff;
+    background-color: #24292e;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+    display: inline-block;
+}
+
+.github-link:hover {
+    background-color: #000;
 }
 
 /* Structural Viewer */
@@ -131,12 +217,88 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
-    border-bottom: 1px solid var(--border-color);
+    background: #f5f7f9;
     padding: 0 1rem;
-    height: 50px;
+    padding-top: 8px; /* Room for tabs to touch bottom */
+    height: auto;
+    min-height: 48px;
     flex-shrink: 0;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border-bottom: 1px solid #ccc;
+    gap: 1rem;
+}
+
+.viewer-header.has-tabs {
+    align-items: flex-end; /* Align tabs to bottom border */
+}
+
+/* Tab Strip Styles */
+.tabs-container {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 4px;
+    /* Hide scrollbar for tabs */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.tabs-container::-webkit-scrollbar {
+    display: none;
+}
+
+.viewer-tab {
+    display: flex;
+    align-items: center;
+    background: #e0e4e8;
+    color: #555;
+    padding: 8px 16px;
+    border-radius: 6px 6px 0 0;
+    border: 1px solid transparent;
+    border-bottom: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+}
+
+.viewer-tab:hover {
+    background: #d4d8dc;
+}
+
+.viewer-tab.active {
+    background: #fff;
+    color: var(--primary-color);
+    border-color: #ccc;
+    font-weight: 600;
+    position: relative;
+    /* Overlay the bottom border of the header to make it look connected */
+    margin-bottom: -1px;
+    padding-bottom: 9px;
+    border-bottom: 1px solid #fff;
+}
+
+.tab-title {
+    margin-right: 4px;
+}
+
+.tab-close {
+    background: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0 0 0 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab-close:hover {
+    color: #d00;
 }
 
 .viewer-header h1 {
@@ -158,13 +320,14 @@ body, html {
 }
 
 #btn-back-tiles, #btn-settings {
-    background: transparent;
+    background: #fff;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 6px 12px;
     cursor: pointer;
     font-size: 0.9rem;
     transition: background 0.2s;
+    margin-bottom: 8px; /* align with tab baseline */
 }
 
 #btn-back-tiles:hover, #btn-settings:hover {

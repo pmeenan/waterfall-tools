@@ -14,34 +14,59 @@
 
     <!-- Upload fallback when no remote file is specified -->
     <div id="drop-zone" class="hidden">
-        <div class="upload-content">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
-            <h2>Drag & Drop File</h2>
-            <p>Select or drop a HAR, Netlog, Trace, PCAP, or JSON file</p>
-            <button id="upload-btn">Browse Files</button>
-            <input type="file" id="file-input" multiple class="hidden">
+        <div class="landing-content">
+            <h2>Waterfall Tools</h2>
+            <p class="tagline">The most advanced, client-side network request waterfall viewer.</p>
+            
+            <div class="features">
+                <div class="featureCard">
+                    <h3>High Performance Viewer</h3>
+                    <p>Designed with raw native canvas operations for frictionless, 60fps scrolling latency buffers across giant waterfalls.</p>
+                </div>
+                <div class="featureCard">
+                    <h3>Format Agnostic</h3>
+                    <p>Natively analyze <strong>HAR, WPT json, Chrome traces, Chrome netlogs, and tcpdump (.cap.gz)</strong> files automatically mapped to an Extended HAR format.</p>
+                </div>
+                <div class="featureCard">
+                    <h3>Embeddable Everywhere</h3>
+                    <p>Easily incorporate visualization capabilities into your own custom React apps, network dashboards, or external projects.</p>
+                </div>
+            </div>
+
+            <div class="upload-section">
+                <p class="upload-hint">Drag & Drop anywhere to load your files, or input them locally</p>
+                <input type="file" id="file-input" multiple class="hidden">
+                <button id="upload-btn">Select File(s)</button>
+                <p class="sub-hint">For tcpdump with TLS Decryption, select or drop both the <code>.cap.gz</code> and your SSL keylog file together.</p>
+            </div>
+
+            <div class="external-links">
+                <a href="https://github.com/pmeenan/waterfall-tools" target="_blank" class="github-link">
+                    View Project on GitHub
+                </a>
+            </div>
         </div>
     </div>
 
     <div id="tile-view" class="hidden">
         <header class="viewer-header">
-            <h1 id="tile-view-title">Network Trace Runs</h1>
+            <h1 id="tile-view-title">Page Selection</h1>
             <div style="width:30px"></div>
         </header>
         <div id="tile-grid"></div>
     </div>
 
     <div id="canvas-container" class="hidden">
-        <header class="viewer-header">
+        <header class="viewer-header has-tabs">
             <button id="btn-back-tiles" class="hidden">🔙 Back to Runs</button>
-            <h1 id="viewer-title">Waterfall Viewer</h1>
+            <div class="tabs-container" id="viewer-tabs">
+                <div class="viewer-tab active" data-tab-id="waterfall">
+                    <span id="viewer-title" class="tab-title">Waterfall</span>
+                </div>
+            </div>
             <button id="btn-settings">⚙️ Options</button>
         </header>
-        <div id="waterfall-view"></div>
+        <div id="waterfall-view" class="tab-content active"></div>
     </div>
 
     <div id="settings-overlay" class="hidden">

@@ -186,10 +186,10 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
             try {
                 const urlObj = new URL(pageUrl);
                 document.title = `Waterfall Viewer - ${urlObj.hostname}`;
-                ui.viewerTitle.textContent = `Waterfall Viewer - ${urlObj.hostname}`;
+                ui.viewerTitle.textContent = `Waterfall`;
             } catch (err) {
                 document.title = `Waterfall Viewer - ${pageUrl}`;
-                ui.viewerTitle.textContent = `Waterfall Viewer`;
+                ui.viewerTitle.textContent = `Waterfall`;
             }
         }
     }
