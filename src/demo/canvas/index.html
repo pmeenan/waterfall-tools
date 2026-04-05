@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+    <div id="interaction-status-bar" style="background: #333; color: white; padding: 5px 10px; font-family: sans-serif; font-size: 13px; text-align: center;">Latest Interaction: None</div>
     <div id="drop-zone">
         <h2>Waterfall Tools Canvas Viewer</h2>
         <p>Drag and drop supported network files here (e.g. HAR, WPT json, Chrome traces, .cap.gz tcpdump).</p>
@@ -15,8 +16,9 @@
         <button id="upload-btn">Select File(s)</button>
     </div>
     
-    <div id="sidebar" class="hidden">
-        <h3>Viewer Options</h3>
+    <div style="display: flex; flex: 1; overflow: hidden; width: 100%;">
+        <div id="sidebar" class="hidden">
+            <h3>Viewer Options</h3>
         <label>Page Select: 
             <select id="ui-page-select"></select>
         </label>
@@ -55,7 +57,8 @@
         </div>
     </div>
 
-    <div id="canvas-container"></div>
+        <div id="canvas-container"></div>
+    </div>
     <script type="module" src="./viewer.js"></script>
 </body>
 </html>

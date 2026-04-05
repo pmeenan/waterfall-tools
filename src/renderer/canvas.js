@@ -22,6 +22,10 @@ export class WaterfallCanvas {
         this.rawEntries = [];
         this.pageObj = null;
         this.pendingRender = null;
+        this.drawnRows = null;
+        this.lastHoveredIndex = null;
+        
+        this._bindEvents();
         
         this.resizeObserver = new ResizeObserver(() => {
             this._requestRender();
@@ -34,6 +38,98 @@ export class WaterfallCanvas {
         if (this.canvas.parentNode) {
             this.canvas.parentNode.removeChild(this.canvas);
         }
+    }
+
+    _bindEvents() {
+        this.canvas.addEventListener('mousemove', (e) => {
+            const target = this._getInteractionTarget(e.offsetX, e.offsetY);
+            let hoverChanged = false;
+            
+            if (target) {
+                if (this.lastHoveredIndex !== target.index) {
+                    this.lastHoveredIndex = target.index;
+                    hoverChanged = true;
+                }
+            } else {
+                if (this.lastHoveredIndex !== null) {
+                    this.lastHoveredIndex = null;
+                    hoverChanged = true;
+                }
+            }
+            
+            if (hoverChanged && typeof this.options.onHover === 'function') {
+                this.options.onHover(target ? { index: target.index, request: this.rawEntries[target.index] } : null);
+            }
+        });
+
+        this.canvas.addEventListener('mouseleave', () => {
+            if (this.lastHoveredIndex !== null) {
+                this.lastHoveredIndex = null;
+                if (typeof this.options.onHover === 'function') {
+                    this.options.onHover(null);
+                }
+            }
+        });
+
+        this.canvas.addEventListener('click', (e) => {
+            if (typeof this.options.onClick === 'function') {
+                const target = this._getInteractionTarget(e.offsetX, e.offsetY);
+                this.options.onClick(target ? { index: target.index, request: this.rawEntries[target.index] } : null);
+            }
+        });
+
+        this.canvas.addEventListener('dblclick', (e) => {
+            if (typeof this.options.onDoubleClick === 'function') {
+                const target = this._getInteractionTarget(e.offsetX, e.offsetY);
+                this.options.onDoubleClick(target ? { index: target.index, request: this.rawEntries[target.index] } : null);
+            }
+        });
+    }
+
+    _getInteractionTarget(x, y) {
+        if (!this.drawnRows || !this.drawnRows.rows || this.drawnRows.rows.length === 0) return null;
+
+        const dim = this.drawnRows.dimensions;
+        const rowHeight = this.options.thumbnailView ? 4 : 18;
+        const topOffset = this.drawnRows.rows[0].y1 > 35 ? 35 : 0;
+        const bottomY = dim.totalRows * rowHeight + rowHeight + topOffset;
+        
+        if (y < topOffset + rowHeight || y > bottomY) return null;
+
+        const baseStartMs = dim.baseMs || (this.drawnRows.rows.length > 0 ? this.drawnRows.rows[0].start : 0);
+        const xScaler = (ms) => Math.floor(dim.labelsWidth + (ms * dim.widthPerMs));
+
+        let hitRow = null;
+
+        // Iterate backwards to hit the topmost visual layer securely natively resolving overlapping coordinates
+        for (let i = this.drawnRows.rows.length - 1; i >= 0; i--) {
+            const row = this.drawnRows.rows[i];
+            
+            if (y >= row.y1 && y <= row.y2) {
+                if (!this.options.connectionView) {
+                    // Waterfall view: entire row stripe (label + empty space + bars) interacts uniformly
+                    hitRow = row;
+                    break;
+                } else {
+                    // Connection view: Constrain mapped hits physically bridging absolute drawing coordinates resolving empty grid offsets organically
+                    const minMs = Math.min(row.start || Number.MAX_SAFE_INTEGER, row.dnsStart || Number.MAX_SAFE_INTEGER, row.connectStart || Number.MAX_SAFE_INTEGER, row.sslStart || Number.MAX_SAFE_INTEGER, row.ttfbStart || Number.MAX_SAFE_INTEGER, row.downloadStart || Number.MAX_SAFE_INTEGER);
+                    const maxMs = Math.max(row.end || 0, row.dnsEnd || 0, row.connectEnd || 0, row.sslEnd || 0, row.ttfbEnd || 0, row.downloadEnd || 0);
+
+                    let barStartX = xScaler(minMs - baseStartMs) - 3; // padding for thin rects mapping safely
+                    let barEndX = xScaler(maxMs - baseStartMs) + 3;
+
+                    // Labels represent full origins in connection view; explicitly prevent interactive states there
+                    let isBarHit = (x >= barStartX && x <= barEndX);
+
+                    if (isBarHit) {
+                        hitRow = row;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return hitRow || null;
     }
 
     render(pageData) {
@@ -60,9 +156,9 @@ export class WaterfallCanvas {
             const canvasWidth = Math.max(minW, clientWidth);
             
             const layoutOptions = Object.assign({}, this.options, { page: this.pageData });
-            const { rows, dimensions, pageEvents } = Layout.calculateRows(this.rawEntries, canvasWidth, layoutOptions);
+            this.drawnRows = Layout.calculateRows(this.rawEntries, canvasWidth, layoutOptions);
             
-            this.draw(rows, dimensions, pageEvents);
+            this.draw(this.drawnRows.rows, this.drawnRows.dimensions, this.drawnRows.pageEvents);
         });
     }
 

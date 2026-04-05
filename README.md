@@ -124,6 +124,12 @@ console.log(defaultOptions);
 await wt.renderTo(containerElement, Object.assign({}, defaultOptions, { minWidth: 800 }));
 ```
 
+### Web Embedding (Superseding `div-embed.js`)
+
+The `WaterfallTools.renderTo(containerElement, options)` API is the standard and fully supported mechanism for embedding Waterfall Tools directly into any generic webpage. 
+
+By passing your target DOM container and your preferred options (which can include callbacks for interactivity), you can easily drop a robust, high-performance canvas-based waterfall directly into your own applications. This unified approach formally supersedes the need for any separate or legacy `div-embed.js` bootstrapping utilities.
+
 ## CLI Interface
 
 The package ships securely with a fully operational terminal interface automating the processing payloads down into their unified HAR outputs directly from your shell configurations.

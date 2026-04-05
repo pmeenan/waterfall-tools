@@ -148,6 +148,12 @@ export class WaterfallTools {
             const dnsMap = {}; // dns_id -> earliest request_id
             
             for (const [reqId, req] of Object.entries(page.requests)) {
+                // Ensure internal data map key matches specifically as interaction payload property natively
+                if (req.id !== undefined && req.id !== reqId) {
+                    req.srcId = req.id;
+                }
+                req.id = reqId;
+
                 if (req.connection_id && (!connectionMap[req.connection_id] || req.time_start < connectionMap[req.connection_id].time)) {
                     connectionMap[req.connection_id] = { id: reqId, time: req.time_start };
                 }

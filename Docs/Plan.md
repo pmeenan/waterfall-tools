@@ -54,9 +54,8 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Implement `src/outputs/simple-json.js` to boil down HAR data to an array of strictly simplified request objects suitable for generic JS usage.
 - [x] Create basic unit tests for the HAR input -> Simple JSON output pipeline.
 
-## Phase 5: Core Canvas Renderer (Browser Platform)
-**Goal:** Render a static waterfall chart to a canvas element utilizing the verified data fixtures from Phase 2.
-## Phase 5: Viewer Enhancements & Features (Completed)
+## Phase 5: Core Canvas Renderer & Viewer Enhancements (Browser Platform)
+**Goal:** Render a static waterfall chart to a canvas element and implement advanced visual features utilizing the verified data fixtures from Phase 2.
 - [x] Implement `src/renderer/layout.js` to calculate row heights, X-axis timestamps, scale distributions and standard WebPageTest color coding.
 - [x] Implement `src/renderer/canvas.js` to draw requests as cascading blocks on a provided `<canvas>`.
 - [x] Implement logic to leverage `requestAnimationFrame` ensuring efficient updates and redraws. 
@@ -78,30 +77,44 @@ This document breaks down the development of the Waterfall Tools library into in
   - [x] Waiting time rendering.
 
 ## Phase 6: Client Interactions
-**Goal:** Make the canvas waterfall interactive without using individual DOM elements.
-- [ ] Implement `src/renderer/interaction.js` to track mouse movements and click events over the active canvas.
-- [ ] Map active spatial indexes on screen to corresponding data representations behind the scenes to identify hovering dynamically.
-- [ ] Build customizable Hooks ("Hover", "Click") for host application overrides and tooltips.
-- [ ] Implement X-axis zooming (scaling time bounding) and conditional visibility filtering (e.g. selectively hiding 404s, domains).
+**Goal:** Make the canvas waterfall interactive without using individual DOM elements by extending the current `renderTo` API.
+- [x] Extend the current `WaterfallTools.renderTo` API to support callbacks (e.g., `options.onHover`, `options.onClick`, `options.onDoubleClick`) for interacting with the waterfall, instead of creating a separate interaction API.
+- [x] Focus interactions strictly on the requests part of the waterfall (not the areas outside of the requests like utilization graphs). However, clicks outside of the requests must still trigger interactions (e.g., returning a null request or empty state) so that any external UI or tooltips can be dismissed.
+- [x] Implement interaction state tracking so that callbacks only fire when the detail of the interaction has actually changed (e.g., hovering over a different request, clicking, double-clicking).
+- [x] Ensure hover notifications correctly send a 'leave' notification when the mouse moves off a request and the new hover location isn't over a new request (including when the mouse leaves the drawing container completely).
+- [x] Include the specific request ID (or full context) in the interaction payload in a form that can easily be used to extract further information about the request directly from `WaterfallTools`.
+- [x] Map active spatial indexes on screen to corresponding data representations behind the scenes to identify hovering dynamically.
+- [x] Update the canvas demo (`src/demo/canvas/`) to display the most recent interaction in a status bar across the top of the page to test and validate these API callbacks.
+- [x] Implement X-axis zooming (scaling time bounding) and conditional visibility filtering (e.g. selectively hiding 404s, domains).
 
 ## Phase 7: Website Embed Interfaces
 **Goal:** Easy drop-in architecture components into fully functioning generic webpages.
-- [ ] Implement `src/embed/div-embed.js` to accept a `<div id="target">` element and an Extended HAR object (or automated fetch URL proxy), automatically bootstrapping the canvas and binding relative interactions without external involvement.
-- [ ] Implement `src/embed/iframe-embed.js` parsing `window.location.search` for configuration data, query params representing data points, to subsequently render fully encapsulated visualizations inherently.
+- [x] Document the primary `WaterfallTools.renderTo(canvasElement, options)` API as the standard mechanism for web embedding, formally superseding the need for a targeted `div-embed.js` bootstrapping utility.
 
-## Phase 8: Environment Adapters & Image Generation
+## Phase 8: Stand-alone Viewer UI
+**Goal:** Create a full stand-alone viewer UI that functions independently via a main HTML page or embedded in an iframe.
+- [ ] Create a main HTML page (`src/viewer/index.html` or similar) for the stand-alone viewer.
+- [ ] Implement query parameter parsing to accept a `src` parameter containing the URL for a data file to load.
+- [ ] If a `src` is provided, display a loading UI to provide feedback while fetching data, transitioning directly into the waterfall view once processed.
+- [ ] If no `src` is provided, display a UI similar to the canvas demo allowing users to load a file manually via an input button or drag/drop.
+- [ ] Architect the UI starting with a simple canvas rendering of the waterfall, keeping the structure flexible enough for future feature expansions.
+- [ ] Map all supported Waterfall renderer options to individual query parameters so they can be explicitly configured via URL.
+- [ ] Ensure the HTML page operates correctly both as a completely stand-alone viewer (served over HTTP or loaded from a local `file://` URI) and when embedded inside an iframe.
+- [ ] Expose a JavaScript API from the viewer so that when embedded in an iframe, the hosting page can programmatically "load" data (using any supported loading method) and have the UI run seamlessly as if the file was loaded natively via the `src` parameter.
+
+## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.
 - [ ] Add explicit platform abstraction definitions within `src/platforms/`.
 - [ ] Prepare Node integrations targeting offscreen canvas or node-canvas counterparts.
 - [ ] Implement `src/outputs/image.js` to digest render data straight into raw image buffer sets / Base64 serialization outputs snapshotting views.
 - [ ] Implement `src/outputs/thumbnail.js` for scaled-down structural representations equivalent to complete image generation maps.
 
-## Phase 9: Headless External Viewers Extension
+## Phase 10: Headless External Viewers Extension
 **Goal:** Expose compatibility channels sending intermediate payloads accurately directly into alternative rendering viewers.
 - [ ] Engineer wrapper bridging in `src/embed/external/perfetto.js` pushing Extended HAR representations uniformly into Perfetto UI layers.
 - [ ] Connect structured HAR objects appropriately into hosted versions matching embedded Chrome DevTools network tab ingestion format guidelines.
 
-## Phase 10: Filmstrip View Integration (Future Roadmap)
+## Phase 11: Filmstrip View Integration (Future Roadmap)
 **Goal:** Construct visual timestamp representations displaying exact render screenshots above waterfall requests over time.
 - [ ] Add explicit intermediary references coupling standard timeline moments to image frames natively into standard HAR output objects.
 - [ ] Bootstrap `src/filmstrip/` interfaces configured to inject array bundles composing individual images or trace screenshots efficiently.

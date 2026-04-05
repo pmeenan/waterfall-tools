@@ -6,6 +6,18 @@ const fileInput = document.getElementById('file-input');
 const uploadBtn = document.getElementById('upload-btn');
 const canvasContainer = document.getElementById('canvas-container');
 const uiSidebar = document.getElementById('sidebar');
+const statusBar = document.getElementById('interaction-status-bar');
+
+function updateStatus(type, payload) {
+    if (!payload) {
+        statusBar.textContent = `Latest Interaction: ${type} (None)`;
+        return;
+    }
+    const idx = payload.index !== undefined ? payload.index : '?';
+    const reqId = payload.request.id !== undefined ? payload.request.id : '?';
+    const url = payload.request.url ? payload.request.url.substring(0, 60) + (payload.request.url.length > 60 ? '...' : '') : 'unknown';
+    statusBar.textContent = `Latest Interaction: ${type} | Index: ${idx} | ID: ${reqId} | URL: ${url}`;
+}
 
 const uiPageSelect = document.getElementById('ui-page-select');
 const uiViewType = document.getElementById('ui-view-type');
@@ -142,7 +154,10 @@ async function processFiles(files) {
                 showChunks: uiShowChunks.checked,
                 showJsTiming: uiShowJs.checked,
                 showWait: uiShowWait.checked,
-                showLegend: !uiThumbView.checked
+                showLegend: !uiThumbView.checked,
+                onHover: (payload) => updateStatus('Hover', payload),
+                onClick: (payload) => updateStatus('Click', payload),
+                onDoubleClick: (payload) => updateStatus('DoubleClick', payload)
             };
         };
 
@@ -223,4 +238,14 @@ document.body.addEventListener('drop', (e) => {
     dragCounter = 0;
     dropZone.classList.remove('drag-active');
     processFiles(e.dataTransfer.files);
+});
+
+uploadBtn.addEventListener('click', () => {
+    fileInput.click();
+});
+
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        processFiles(e.target.files);
+    }
 });
