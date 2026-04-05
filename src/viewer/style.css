@@ -338,6 +338,22 @@ body, html {
     z-index: 2;
 }
 
+#trace-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+#trace-overlay-content {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    font-family: var(--font-stack);
+}
+
 #btn-back-tiles, #btn-settings {
     background: #fff;
     border: 1px solid var(--border-color);

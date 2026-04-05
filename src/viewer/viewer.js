@@ -19,12 +19,68 @@ const ui = {
     tabLighthouse: document.getElementById('tab-lighthouse'),
     lighthouseView: document.getElementById('lighthouse-view'),
     lighthouseFrame: document.getElementById('lighthouse-frame'),
+    tabTrace: document.getElementById('tab-trace'),
+    traceView: document.getElementById('trace-view'),
+    traceFrame: document.getElementById('trace-frame'),
+    traceOverlay: document.getElementById('trace-overlay'),
+    traceOverlayContent: document.getElementById('trace-overlay-content'),
     viewerTabs: document.getElementById('viewer-tabs')
 };
 
 let waterfallTool = null;
 let rendererCanvas = null;
 let activeBlobUrls = [];
+let pendingTabLoads = {};
+
+function loadTracePerfetto(traceBuffer) {
+    ui.traceOverlay.style.display = 'flex';
+    ui.traceOverlayContent.innerText = 'Loading Trace Viewer...';
+    
+    if (ui.traceFrame.src === 'about:blank' || !ui.traceFrame.src) {
+        ui.traceFrame.src = 'https://ui.perfetto.dev';
+    }
+
+    const ORIGIN = 'https://ui.perfetto.dev';
+    let loaded = false;
+    let pingInterval;
+
+    const onMessage = (e) => {
+        if (e.origin !== ORIGIN) return;
+        if (e.data === 'PONG') {
+            if (!loaded) {
+                loaded = true;
+                clearInterval(pingInterval);
+                ui.traceOverlayContent.innerText = 'Loading Trace Data...';
+                ui.traceFrame.contentWindow.postMessage({
+                    perfetto: {
+                        buffer: traceBuffer,
+                        title: 'WaterfallTools Trace'
+                    }
+                }, ORIGIN);
+                
+                setTimeout(() => {
+                    ui.traceOverlay.style.display = 'none';
+                    window.removeEventListener('message', onMessage);
+                }, 200);
+            }
+        }
+    };
+    
+    window.addEventListener('message', onMessage);
+
+    pingInterval = setInterval(() => {
+        if (ui.traceFrame && ui.traceFrame.contentWindow) {
+            ui.traceFrame.contentWindow.postMessage('PING', ORIGIN);
+        }
+    }, 500);
+
+    const onLoad = () => {
+        if (ui.traceFrame && ui.traceFrame.contentWindow && !loaded) {
+            ui.traceFrame.contentWindow.postMessage('PING', ORIGIN);
+        }
+    };
+    ui.traceFrame.addEventListener('load', onLoad, { once: true });
+}
 
 function showLoading(text = 'Loading...') {
     ui.loadingText.textContent = text;
@@ -250,18 +306,35 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     ui.waterfallView.classList.add('active');
 
+    pendingTabLoads = {};
     if (ui.tabLighthouse) ui.tabLighthouse.classList.add('hidden');
     if (ui.lighthouseFrame) ui.lighthouseFrame.src = 'about:blank';
+    if (ui.tabTrace) ui.tabTrace.classList.add('hidden');
+    if (ui.traceFrame) ui.traceFrame.src = 'about:blank';
 
     try {
         const lhResource = await waterfallTool.getPageResource(pageId, 'lighthouse');
         if (lhResource && lhResource.url && ui.tabLighthouse) {
             ui.tabLighthouse.classList.remove('hidden');
-            ui.lighthouseFrame.src = lhResource.url;
             activeBlobUrls.push(lhResource.url);
+            pendingTabLoads.lighthouse = () => {
+                ui.lighthouseFrame.src = lhResource.url;
+            };
         }
     } catch (e) {
         console.warn(`[viewer.js] Failed to fetch lighthouse HTML for ${pageId}:`, e);
+    }
+    
+    try {
+        const traceResource = await waterfallTool.getPageResource(pageId, 'trace');
+        if (traceResource && traceResource.buffer && ui.tabTrace) {
+            ui.tabTrace.classList.remove('hidden');
+            pendingTabLoads.trace = () => {
+                loadTracePerfetto(traceResource.buffer);
+            };
+        }
+    } catch (e) {
+        console.warn(`[viewer.js] Failed to fetch trace data for ${pageId}:`, e);
     }
 
     rendererCanvas = await waterfallTool.renderTo(ui.waterfallView, renderOptions);
@@ -507,6 +580,16 @@ async function initViewer() {
                 if (rendererCanvas) window.dispatchEvent(new Event('resize'));
             } else if (tabId === 'lighthouse') {
                 if (ui.lighthouseView) ui.lighthouseView.classList.add('active');
+                if (pendingTabLoads.lighthouse) {
+                    pendingTabLoads.lighthouse();
+                    delete pendingTabLoads.lighthouse;
+                }
+            } else if (tabId === 'trace') {
+                if (ui.traceView) ui.traceView.classList.add('active');
+                if (pendingTabLoads.trace) {
+                    pendingTabLoads.trace();
+                    delete pendingTabLoads.trace;
+                }
             }
         });
     }

@@ -120,6 +120,9 @@ export class WaterfallTools {
         if (isGz !== undefined) streamOptions.isGz = isGz;
         if (hasTraceEventsWrapper !== undefined) streamOptions.hasTraceEventsWrapper = hasTraceEventsWrapper;
 
+        this._sourceFormat = format;
+        this._rawBuffer = buf.buffer; // Store ArrayBuffer
+
         return await this.loadStream(stream, streamOptions);
     }
 
@@ -293,6 +296,11 @@ export class WaterfallTools {
             return { url, mimeType: 'text/html' };
         }
 
+        if (resourceType === 'trace' && this._sourceFormat === 'chrome-trace' && this._rawBuffer) {
+            const blob = new Blob([this._rawBuffer], { type: 'application/json' });
+            return { url: URL.createObjectURL(blob), mimeType: 'application/json', buffer: this._rawBuffer };
+        }
+
         if (!this.data._opfsStorage || !this.data._zipFiles) {
             console.warn(`[getPageResource] Aborting: Missing _opfsStorage (${!!this.data._opfsStorage}) or _zipFiles (${!!this.data._zipFiles})`);
             return null;
@@ -368,16 +376,16 @@ export class WaterfallTools {
             totalLen += value.length;
         }
         
-        if (typeof Blob !== 'undefined' && typeof URL !== 'undefined') {
-            const blob = new Blob(chunks, { type: mimeType });
-            return { url: URL.createObjectURL(blob), mimeType };
-        }
-        
         const fullArr = new Uint8Array(totalLen);
         let offset = 0;
         for (const c of chunks) {
             fullArr.set(c, offset);
             offset += c.length;
+        }
+        
+        if (typeof Blob !== 'undefined' && typeof URL !== 'undefined') {
+            const blob = new Blob([fullArr], { type: mimeType });
+            return { url: URL.createObjectURL(blob), mimeType, buffer: fullArr.buffer };
         }
         
         return { buffer: fullArr, mimeType };

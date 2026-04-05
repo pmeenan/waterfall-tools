@@ -66,6 +66,9 @@
                 <div class="viewer-tab hidden" data-tab-id="lighthouse" id="tab-lighthouse">
                     <span class="tab-title">Lighthouse</span>
                 </div>
+                <div class="viewer-tab hidden" data-tab-id="trace" id="tab-trace">
+                    <span class="tab-title">Trace</span>
+                </div>
             </div>
             <button id="btn-settings">⚙️ Options</button>
         </header>
@@ -73,6 +76,14 @@
             <div id="waterfall-view" class="tab-content active"></div>
             <div id="lighthouse-view" class="tab-content" style="background: #fff;">
                 <iframe id="lighthouse-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+            <div id="trace-view" class="tab-content" style="background: #fff;">
+                <div id="trace-overlay">
+                    <div id="trace-overlay-content">
+                        Loading Trace Viewer...
+                    </div>
+                </div>
+                <iframe id="trace-frame" style="width: 100%; height: 100%; border: none;"></iframe>
             </div>
         </div>
     </div>
