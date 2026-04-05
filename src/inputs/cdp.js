@@ -1,3 +1,4 @@
+import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 import { normalizeWPT } from './wpt-json.js';
 
 const PRIORITY_MAP = {
@@ -767,7 +768,7 @@ export async function processCDPFileNode(input, options = {}) {
         if (options.debug) console.log(`[cdp.js] Successfully normalized CDP to HAR.`);
         data.log.creator.name = "waterfall-tools (devtools)";
         
-        const { buildWaterfallDataFromHar } = await import('../core/har-converter.js');
+        // Use statically imported buildWaterfallDataFromHar
         const relational = buildWaterfallDataFromHar(data.log, 'cdp');
         
         const pageKeys = Object.keys(relational.pages);

@@ -566,9 +566,14 @@ export class WaterfallCanvas {
                 if (sConn < sConnEnd) this.drawBar(sConn, sConnEnd, stateY1, stateY2, row.colors.connect, true);
                 if (sSsl < sSslEnd) this.drawBar(sSsl, sSslEnd, stateY1, stateY2, row.colors.ssl, true);
                 
-                // TTFB block (specifically limited to TTFB duration natively without expanding)
-                if (sTtfb < sTtfbEnd) {
-                    this.drawBar(sTtfb, sTtfbEnd, barY1, barY2, row.colors.ttfb, true);
+                // TTFB block
+                let ttfbDrawEnd = sTtfbEnd;
+                if (!this.options.connectionView) {
+                    ttfbDrawEnd = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
+                }
+                
+                if (sTtfb < ttfbDrawEnd) {
+                    this.drawBar(sTtfb, ttfbDrawEnd, barY1, barY2, row.colors.ttfb, true);
                 }
             });
 
@@ -658,38 +663,35 @@ export class WaterfallCanvas {
                     let minMs = row.downloadStart - baseStartMs;
                     let maxBw = dimensions.maxBw || 0;
                     
-                    if (maxBw > 0) {
-                        row.chunks.forEach(chunk => {
-                            if (chunk.ts !== undefined) {
-                                let cTs = chunk.ts;
-                                if (cTs > 1000000000000) cTs -= baseStartMs;
-                                else cTs -= (this.options.startTime ? this.options.startTime * 1000 : 0);
-                                
-                                let startMs = cTs;
-                                if (chunk.bytes !== undefined) {
-                                    const chunkTime = chunk.bytes / (maxBw / 8.0);
-                                    if (chunkTime > 0) startMs -= chunkTime;
-                                }
-                                
-                                startMs = Math.max(minMs, startMs);
-                                cTs = Math.max(startMs, cTs);
-                                
-                                const chunkStartX = xScaler(startMs);
-                                const chunkEndX = xScaler(cTs);
-                                this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
-                            }
-                        });
-                    } else {
-                        let firstChunkTs = minMs;
-                        if (row.chunks[0].ts !== undefined) {
-                            let cTs = row.chunks[0].ts;
+                    row.chunks.forEach(chunk => {
+                        if (chunk.ts !== undefined) {
+                            let cTs = chunk.ts;
                             if (cTs > 1000000000000) cTs -= baseStartMs;
-                            firstChunkTs = Math.max(minMs, cTs);
+                            else cTs -= (this.options.startTime ? this.options.startTime * 1000 : 0);
+                            
+                            let startMs = cTs;
+                            if (maxBw > 0 && chunk.bytes !== undefined) {
+                                // dimensions.maxBw represents Kbps organically from WPT inputs
+                                const maxBwBps = maxBw * 1000.0;
+                                // chunkTime natively calculates seconds correctly derived from Mbps wire limits
+                                const chunkTime = (chunk.bytes / (maxBwBps / 8.0)) * 1000.0;
+                                if (chunkTime > 0) startMs -= chunkTime;
+                            }
+                            
+                            startMs = Math.max(minMs, startMs);
+                            cTs = Math.max(startMs, cTs);
+                            
+                            const chunkStartX = xScaler(startMs);
+                            let chunkEndX = xScaler(cTs);
+                            
+                            // Emulate legacy 1px fallback if bandwidth implies instantaneous (maxBw == 0 or infinitesimally small rendering gaps)
+                            if (chunkEndX - chunkStartX < 1) {
+                                chunkEndX = chunkStartX + 1;
+                            }
+                            
+                            this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
                         }
-                        const chunkStartX = xScaler(firstChunkTs);
-                        const chunkEndX = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
-                        this.drawBar(chunkStartX, chunkEndX, barY1, barY2, row.colors.download, true);
-                    }
+                    });
                 }
                 
                 // 7. Request timing label

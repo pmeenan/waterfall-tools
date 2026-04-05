@@ -1,4 +1,6 @@
 import { Netlog, normalizeNetlogToHAR } from './netlog.js';
+import { buildWaterfallDataFromHar } from '../core/har-converter.js';
+
 const PRIORITY_MAP = {
     "VeryHigh": "Highest",
     "HIGHEST": "Highest",
@@ -436,7 +438,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
         
         if (options.debug) console.log(`[chrome-trace.js] Finished applying HAR generation successfully.`);
         
-        const { buildWaterfallDataFromHar } = await import('../core/har-converter.js');
+        // Use statically imported buildWaterfallDataFromHar
         return buildWaterfallDataFromHar(har.log, 'chrome-trace');
 
     } catch (e) {

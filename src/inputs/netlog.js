@@ -1329,7 +1329,7 @@ export async function processNetlogFileNode(input, options = {}) {
         if (options.debug) console.log(`[netlog.js] Successfully normalized Netlog data. Evaluated ${requests.length} valid requests.`);
         const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, start_time);
         
-        const { buildWaterfallDataFromHar } = await import('../core/har-converter.js');
+        // Use statically imported buildWaterfallDataFromHar
         return buildWaterfallDataFromHar(har.log, 'netlog');
 
     } catch (e) {

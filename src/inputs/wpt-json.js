@@ -464,3 +464,65 @@ export async function processWPTFlatStreamNode(input, runStr, cachedNum, outputH
     }
 }
 
+export function formatWptUtilization(rawUtilization, bwDown = 0) {
+    const stdUtil = {};
+    for (const uKey of Object.keys(rawUtilization)) {
+        const uVal = rawUtilization[uKey];
+        let dataDict = null;
+        let maxVal = 1;
+        
+        if (Array.isArray(uVal) && uVal.length >= 2 && typeof uVal[0] === 'object' && !Array.isArray(uVal[0])) {
+            dataDict = uVal[0];
+            maxVal = Math.max(1, parseFloat(uVal[1]) || 1);
+        } else if (uVal && typeof uVal === 'object' && uVal.data && typeof uVal.data === 'object') {
+            dataDict = uVal.data;
+            maxVal = Math.max(1, parseFloat(uVal.max) || 1);
+        }
+        
+        if (dataDict) {
+            const arr = [];
+            let rawPts = Object.entries(dataDict).map(([k, v]) => ({ ts: parseFloat(k), val: parseFloat(v) }));
+            rawPts.sort((a, b) => a.ts - b.ts);
+            
+            if (uKey === 'bw') {
+                const wireBps = bwDown * 1000.0;
+                const limit = wireBps > 0 ? wireBps : maxVal;
+                
+                let intervalMs = 100;
+                if (rawPts.length > 1) {
+                    intervalMs = rawPts[1].ts - rawPts[0].ts;
+                    if (intervalMs <= 0) intervalMs = 100;
+                }
+                
+                if (wireBps > 0) {
+                    for (let i = rawPts.length - 1; i >= 0; i--) {
+                        if (rawPts[i].val > limit) {
+                            let excess = rawPts[i].val - limit;
+                            rawPts[i].val = limit;
+                            if (i > 0) {
+                                rawPts[i-1].val += excess;
+                            } else {
+                                rawPts.unshift({ ts: rawPts[0].ts - intervalMs, val: excess });
+                                i++;
+                            }
+                        }
+                    }
+                    maxVal = limit;
+                }
+            }
+            
+            for (const pt of rawPts) {
+                const pct = (pt.val / maxVal) * 100.0;
+                arr.push([pt.ts, pct]);
+            }
+            
+            arr.max = maxVal;
+            stdUtil[uKey] = arr;
+            stdUtil[uKey + 'Max'] = maxVal;
+        } else {
+            stdUtil[uKey] = uVal;
+        }
+    }
+    return stdUtil;
+}
+
