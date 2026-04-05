@@ -672,178 +672,7 @@
       },
       {
         "startedDateTime": "2026-03-27T21:36:33.949Z",
-        "time": 80,
-        "pageref": "page_4",
-        "request": {
-          "method": "GET",
-          "url": "https://www.gstatic.com/og/_/js/k=og.asy.en_US.fh17Jb9Is2A.2019.O/rt=j/m=_ac,_awd,ada,lldp,qads,abld/exm=/d=1/ed=1/rs=AA2YrTuSzwr9n3ULMyPU3yXllcHG7SQxjA",
-          "httpVersion": "HTTP/2",
-          "cookies": [],
-          "headers": [
-            {
-              "name": "Host",
-              "value": "www.gstatic.com"
-            },
-            {
-              "name": "User-Agent",
-              "value": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0"
-            },
-            {
-              "name": "Accept",
-              "value": "*/*"
-            },
-            {
-              "name": "Accept-Language",
-              "value": "en-US,en;q=0.5"
-            },
-            {
-              "name": "Accept-Encoding",
-              "value": "gzip, deflate, br, zstd"
-            },
-            {
-              "name": "Referer",
-              "value": "https://www.google.com/"
-            },
-            {
-              "name": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "name": "Sec-Fetch-Dest",
-              "value": "script"
-            },
-            {
-              "name": "Sec-Fetch-Mode",
-              "value": "no-cors"
-            },
-            {
-              "name": "Sec-Fetch-Site",
-              "value": "cross-site"
-            }
-          ],
-          "queryString": [],
-          "headersSize": -1,
-          "bodySize": -1
-        },
-        "response": {
-          "status": 200,
-          "statusText": "",
-          "httpVersion": "HTTP/2",
-          "cookies": [],
-          "headers": [
-            {
-              "name": "accept-ranges",
-              "value": "bytes"
-            },
-            {
-              "name": "content-encoding",
-              "value": "gzip"
-            },
-            {
-              "name": "content-security-policy-report-only",
-              "value": "require-trusted-types-for 'script'; report-uri https://csp.withgoogle.com/csp/one-google-eng"
-            },
-            {
-              "name": "cross-origin-resource-policy",
-              "value": "cross-origin"
-            },
-            {
-              "name": "cross-origin-opener-policy",
-              "value": "same-origin; report-to=\"one-google-eng\""
-            },
-            {
-              "name": "report-to",
-              "value": "{\"group\":\"one-google-eng\",\"max_age\":2592000,\"endpoints\":[{\"url\":\"https://csp.withgoogle.com/csp/report-to/one-google-eng\"}]}"
-            },
-            {
-              "name": "content-length",
-              "value": "81236"
-            },
-            {
-              "name": "x-content-type-options",
-              "value": "nosniff"
-            },
-            {
-              "name": "server",
-              "value": "sffe"
-            },
-            {
-              "name": "x-xss-protection",
-              "value": "0"
-            },
-            {
-              "name": "date",
-              "value": "Mon, 23 Mar 2026 11:35:42 GMT"
-            },
-            {
-              "name": "expires",
-              "value": "Tue, 23 Mar 2027 11:35:42 GMT"
-            },
-            {
-              "name": "cache-control",
-              "value": "public, max-age=31536000"
-            },
-            {
-              "name": "last-modified",
-              "value": "Sun, 22 Mar 2026 01:34:12 GMT"
-            },
-            {
-              "name": "content-type",
-              "value": "text/javascript; charset=UTF-8"
-            },
-            {
-              "name": "vary",
-              "value": "Accept-Encoding, Origin"
-            },
-            {
-              "name": "age",
-              "value": "381652"
-            },
-            {
-              "name": "alt-svc",
-              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
-            },
-            {
-              "name": "X-Firefox-Spdy",
-              "value": "h2"
-            }
-          ],
-          "content": {
-            "size": 223260,
-            "mimeType": "text/javascript; charset=UTF-8",
-            "compression": 0
-          },
-          "redirectURL": "",
-          "headersSize": -1,
-          "bodySize": 223260
-        },
-        "cache": {},
-        "timings": {
-          "dns": 14,
-          "connect": -1,
-          "ssl": -1,
-          "send": 0,
-          "wait": 45,
-          "receive": 21
-        },
-        "serverIPAddress": "142.251.16.94",
-        "connection": "443",
-        "_chunks": [],
-        "_securityState": "secure",
-        "_dnsTimeMs": 1774647393949,
-        "_dnsEndTimeMs": 1774647393963,
-        "_load_start": 111,
-        "_dns_start": 111,
-        "_dns_end": 125,
-        "_ttfb_start": 111,
-        "_ttfb_end": 156,
-        "_download_start": 156,
-        "_download_end": 177,
-        "_all_end": 177
-      },
-      {
-        "startedDateTime": "2026-03-27T21:36:33.949Z",
-        "time": 39,
+        "time": 52,
         "pageref": "page_4",
         "request": {
           "method": "GET",
@@ -998,7 +827,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 32,
+          "wait": 45,
           "receive": 7
         },
         "serverIPAddress": "172.253.115.94",
@@ -1007,14 +836,14 @@
         "_securityState": "secure",
         "_load_start": 111,
         "_ttfb_start": 111,
-        "_ttfb_end": 143,
-        "_download_start": 143,
-        "_download_end": 150,
-        "_all_end": 150
+        "_ttfb_end": 156,
+        "_download_start": 156,
+        "_download_end": 163,
+        "_all_end": 163
       },
       {
         "startedDateTime": "2026-03-27T21:36:33.953Z",
-        "time": 41,
+        "time": 92,
         "pageref": "page_4",
         "request": {
           "method": "POST",
@@ -1185,7 +1014,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 41,
+          "wait": 92,
           "receive": 0
         },
         "serverIPAddress": "142.251.111.141",
@@ -1194,10 +1023,181 @@
         "_securityState": "secure",
         "_load_start": 115,
         "_ttfb_start": 115,
-        "_ttfb_end": 156,
-        "_download_start": 156,
-        "_download_end": 156,
-        "_all_end": 156
+        "_ttfb_end": 207,
+        "_download_start": 207,
+        "_download_end": 207,
+        "_all_end": 207
+      },
+      {
+        "startedDateTime": "2026-03-27T21:36:33.949Z",
+        "time": 142,
+        "pageref": "page_4",
+        "request": {
+          "method": "GET",
+          "url": "https://www.gstatic.com/og/_/js/k=og.asy.en_US.fh17Jb9Is2A.2019.O/rt=j/m=_ac,_awd,ada,lldp,qads,abld/exm=/d=1/ed=1/rs=AA2YrTuSzwr9n3ULMyPU3yXllcHG7SQxjA",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Host",
+              "value": "www.gstatic.com"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0"
+            },
+            {
+              "name": "Accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-US,en;q=0.5"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "Referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "script"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "no-cors"
+            },
+            {
+              "name": "Sec-Fetch-Site",
+              "value": "cross-site"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "content-security-policy-report-only",
+              "value": "require-trusted-types-for 'script'; report-uri https://csp.withgoogle.com/csp/one-google-eng"
+            },
+            {
+              "name": "cross-origin-resource-policy",
+              "value": "cross-origin"
+            },
+            {
+              "name": "cross-origin-opener-policy",
+              "value": "same-origin; report-to=\"one-google-eng\""
+            },
+            {
+              "name": "report-to",
+              "value": "{\"group\":\"one-google-eng\",\"max_age\":2592000,\"endpoints\":[{\"url\":\"https://csp.withgoogle.com/csp/report-to/one-google-eng\"}]}"
+            },
+            {
+              "name": "content-length",
+              "value": "81236"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "server",
+              "value": "sffe"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "date",
+              "value": "Mon, 23 Mar 2026 11:35:42 GMT"
+            },
+            {
+              "name": "expires",
+              "value": "Tue, 23 Mar 2027 11:35:42 GMT"
+            },
+            {
+              "name": "cache-control",
+              "value": "public, max-age=31536000"
+            },
+            {
+              "name": "last-modified",
+              "value": "Sun, 22 Mar 2026 01:34:12 GMT"
+            },
+            {
+              "name": "content-type",
+              "value": "text/javascript; charset=UTF-8"
+            },
+            {
+              "name": "vary",
+              "value": "Accept-Encoding, Origin"
+            },
+            {
+              "name": "age",
+              "value": "381652"
+            },
+            {
+              "name": "alt-svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            },
+            {
+              "name": "X-Firefox-Spdy",
+              "value": "h2"
+            }
+          ],
+          "content": {
+            "size": 223260,
+            "mimeType": "text/javascript; charset=UTF-8",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 223260
+        },
+        "cache": {},
+        "timings": {
+          "dns": 14,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 107,
+          "receive": 21
+        },
+        "serverIPAddress": "142.251.16.94",
+        "connection": "443",
+        "_chunks": [],
+        "_securityState": "secure",
+        "_dnsTimeMs": 1774647393949,
+        "_dnsEndTimeMs": 1774647393963,
+        "_load_start": 111,
+        "_dns_start": 111,
+        "_dns_end": 125,
+        "_ttfb_start": 111,
+        "_ttfb_end": 218,
+        "_download_start": 218,
+        "_download_end": 239,
+        "_all_end": 239
       },
       {
         "startedDateTime": "2026-03-27T21:36:33.970Z",
@@ -2390,7 +2390,7 @@
       },
       {
         "startedDateTime": "2026-03-27T21:36:34.101Z",
-        "time": 34,
+        "time": 93,
         "pageref": "page_4",
         "request": {
           "method": "OPTIONS",
@@ -2553,7 +2553,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 34,
+          "wait": 93,
           "receive": 0
         },
         "serverIPAddress": "142.251.111.95",
@@ -2562,10 +2562,10 @@
         "_securityState": "secure",
         "_load_start": 263,
         "_ttfb_start": 263,
-        "_ttfb_end": 297,
-        "_download_start": 297,
-        "_download_end": 297,
-        "_all_end": 297
+        "_ttfb_end": 356,
+        "_download_start": 356,
+        "_download_end": 356,
+        "_all_end": 356
       },
       {
         "startedDateTime": "2026-03-27T21:36:34.105Z",
@@ -3412,7 +3412,7 @@
       },
       {
         "startedDateTime": "2026-03-27T21:36:34.155Z",
-        "time": 15,
+        "time": 16,
         "pageref": "page_4",
         "request": {
           "method": "POST",
@@ -3551,7 +3551,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 15,
+          "wait": 16,
           "receive": 0
         },
         "serverIPAddress": "142.251.151.119",
@@ -3560,14 +3560,14 @@
         "_securityState": "secure",
         "_load_start": 317,
         "_ttfb_start": 317,
-        "_ttfb_end": 332,
-        "_download_start": 332,
-        "_download_end": 332,
-        "_all_end": 332
+        "_ttfb_end": 333,
+        "_download_start": 333,
+        "_download_end": 333,
+        "_all_end": 333
       },
       {
         "startedDateTime": "2026-03-27T21:36:34.157Z",
-        "time": 14,
+        "time": 19,
         "pageref": "page_4",
         "request": {
           "method": "POST",
@@ -3706,7 +3706,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 14,
+          "wait": 19,
           "receive": 0
         },
         "serverIPAddress": "142.251.151.119",
@@ -3715,14 +3715,14 @@
         "_securityState": "secure",
         "_load_start": 319,
         "_ttfb_start": 319,
-        "_ttfb_end": 333,
-        "_download_start": 333,
-        "_download_end": 333,
-        "_all_end": 333
+        "_ttfb_end": 338,
+        "_download_start": 338,
+        "_download_end": 338,
+        "_all_end": 338
       },
       {
         "startedDateTime": "2026-03-27T21:36:34.158Z",
-        "time": 32,
+        "time": 37,
         "pageref": "page_4",
         "request": {
           "method": "GET",
@@ -3869,7 +3869,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 32,
+          "wait": 37,
           "receive": 0
         },
         "serverIPAddress": "142.251.151.119",
@@ -3878,10 +3878,10 @@
         "_securityState": "secure",
         "_load_start": 320,
         "_ttfb_start": 320,
-        "_ttfb_end": 352,
-        "_download_start": 352,
-        "_download_end": 352,
-        "_all_end": 352
+        "_ttfb_end": 357,
+        "_download_start": 357,
+        "_download_end": 357,
+        "_all_end": 357
       },
       {
         "startedDateTime": "2026-03-27T21:36:34.163Z",
@@ -6433,6 +6433,165 @@
         "_all_end": 539
       },
       {
+        "startedDateTime": "2026-03-27T21:36:35.100Z",
+        "time": 84,
+        "pageref": "page_4",
+        "request": {
+          "method": "OPTIONS",
+          "url": "https://play.google.com/log?format=json&hasfast=true",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Host",
+              "value": "play.google.com"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0"
+            },
+            {
+              "name": "Accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-US,en;q=0.5"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "Access-Control-Request-Method",
+              "value": "POST"
+            },
+            {
+              "name": "Access-Control-Request-Headers",
+              "value": "content-encoding,content-type"
+            },
+            {
+              "name": "Referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "Origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "empty"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "cors"
+            },
+            {
+              "name": "Sec-Fetch-Site",
+              "value": "same-site"
+            },
+            {
+              "name": "Priority",
+              "value": "u=4"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "access-control-allow-origin",
+              "value": "https://www.google.com"
+            },
+            {
+              "name": "access-control-allow-methods",
+              "value": "GET, POST, OPTIONS"
+            },
+            {
+              "name": "access-control-max-age",
+              "value": "86400"
+            },
+            {
+              "name": "access-control-allow-credentials",
+              "value": "true"
+            },
+            {
+              "name": "access-control-allow-headers",
+              "value": "X-Playlog-Web,authorization,content-encoding,content-type,origin"
+            },
+            {
+              "name": "content-type",
+              "value": "text/plain; charset=UTF-8"
+            },
+            {
+              "name": "date",
+              "value": "Fri, 27 Mar 2026 21:36:35 GMT"
+            },
+            {
+              "name": "server",
+              "value": "Playlog"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            },
+            {
+              "name": "x-xss-protection",
+              "value": "0"
+            },
+            {
+              "name": "x-frame-options",
+              "value": "SAMEORIGIN"
+            },
+            {
+              "name": "alt-svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            },
+            {
+              "name": "X-Firefox-Spdy",
+              "value": "h2"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "text/plain; charset=UTF-8",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 84,
+          "receive": 0
+        },
+        "serverIPAddress": "142.251.167.139",
+        "connection": "443",
+        "_chunks": [],
+        "_securityState": "secure",
+        "_load_start": 1262,
+        "_ttfb_start": 1262,
+        "_ttfb_end": 1346,
+        "_download_start": 1346,
+        "_download_end": 1346,
+        "_all_end": 1346
+      },
+      {
         "startedDateTime": "2026-03-27T21:36:35.099Z",
         "time": 57,
         "pageref": "page_4",
@@ -6602,165 +6761,6 @@
         "_download_start": 1305,
         "_download_end": 1305,
         "_all_end": 1305
-      },
-      {
-        "startedDateTime": "2026-03-27T21:36:35.100Z",
-        "time": 29,
-        "pageref": "page_4",
-        "request": {
-          "method": "OPTIONS",
-          "url": "https://play.google.com/log?format=json&hasfast=true",
-          "httpVersion": "HTTP/2",
-          "cookies": [],
-          "headers": [
-            {
-              "name": "Host",
-              "value": "play.google.com"
-            },
-            {
-              "name": "User-Agent",
-              "value": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0"
-            },
-            {
-              "name": "Accept",
-              "value": "*/*"
-            },
-            {
-              "name": "Accept-Language",
-              "value": "en-US,en;q=0.5"
-            },
-            {
-              "name": "Accept-Encoding",
-              "value": "gzip, deflate, br, zstd"
-            },
-            {
-              "name": "Access-Control-Request-Method",
-              "value": "POST"
-            },
-            {
-              "name": "Access-Control-Request-Headers",
-              "value": "content-encoding,content-type"
-            },
-            {
-              "name": "Referer",
-              "value": "https://www.google.com/"
-            },
-            {
-              "name": "Origin",
-              "value": "https://www.google.com"
-            },
-            {
-              "name": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "name": "Sec-Fetch-Dest",
-              "value": "empty"
-            },
-            {
-              "name": "Sec-Fetch-Mode",
-              "value": "cors"
-            },
-            {
-              "name": "Sec-Fetch-Site",
-              "value": "same-site"
-            },
-            {
-              "name": "Priority",
-              "value": "u=4"
-            }
-          ],
-          "queryString": [],
-          "headersSize": -1,
-          "bodySize": -1
-        },
-        "response": {
-          "status": 200,
-          "statusText": "",
-          "httpVersion": "HTTP/2",
-          "cookies": [],
-          "headers": [
-            {
-              "name": "access-control-allow-origin",
-              "value": "https://www.google.com"
-            },
-            {
-              "name": "access-control-allow-methods",
-              "value": "GET, POST, OPTIONS"
-            },
-            {
-              "name": "access-control-max-age",
-              "value": "86400"
-            },
-            {
-              "name": "access-control-allow-credentials",
-              "value": "true"
-            },
-            {
-              "name": "access-control-allow-headers",
-              "value": "X-Playlog-Web,authorization,content-encoding,content-type,origin"
-            },
-            {
-              "name": "content-type",
-              "value": "text/plain; charset=UTF-8"
-            },
-            {
-              "name": "date",
-              "value": "Fri, 27 Mar 2026 21:36:35 GMT"
-            },
-            {
-              "name": "server",
-              "value": "Playlog"
-            },
-            {
-              "name": "content-length",
-              "value": "0"
-            },
-            {
-              "name": "x-xss-protection",
-              "value": "0"
-            },
-            {
-              "name": "x-frame-options",
-              "value": "SAMEORIGIN"
-            },
-            {
-              "name": "alt-svc",
-              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
-            },
-            {
-              "name": "X-Firefox-Spdy",
-              "value": "h2"
-            }
-          ],
-          "content": {
-            "size": 0,
-            "mimeType": "text/plain; charset=UTF-8",
-            "compression": 0
-          },
-          "redirectURL": "",
-          "headersSize": -1,
-          "bodySize": 0
-        },
-        "cache": {},
-        "timings": {
-          "dns": -1,
-          "connect": -1,
-          "ssl": -1,
-          "send": 0,
-          "wait": 29,
-          "receive": 0
-        },
-        "serverIPAddress": "142.251.167.139",
-        "connection": "443",
-        "_chunks": [],
-        "_securityState": "secure",
-        "_load_start": 1262,
-        "_ttfb_start": 1262,
-        "_ttfb_end": 1291,
-        "_download_start": 1291,
-        "_download_end": 1291,
-        "_all_end": 1291
       },
       {
         "startedDateTime": "2026-03-27T21:36:44.818Z",

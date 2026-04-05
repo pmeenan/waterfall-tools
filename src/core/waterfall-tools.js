@@ -433,7 +433,39 @@ export class WaterfallTools {
 
             if (page.requests) {
                 const reqArray = Object.values(page.requests);
-                reqArray.sort((a, b) => a.time_start - b.time_start);
+                const getLoadStartMs = (req) => {
+                    let hasAbsoluteTimings = req._load_start !== undefined || req._dns_start !== undefined || req._ttfb_start !== undefined;
+                    
+                    if (hasAbsoluteTimings) {
+                        let baseEpoch = globalEarliestMs;
+                        let blockedEnd = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : 0));
+                        
+                        let dnsStart = (req._dns_start !== undefined && req._dns_start >= 0) ? baseEpoch + req._dns_start : blockedEnd;
+                        let dnsEnd = (req._dns_end !== undefined && req._dns_end >= 0) ? baseEpoch + req._dns_end : dnsStart;
+                        
+                        let connectStart = (req._connect_start !== undefined && req._connect_start >= 0) ? baseEpoch + req._connect_start : dnsEnd;
+                        let connectEnd = (req._connect_end !== undefined && req._connect_end >= 0) ? baseEpoch + req._connect_end : connectStart;
+                        
+                        let sslStart = (req._ssl_start !== undefined && req._ssl_start >= 0) ? baseEpoch + req._ssl_start : connectEnd;
+                        let sslEnd = (req._ssl_end !== undefined && req._ssl_end >= 0) ? baseEpoch + req._ssl_end : sslStart;
+                        
+                        let requestStart = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : (sslEnd - baseEpoch)));
+
+                        return Math.max(requestStart, connectEnd);
+                    }
+
+                    // Fallback to time_start plus blocking/DNS/TCP delays modeling TTFB request start
+                    let delay = 0;
+                    if (req.timings) {
+                        if (req.timings.blocked > 0) delay += req.timings.blocked;
+                        if (req.timings.dns > 0) delay += req.timings.dns;
+                        if (req.timings.connect > 0) delay += req.timings.connect;
+                        if (req.timings.send > 0) delay += req.timings.send;
+                    }
+                    return req.time_start + delay;
+                };
+
+                reqArray.sort((a, b) => getLoadStartMs(a) - getLoadStartMs(b));
 
                 for (const req of reqArray) {
                     
@@ -485,20 +517,20 @@ export class WaterfallTools {
                         }
                     }
 
-                    // WebPageTest compatibility tracking
-                    if (req.time_start > 0) entry._load_start = Math.floor(req.time_start - globalEarliestMs);
-                    if (req._dnsTimeMs > 0) entry._dns_start = Math.floor(req._dnsTimeMs - globalEarliestMs);
-                    if (req._dnsEndTimeMs > 0) entry._dns_end = Math.floor(req._dnsEndTimeMs - globalEarliestMs);
-                    if (req._connectTimeMs > 0) entry._connect_start = Math.floor(req._connectTimeMs - globalEarliestMs);
-                    if (req._connectEndTimeMs > 0) entry._connect_end = Math.floor(req._connectEndTimeMs - globalEarliestMs);
-                    if (req._sslStartTimeMs > 0) entry._ssl_start = Math.floor(req._sslStartTimeMs - globalEarliestMs);
-                    if (req.time_start > 0 && req.timings.ssl > 0) entry._ssl_end = entry._load_start;
-                    if (req.time_start > 0) entry._ttfb_start = entry._load_start;
-                    if (req.first_data_time > 0) entry._ttfb_end = Math.floor(req.first_data_time - globalEarliestMs);
-                    if (req.first_data_time > 0) entry._download_start = entry._ttfb_end;
-                    if (req.time_end > 0) {
+                    // WebPageTest compatibility tracking fallbacks cleanly preserving mapped metrics
+                    if (req.time_start > 0 && entry._load_start === undefined) entry._load_start = Math.floor(req.time_start - globalEarliestMs);
+                    if (req._dnsTimeMs > 0 && entry._dns_start === undefined) entry._dns_start = Math.floor(req._dnsTimeMs - globalEarliestMs);
+                    if (req._dnsEndTimeMs > 0 && entry._dns_end === undefined) entry._dns_end = Math.floor(req._dnsEndTimeMs - globalEarliestMs);
+                    if (req._connectTimeMs > 0 && entry._connect_start === undefined) entry._connect_start = Math.floor(req._connectTimeMs - globalEarliestMs);
+                    if (req._connectEndTimeMs > 0 && entry._connect_end === undefined) entry._connect_end = Math.floor(req._connectEndTimeMs - globalEarliestMs);
+                    if (req._sslStartTimeMs > 0 && entry._ssl_start === undefined) entry._ssl_start = Math.floor(req._sslStartTimeMs - globalEarliestMs);
+                    if (req.time_start > 0 && req.timings.ssl > 0 && entry._ssl_end === undefined) entry._ssl_end = entry._load_start;
+                    if (req.time_start > 0 && entry._ttfb_start === undefined) entry._ttfb_start = entry._load_start;
+                    if (req.first_data_time > 0 && entry._ttfb_end === undefined) entry._ttfb_end = Math.floor(req.first_data_time - globalEarliestMs);
+                    if (req.first_data_time > 0 && entry._download_start === undefined) entry._download_start = entry._ttfb_end;
+                    if (req.time_end > 0 && entry._download_end === undefined) {
                         entry._download_end = Math.floor(req.time_end - globalEarliestMs);
-                        entry._all_end = entry._download_end;
+                        if (entry._all_end === undefined) entry._all_end = entry._download_end;
                     }
                     
                     entriesOut.push(entry);

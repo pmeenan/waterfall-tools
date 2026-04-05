@@ -1046,7 +1046,7 @@
     "entries": [
       {
         "startedDateTime": "1970-08-20T15:08:27.116Z",
-        "time": 174.9998435974121,
+        "time": 215.9998435974121,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -1189,11 +1189,11 @@
           "connect": 17,
           "ssl": 43,
           "send": 0,
-          "wait": 98.99984359741211,
+          "wait": 139.9998435974121,
           "receive": 5
         },
         "serverIPAddress": "",
-        "connection": "conn_req_0",
+        "connection": "173",
         "_chunks": [
           {
             "ts": 149,
@@ -1260,10 +1260,10 @@
         "_weight": 256,
         "_server_address": "[2600:9000:215a:6200:7:49a5:5fd6:da1]:443",
         "_socket_group": "https://www.amazon.com <https://amazon.com same_site>",
-        "_connect_start": 54,
-        "_connect_end": 71,
-        "_ssl_start": 28,
-        "_ssl_end": 0,
+        "_connect_start": 56,
+        "_connect_end": 73,
+        "_ssl_start": 73,
+        "_ssl_end": 116,
         "_certificates": [
           "-----BEGIN CERTIFICATE-----\nMIIHwzCCBqugAwIBAgIQBWYMLqhW49UjlT6TnohrXTANBgkqhkiG9w0BAQsFADA8\nMQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRwwGgYDVQQDExNBbWF6b24g\nUlNBIDIwNDggTTA0MB4XDTI2MDExOTAwMDAwMFoXDTI3MDExMTIzNTk1OVowGTEX\nMBUGA1UEAxMOd3d3LmFtYXpvbi5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw\nggEKAoIBAQDTDk0q0dmqQ1DqhypjQEowu4xDobxv36/9qWUy7sbCg2hVfWkb7C+T\nfTs48yGgDWN3eQpwMM8erzSyKckRSjYL1FVejJVPmXs9q94a028XkYoZEwODuBhY\nHHapgm7O8T5Om3oc1x0oapDrpNK2Oy3UYQ6BPnVed7+/mHV++nIMtUpK2Tqch/Cm\nxfDJIZSatAb6szZngVUOmBxcBTnr6H7VgCJGE+725GXty2opBauqI57XsOigQAij\nRSo9kgX1dgV6NRAEwiq1VzjrD/08DueML5oqow10Ubs9KhTZd9wppsk8m8SZMo2i\nPHVFS05gDTcATL8G7kuMbAMd40J+Cze7AgMBAAGjggTiMIIE3jAfBgNVHSMEGDAW\ngBQfUpJhVoJUf4Fm2B09CqoyXIfdCDAdBgNVHQ4EFgQULWhAIpWHPxT3Eyj1WDgx\nTovf+wcwggIbBgNVHREEggISMIICDoIOd3d3LmFtYXpvbi5jb22CDXlwLmFtYXpv\nbi5jb22CFmtvbnJhZC10ZXN0LmFtYXpvbi5jb22CJXAteW8td3d3LWFtYXpvbi1j\nb20ta2FsaWFzLmFtYXpvbi5jb22CEm1wM3JlY3MuYW1hem9uLmNvbYIlcC1udC13\nd3ctYW1hem9uLWNvbS1rYWxpYXMuYW1hem9uLmNvbYIVb3JpZ2luLXd3dy5hbWF6\nb24uY29tghFidXlib3guYW1hem9uLmNvbYIRdWVkYXRhLmFtYXpvbi5jb22CDXVz\nLmFtYXpvbi5jb22CFnllbGxvd3BhZ2VzLmFtYXpvbi5jb22CD2hvbWUuYW1hem9u\nLmNvbYIQd3d3Lm0uYW1hem9uLmNvbYIRaXBob25lLmFtYXpvbi5jb22CDHd3dy5h\nbXpuLmNvbYISaHVkZGxlcy5hbWF6b24uY29tggphbWF6b24uY29tghRjb3Jwb3Jh\ndGUuYW1hem9uLmNvbYIYc2hvcC5idXNpbmVzcy5hbWF6b24uY29tgiVwLXkzLXd3\ndy1hbWF6b24tY29tLWthbGlhcy5hbWF6b24uY29tgiFidWNrZXllLXJldGFpbC13\nZWJzaXRlLmFtYXpvbi5jb22CEnd3dy5jZG4uYW1hem9uLmNvbYITdGVzdC13d3cu\nYW1hem9uLmNvbYIIYW16bi5jb20wEwYDVR0gBAwwCjAIBgZngQwBAgEwDgYDVR0P\nAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMBMDsGA1UdHwQ0MDIwMKAuoCyG\nKmh0dHA6Ly9jcmwucjJtMDQuYW1hem9udHJ1c3QuY29tL3IybTA0LmNybDB1Bggr\nBgEFBQcBAQRpMGcwLQYIKwYBBQUHMAGGIWh0dHA6Ly9vY3NwLnIybTA0LmFtYXpv\nbnRydXN0LmNvbTA2BggrBgEFBQcwAoYqaHR0cDovL2NydC5yMm0wNC5hbWF6b250\ncnVzdC5jb20vcjJtMDQuY2VyMAwGA1UdEwEB/wQCMAAwggF/BgorBgEEAdZ5AgQC\nBIIBbwSCAWsBaQB2AExj3JjlnB2riPYeij3ero+rRKM3e1+blMP7oZz8wb4mAAAB\nm9hGNoUAAAQDAEcwRQIhALFOclSdN2d9BwIOPVhPjv9zlqu1/WzZNZUlVbSX7no5\nAiBIrnxyuKTUBCP5EPJsnTTPs3mm09OAg3Q6u8FaJYLGqAB3AByfaCzp+vBFaVD4\nG5aKh93bMhDYTObIsuOCUkrEz1mfAAABm9hGNrQAAAQDAEgwRgIhAPBymKGC+150\nOdARt45GADSbwl9Oq8138J8DH2S8ybfOAiEApKNtrw3Wqi9zup7KHVe7CBNg9yOh\nT9Vxmz/QjRHCxPUAdgBgTJqven93XwHUBvySDciZ6wscffjJUhv6+hd3O5eLyQAA\nAZvYRjd7AAAEAwBHMEUCIDHVLkzKNWs3pAc1kTecQqeIwVoPv17KrWyq7n9IqVTJ\nAiEAnRz5I1Zd5P3n623zVA60Rj65p8Y0UJ/AmVzbb5cXgcQwDQYJKoZIhvcNAQEL\nBQADggEBAFd/o5SbfhlNXo2Q86tIGL2ObR9Jgrsrrwn875nfQpT2uHYTRKC1/TaR\nc3xmMLOkiAKuqo3Ug+VJNwxnDf3ArR4vdaTIgjCDz47J19cLWwpwqPd/xmCHSKz6\ntmdIuqEkHe6UJT+Y1E9IXERCdp1TEy3M2jhACdnyEG1svrCMyBBLseamOs513p2d\nJ8L5EwC5cAOvDiHGJRbhuZyGY/KNeZ0AK+NQp7y0cmFdSatZ/n9bZo3hSUE84G8s\nziqk6Dbwiapk39zW254mSb+gagZ2tN+w1rJR7b6eeI004VhDQ4HM4AtNzN63Gb9N\ne1h/aRAvYr9OeoMNlEzvwz/e1TXF2uI=\n-----END CERTIFICATE-----\n",
           "-----BEGIN CERTIFICATE-----\nMIIEXjCCA0agAwIBAgITB3MSTyqVLj7Rili9uF0bwM5fJzANBgkqhkiG9w0BAQsF\nADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\nb24gUm9vdCBDQSAxMB4XDTIyMDgyMzIyMjYzNVoXDTMwMDgyMzIyMjYzNVowPDEL\nMAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEcMBoGA1UEAxMTQW1hem9uIFJT\nQSAyMDQ4IE0wNDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAM3pVR6A\nlQOp4xe776FdePXyejgA38mYx1ou9/jrpV6Sfn+/oqBKgwhY6ePsQHHQayWBJdBn\nv4Wz363qRI4XUh9swBFJ11TnZ3LqOMvHmWq2+loA0QPtOfXdJ2fHBLrBrngtJ/GB\n0p5olAVYrSZgvQGP16Rf8ddtNyxEEhYm3HuhmNi+vSeAq1tLYJPAvRCXonTpWdSD\nxY6hvdmxlqTYi82AtBXSfpGQ58HHM0hw0C6aQakghrwWi5fGslLOqzpimNMIsT7c\nqa0GJx6JfKqJqmQQNplO2h8n9ZsFJgBowof01ppdoLAWg6caMOM0om/VILKaa30F\n9W/r8Qjah7ltGVkCAwEAAaOCAVowggFWMBIGA1UdEwEB/wQIMAYBAf8CAQAwDgYD\nVR0PAQH/BAQDAgGGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAdBgNV\nHQ4EFgQUH1KSYVaCVH+BZtgdPQqqMlyH3QgwHwYDVR0jBBgwFoAUhBjMhTTsvAyU\nlC4IWZzHshBOCggwewYIKwYBBQUHAQEEbzBtMC8GCCsGAQUFBzABhiNodHRwOi8v\nb2NzcC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbTA6BggrBgEFBQcwAoYuaHR0cDov\nL2NydC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbS9yb290Y2ExLmNlcjA/BgNVHR8E\nODA2MDSgMqAwhi5odHRwOi8vY3JsLnJvb3RjYTEuYW1hem9udHJ1c3QuY29tL3Jv\nb3RjYTEuY3JsMBMGA1UdIAQMMAowCAYGZ4EMAQIBMA0GCSqGSIb3DQEBCwUAA4IB\nAQA+1O5UsAaNuW3lHzJtpNGwBnZd9QEYFtxpiAnIaV4qApnGS9OCw5ZPwie7YSlD\nZF5yyFPsFhUC2Q9uJHY/CRV1b5hIiGH0+6+w5PgKiY1MWuWT8VAaJjFxvuhM7a/e\nfN2TIw1Wd6WCl6YRisunjQOrSP+unqC8A540JNyZ1JOE3jVqat3OZBGgMvihdj2w\nY23EpwesrKiQzkHzmvSH67PVW4ycbPy08HVZnBxZ5NrlGG9bwXR3fNTaz+c+Ej6c\n5AnwI3qkOFgSkg3Y75cdFz6pO/olK+e3AqygAcv0WjzmkDPuBjssuZjCHMC56oH3\nGJkV29Di2j5prHJbwZjG1inU\n-----END CERTIFICATE-----\n",
@@ -1393,14 +1393,14 @@
         "_sslStartTimeMs": 20012907144,
         "_load_start": 0,
         "_ttfb_start": 0,
-        "_ttfb_end": 98,
-        "_download_start": 98,
-        "_download_end": 103,
-        "_all_end": 103
+        "_ttfb_end": 139,
+        "_download_start": 139,
+        "_download_end": 144,
+        "_all_end": 144
       },
       {
         "startedDateTime": "1970-08-20T15:08:27.307Z",
-        "time": 1045.9998245239258,
+        "time": 1049.9998245239258,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -1543,11 +1543,11 @@
           "connect": 31,
           "ssl": 63,
           "send": 0,
-          "wait": 121.99982452392578,
+          "wait": 125.99982452392578,
           "receive": 850
         },
         "serverIPAddress": "",
-        "connection": "conn_req_1",
+        "connection": "197",
         "_chunks": [
           {
             "ts": 358,
@@ -2000,10 +2000,10 @@
         "_weight": 220,
         "_server_address": "3.167.37.14:443",
         "_socket_group": "https://1c5c1ecf7303.c0b160fb.us-east-1.token.awswaf.com <https://amazon.com same_site>",
-        "_connect_start": 234,
-        "_connect_end": 265,
-        "_ssl_start": 202,
-        "_ssl_end": 191,
+        "_connect_start": 213,
+        "_connect_end": 244,
+        "_ssl_start": 244,
+        "_ssl_end": 307,
         "_certificates": [
           "-----BEGIN CERTIFICATE-----\nMIIF6zCCBNOgAwIBAgIQC9atTb+K7Yl6F5763qK97TANBgkqhkiG9w0BAQsFADA8\nMQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRwwGgYDVQQDExNBbWF6b24g\nUlNBIDIwNDggTTAxMB4XDTI2MDMwMzAwMDAwMFoXDTI2MDkxNjIzNTk1OVowMDEu\nMCwGA1UEAwwlKi5jMGIxNjBmYi51cy1lYXN0LTEudG9rZW4uYXdzd2FmLmNvbTCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALjkMPdgL0Ouy9Gqr863c5HB\nOQNnqHuTgiJFkdbl+pjg1k/Ua53/zaXsM7R8CSeN9IB0FKky5JgwrvUzqlrqK48z\nvfX1ZE4YT1vmlhn+w/q6gqgDNu8ePAGp+t8eQL6PS9aKxIO5GcP8SlXlY+NReCqD\nuBxf5J/nZxxX1K/3Z1ZYCdTGS/HHn7oPG7+iTcdkvyXuHB3gdeYyOro1GKGmiSkc\nqxRdGLy/VUXRXykuSWkLJcYFK9RMRKzkK8k6JIL1C8SuY2xc7x7X6KeNjZCs1sLy\nWyBc0AqqZfmtEkS+/dglZPkn16OejiHLSOLJBdCz/XKPGv4g/oe/G1MZ/HhcQUcC\nAwEAAaOCAvMwggLvMB8GA1UdIwQYMBaAFIG4DmOKiRIY5fo7O1CVn+blkBOFMB0G\nA1UdDgQWBBQ8r3USYkWAepyx3/9hgfXlZcw3ajAwBgNVHREEKTAngiUqLmMwYjE2\nMGZiLnVzLWVhc3QtMS50b2tlbi5hd3N3YWYuY29tMBMGA1UdIAQMMAowCAYGZ4EM\nAQIBMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAKBggrBgEFBQcDATA7BgNVHR8E\nNDAyMDCgLqAshipodHRwOi8vY3JsLnIybTAxLmFtYXpvbnRydXN0LmNvbS9yMm0w\nMS5jcmwwdQYIKwYBBQUHAQEEaTBnMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5y\nMm0wMS5hbWF6b250cnVzdC5jb20wNgYIKwYBBQUHMAKGKmh0dHA6Ly9jcnQucjJt\nMDEuYW1hem9udHJ1c3QuY29tL3IybTAxLmNlcjAMBgNVHRMBAf8EAjAAMIIBfQYK\nKwYBBAHWeQIEAgSCAW0EggFpAWcAdgDCMX5XRRmjRe5/ON6ykEHrx8IhWiK/f9W1\nrXaa2Q5SzQAAAZyyRAgAAAAEAwBHMEUCIQCgbCu6Pkc9CSYpXHaeiQcFUpqb+Nqk\niXwGySdl8rAapgIgE2vvMp0YhTLtOpt/Xkg0CHZytCaki9IHynFkUQz4ULcAdgDX\nbX0Q0af1d8LH6V/XAL/5gskzWmXh0LMBcxfAyMVpdwAAAZyyRAgYAAAEAwBHMEUC\nIQD8ww/w4RTfWDCxa6ZCHC7idA1G6vIeDJ+/6cgMr/WpvAIgDiQc1/YIk4SSiIdM\nHIqLafCBwFfKY5mLmcUSckQ43K4AdQCUTkOH+uzB74HzGSQmqBhlAcfTXzgCAT9y\nZ31VNy4Z2AAAAZyyRAgKAAAEAwBGMEQCIGZaoXOVtj7P7ZQx3qGqIYg/rgV7CHYj\n9WqpIKN+jnIUAiBhF/5/x2sA0uFMFmJECZbecaKjWS6cZEvtZgTbOwW0ZjANBgkq\nhkiG9w0BAQsFAAOCAQEAfU8D05YNkOI7xaMFlRj9pIV97NCRA9H4XlBMApp9cw26\nUdAi7UyTo1Cxhm2q/VmYmdIO8mipgHhIQTjk3eXlmyRKqMeoLRAd8G7L1T0/5TbC\nHmrgeLQDrPcen9t8HpPCf80p7z8bFVNC6X7PWHgKo+8jhjYsWBXD1HTA6UDmRfTd\n5c1xU63R1oaayK+YyvToHUraoA/K8dQ0/Sm5rn4J4jIl/Mzg/9Ndxxh9dbWqj06R\nn5K00hiRYVAw0inM0fO1ZUFlJjS8DGwtZGAxU5SCb1lPtgZumjPyqlgTHiCuw8nG\nT22VeYY5FVWj5k8CvEc8sDJZqfdy9ATLmMSMgN3jcQ==\n-----END CERTIFICATE-----\n",
           "-----BEGIN CERTIFICATE-----\nMIIEXjCCA0agAwIBAgITB3MSOAudZoijOx7Zv5zNpo4ODzANBgkqhkiG9w0BAQsF\nADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\nb24gUm9vdCBDQSAxMB4XDTIyMDgyMzIyMjEyOFoXDTMwMDgyMzIyMjEyOFowPDEL\nMAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEcMBoGA1UEAxMTQW1hem9uIFJT\nQSAyMDQ4IE0wMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOtxLKnL\nH4gokjIwr4pXD3i3NyWVVYesZ1yX0yLI2qIUZ2t88Gfa4gMqs1YSXca1R/lnCKeT\nepWSGA+0+fkQNpp/L4C2T7oTTsddUx7g3ZYzByDTlrwS5HRQQqEFE3O1T5tEJP4t\nf+28IoXsNiEzl3UGzicYgtzj2cWCB41eJgEmJmcf2T8TzzK6a614ZPyq/w4CPAff\nnAV4coz96nW3AyiE2uhuB4zQUIXvgVSycW7sbWLvj5TDXunEpNCRwC4kkZjK7rol\njtT2cbb7W2s4Bkg3R42G3PLqBvt2N32e/0JOTViCk8/iccJ4sXqrS1uUN4iB5Nmv\nJK74csVl+0u0UecCAwEAAaOCAVowggFWMBIGA1UdEwEB/wQIMAYBAf8CAQAwDgYD\nVR0PAQH/BAQDAgGGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAdBgNV\nHQ4EFgQUgbgOY4qJEhjl+js7UJWf5uWQE4UwHwYDVR0jBBgwFoAUhBjMhTTsvAyU\nlC4IWZzHshBOCggwewYIKwYBBQUHAQEEbzBtMC8GCCsGAQUFBzABhiNodHRwOi8v\nb2NzcC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbTA6BggrBgEFBQcwAoYuaHR0cDov\nL2NydC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbS9yb290Y2ExLmNlcjA/BgNVHR8E\nODA2MDSgMqAwhi5odHRwOi8vY3JsLnJvb3RjYTEuYW1hem9udHJ1c3QuY29tL3Jv\nb3RjYTEuY3JsMBMGA1UdIAQMMAowCAYGZ4EMAQIBMA0GCSqGSIb3DQEBCwUAA4IB\nAQCtAN4CBSMuBjJitGuxlBbkEUDeK/pZwTXv4KqPK0G50fOHOQAd8j21p0cMBgbG\nkfMHVwLU7b0XwZCav0h1ogdPMN1KakK1DT0VwA/+hFvGPJnMV1Kx2G4S1ZaSk0uU\n5QfoiYIIano01J5k4T2HapKQmmOhS/iPtuo00wW+IMLeBuKMn3OLn005hcrOGTad\nhcmeyfhQP7Z+iKHvyoQGi1C0ClymHETx/chhQGDyYSWqB/THwnN15AwLQo0E5V9E\nSJlbe4mBlqeInUsNYugExNf+tOiybcrswBy8OFsd34XOW3rjSUtsuafd9AWySa3h\nxRRrwszrzX/WWGm6wyB+f7C4\n-----END CERTIFICATE-----\n",
@@ -2077,8 +2077,8 @@
             }
           ]
         },
-        "_dns_start": 191,
-        "_dns_end": 234,
+        "_dns_start": 169,
+        "_dns_end": 212,
         "_dns_details": {
           "AAAA": {
             "error": -105
@@ -2102,10 +2102,10 @@
         "_sslStartTimeMs": 20012907318,
         "_load_start": 191,
         "_ttfb_start": 191,
-        "_ttfb_end": 312,
-        "_download_start": 312,
-        "_download_end": 1162,
-        "_all_end": 1162
+        "_ttfb_end": 316,
+        "_download_start": 316,
+        "_download_end": 1166,
+        "_all_end": 1166
       },
       {
         "startedDateTime": "1970-08-20T15:08:28.572Z",
@@ -2260,7 +2260,7 @@
           "receive": 4
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "220",
         "_chunks": [
           {
             "ts": 1632,
@@ -2275,6 +2275,7 @@
         "_priority": "High",
         "_initial_priority": "High",
         "_method": "GET",
+        "_quic_session": 220,
         "_start": 1572.000209,
         "_request_headers": [
           ":method: GET",
@@ -2503,7 +2504,7 @@
           "receive": 1
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "220",
         "_chunks": [
           {
             "ts": 1888,
@@ -2518,6 +2519,7 @@
         "_priority": "High",
         "_initial_priority": "High",
         "_method": "POST",
+        "_quic_session": 220,
         "_start": 1740.000222,
         "_request_headers": [
           ":method: POST",
@@ -2776,7 +2778,7 @@
           "receive": 3
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "173",
         "_chunks": [
           {
             "ts": 1874,
@@ -3031,7 +3033,7 @@
           "receive": 1
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "220",
         "_chunks": [
           {
             "ts": 2051,
@@ -3046,6 +3048,7 @@
         "_priority": "High",
         "_initial_priority": "High",
         "_method": "POST",
+        "_quic_session": 220,
         "_start": 1904.000239,
         "_request_headers": [
           ":method: POST",
@@ -3264,7 +3267,7 @@
           "receive": 2
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "236",
         "_chunks": [
           {
             "ts": 2128,
@@ -3280,6 +3283,7 @@
         "_priority": "Highest",
         "_initial_priority": "Highest",
         "_method": "GET",
+        "_quic_session": 236,
         "_start": 2080.000248,
         "_request_headers": [
           ":method: GET",
@@ -3341,422 +3345,6 @@
         "_download_start": 2010,
         "_download_end": 2012,
         "_all_end": 2012
-      },
-      {
-        "startedDateTime": "1970-08-20T15:08:29.281Z",
-        "time": 183.9997329711914,
-        "pageref": "page_1_0_1",
-        "request": {
-          "method": "GET",
-          "url": "https://images-na.ssl-images-amazon.com/images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min._V1_.css",
-          "httpVersion": "HTTP/2",
-          "cookies": [],
-          "headers": [
-            {
-              "name": "sec-ch-ua-platform",
-              "value": "\"Unknown\""
-            },
-            {
-              "name": "user-agent",
-              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
-            },
-            {
-              "name": "sec-ch-ua",
-              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
-            },
-            {
-              "name": "sec-ch-ua-mobile",
-              "value": "?0"
-            },
-            {
-              "name": "accept",
-              "value": "text/css,*/*;q=0.1"
-            },
-            {
-              "name": "sec-fetch-site",
-              "value": "cross-site"
-            },
-            {
-              "name": "sec-fetch-mode",
-              "value": "no-cors"
-            },
-            {
-              "name": "sec-fetch-dest",
-              "value": "style"
-            },
-            {
-              "name": "sec-fetch-storage-access",
-              "value": "active"
-            },
-            {
-              "name": "referer",
-              "value": "https://www.amazon.com/"
-            },
-            {
-              "name": "accept-encoding",
-              "value": "gzip, deflate, br, zstd"
-            },
-            {
-              "name": "accept-language",
-              "value": "en-US,en;q=0.9"
-            },
-            {
-              "name": "priority",
-              "value": "u=0"
-            }
-          ],
-          "queryString": [],
-          "headersSize": -1,
-          "bodySize": -1
-        },
-        "response": {
-          "status": 200,
-          "statusText": "",
-          "httpVersion": "HTTP/2",
-          "cookies": [],
-          "headers": [
-            {
-              "name": "content-type",
-              "value": "text/css"
-            },
-            {
-              "name": "date",
-              "value": "Wed, 06 Aug 2025 02:13:09 GMT"
-            },
-            {
-              "name": "x-nginx-cache-status",
-              "value": "HIT"
-            },
-            {
-              "name": "content-encoding",
-              "value": "br"
-            },
-            {
-              "name": "server",
-              "value": "Server"
-            },
-            {
-              "name": "x-amz-ir-id",
-              "value": "12fcb533-46a4-4661-921d-d4e386734ae9"
-            },
-            {
-              "name": "cache-control",
-              "value": "max-age=630720000,public"
-            },
-            {
-              "name": "last-modified",
-              "value": "Wed, 17 Jul 2013 22:49:32 GMT"
-            },
-            {
-              "name": "access-control-allow-origin",
-              "value": "*"
-            },
-            {
-              "name": "timing-allow-origin",
-              "value": "https://www.amazon.com"
-            },
-            {
-              "name": "edge-cache-tag",
-              "value": "x-cache-490,/images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min"
-            },
-            {
-              "name": "expires",
-              "value": "Tue, 25 Jul 2045 10:54:28 GMT"
-            },
-            {
-              "name": "surrogate-key",
-              "value": "x-cache-490 /images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min"
-            },
-            {
-              "name": "via",
-              "value": "1.1 8050c5b4863c56ab9f53d7e4db71f5ec.cloudfront.net (CloudFront)"
-            },
-            {
-              "name": "alt-svc",
-              "value": "h3=\":443\"; ma=86400"
-            },
-            {
-              "name": "age",
-              "value": "20122975"
-            },
-            {
-              "name": "server-timing",
-              "value": "cdn-cache-hit,cdn-pop;desc=\"IAD89-P3\",cdn-rid;desc=\"gBlJ6Lo9xFgQZpoUann3lqIHmsygLBPJbJTDzoBrhT2GRcmDrj0LQg==\",cdn-hit-layer;desc=\"EDGE\",cdn-downstream-fbl;dur=3,provider;desc=\"cf\""
-            },
-            {
-              "name": "accept-ch",
-              "value": "Sec-CH-UA-Form-Factors, Sec-CH-Viewport-Width, Sec-CH-Width, Sec-CH-Viewport-Height, Sec-CH-DPR, ECT"
-            },
-            {
-              "name": "x-cache",
-              "value": "Hit from cloudfront"
-            },
-            {
-              "name": "x-amz-cf-pop",
-              "value": "IAD89-P3"
-            },
-            {
-              "name": "x-amz-cf-id",
-              "value": "gBlJ6Lo9xFgQZpoUann3lqIHmsygLBPJbJTDzoBrhT2GRcmDrj0LQg=="
-            }
-          ],
-          "content": {
-            "size": 18915,
-            "mimeType": "text/css",
-            "compression": 0
-          },
-          "redirectURL": "",
-          "headersSize": -1,
-          "bodySize": 18915
-        },
-        "cache": {},
-        "timings": {
-          "dns": 55,
-          "connect": 16,
-          "ssl": 44,
-          "send": 0,
-          "wait": 99.9997329711914,
-          "receive": 13
-        },
-        "serverIPAddress": "",
-        "connection": "conn_req_7",
-        "_chunks": [
-          {
-            "ts": 2315,
-            "bytes": 18915,
-            "inflated": 37633
-          }
-        ],
-        "_chunks_in": [],
-        "_chunks_out": [],
-        "_bytes_in": 18915,
-        "_created": 2162,
-        "_url": "https://images-na.ssl-images-amazon.com/images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min._V1_.css",
-        "_priority": "Highest",
-        "_initial_priority": "Highest",
-        "_method": "GET",
-        "_group": "https://images-na.ssl-images-amazon.com <https://amazon.com same_site>",
-        "_socket": 287,
-        "_h2_session": 289,
-        "_start": 2281.000266,
-        "_request_headers": [
-          ":method: GET",
-          ":authority: images-na.ssl-images-amazon.com",
-          ":scheme: https",
-          ":path: /images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min._V1_.css",
-          "sec-ch-ua-platform: \"Unknown\"",
-          "user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524",
-          "sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\"",
-          "sec-ch-ua-mobile: ?0",
-          "accept: text/css,*/*;q=0.1",
-          "sec-fetch-site: cross-site",
-          "sec-fetch-mode: no-cors",
-          "sec-fetch-dest: style",
-          "sec-fetch-storage-access: active",
-          "referer: https://www.amazon.com/",
-          "accept-encoding: gzip, deflate, br, zstd",
-          "accept-language: en-US,en;q=0.9",
-          "priority: u=0"
-        ],
-        "_protocol": "HTTP/2",
-        "_stream_id": 1,
-        "_response_headers": [
-          ":status: 200",
-          "content-type: text/css",
-          "date: Wed, 06 Aug 2025 02:13:09 GMT",
-          "x-nginx-cache-status: HIT",
-          "content-encoding: br",
-          "server: Server",
-          "x-amz-ir-id: 12fcb533-46a4-4661-921d-d4e386734ae9",
-          "cache-control: max-age=630720000,public",
-          "last-modified: Wed, 17 Jul 2013 22:49:32 GMT",
-          "access-control-allow-origin: *",
-          "timing-allow-origin: https://www.amazon.com",
-          "edge-cache-tag: x-cache-490,/images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min",
-          "expires: Tue, 25 Jul 2045 10:54:28 GMT",
-          "surrogate-key: x-cache-490 /images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min",
-          "via: 1.1 8050c5b4863c56ab9f53d7e4db71f5ec.cloudfront.net (CloudFront)",
-          "alt-svc: h3=\":443\"; ma=86400",
-          "age: 20122975",
-          "server-timing: cdn-cache-hit,cdn-pop;desc=\"IAD89-P3\",cdn-rid;desc=\"gBlJ6Lo9xFgQZpoUann3lqIHmsygLBPJbJTDzoBrhT2GRcmDrj0LQg==\",cdn-hit-layer;desc=\"EDGE\",cdn-downstream-fbl;dur=3,provider;desc=\"cf\"",
-          "accept-ch: Sec-CH-UA-Form-Factors, Sec-CH-Viewport-Width, Sec-CH-Width, Sec-CH-Viewport-Height, Sec-CH-DPR, ECT",
-          "x-cache: Hit from cloudfront",
-          "x-amz-cf-pop: IAD89-P3",
-          "x-amz-cf-id: gBlJ6Lo9xFgQZpoUann3lqIHmsygLBPJbJTDzoBrhT2GRcmDrj0LQg=="
-        ],
-        "_first_byte": 2310,
-        "_end": 2323,
-        "_has_raw_bytes": true,
-        "_uncompressed_bytes_in": 168705,
-        "_netlog_id": "266",
-        "_fromNet": true,
-        "_exclusive": 1,
-        "_parent_stream_id": 0,
-        "_weight": 256,
-        "_server_address": "[2600:9000:28a9:b400:1d:d7f6:39d5:bd01]:443",
-        "_socket_group": "https://images-na.ssl-images-amazon.com <https://amazon.com same_site>",
-        "_connect_start": 2220,
-        "_connect_end": 2236,
-        "_ssl_start": 2192,
-        "_ssl_end": 2165,
-        "_certificates": [
-          "-----BEGIN CERTIFICATE-----\nMIIHJTCCBg2gAwIBAgIQDxtOcKWySXEgi+QJgm98/jANBgkqhkiG9w0BAQsFADBE\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMR4wHAYDVQQDExVE\naWdpQ2VydCBHbG9iYWwgQ0EgRzIwHhcNMjUwNzAxMDAwMDAwWhcNMjYwNjE4MjM1\nOTU5WjAqMSgwJgYDVQQDEx9pbWFnZXMtbmEuc3NsLWltYWdlcy1hbWF6b24uY29t\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmztIn1kgm2kVt3NmYTQ9\nt6d/0ORYHQknUoA0n+/KDJqPTk94zUwRvr8tvkWaUpdla+KWoBp8VHhGwJF/o3kR\nJYEWa8MpQutFdLjkDZ0kxz7RGo4paoDtptVSp/6FsSlovBSj40o6KHpqQqs8ldry\nLJ8wZlpJFv44TXuwJPAa61Cs3UXJOszSxumQ57jzkSSc+zSHkvtjaJ4BnZXoo17b\nsj2thyM55vpx88GNgw9kllyVAUreX4lPPVCOAHo4ZqMyWy1KR2j8v+gAHygtRscz\nSUqnfCYajlFWND1alReEDgPBts/lL6wxfmRvhe8Zaj6AEDAglk3CZYNJUHVZPoJn\nmwIDAQABo4IEKzCCBCcwHwYDVR0jBBgwFoAUJG4rLdBqklFRJWkBqppHponnQCAw\nHQYDVR0OBBYEFNizQu3WEjkVRLPvUjVp24XTDZl5MIH0BgNVHREEgewwgemCH2lt\nYWdlcy1uYS5zc2wtaW1hZ2VzLWFtYXpvbi5jb22CEm0ubWVkaWEtYW1hem9uLmNv\nbYIfaW1hZ2VzLWZlLnNzbC1pbWFnZXMtYW1hem9uLmNvbYIfaW1hZ2VzLWV1LnNz\nbC1pbWFnZXMtYW1hem9uLmNvbYIRaWEubWVkaWEtaW1kYi5jb22CEmYubWVkaWEt\nYW1hem9uLmNvbYIRaW1hZ2VzLmFtYXpvbi5jb22CE2ctaW1hZ2VzLmFtYXpvbi5j\nb22CDWltZy5hbWF6b24uY2GCEmMubWVkaWEtYW1hem9uLmNvbTA+BgNVHSAENzA1\nMDMGBmeBDAECATApMCcGCCsGAQUFBwIBFhtodHRwOi8vd3d3LmRpZ2ljZXJ0LmNv\nbS9DUFMwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEF\nBQcDAjB3BgNVHR8EcDBuMDWgM6Axhi9odHRwOi8vY3JsMy5kaWdpY2VydC5jb20v\nRGlnaUNlcnRHbG9iYWxDQUcyLmNybDA1oDOgMYYvaHR0cDovL2NybDQuZGlnaWNl\ncnQuY29tL0RpZ2lDZXJ0R2xvYmFsQ0FHMi5jcmwwdAYIKwYBBQUHAQEEaDBmMCQG\nCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wPgYIKwYBBQUHMAKG\nMmh0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbENBRzIu\nY3J0MAwGA1UdEwEB/wQCMAAwggGABgorBgEEAdZ5AgQCBIIBcASCAWwBagB3AA5X\nlLzzrqk+MxssmQez95Dfm8I9cTIl3SGpJaxhxU4hAAABl8ferccAAAQDAEgwRgIh\nAJKquzOAJQczk3SFB+xV0DEK7k4pe8fsFLbwqyNDfoO8AiEAgOKhIsfjtjjyfSe6\nMPX7jqgsIVZtdcwdz5G01Hok0d0AdgBkEcRspBLsp4kcogIuALyrTygH1B41J6vq\n/tUDyX3N8AAAAZfH3q4EAAAEAwBHMEUCIFcvnULq1Ktd0HVgJP+rsjy16RIYySU4\nx+8VPbt4FGZFAiEApbpE40cHF+ssTyI6co5Z8Y5Kbt0kNhQjQuVbd/StzcoAdwBJ\nnJtp3h187Pw23s2HZKa4W68Kh4AZ0VVS++nrKd34wwAAAZfH3q4VAAAEAwBIMEYC\nIQCVS9qnJxdfdP5bnjvsj7k6zmz0+7o6qT8063ZM7MX4rQIhANpspsuNloTTHSZ7\nRyFFcXpO2HWnatiRh9uQEvKNiGMzMA0GCSqGSIb3DQEBCwUAA4IBAQDGpKqXHUA0\n/N5AMzHYZdrD5+NF7R410qivMd60yM3Ngb1IcuF7VxcqGSvD493bUZ0VfkjQS/bI\nlmrp/1z01AVmNakHJeabdkEaUOlyqGXCW7JXJDKImtKXK0qaJ6EoV+3P9+xPKW/q\n53FvS12uBiQOflOwGvR2iLfcTqfA8GpcHcfKCkpv1qipG70W4D8JrmQaQPd2PMSG\nu+wzJb3E5RwyQHImKHSU+0OylDCRD37aqaNhgbqev+xAkiWvvgkAFoeJVqX4TO2v\nRTJONESdBtK72tXnpPnbcNgHwbxzooKikLE1U8rBvhGJvOxR3O+EzeD+nONf4crE\n2HAI1p0qro9X\n-----END CERTIFICATE-----\n",
-          "-----BEGIN CERTIFICATE-----\nMIIEizCCA3OgAwIBAgIQDI7gyQ1qiRWIBAYe4kH5rzANBgkqhkiG9w0BAQsFADBh\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBH\nMjAeFw0xMzA4MDExMjAwMDBaFw0yODA4MDExMjAwMDBaMEQxCzAJBgNVBAYTAlVT\nMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxHjAcBgNVBAMTFURpZ2lDZXJ0IEdsb2Jh\nbCBDQSBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANNIfL7zBYZd\nW9UvhU5L4IatFaxhz1uvPmoKR/uadpFgC4przc/cV35gmAvkVNlW7SHMArZagV+X\nau4CLyMnuG3UsOcGAngLH1ypmTb+u6wbBfpXzYEQQGfWMItYNdSWYb7QjHqXnxr5\nIuYUL6nG6AEfq/gmD6yOTSwyOR2Bm40cZbIc22GoiS9g5+vCShjEbyrpEJIJ7RfR\nACvmfe8EiRROM6GyD5eHn7OgzS+8LOy4g2gxPR/VSpAQGQuBldYpdlH5NnbQtwl6\nOErXb4y/E3w57bqukPyV93t4CTZedJMeJfD/1K2uaGvG/w/VNfFVbkhJ+Pi474j4\n8V4Rd6rfArMCAwEAAaOCAVowggFWMBIGA1UdEwEB/wQIMAYBAf8CAQAwDgYDVR0P\nAQH/BAQDAgGGMDQGCCsGAQUFBwEBBCgwJjAkBggrBgEFBQcwAYYYaHR0cDovL29j\nc3AuZGlnaWNlcnQuY29tMHsGA1UdHwR0MHIwN6A1oDOGMWh0dHA6Ly9jcmw0LmRp\nZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RHMi5jcmwwN6A1oDOGMWh0dHA6\nLy9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RHMi5jcmwwPQYD\nVR0gBDYwNDAyBgRVHSAAMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8vd3d3LmRpZ2lj\nZXJ0LmNvbS9DUFMwHQYDVR0OBBYEFCRuKy3QapJRUSVpAaqaR6aJ50AgMB8GA1Ud\nIwQYMBaAFE4iVCAYlebjbuYP+vq5Eu0GF485MA0GCSqGSIb3DQEBCwUAA4IBAQAL\nOYSR+ZfrqoGvhOlaOJL84mxZvzbIRacxAxHhBsCsMsdaVSnaT0AC9aHesO3ewPj2\ndZ12uYf+QYB6z13jAMZbAuabeGLJ3LhimnftiQjXS8X9Q9ViIyfEBFltcT8jW+rZ\n8uckJ2/0lYDblizkVIvP6hnZf1WZUXoOLRg9eFhSvGNoVwvdRLNXSmDmyHBwW4co\natc7TlJFGa8kBpJIERqLrqwYElesA8u49L3KJg6nwd3jM+/AVTANlVlOnAM2BvjA\njxSZnE0qnsHhfTuvcqdFuhOWKU4Z0BqYBvQ3lBetoxi6PrABDJXWKTUgNX31EGDk\n92hiHuwZ4STyhxGs6QiA\n-----END CERTIFICATE-----\n",
-          "-----BEGIN CERTIFICATE-----\nMIIE3zCCA8egAwIBAgIQSysBFc3lx0gbPN3+3hEWnjANBgkqhkiG9w0BAQsFADCB\nyjELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMR8wHQYDVQQL\nExZWZXJpU2lnbiBUcnVzdCBOZXR3b3JrMTowOAYDVQQLEzEoYykgMjAwNiBWZXJp\nU2lnbiwgSW5jLiAtIEZvciBhdXRob3JpemVkIHVzZSBvbmx5MUUwQwYDVQQDEzxW\nZXJpU2lnbiBDbGFzcyAzIFB1YmxpYyBQcmltYXJ5IENlcnRpZmljYXRpb24gQXV0\naG9yaXR5IC0gRzUwHhcNMTgwNDAzMDAwMDAwWhcNMjgwNDAyMjM1OTU5WjBhMQsw\nCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3d3cu\nZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBHMjCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALs3zTTce2vJsmiQrUp1/0a6\nIQoIjfUZVMn7iNvzrvI6iZE8euarBhprz6wt6F4JJES6Ypp+1qOofuBUdSAFrFC3\nnGMabDDc2h8Zsdce3v3X4MuUgzeu7B9DTt17LNK9LqUv5Km4rTrUmaS2JembawBg\nkmD/TyFJGPdnkKthBpyP8rrptOmSMmu181foXRvNjB2rlQSVSfM1LZbjSW3dd+P7\nSUu0rFUHqY+Vs7Qju0xtRfD2qbKVMLT9TFWMJ0pXFHyCnc1zktMWSgYMjFDRjx4J\nvheh5iHK/YPlELyDpQrEZyj2cxQUPUZ2w4cUiSE0Ta8PRQymSaG6u5zFsTODKYUC\nAwEAAaOCAScwggEjMB0GA1UdDgQWBBROIlQgGJXm427mD/r6uRLtBhePOTAPBgNV\nHRMBAf8EBTADAQH/MF8GA1UdIARYMFYwVAYEVR0gADBMMCMGCCsGAQUFBwIBFhdo\ndHRwczovL2Quc3ltY2IuY29tL2NwczAlBggrBgEFBQcCAjAZDBdodHRwczovL2Qu\nc3ltY2IuY29tL3JwYTAvBgNVHR8EKDAmMCSgIqAghh5odHRwOi8vcy5zeW1jYi5j\nb20vcGNhMy1nNS5jcmwwDgYDVR0PAQH/BAQDAgGGMC4GCCsGAQUFBwEBBCIwIDAe\nBggrBgEFBQcwAYYSaHR0cDovL3Muc3ltY2QuY29tMB8GA1UdIwQYMBaAFH/TZafC\n3ey78DAJ80M5+gKvMzEzMA0GCSqGSIb3DQEBCwUAA4IBAQCOStidCZ2ebdzF1Jkd\nijPBIAyeed+Chn4dWDm0ptwghHtZ7Q1DRFGLlOQQgXmcFBZtRCcGRgC2ZZDTjFYE\nfs1mnDD3J+fKxm+cM6rR5JTlLxP4j3v6k91tk1l3TtZhucfF5qs+SNmpp/QQtneN\nJoyWHawD8Knb1BZOUA9sxrFeFdJz4uAz+ld6Fdm1ZtU5gMQXUOKHL6ZGry8+Qnax\n9A35U6m4eroyFSlmrbteDOW5jkZtDuu3E33vx7Di7yLZV/Pfto/28wAcHxnhukPk\nCmMNKS5wFI5j7dStFFn6QWYpQX5SGuu7ywTgOE/nbsDXwqcUsO+elydJvwFEwtwX\nb0ES\n-----END CERTIFICATE-----\n"
-        ],
-        "_http2_server_settings": {
-          "SETTINGS_MAX_CONCURRENT_STREAMS": 128,
-          "SETTINGS_INITIAL_WINDOW_SIZE": 65536,
-          "SETTINGS_MAX_FRAME_SIZE": 16777215
-        },
-        "_tls_version": "TLS 1.3",
-        "_tls_resumed": false,
-        "_tls_next_proto": "h2",
-        "_tls_cipher_suite": 4865,
-        "_dns_info": {
-          "secure": false,
-          "transactions_needed": [
-            {
-              "dns_query_type": "HTTPS"
-            },
-            {
-              "dns_query_type": "AAAA"
-            },
-            {
-              "dns_query_type": "A"
-            }
-          ],
-          "results": [
-            {
-              "alias_target": "media.amazon.map.fastly.net",
-              "domain_name": "f.media-amazon.com",
-              "query_type": "A",
-              "source": "dns",
-              "timed_expiration": "13419043004845766",
-              "type": "alias"
-            },
-            {
-              "alias_target": "tp.c47710ee9-frontier.media-amazon.com",
-              "domain_name": "m.media-amazon.com",
-              "query_type": "A",
-              "source": "dns",
-              "timed_expiration": "13419043004845766",
-              "type": "alias"
-            },
-            {
-              "domain_name": "c.media-amazon.com",
-              "endpoints": [
-                {
-                  "address": "2600:9000:28a9:b400:1d:d7f6:39d5:bd01",
-                  "port": 0
-                },
-                {
-                  "address": "2600:9000:28a9:6c00:1d:d7f6:39d5:bd01",
-                  "port": 0
-                },
-                {
-                  "address": "2600:9000:28a9:3c00:1d:d7f6:39d5:bd01",
-                  "port": 0
-                },
-                {
-                  "address": "2600:9000:28a9:a00:1d:d7f6:39d5:bd01",
-                  "port": 0
-                },
-                {
-                  "address": "2600:9000:28a9:4a00:1d:d7f6:39d5:bd01",
-                  "port": 0
-                },
-                {
-                  "address": "2600:9000:28a9:8000:1d:d7f6:39d5:bd01",
-                  "port": 0
-                },
-                {
-                  "address": "2600:9000:28a9:0:1d:d7f6:39d5:bd01",
-                  "port": 0
-                },
-                {
-                  "address": "2600:9000:28a9:b000:1d:d7f6:39d5:bd01",
-                  "port": 0
-                },
-                {
-                  "address": "151.101.1.16",
-                  "port": 0
-                },
-                {
-                  "address": "151.101.65.16",
-                  "port": 0
-                },
-                {
-                  "address": "151.101.129.16",
-                  "port": 0
-                },
-                {
-                  "address": "151.101.193.16",
-                  "port": 0
-                }
-              ],
-              "hosts": [],
-              "query_type": "UNSPECIFIED",
-              "source": "dns",
-              "strings": [],
-              "timed_expiration": "13419043024845766",
-              "type": "data"
-            },
-            {
-              "alias_target": "m.media-amazon.com",
-              "domain_name": "images-na.ssl-images-amazon.com",
-              "query_type": "AAAA",
-              "source": "dns",
-              "timed_expiration": "13419060473845971",
-              "type": "alias"
-            },
-            {
-              "alias_target": "f.media-amazon.com",
-              "domain_name": "tp.c47710ee9-frontier.media-amazon.com",
-              "query_type": "A",
-              "source": "dns",
-              "timed_expiration": "13419043004845766",
-              "type": "alias"
-            },
-            {
-              "alias_target": "c.media-amazon.com",
-              "domain_name": "tp.c47710ee9-frontier.media-amazon.com",
-              "query_type": "AAAA",
-              "source": "dns",
-              "timed_expiration": "13419043003845971",
-              "type": "alias"
-            },
-            {
-              "alias_target": "tp.c47710ee9-frontier.media-amazon.com",
-              "domain_name": "m.media-amazon.com",
-              "query_type": "AAAA",
-              "source": "dns",
-              "timed_expiration": "13419043024845971",
-              "type": "alias"
-            },
-            {
-              "alias_target": "m.media-amazon.com",
-              "domain_name": "images-na.ssl-images-amazon.com",
-              "query_type": "A",
-              "source": "dns",
-              "timed_expiration": "13419063197845766",
-              "type": "alias"
-            }
-          ]
-        },
-        "_dns_start": 2165,
-        "_dns_end": 2220,
-        "_dnsTimeMs": 20012909281,
-        "_dnsEndTimeMs": 20012909336,
-        "_connectTimeMs": 20012909336,
-        "_connectEndTimeMs": 20012909352,
-        "_sslStartTimeMs": 20012909308,
-        "_load_start": 2165,
-        "_ttfb_start": 2165,
-        "_ttfb_end": 2264,
-        "_download_start": 2264,
-        "_download_end": 2277,
-        "_all_end": 2277
       },
       {
         "startedDateTime": "1970-08-20T15:08:29.360Z",
@@ -3931,7 +3519,7 @@
           "receive": 3
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "289",
         "_chunks": [
           {
             "ts": 2403,
@@ -4185,7 +3773,7 @@
           "receive": 4
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "289",
         "_chunks": [
           {
             "ts": 2416,
@@ -4447,7 +4035,7 @@
           "receive": 20
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "289",
         "_chunks": [
           {
             "ts": 2440,
@@ -4527,6 +4115,422 @@
         "_download_start": 2303,
         "_download_end": 2323,
         "_all_end": 2323
+      },
+      {
+        "startedDateTime": "1970-08-20T15:08:29.281Z",
+        "time": 185.9997329711914,
+        "pageref": "page_1_0_1",
+        "request": {
+          "method": "GET",
+          "url": "https://images-na.ssl-images-amazon.com/images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min._V1_.css",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Unknown\""
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "accept",
+              "value": "text/css,*/*;q=0.1"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "no-cors"
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "style"
+            },
+            {
+              "name": "sec-fetch-storage-access",
+              "value": "active"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.amazon.com/"
+            },
+            {
+              "name": "accept-encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "priority",
+              "value": "u=0"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "text/css"
+            },
+            {
+              "name": "date",
+              "value": "Wed, 06 Aug 2025 02:13:09 GMT"
+            },
+            {
+              "name": "x-nginx-cache-status",
+              "value": "HIT"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "server",
+              "value": "Server"
+            },
+            {
+              "name": "x-amz-ir-id",
+              "value": "12fcb533-46a4-4661-921d-d4e386734ae9"
+            },
+            {
+              "name": "cache-control",
+              "value": "max-age=630720000,public"
+            },
+            {
+              "name": "last-modified",
+              "value": "Wed, 17 Jul 2013 22:49:32 GMT"
+            },
+            {
+              "name": "access-control-allow-origin",
+              "value": "*"
+            },
+            {
+              "name": "timing-allow-origin",
+              "value": "https://www.amazon.com"
+            },
+            {
+              "name": "edge-cache-tag",
+              "value": "x-cache-490,/images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min"
+            },
+            {
+              "name": "expires",
+              "value": "Tue, 25 Jul 2045 10:54:28 GMT"
+            },
+            {
+              "name": "surrogate-key",
+              "value": "x-cache-490 /images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min"
+            },
+            {
+              "name": "via",
+              "value": "1.1 8050c5b4863c56ab9f53d7e4db71f5ec.cloudfront.net (CloudFront)"
+            },
+            {
+              "name": "alt-svc",
+              "value": "h3=\":443\"; ma=86400"
+            },
+            {
+              "name": "age",
+              "value": "20122975"
+            },
+            {
+              "name": "server-timing",
+              "value": "cdn-cache-hit,cdn-pop;desc=\"IAD89-P3\",cdn-rid;desc=\"gBlJ6Lo9xFgQZpoUann3lqIHmsygLBPJbJTDzoBrhT2GRcmDrj0LQg==\",cdn-hit-layer;desc=\"EDGE\",cdn-downstream-fbl;dur=3,provider;desc=\"cf\""
+            },
+            {
+              "name": "accept-ch",
+              "value": "Sec-CH-UA-Form-Factors, Sec-CH-Viewport-Width, Sec-CH-Width, Sec-CH-Viewport-Height, Sec-CH-DPR, ECT"
+            },
+            {
+              "name": "x-cache",
+              "value": "Hit from cloudfront"
+            },
+            {
+              "name": "x-amz-cf-pop",
+              "value": "IAD89-P3"
+            },
+            {
+              "name": "x-amz-cf-id",
+              "value": "gBlJ6Lo9xFgQZpoUann3lqIHmsygLBPJbJTDzoBrhT2GRcmDrj0LQg=="
+            }
+          ],
+          "content": {
+            "size": 18915,
+            "mimeType": "text/css",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 18915
+        },
+        "cache": {},
+        "timings": {
+          "dns": 55,
+          "connect": 16,
+          "ssl": 44,
+          "send": 0,
+          "wait": 101.9997329711914,
+          "receive": 13
+        },
+        "serverIPAddress": "",
+        "connection": "289",
+        "_chunks": [
+          {
+            "ts": 2315,
+            "bytes": 18915,
+            "inflated": 37633
+          }
+        ],
+        "_chunks_in": [],
+        "_chunks_out": [],
+        "_bytes_in": 18915,
+        "_created": 2162,
+        "_url": "https://images-na.ssl-images-amazon.com/images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min._V1_.css",
+        "_priority": "Highest",
+        "_initial_priority": "Highest",
+        "_method": "GET",
+        "_group": "https://images-na.ssl-images-amazon.com <https://amazon.com same_site>",
+        "_socket": 287,
+        "_h2_session": 289,
+        "_start": 2281.000266,
+        "_request_headers": [
+          ":method: GET",
+          ":authority: images-na.ssl-images-amazon.com",
+          ":scheme: https",
+          ":path: /images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min._V1_.css",
+          "sec-ch-ua-platform: \"Unknown\"",
+          "user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 PTST/260302.154524",
+          "sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"146\", \"Google Chrome\";v=\"146\"",
+          "sec-ch-ua-mobile: ?0",
+          "accept: text/css,*/*;q=0.1",
+          "sec-fetch-site: cross-site",
+          "sec-fetch-mode: no-cors",
+          "sec-fetch-dest: style",
+          "sec-fetch-storage-access: active",
+          "referer: https://www.amazon.com/",
+          "accept-encoding: gzip, deflate, br, zstd",
+          "accept-language: en-US,en;q=0.9",
+          "priority: u=0"
+        ],
+        "_protocol": "HTTP/2",
+        "_stream_id": 1,
+        "_response_headers": [
+          ":status: 200",
+          "content-type: text/css",
+          "date: Wed, 06 Aug 2025 02:13:09 GMT",
+          "x-nginx-cache-status: HIT",
+          "content-encoding: br",
+          "server: Server",
+          "x-amz-ir-id: 12fcb533-46a4-4661-921d-d4e386734ae9",
+          "cache-control: max-age=630720000,public",
+          "last-modified: Wed, 17 Jul 2013 22:49:32 GMT",
+          "access-control-allow-origin: *",
+          "timing-allow-origin: https://www.amazon.com",
+          "edge-cache-tag: x-cache-490,/images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min",
+          "expires: Tue, 25 Jul 2045 10:54:28 GMT",
+          "surrogate-key: x-cache-490 /images/G/01/AUIClients/AmazonUI-3c913031596ca78a3768f4e934b1cc02ce238101.secure.min",
+          "via: 1.1 8050c5b4863c56ab9f53d7e4db71f5ec.cloudfront.net (CloudFront)",
+          "alt-svc: h3=\":443\"; ma=86400",
+          "age: 20122975",
+          "server-timing: cdn-cache-hit,cdn-pop;desc=\"IAD89-P3\",cdn-rid;desc=\"gBlJ6Lo9xFgQZpoUann3lqIHmsygLBPJbJTDzoBrhT2GRcmDrj0LQg==\",cdn-hit-layer;desc=\"EDGE\",cdn-downstream-fbl;dur=3,provider;desc=\"cf\"",
+          "accept-ch: Sec-CH-UA-Form-Factors, Sec-CH-Viewport-Width, Sec-CH-Width, Sec-CH-Viewport-Height, Sec-CH-DPR, ECT",
+          "x-cache: Hit from cloudfront",
+          "x-amz-cf-pop: IAD89-P3",
+          "x-amz-cf-id: gBlJ6Lo9xFgQZpoUann3lqIHmsygLBPJbJTDzoBrhT2GRcmDrj0LQg=="
+        ],
+        "_first_byte": 2310,
+        "_end": 2323,
+        "_has_raw_bytes": true,
+        "_uncompressed_bytes_in": 168705,
+        "_netlog_id": "266",
+        "_fromNet": true,
+        "_exclusive": 1,
+        "_parent_stream_id": 0,
+        "_weight": 256,
+        "_server_address": "[2600:9000:28a9:b400:1d:d7f6:39d5:bd01]:443",
+        "_socket_group": "https://images-na.ssl-images-amazon.com <https://amazon.com same_site>",
+        "_connect_start": 2220,
+        "_connect_end": 2236,
+        "_ssl_start": 2236,
+        "_ssl_end": 2280,
+        "_certificates": [
+          "-----BEGIN CERTIFICATE-----\nMIIHJTCCBg2gAwIBAgIQDxtOcKWySXEgi+QJgm98/jANBgkqhkiG9w0BAQsFADBE\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMR4wHAYDVQQDExVE\naWdpQ2VydCBHbG9iYWwgQ0EgRzIwHhcNMjUwNzAxMDAwMDAwWhcNMjYwNjE4MjM1\nOTU5WjAqMSgwJgYDVQQDEx9pbWFnZXMtbmEuc3NsLWltYWdlcy1hbWF6b24uY29t\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmztIn1kgm2kVt3NmYTQ9\nt6d/0ORYHQknUoA0n+/KDJqPTk94zUwRvr8tvkWaUpdla+KWoBp8VHhGwJF/o3kR\nJYEWa8MpQutFdLjkDZ0kxz7RGo4paoDtptVSp/6FsSlovBSj40o6KHpqQqs8ldry\nLJ8wZlpJFv44TXuwJPAa61Cs3UXJOszSxumQ57jzkSSc+zSHkvtjaJ4BnZXoo17b\nsj2thyM55vpx88GNgw9kllyVAUreX4lPPVCOAHo4ZqMyWy1KR2j8v+gAHygtRscz\nSUqnfCYajlFWND1alReEDgPBts/lL6wxfmRvhe8Zaj6AEDAglk3CZYNJUHVZPoJn\nmwIDAQABo4IEKzCCBCcwHwYDVR0jBBgwFoAUJG4rLdBqklFRJWkBqppHponnQCAw\nHQYDVR0OBBYEFNizQu3WEjkVRLPvUjVp24XTDZl5MIH0BgNVHREEgewwgemCH2lt\nYWdlcy1uYS5zc2wtaW1hZ2VzLWFtYXpvbi5jb22CEm0ubWVkaWEtYW1hem9uLmNv\nbYIfaW1hZ2VzLWZlLnNzbC1pbWFnZXMtYW1hem9uLmNvbYIfaW1hZ2VzLWV1LnNz\nbC1pbWFnZXMtYW1hem9uLmNvbYIRaWEubWVkaWEtaW1kYi5jb22CEmYubWVkaWEt\nYW1hem9uLmNvbYIRaW1hZ2VzLmFtYXpvbi5jb22CE2ctaW1hZ2VzLmFtYXpvbi5j\nb22CDWltZy5hbWF6b24uY2GCEmMubWVkaWEtYW1hem9uLmNvbTA+BgNVHSAENzA1\nMDMGBmeBDAECATApMCcGCCsGAQUFBwIBFhtodHRwOi8vd3d3LmRpZ2ljZXJ0LmNv\nbS9DUFMwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEF\nBQcDAjB3BgNVHR8EcDBuMDWgM6Axhi9odHRwOi8vY3JsMy5kaWdpY2VydC5jb20v\nRGlnaUNlcnRHbG9iYWxDQUcyLmNybDA1oDOgMYYvaHR0cDovL2NybDQuZGlnaWNl\ncnQuY29tL0RpZ2lDZXJ0R2xvYmFsQ0FHMi5jcmwwdAYIKwYBBQUHAQEEaDBmMCQG\nCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wPgYIKwYBBQUHMAKG\nMmh0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbENBRzIu\nY3J0MAwGA1UdEwEB/wQCMAAwggGABgorBgEEAdZ5AgQCBIIBcASCAWwBagB3AA5X\nlLzzrqk+MxssmQez95Dfm8I9cTIl3SGpJaxhxU4hAAABl8ferccAAAQDAEgwRgIh\nAJKquzOAJQczk3SFB+xV0DEK7k4pe8fsFLbwqyNDfoO8AiEAgOKhIsfjtjjyfSe6\nMPX7jqgsIVZtdcwdz5G01Hok0d0AdgBkEcRspBLsp4kcogIuALyrTygH1B41J6vq\n/tUDyX3N8AAAAZfH3q4EAAAEAwBHMEUCIFcvnULq1Ktd0HVgJP+rsjy16RIYySU4\nx+8VPbt4FGZFAiEApbpE40cHF+ssTyI6co5Z8Y5Kbt0kNhQjQuVbd/StzcoAdwBJ\nnJtp3h187Pw23s2HZKa4W68Kh4AZ0VVS++nrKd34wwAAAZfH3q4VAAAEAwBIMEYC\nIQCVS9qnJxdfdP5bnjvsj7k6zmz0+7o6qT8063ZM7MX4rQIhANpspsuNloTTHSZ7\nRyFFcXpO2HWnatiRh9uQEvKNiGMzMA0GCSqGSIb3DQEBCwUAA4IBAQDGpKqXHUA0\n/N5AMzHYZdrD5+NF7R410qivMd60yM3Ngb1IcuF7VxcqGSvD493bUZ0VfkjQS/bI\nlmrp/1z01AVmNakHJeabdkEaUOlyqGXCW7JXJDKImtKXK0qaJ6EoV+3P9+xPKW/q\n53FvS12uBiQOflOwGvR2iLfcTqfA8GpcHcfKCkpv1qipG70W4D8JrmQaQPd2PMSG\nu+wzJb3E5RwyQHImKHSU+0OylDCRD37aqaNhgbqev+xAkiWvvgkAFoeJVqX4TO2v\nRTJONESdBtK72tXnpPnbcNgHwbxzooKikLE1U8rBvhGJvOxR3O+EzeD+nONf4crE\n2HAI1p0qro9X\n-----END CERTIFICATE-----\n",
+          "-----BEGIN CERTIFICATE-----\nMIIEizCCA3OgAwIBAgIQDI7gyQ1qiRWIBAYe4kH5rzANBgkqhkiG9w0BAQsFADBh\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBH\nMjAeFw0xMzA4MDExMjAwMDBaFw0yODA4MDExMjAwMDBaMEQxCzAJBgNVBAYTAlVT\nMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxHjAcBgNVBAMTFURpZ2lDZXJ0IEdsb2Jh\nbCBDQSBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANNIfL7zBYZd\nW9UvhU5L4IatFaxhz1uvPmoKR/uadpFgC4przc/cV35gmAvkVNlW7SHMArZagV+X\nau4CLyMnuG3UsOcGAngLH1ypmTb+u6wbBfpXzYEQQGfWMItYNdSWYb7QjHqXnxr5\nIuYUL6nG6AEfq/gmD6yOTSwyOR2Bm40cZbIc22GoiS9g5+vCShjEbyrpEJIJ7RfR\nACvmfe8EiRROM6GyD5eHn7OgzS+8LOy4g2gxPR/VSpAQGQuBldYpdlH5NnbQtwl6\nOErXb4y/E3w57bqukPyV93t4CTZedJMeJfD/1K2uaGvG/w/VNfFVbkhJ+Pi474j4\n8V4Rd6rfArMCAwEAAaOCAVowggFWMBIGA1UdEwEB/wQIMAYBAf8CAQAwDgYDVR0P\nAQH/BAQDAgGGMDQGCCsGAQUFBwEBBCgwJjAkBggrBgEFBQcwAYYYaHR0cDovL29j\nc3AuZGlnaWNlcnQuY29tMHsGA1UdHwR0MHIwN6A1oDOGMWh0dHA6Ly9jcmw0LmRp\nZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RHMi5jcmwwN6A1oDOGMWh0dHA6\nLy9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RHMi5jcmwwPQYD\nVR0gBDYwNDAyBgRVHSAAMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8vd3d3LmRpZ2lj\nZXJ0LmNvbS9DUFMwHQYDVR0OBBYEFCRuKy3QapJRUSVpAaqaR6aJ50AgMB8GA1Ud\nIwQYMBaAFE4iVCAYlebjbuYP+vq5Eu0GF485MA0GCSqGSIb3DQEBCwUAA4IBAQAL\nOYSR+ZfrqoGvhOlaOJL84mxZvzbIRacxAxHhBsCsMsdaVSnaT0AC9aHesO3ewPj2\ndZ12uYf+QYB6z13jAMZbAuabeGLJ3LhimnftiQjXS8X9Q9ViIyfEBFltcT8jW+rZ\n8uckJ2/0lYDblizkVIvP6hnZf1WZUXoOLRg9eFhSvGNoVwvdRLNXSmDmyHBwW4co\natc7TlJFGa8kBpJIERqLrqwYElesA8u49L3KJg6nwd3jM+/AVTANlVlOnAM2BvjA\njxSZnE0qnsHhfTuvcqdFuhOWKU4Z0BqYBvQ3lBetoxi6PrABDJXWKTUgNX31EGDk\n92hiHuwZ4STyhxGs6QiA\n-----END CERTIFICATE-----\n",
+          "-----BEGIN CERTIFICATE-----\nMIIE3zCCA8egAwIBAgIQSysBFc3lx0gbPN3+3hEWnjANBgkqhkiG9w0BAQsFADCB\nyjELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDlZlcmlTaWduLCBJbmMuMR8wHQYDVQQL\nExZWZXJpU2lnbiBUcnVzdCBOZXR3b3JrMTowOAYDVQQLEzEoYykgMjAwNiBWZXJp\nU2lnbiwgSW5jLiAtIEZvciBhdXRob3JpemVkIHVzZSBvbmx5MUUwQwYDVQQDEzxW\nZXJpU2lnbiBDbGFzcyAzIFB1YmxpYyBQcmltYXJ5IENlcnRpZmljYXRpb24gQXV0\naG9yaXR5IC0gRzUwHhcNMTgwNDAzMDAwMDAwWhcNMjgwNDAyMjM1OTU5WjBhMQsw\nCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3d3cu\nZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBHMjCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALs3zTTce2vJsmiQrUp1/0a6\nIQoIjfUZVMn7iNvzrvI6iZE8euarBhprz6wt6F4JJES6Ypp+1qOofuBUdSAFrFC3\nnGMabDDc2h8Zsdce3v3X4MuUgzeu7B9DTt17LNK9LqUv5Km4rTrUmaS2JembawBg\nkmD/TyFJGPdnkKthBpyP8rrptOmSMmu181foXRvNjB2rlQSVSfM1LZbjSW3dd+P7\nSUu0rFUHqY+Vs7Qju0xtRfD2qbKVMLT9TFWMJ0pXFHyCnc1zktMWSgYMjFDRjx4J\nvheh5iHK/YPlELyDpQrEZyj2cxQUPUZ2w4cUiSE0Ta8PRQymSaG6u5zFsTODKYUC\nAwEAAaOCAScwggEjMB0GA1UdDgQWBBROIlQgGJXm427mD/r6uRLtBhePOTAPBgNV\nHRMBAf8EBTADAQH/MF8GA1UdIARYMFYwVAYEVR0gADBMMCMGCCsGAQUFBwIBFhdo\ndHRwczovL2Quc3ltY2IuY29tL2NwczAlBggrBgEFBQcCAjAZDBdodHRwczovL2Qu\nc3ltY2IuY29tL3JwYTAvBgNVHR8EKDAmMCSgIqAghh5odHRwOi8vcy5zeW1jYi5j\nb20vcGNhMy1nNS5jcmwwDgYDVR0PAQH/BAQDAgGGMC4GCCsGAQUFBwEBBCIwIDAe\nBggrBgEFBQcwAYYSaHR0cDovL3Muc3ltY2QuY29tMB8GA1UdIwQYMBaAFH/TZafC\n3ey78DAJ80M5+gKvMzEzMA0GCSqGSIb3DQEBCwUAA4IBAQCOStidCZ2ebdzF1Jkd\nijPBIAyeed+Chn4dWDm0ptwghHtZ7Q1DRFGLlOQQgXmcFBZtRCcGRgC2ZZDTjFYE\nfs1mnDD3J+fKxm+cM6rR5JTlLxP4j3v6k91tk1l3TtZhucfF5qs+SNmpp/QQtneN\nJoyWHawD8Knb1BZOUA9sxrFeFdJz4uAz+ld6Fdm1ZtU5gMQXUOKHL6ZGry8+Qnax\n9A35U6m4eroyFSlmrbteDOW5jkZtDuu3E33vx7Di7yLZV/Pfto/28wAcHxnhukPk\nCmMNKS5wFI5j7dStFFn6QWYpQX5SGuu7ywTgOE/nbsDXwqcUsO+elydJvwFEwtwX\nb0ES\n-----END CERTIFICATE-----\n"
+        ],
+        "_http2_server_settings": {
+          "SETTINGS_MAX_CONCURRENT_STREAMS": 128,
+          "SETTINGS_INITIAL_WINDOW_SIZE": 65536,
+          "SETTINGS_MAX_FRAME_SIZE": 16777215
+        },
+        "_tls_version": "TLS 1.3",
+        "_tls_resumed": false,
+        "_tls_next_proto": "h2",
+        "_tls_cipher_suite": 4865,
+        "_dns_info": {
+          "secure": false,
+          "transactions_needed": [
+            {
+              "dns_query_type": "HTTPS"
+            },
+            {
+              "dns_query_type": "AAAA"
+            },
+            {
+              "dns_query_type": "A"
+            }
+          ],
+          "results": [
+            {
+              "alias_target": "media.amazon.map.fastly.net",
+              "domain_name": "f.media-amazon.com",
+              "query_type": "A",
+              "source": "dns",
+              "timed_expiration": "13419043004845766",
+              "type": "alias"
+            },
+            {
+              "alias_target": "tp.c47710ee9-frontier.media-amazon.com",
+              "domain_name": "m.media-amazon.com",
+              "query_type": "A",
+              "source": "dns",
+              "timed_expiration": "13419043004845766",
+              "type": "alias"
+            },
+            {
+              "domain_name": "c.media-amazon.com",
+              "endpoints": [
+                {
+                  "address": "2600:9000:28a9:b400:1d:d7f6:39d5:bd01",
+                  "port": 0
+                },
+                {
+                  "address": "2600:9000:28a9:6c00:1d:d7f6:39d5:bd01",
+                  "port": 0
+                },
+                {
+                  "address": "2600:9000:28a9:3c00:1d:d7f6:39d5:bd01",
+                  "port": 0
+                },
+                {
+                  "address": "2600:9000:28a9:a00:1d:d7f6:39d5:bd01",
+                  "port": 0
+                },
+                {
+                  "address": "2600:9000:28a9:4a00:1d:d7f6:39d5:bd01",
+                  "port": 0
+                },
+                {
+                  "address": "2600:9000:28a9:8000:1d:d7f6:39d5:bd01",
+                  "port": 0
+                },
+                {
+                  "address": "2600:9000:28a9:0:1d:d7f6:39d5:bd01",
+                  "port": 0
+                },
+                {
+                  "address": "2600:9000:28a9:b000:1d:d7f6:39d5:bd01",
+                  "port": 0
+                },
+                {
+                  "address": "151.101.1.16",
+                  "port": 0
+                },
+                {
+                  "address": "151.101.65.16",
+                  "port": 0
+                },
+                {
+                  "address": "151.101.129.16",
+                  "port": 0
+                },
+                {
+                  "address": "151.101.193.16",
+                  "port": 0
+                }
+              ],
+              "hosts": [],
+              "query_type": "UNSPECIFIED",
+              "source": "dns",
+              "strings": [],
+              "timed_expiration": "13419043024845766",
+              "type": "data"
+            },
+            {
+              "alias_target": "m.media-amazon.com",
+              "domain_name": "images-na.ssl-images-amazon.com",
+              "query_type": "AAAA",
+              "source": "dns",
+              "timed_expiration": "13419060473845971",
+              "type": "alias"
+            },
+            {
+              "alias_target": "f.media-amazon.com",
+              "domain_name": "tp.c47710ee9-frontier.media-amazon.com",
+              "query_type": "A",
+              "source": "dns",
+              "timed_expiration": "13419043004845766",
+              "type": "alias"
+            },
+            {
+              "alias_target": "c.media-amazon.com",
+              "domain_name": "tp.c47710ee9-frontier.media-amazon.com",
+              "query_type": "AAAA",
+              "source": "dns",
+              "timed_expiration": "13419043003845971",
+              "type": "alias"
+            },
+            {
+              "alias_target": "tp.c47710ee9-frontier.media-amazon.com",
+              "domain_name": "m.media-amazon.com",
+              "query_type": "AAAA",
+              "source": "dns",
+              "timed_expiration": "13419043024845971",
+              "type": "alias"
+            },
+            {
+              "alias_target": "m.media-amazon.com",
+              "domain_name": "images-na.ssl-images-amazon.com",
+              "query_type": "A",
+              "source": "dns",
+              "timed_expiration": "13419063197845766",
+              "type": "alias"
+            }
+          ]
+        },
+        "_dns_start": 2164,
+        "_dns_end": 2219,
+        "_dnsTimeMs": 20012909281,
+        "_dnsEndTimeMs": 20012909336,
+        "_connectTimeMs": 20012909336,
+        "_connectEndTimeMs": 20012909352,
+        "_sslStartTimeMs": 20012909308,
+        "_load_start": 2165,
+        "_ttfb_start": 2165,
+        "_ttfb_end": 2266,
+        "_download_start": 2266,
+        "_download_end": 2279,
+        "_all_end": 2279
       },
       {
         "startedDateTime": "1970-08-20T15:08:29.449Z",
@@ -4701,7 +4705,7 @@
           "receive": 4
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "315",
         "_chunks": [
           {
             "ts": 2482,
@@ -4717,6 +4721,7 @@
         "_priority": "Low",
         "_initial_priority": "Low",
         "_method": "GET",
+        "_quic_session": 315,
         "_start": 2449.000329,
         "_request_headers": [
           ":method: GET",
@@ -4947,7 +4952,7 @@
           "receive": 1
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "315",
         "_chunks": [
           {
             "ts": 2529,
@@ -4963,6 +4968,7 @@
         "_priority": "Low",
         "_initial_priority": "Low",
         "_method": "GET",
+        "_quic_session": 315,
         "_start": 2502.000337,
         "_request_headers": [
           ":method: GET",
@@ -5022,7 +5028,7 @@
       },
       {
         "startedDateTime": "1970-08-20T15:08:29.560Z",
-        "time": 285.9997100830078,
+        "time": 286.9997100830078,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -5121,11 +5127,11 @@
           "connect": 35,
           "ssl": 72,
           "send": 0,
-          "wait": 158.9997100830078,
+          "wait": 159.9997100830078,
           "receive": 5
         },
         "serverIPAddress": "",
-        "connection": "conn_req_13",
+        "connection": "346",
         "_chunks": [
           {
             "ts": 2602,
@@ -5181,10 +5187,10 @@
         "_weight": 220,
         "_server_address": "32.193.188.85:443",
         "_socket_group": "https://fls-na.amazon.com <https://amazon.com same_site>",
-        "_connect_start": 2531,
-        "_connect_end": 2566,
-        "_ssl_start": 2494,
-        "_ssl_end": 2444,
+        "_connect_start": 2451,
+        "_connect_end": 2486,
+        "_ssl_start": 2486,
+        "_ssl_end": 2558,
         "_certificates": [
           "-----BEGIN CERTIFICATE-----\nMIIGgDCCBWigAwIBAgIQDpEUquvS47z6SyT/WHRELTANBgkqhkiG9w0BAQsFADA8\nMQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRwwGgYDVQQDExNBbWF6b24g\nUlNBIDIwNDggTTAzMB4XDTI1MDkwMzAwMDAwMFoXDTI2MTAwMjIzNTk1OVowHDEa\nMBgGA1UEAxMRZmxzLW5hLmFtYXpvbi5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IB\nDwAwggEKAoIBAQDSZFAd99sFX0N8Yn1Tr65OmKXomfm+I2KGeactROV85y7iFHnC\nlB+rBvE2DUlg4xLo+BtQbXlW47vPhneAN1DIg41kaMWe7xpD4nmW65l0hWKlxkuk\nV5qY5kYt5BzaE2tUqQxr1Hc2vL/MX6ulPn0gCeR4eCGW6BaFHBo2of7wjrTj/C99\nS1ZwcR9LNGPNzkeq+eVnfr5x+S0zUhhB9cuAJTDP06ermKjAzXvvWiCaIitv/6NA\nbBR+w9yNDXjTbQLLNUj/tJT5TKVIiEbxTtH66s3YT1Bn+cRemjqeS4/JlUvr8T2Q\nfflmB4jTbXxvpVw/2owNWqKTp9Z7G2OxUk3TAgMBAAGjggOcMIIDmDAfBgNVHSME\nGDAWgBRV2Rhf0hzMAeFYtL6r2VVCAdcuAjAdBgNVHQ4EFgQU7djgBG1O39zs4c/f\nRfNPgEtZISIwgdcGA1UdEQSBzzCBzIIRZmxzLW5hLmFtYXpvbi5jb22CFGZscy1u\nYS5hbWF6b24uY29tLm14gidnYXRld2F5LnByb2QudXMtZWFzdC0xLmZvcmVzdGVy\nLmEyei5jb22CEGZscy1uYS5hbWF6b24uY2yCFGZscy1uYS5hbWF6b24uY29tLmJy\nghBmbHMtbmEuYW1hem9uLmNhghRmbHMtbmEuYW1hem9uLmNvbS5jb4IoZW5kcG9p\nbnQucHJvZC51cy1lYXN0LTEuZm9yZXN0ZXIuYTJ6LmNvbTATBgNVHSAEDDAKMAgG\nBmeBDAECATAOBgNVHQ8BAf8EBAMCBaAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwOwYD\nVR0fBDQwMjAwoC6gLIYqaHR0cDovL2NybC5yMm0wMy5hbWF6b250cnVzdC5jb20v\ncjJtMDMuY3JsMHUGCCsGAQUFBwEBBGkwZzAtBggrBgEFBQcwAYYhaHR0cDovL29j\nc3AucjJtMDMuYW1hem9udHJ1c3QuY29tMDYGCCsGAQUFBzAChipodHRwOi8vY3J0\nLnIybTAzLmFtYXpvbnRydXN0LmNvbS9yMm0wMy5jZXIwDAYDVR0TAQH/BAIwADCC\nAX4GCisGAQQB1nkCBAIEggFuBIIBagFoAHYA2AlVO5RPev/IFhlvlE+Fq7D4/F6H\nVSYPFdEucrtFSxQAAAGZDWNspgAABAMARzBFAiAhV4pD6pi/pUZTZ7mNiA16EyKT\n2cdAbnkn0I+fdS0ZnwIhAMRsGCOVXxWvKFAKeJwn0TFbVRyi1tS9YaWylLSv9Rts\nAHYAwjF+V0UZo0XufzjespBB68fCIVoiv3/Vta12mtkOUs0AAAGZDWNslgAABAMA\nRzBFAiEA/WHJbXxCnBeK6fK++FmizI8pNGa77LYbVpoUZFs/lRsCIG/a0MPZCczq\nc5Xe6URFZBqLH7L2ssgXr3lnGkvZJRTRAHYAlE5Dh/rswe+B8xkkJqgYZQHH0184\nAgE/cmd9VTcuGdgAAAGZDWNsrAAABAMARzBFAiBOh9e98uXLYlmFSrXBFFZCU1ax\nGJ7lRUTpNLPrv/UO9wIhAJ19Zcs/Ka/iafwWBkO1/PEB+c8t6Y7D//JvBaCC1qjD\nMA0GCSqGSIb3DQEBCwUAA4IBAQB/jDjcqmrHDOKAcbMgq84pIoVHgVxlKJD6levz\neV0E86oZAeXvv9yDvohFC7zz1Tzrx3FvaBSFkB8Fimo8Ie4oPqswKiWaViMK8tHX\nGBJzoSj6UrUKpgIZU/Hnla4t+fSqMIwho7CBC7WFiG9b5o9rvgcA0ioxuepg+xBt\nBK3qwyQw+cyX7zXYaVB1KBDvpSt2gDnQneNmePbMLsR523ryzzE6lOF648qJkqSD\nXbCoTRD+2bygg4TCgX4d4J2CSRSFrGemm/aAC5dhOVh6MXHgdIJlYRDXhl5YPoVN\n3+/rmCZn/zc/d9zr5EQWmrITkBH3LGWYv4hqrpxfu/gpY/EW\n-----END CERTIFICATE-----\n",
           "-----BEGIN CERTIFICATE-----\nMIIEXjCCA0agAwIBAgITB3MSTNQG0mfAmRzdKZqfODF5hTANBgkqhkiG9w0BAQsF\nADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\nb24gUm9vdCBDQSAxMB4XDTIyMDgyMzIyMjYwNFoXDTMwMDgyMzIyMjYwNFowPDEL\nMAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEcMBoGA1UEAxMTQW1hem9uIFJT\nQSAyMDQ4IE0wMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALd/pVko\n8vuM475Tf45HV3BbCl/B9Jy89G1CRkFjcPY06WA9lS+7dWbUA7GtWUKoksr69hKM\nwcMsNpxlw7b3jeXFgxB09/nmalcAWtnLzF+LaDKEA5DQmvKzuh1nfIfqEiKCQSmX\nXh09Xs+dO7cm5qbaL2hhNJCSAejciwcvOFgFNgEMR42wm6KIFHsQW28jhA+1u/M0\np6fVwReuEgZfLfdx82Px0LJck3lST3EB/JfbdsdOzzzg5YkY1dfuqf8y5fUeZ7Cz\nWXbTjujwX/TovmeWKA36VLCz75azW6tDNuDn66FOpADZZ9omVaF6BqNJiLMVl6P3\n/c0OiUMC6Z5OfKcCAwEAAaOCAVowggFWMBIGA1UdEwEB/wQIMAYBAf8CAQAwDgYD\nVR0PAQH/BAQDAgGGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAdBgNV\nHQ4EFgQUVdkYX9IczAHhWLS+q9lVQgHXLgIwHwYDVR0jBBgwFoAUhBjMhTTsvAyU\nlC4IWZzHshBOCggwewYIKwYBBQUHAQEEbzBtMC8GCCsGAQUFBzABhiNodHRwOi8v\nb2NzcC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbTA6BggrBgEFBQcwAoYuaHR0cDov\nL2NydC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbS9yb290Y2ExLmNlcjA/BgNVHR8E\nODA2MDSgMqAwhi5odHRwOi8vY3JsLnJvb3RjYTEuYW1hem9udHJ1c3QuY29tL3Jv\nb3RjYTEuY3JsMBMGA1UdIAQMMAowCAYGZ4EMAQIBMA0GCSqGSIb3DQEBCwUAA4IB\nAQAGjeWm2cC+3z2MzSCnte46/7JZvj3iQZDY7EvODNdZF41n71Lrk9kbfNwerK0d\nVNzW36Wefr7j7ZSwBVg50W5ay65jNSN74TTQV1yt4WnSbVvN6KlMs1hiyOZdoHKs\nKDV2UGNxbdoBYCQNa2GYF8FQIWLugNp35aSOpMy6cFlymFQomIrnOQHwK1nvVY4q\nxDSJMU/gNJz17D8ArPN3ngnyZ2TwepJ0uBINz3G5te2rdFUF4i4Y3Bb7FUlHDYm4\nu8aIRGpk2ZpfXmxaoxnbIBZRvGLPSUuPwnwoUOMsJ8jirI5vs2dvchPb7MtI1rle\ni02f2ivH2vxkjDLltSpe2fiC\n-----END CERTIFICATE-----\n",
@@ -5322,8 +5328,8 @@
             }
           ]
         },
-        "_dns_start": 2444,
-        "_dns_end": 2531,
+        "_dns_start": 2338,
+        "_dns_end": 2425,
         "_dns_details": {
           "HTTPS": {
             "cname": [
@@ -5347,10 +5353,10 @@
         "_sslStartTimeMs": 20012909610,
         "_load_start": 2444,
         "_ttfb_start": 2444,
-        "_ttfb_end": 2602,
-        "_download_start": 2602,
-        "_download_end": 2607,
-        "_all_end": 2607
+        "_ttfb_end": 2603,
+        "_download_start": 2603,
+        "_download_end": 2608,
+        "_all_end": 2608
       },
       {
         "startedDateTime": "1970-08-20T15:08:30.547Z",
@@ -5469,7 +5475,7 @@
           "receive": 0
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "346",
         "_chunks": [],
         "_chunks_in": [],
         "_chunks_out": [],

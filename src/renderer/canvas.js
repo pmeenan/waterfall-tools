@@ -139,8 +139,33 @@ export class WaterfallCanvas {
         this.rawEntries = [];
         if (pageData && pageData.requests) {
             this.rawEntries = Object.values(pageData.requests);
-            // Re-enforce strictly deterministic ordering
-            this.rawEntries.sort((a, b) => a.time_start - b.time_start);
+            const getSortEpoch = (req) => {
+                let hasAbsoluteTimings = req._load_start !== undefined || req._dns_start !== undefined || req._ttfb_start !== undefined;
+                if (hasAbsoluteTimings) {
+                    let baseEpoch = 0; // Relative sorting
+                    let blockedEnd = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : 0));
+                    let dnsStart = (req._dns_start !== undefined && req._dns_start >= 0) ? baseEpoch + req._dns_start : blockedEnd;
+                    let dnsEnd = (req._dns_end !== undefined && req._dns_end >= 0) ? baseEpoch + req._dns_end : dnsStart;
+                    let connectStart = (req._connect_start !== undefined && req._connect_start >= 0) ? baseEpoch + req._connect_start : dnsEnd;
+                    let connectEnd = (req._connect_end !== undefined && req._connect_end >= 0) ? baseEpoch + req._connect_end : connectStart;
+                    let sslStart = (req._ssl_start !== undefined && req._ssl_start >= 0) ? baseEpoch + req._ssl_start : connectEnd;
+                    let sslEnd = (req._ssl_end !== undefined && req._ssl_end >= 0) ? baseEpoch + req._ssl_end : sslStart;
+                    let requestStart = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : (sslEnd - baseEpoch)));
+                    return Math.max(requestStart, connectEnd);
+                }
+                
+                let delay = 0;
+                if (req.timings) {
+                    if (req.timings.blocked > 0) delay += req.timings.blocked;
+                    if (req.timings.dns > 0) delay += req.timings.dns;
+                    if (req.timings.connect > 0) delay += req.timings.connect;
+                    if (req.timings.send > 0) delay += req.timings.send;
+                }
+                return req.time_start + delay;
+            };
+
+            // Enforce visually correct chronology blocking multiplexed socket dependencies visually seamlessly
+            this.rawEntries.sort((a, b) => getSortEpoch(a) - getSortEpoch(b));
         }
         
         this._requestRender();

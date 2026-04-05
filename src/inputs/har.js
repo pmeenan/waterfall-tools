@@ -4,6 +4,8 @@
  * the Waterfall Tools Extended HAR intermediary structure.
  */
 
+import { buildWaterfallDataFromHar } from '../core/har-converter.js';
+
 /**
  * Normalizes a parsed HAR object into the Extended HAR format.
  * This function is isomorphic and operates synchronously.

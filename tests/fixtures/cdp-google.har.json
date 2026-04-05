@@ -9,7 +9,7 @@
       {
         "id": "page_1_0_1",
         "title": "Run 1, First View for ",
-        "startedDateTime": "2026-03-30T20:30:41.398Z",
+        "startedDateTime": "2026-04-05T23:47:57.303Z",
         "pageTimings": {
           "onLoad": 1331,
           "onContentLoad": -1,
@@ -24,6 +24,8 @@
         "_LargestContentfulPaint": -1,
         "_domInteractive": -1,
         "_bwDown": -1,
+        "_run": 1,
+        "_cached": 0,
         "_loadTime": 1331,
         "_docTime": 1331,
         "_fullyLoaded": 2634,
@@ -38,14 +40,13 @@
         "_responses_other": 0,
         "_result": 0,
         "_testStartOffset": 0,
-        "_cached": 0,
         "_optimization_checked": 0,
         "_main_frame": "1DB8BEFD510639221CD5879370430880"
       }
     ],
     "entries": [
       {
-        "startedDateTime": "2026-03-30T20:30:41.398Z",
+        "startedDateTime": "2026-04-05T23:47:57.303Z",
         "time": 185,
         "pageref": "page_1_0_1",
         "request": {
@@ -313,7 +314,7 @@
           "receive": 87
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 185,
@@ -339,7 +340,7 @@
         "_request_type": "Document",
         "_load_ms": 185,
         "_ttfb_ms": 98,
-        "_load_start": 0,
+        "_load_start": 1,
         "_load_start_float": 0.809000000000001,
         "_bytesIn": 55528,
         "_objectSize": 55528,
@@ -433,14 +434,14 @@
         "_download_ms": 87,
         "_all_ms": 185,
         "_created": 0,
-        "_ttfb_start": 0,
+        "_ttfb_start": 1,
         "_ttfb_end": 98,
         "_download_start": 98,
         "_download_end": 185,
         "_all_end": 185
       },
       {
-        "startedDateTime": "2026-03-30T20:30:41.592Z",
+        "startedDateTime": "2026-04-05T23:47:57.496Z",
         "time": 51,
         "pageref": "page_1_0_1",
         "request": {
@@ -668,7 +669,7 @@
           "receive": 22
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 246,
@@ -698,7 +699,7 @@
         "_request_type": "Stylesheet",
         "_load_ms": 51,
         "_ttfb_ms": 29,
-        "_load_start": 194,
+        "_load_start": 195,
         "_load_start_float": 195.00099999822677,
         "_bytesIn": 1356,
         "_objectSize": 1330,
@@ -782,14 +783,14 @@
         "_download_ms": 22,
         "_all_ms": 51,
         "_created": 193.92099999822676,
-        "_ttfb_start": 194,
-        "_ttfb_end": 223,
-        "_download_start": 223,
-        "_download_end": 245,
-        "_all_end": 245
+        "_ttfb_start": 195,
+        "_ttfb_end": 222,
+        "_download_start": 222,
+        "_download_end": 244,
+        "_all_end": 244
       },
       {
-        "startedDateTime": "2026-03-30T20:30:41.595Z",
+        "startedDateTime": "2026-04-05T23:47:57.499Z",
         "time": 461,
         "pageref": "page_1_0_1",
         "request": {
@@ -1013,7 +1014,7 @@
           "receive": 410
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 658,
@@ -1111,7 +1112,7 @@
         "_request_type": "Script",
         "_load_ms": 461,
         "_ttfb_ms": 51,
-        "_load_start": 197,
+        "_load_start": 198,
         "_load_start_float": 197.53199999755319,
         "_bytesIn": 365098,
         "_objectSize": 365017,
@@ -1194,14 +1195,14 @@
         "_download_ms": 410,
         "_all_ms": 461,
         "_created": 196.07899999755318,
-        "_ttfb_start": 197,
-        "_ttfb_end": 248,
-        "_download_start": 248,
-        "_download_end": 658,
-        "_all_end": 658
+        "_ttfb_start": 198,
+        "_ttfb_end": 247,
+        "_download_start": 247,
+        "_download_end": 657,
+        "_all_end": 657
       },
       {
-        "startedDateTime": "2026-03-30T20:30:41.713Z",
+        "startedDateTime": "2026-04-05T23:47:57.612Z",
         "time": 187,
         "pageref": "page_1_0_1",
         "request": {
@@ -1413,7 +1414,7 @@
           "receive": 109
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 501,
@@ -1443,7 +1444,7 @@
         "_request_type": "Image",
         "_load_ms": 187,
         "_ttfb_ms": 78,
-        "_load_start": 315,
+        "_load_start": 316,
         "_load_start_float": 316.1379999973576,
         "_bytesIn": 682,
         "_objectSize": 660,
@@ -1523,14 +1524,14 @@
         "_download_ms": 109,
         "_all_ms": 187,
         "_created": 309.4939999973576,
-        "_ttfb_start": 315,
-        "_ttfb_end": 393,
-        "_download_start": 393,
-        "_download_end": 502,
-        "_all_end": 502
+        "_ttfb_start": 316,
+        "_ttfb_end": 387,
+        "_download_start": 387,
+        "_download_end": 496,
+        "_all_end": 496
       },
       {
-        "startedDateTime": "2026-03-30T20:30:41.727Z",
+        "startedDateTime": "2026-04-05T23:47:57.524Z",
         "time": 176,
         "pageref": "page_1_0_1",
         "request": {
@@ -1714,7 +1715,7 @@
           "receive": 125
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "250",
         "_chunks": [
           {
             "ts": 503,
@@ -1752,7 +1753,7 @@
         "_request_type": "Font",
         "_load_ms": 176,
         "_ttfb_ms": 51,
-        "_load_start": 329,
+        "_load_start": 330,
         "_load_start_float": 330.4679999998533,
         "_bytesIn": 15371,
         "_objectSize": 15344,
@@ -1825,14 +1826,14 @@
         "_download_ms": 125,
         "_all_ms": 176,
         "_created": 221.77999999985332,
-        "_ttfb_start": 329,
-        "_ttfb_end": 380,
-        "_download_start": 380,
-        "_download_end": 505,
-        "_all_end": 505
+        "_ttfb_start": 330,
+        "_ttfb_end": 272,
+        "_download_start": 272,
+        "_download_end": 397,
+        "_all_end": 397
       },
       {
-        "startedDateTime": "2026-03-30T20:30:41.729Z",
+        "startedDateTime": "2026-04-05T23:47:57.524Z",
         "time": 176,
         "pageref": "page_1_0_1",
         "request": {
@@ -2016,7 +2017,7 @@
           "receive": 85
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "250",
         "_chunks": [
           {
             "ts": 507,
@@ -2050,7 +2051,7 @@
         "_request_type": "Font",
         "_load_ms": 176,
         "_ttfb_ms": 91,
-        "_load_start": 331,
+        "_load_start": 332,
         "_load_start_float": 331.7289999980144,
         "_bytesIn": 15463,
         "_objectSize": 15436,
@@ -2123,14 +2124,14 @@
         "_download_ms": 85,
         "_all_ms": 176,
         "_created": 221.96799999801442,
-        "_ttfb_start": 331,
-        "_ttfb_end": 422,
-        "_download_start": 422,
-        "_download_end": 507,
-        "_all_end": 507
+        "_ttfb_start": 332,
+        "_ttfb_end": 312,
+        "_download_start": 312,
+        "_download_end": 397,
+        "_all_end": 397
       },
       {
-        "startedDateTime": "2026-03-30T20:30:41.732Z",
+        "startedDateTime": "2026-04-05T23:47:57.523Z",
         "time": 174,
         "pageref": "page_1_0_1",
         "request": {
@@ -2314,7 +2315,7 @@
           "receive": 105
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "250",
         "_chunks": [
           {
             "ts": 508,
@@ -2360,7 +2361,7 @@
         "_request_type": "Font",
         "_load_ms": 174,
         "_ttfb_ms": 69,
-        "_load_start": 334,
+        "_load_start": 335,
         "_load_start_float": 335.04299999900206,
         "_bytesIn": 39548,
         "_objectSize": 39516,
@@ -2433,15 +2434,15 @@
         "_download_ms": 105,
         "_all_ms": 174,
         "_created": 220.3159999990021,
-        "_ttfb_start": 334,
-        "_ttfb_end": 403,
-        "_download_start": 403,
-        "_download_end": 508,
-        "_all_end": 508
+        "_ttfb_start": 335,
+        "_ttfb_end": 289,
+        "_download_start": 289,
+        "_download_end": 394,
+        "_all_end": 394
       },
       {
-        "startedDateTime": "2026-03-30T20:30:41.738Z",
-        "time": 488,
+        "startedDateTime": "2026-04-05T23:47:57.500Z",
+        "time": 490.916015625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -2612,11 +2613,11 @@
           "connect": 63,
           "ssl": 44,
           "send": 0,
-          "wait": 140,
+          "wait": 142.916015625,
           "receive": 249
         },
         "serverIPAddress": "",
-        "connection": "conn_req_3",
+        "connection": "258",
         "_chunks": [
           {
             "ts": 629,
@@ -2658,7 +2659,7 @@
         "_request_type": "Script",
         "_load_ms": 290,
         "_ttfb_ms": 41,
-        "_load_start": 340,
+        "_load_start": 341,
         "_load_start_float": 341.03899999944963,
         "_bytesIn": 81832,
         "_objectSize": 81236,
@@ -2669,12 +2670,12 @@
         "_contentEncoding": "gzip",
         "_socket": 258,
         "_protocol": "HTTP/2",
-        "_dns_start": 340,
-        "_dns_end": 376,
-        "_connect_start": 376,
-        "_connect_end": 439,
-        "_ssl_start": 395,
-        "_ssl_end": 340,
+        "_dns_start": 200,
+        "_dns_end": 236,
+        "_connect_start": 242,
+        "_connect_end": 261,
+        "_ssl_start": 261,
+        "_ssl_end": 305,
         "_securityDetails": {
           "protocol": "TLS 1.3",
           "keyExchange": "",
@@ -2773,19 +2774,19 @@
         "_download_ms": 249,
         "_all_ms": 290,
         "_created": 197.0839999994496,
-        "_dnsTimeMs": 1774902641738,
-        "_dnsEndTimeMs": 1774902641774,
-        "_connectTimeMs": 1774902641774,
-        "_connectEndTimeMs": 1774902641837,
-        "_sslStartTimeMs": 1774902641793,
-        "_ttfb_start": 340,
-        "_ttfb_end": 480,
-        "_download_start": 480,
-        "_download_end": 729,
-        "_all_end": 729
+        "_dnsTimeMs": 1775432877500,
+        "_dnsEndTimeMs": 1775432877536,
+        "_connectTimeMs": 1775432877536,
+        "_connectEndTimeMs": 1775432877599,
+        "_sslStartTimeMs": 1775432877555,
+        "_ttfb_start": 341,
+        "_ttfb_end": 339,
+        "_download_start": 339,
+        "_download_end": 588,
+        "_all_end": 588
       },
       {
-        "startedDateTime": "2026-03-30T20:30:41.915Z",
+        "startedDateTime": "2026-04-05T23:47:57.802Z",
         "time": 136,
         "pageref": "page_1_0_1",
         "request": {
@@ -3065,7 +3066,7 @@
           "receive": 60
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 632,
@@ -3095,7 +3096,7 @@
         "_request_type": "XHR",
         "_load_ms": 136,
         "_ttfb_ms": 76,
-        "_load_start": 517,
+        "_load_start": 518,
         "_load_start_float": 517.5039999968457,
         "_bytesIn": 156,
         "_objectSize": 156,
@@ -3192,14 +3193,14 @@
         "_download_ms": 60,
         "_all_ms": 136,
         "_created": 499.0879999968456,
-        "_ttfb_start": 517,
-        "_ttfb_end": 593,
-        "_download_start": 593,
-        "_download_end": 653,
-        "_all_end": 653
+        "_ttfb_start": 518,
+        "_ttfb_end": 575,
+        "_download_start": 575,
+        "_download_end": 635,
+        "_all_end": 635
       },
       {
-        "startedDateTime": "2026-03-30T20:30:41.962Z",
+        "startedDateTime": "2026-04-05T23:47:57.864Z",
         "time": 41,
         "pageref": "page_1_0_1",
         "request": {
@@ -3379,7 +3380,7 @@
           "receive": 20
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "258",
         "_chunks": [
           {
             "ts": 606,
@@ -3409,7 +3410,7 @@
         "_request_type": "Stylesheet",
         "_load_ms": 41,
         "_ttfb_ms": 21,
-        "_load_start": 564,
+        "_load_start": 565,
         "_load_start_float": 564.9639999990088,
         "_bytesIn": 1716,
         "_objectSize": 1582,
@@ -3481,14 +3482,14 @@
         "_download_ms": 20,
         "_all_ms": 41,
         "_created": 561.9919999990088,
-        "_ttfb_start": 564,
-        "_ttfb_end": 585,
-        "_download_start": 585,
-        "_download_end": 605,
-        "_all_end": 605
+        "_ttfb_start": 565,
+        "_ttfb_end": 582,
+        "_download_start": 582,
+        "_download_end": 602,
+        "_all_end": 602
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.003Z",
+        "startedDateTime": "2026-04-05T23:47:57.896Z",
         "time": 297,
         "pageref": "page_1_0_1",
         "request": {
@@ -3704,7 +3705,7 @@
           "receive": 269
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -3725,7 +3726,7 @@
         "_request_type": "Ping",
         "_load_ms": 297,
         "_ttfb_ms": 28,
-        "_load_start": 605,
+        "_load_start": 606,
         "_load_start_float": 605.8329999996103,
         "_bytesIn": 19,
         "_objectSize": 0,
@@ -3806,14 +3807,14 @@
         "_download_ms": 269,
         "_all_ms": 297,
         "_created": 593.3189999996102,
-        "_ttfb_start": 605,
-        "_ttfb_end": 633,
-        "_download_start": 633,
-        "_download_end": 902,
-        "_all_end": 902
+        "_ttfb_start": 606,
+        "_ttfb_end": 621,
+        "_download_start": 621,
+        "_download_end": 890,
+        "_all_end": 890
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.053Z",
+        "startedDateTime": "2026-04-05T23:47:57.955Z",
         "time": 268,
         "pageref": "page_1_0_1",
         "request": {
@@ -4029,7 +4030,7 @@
           "receive": 240
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -4050,7 +4051,7 @@
         "_request_type": "Ping",
         "_load_ms": 268,
         "_ttfb_ms": 28,
-        "_load_start": 655,
+        "_load_start": 656,
         "_load_start_float": 656.4299999968154,
         "_bytesIn": 19,
         "_objectSize": 0,
@@ -4131,14 +4132,14 @@
         "_download_ms": 240,
         "_all_ms": 268,
         "_created": 652.2429999968153,
-        "_ttfb_start": 655,
-        "_ttfb_end": 683,
-        "_download_start": 683,
-        "_download_end": 923,
-        "_all_end": 923
+        "_ttfb_start": 656,
+        "_ttfb_end": 680,
+        "_download_start": 680,
+        "_download_end": 920,
+        "_all_end": 920
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.273Z",
+        "startedDateTime": "2026-04-05T23:47:58.178Z",
         "time": 109,
         "pageref": "page_1_0_1",
         "request": {
@@ -4350,7 +4351,7 @@
           "receive": 82
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -4371,7 +4372,7 @@
         "_request_type": "Ping",
         "_load_ms": 109,
         "_ttfb_ms": 27,
-        "_load_start": 875,
+        "_load_start": 876,
         "_load_start_float": 876.0889999979187,
         "_bytesIn": 19,
         "_objectSize": 0,
@@ -4451,14 +4452,14 @@
         "_download_ms": 82,
         "_all_ms": 109,
         "_created": 875.2839999979187,
-        "_ttfb_start": 875,
+        "_ttfb_start": 876,
         "_ttfb_end": 902,
         "_download_start": 902,
         "_download_end": 984,
         "_all_end": 984
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.351Z",
+        "startedDateTime": "2026-04-05T23:47:58.256Z",
         "time": 194,
         "pageref": "page_1_0_1",
         "request": {
@@ -4686,7 +4687,7 @@
           "receive": 163
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1148,
@@ -4724,7 +4725,7 @@
         "_request_type": "Script",
         "_load_ms": 194,
         "_ttfb_ms": 31,
-        "_load_start": 953,
+        "_load_start": 954,
         "_load_start_float": 954.3789999982624,
         "_bytesIn": 40849,
         "_objectSize": 40818,
@@ -4809,14 +4810,14 @@
         "_download_ms": 163,
         "_all_ms": 194,
         "_created": 953.4529999982624,
-        "_ttfb_start": 953,
+        "_ttfb_start": 954,
         "_ttfb_end": 984,
         "_download_start": 984,
         "_download_end": 1147,
         "_all_end": 1147
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.357Z",
+        "startedDateTime": "2026-04-05T23:47:58.262Z",
         "time": 193,
         "pageref": "page_1_0_1",
         "request": {
@@ -5044,7 +5045,7 @@
           "receive": 118
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1153,
@@ -5070,7 +5071,7 @@
         "_request_type": "Fetch",
         "_load_ms": 193,
         "_ttfb_ms": 75,
-        "_load_start": 959,
+        "_load_start": 960,
         "_load_start_float": 960.1579999983678,
         "_bytesIn": 1385,
         "_objectSize": 1359,
@@ -5155,14 +5156,14 @@
         "_download_ms": 118,
         "_all_ms": 193,
         "_created": 959.3099999983679,
-        "_ttfb_start": 959,
+        "_ttfb_start": 960,
         "_ttfb_end": 1034,
         "_download_start": 1034,
         "_download_end": 1152,
         "_all_end": 1152
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.372Z",
+        "startedDateTime": "2026-04-05T23:47:58.277Z",
         "time": 159,
         "pageref": "page_1_0_1",
         "request": {
@@ -5370,7 +5371,7 @@
           "receive": 86
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -5391,7 +5392,7 @@
         "_request_type": "Image",
         "_load_ms": 159,
         "_ttfb_ms": 73,
-        "_load_start": 974,
+        "_load_start": 975,
         "_load_start_float": 975.1339999987052,
         "_bytesIn": 22,
         "_objectSize": 0,
@@ -5469,14 +5470,14 @@
         "_download_ms": 86,
         "_all_ms": 159,
         "_created": 974.2159999987052,
-        "_ttfb_start": 974,
+        "_ttfb_start": 975,
         "_ttfb_end": 1047,
         "_download_start": 1047,
         "_download_end": 1133,
         "_all_end": 1133
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.528Z",
+        "startedDateTime": "2026-04-05T23:47:58.432Z",
         "time": 128,
         "pageref": "page_1_0_1",
         "request": {
@@ -5748,7 +5749,7 @@
           "receive": 33
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1255,
@@ -5778,7 +5779,7 @@
         "_request_type": "XHR",
         "_load_ms": 128,
         "_ttfb_ms": 95,
-        "_load_start": 1130,
+        "_load_start": 1131,
         "_load_start_float": 1131.352999999744,
         "_bytesIn": 1957,
         "_objectSize": 1957,
@@ -5873,14 +5874,14 @@
         "_download_ms": 33,
         "_all_ms": 128,
         "_created": 1129.2439999997441,
-        "_ttfb_start": 1130,
-        "_ttfb_end": 1225,
-        "_download_start": 1225,
-        "_download_end": 1258,
-        "_all_end": 1258
+        "_ttfb_start": 1131,
+        "_ttfb_end": 1224,
+        "_download_start": 1224,
+        "_download_end": 1257,
+        "_all_end": 1257
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.559Z",
+        "startedDateTime": "2026-04-05T23:47:58.462Z",
         "time": 52,
         "pageref": "page_1_0_1",
         "request": {
@@ -6108,7 +6109,7 @@
           "receive": 18
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1213,
@@ -6138,7 +6139,7 @@
         "_request_type": "Script",
         "_load_ms": 52,
         "_ttfb_ms": 34,
-        "_load_start": 1161,
+        "_load_start": 1162,
         "_load_start_float": 1162.4769999988082,
         "_bytesIn": 2186,
         "_objectSize": 2159,
@@ -6223,14 +6224,14 @@
         "_download_ms": 18,
         "_all_ms": 52,
         "_created": 1159.7389999988081,
-        "_ttfb_start": 1161,
-        "_ttfb_end": 1195,
-        "_download_start": 1195,
-        "_download_end": 1213,
-        "_all_end": 1213
+        "_ttfb_start": 1162,
+        "_ttfb_end": 1193,
+        "_download_start": 1193,
+        "_download_end": 1211,
+        "_all_end": 1211
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.565Z",
+        "startedDateTime": "2026-04-05T23:47:58.470Z",
         "time": 49,
         "pageref": "page_1_0_1",
         "request": {
@@ -6442,7 +6443,7 @@
           "receive": 15
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -6463,7 +6464,7 @@
         "_request_type": "Ping",
         "_load_ms": 49,
         "_ttfb_ms": 34,
-        "_load_start": 1167,
+        "_load_start": 1168,
         "_load_start_float": 1167.9849999973144,
         "_bytesIn": 24,
         "_objectSize": 0,
@@ -6543,14 +6544,14 @@
         "_download_ms": 15,
         "_all_ms": 49,
         "_created": 1167.0849999973143,
-        "_ttfb_start": 1167,
+        "_ttfb_start": 1168,
         "_ttfb_end": 1201,
         "_download_start": 1201,
         "_download_end": 1216,
         "_all_end": 1216
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.567Z",
+        "startedDateTime": "2026-04-05T23:47:58.472Z",
         "time": 84,
         "pageref": "page_1_0_1",
         "request": {
@@ -6762,7 +6763,7 @@
           "receive": 49
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -6783,7 +6784,7 @@
         "_request_type": "Ping",
         "_load_ms": 84,
         "_ttfb_ms": 35,
-        "_load_start": 1169,
+        "_load_start": 1170,
         "_load_start_float": 1169.9819999991619,
         "_bytesIn": 24,
         "_objectSize": 0,
@@ -6863,14 +6864,14 @@
         "_download_ms": 49,
         "_all_ms": 84,
         "_created": 1169.0999999991618,
-        "_ttfb_start": 1169,
+        "_ttfb_start": 1170,
         "_ttfb_end": 1204,
         "_download_start": 1204,
         "_download_end": 1253,
         "_all_end": 1253
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.591Z",
+        "startedDateTime": "2026-04-05T23:47:58.491Z",
         "time": 131,
         "pageref": "page_1_0_1",
         "request": {
@@ -7138,7 +7139,7 @@
           "receive": 67
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1309,
@@ -7168,7 +7169,7 @@
         "_request_type": "XHR",
         "_load_ms": 131,
         "_ttfb_ms": 64,
-        "_load_start": 1193,
+        "_load_start": 1194,
         "_load_start_float": 1194.1179999993894,
         "_bytesIn": 173,
         "_objectSize": 173,
@@ -7262,14 +7263,14 @@
         "_download_ms": 67,
         "_all_ms": 131,
         "_created": 1188.0569999993895,
-        "_ttfb_start": 1193,
-        "_ttfb_end": 1257,
-        "_download_start": 1257,
-        "_download_end": 1324,
-        "_all_end": 1324
+        "_ttfb_start": 1194,
+        "_ttfb_end": 1252,
+        "_download_start": 1252,
+        "_download_end": 1319,
+        "_all_end": 1319
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.634Z",
+        "startedDateTime": "2026-04-05T23:47:58.538Z",
         "time": 123,
         "pageref": "page_1_0_1",
         "request": {
@@ -7497,7 +7498,7 @@
           "receive": 89
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1360,
@@ -7523,7 +7524,7 @@
         "_request_type": "Fetch",
         "_load_ms": 123,
         "_ttfb_ms": 34,
-        "_load_start": 1236,
+        "_load_start": 1237,
         "_load_start_float": 1236.6359999988804,
         "_bytesIn": 386,
         "_objectSize": 358,
@@ -7608,14 +7609,14 @@
         "_download_ms": 89,
         "_all_ms": 123,
         "_created": 1235.6289999988803,
-        "_ttfb_start": 1236,
-        "_ttfb_end": 1270,
-        "_download_start": 1270,
-        "_download_end": 1359,
-        "_all_end": 1359
+        "_ttfb_start": 1237,
+        "_ttfb_end": 1269,
+        "_download_start": 1269,
+        "_download_end": 1358,
+        "_all_end": 1358
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.642Z",
+        "startedDateTime": "2026-04-05T23:47:58.543Z",
         "time": 151,
         "pageref": "page_1_0_1",
         "request": {
@@ -7843,7 +7844,7 @@
           "receive": 117
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1396,
@@ -7898,7 +7899,7 @@
         "_request_type": "Script",
         "_load_ms": 151,
         "_ttfb_ms": 34,
-        "_load_start": 1244,
+        "_load_start": 1245,
         "_load_start_float": 1245.420999998504,
         "_bytesIn": 75718,
         "_objectSize": 75680,
@@ -7982,14 +7983,14 @@
         "_download_ms": 117,
         "_all_ms": 151,
         "_created": 1240.2809999985038,
-        "_ttfb_start": 1244,
-        "_ttfb_end": 1278,
-        "_download_start": 1278,
-        "_download_end": 1395,
-        "_all_end": 1395
+        "_ttfb_start": 1245,
+        "_ttfb_end": 1274,
+        "_download_start": 1274,
+        "_download_end": 1391,
+        "_all_end": 1391
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.645Z",
+        "startedDateTime": "2026-04-05T23:47:58.545Z",
         "time": 185,
         "pageref": "page_1_0_1",
         "request": {
@@ -8217,7 +8218,7 @@
           "receive": 116
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1433,
@@ -8264,7 +8265,7 @@
         "_request_type": "Script",
         "_load_ms": 185,
         "_ttfb_ms": 69,
-        "_load_start": 1247,
+        "_load_start": 1248,
         "_load_start_float": 1248.3170000002256,
         "_bytesIn": 55027,
         "_objectSize": 54992,
@@ -8348,14 +8349,14 @@
         "_download_ms": 116,
         "_all_ms": 185,
         "_created": 1242.6610000002256,
-        "_ttfb_start": 1247,
-        "_ttfb_end": 1316,
-        "_download_start": 1316,
-        "_download_end": 1432,
-        "_all_end": 1432
+        "_ttfb_start": 1248,
+        "_ttfb_end": 1311,
+        "_download_start": 1311,
+        "_download_end": 1427,
+        "_all_end": 1427
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.738Z",
+        "startedDateTime": "2026-04-05T23:47:58.638Z",
         "time": 40,
         "pageref": "page_1_0_1",
         "request": {
@@ -8559,7 +8560,7 @@
           "receive": 8
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -8580,7 +8581,7 @@
         "_request_type": "Image",
         "_load_ms": 40,
         "_ttfb_ms": 32,
-        "_load_start": 1340,
+        "_load_start": 1341,
         "_load_start_float": 1340.9859999991627,
         "_bytesIn": 26,
         "_objectSize": 0,
@@ -8657,15 +8658,15 @@
         "_download_ms": 8,
         "_all_ms": 40,
         "_created": 1335.3009999991627,
-        "_ttfb_start": 1340,
-        "_ttfb_end": 1372,
-        "_download_start": 1372,
-        "_download_end": 1380,
-        "_all_end": 1380
+        "_ttfb_start": 1341,
+        "_ttfb_end": 1367,
+        "_download_start": 1367,
+        "_download_end": 1375,
+        "_all_end": 1375
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.753Z",
-        "time": 537,
+        "startedDateTime": "2026-04-05T23:47:58.607Z",
+        "time": 539.77392578125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -8856,11 +8857,11 @@
           "connect": 48,
           "ssl": 32,
           "send": 0,
-          "wait": 156,
+          "wait": 158.77392578125,
           "receive": 333
         },
         "serverIPAddress": "",
-        "connection": "conn_req_24",
+        "connection": "464",
         "_chunks": [
           {
             "ts": 1793,
@@ -8890,7 +8891,7 @@
         "_request_type": "XHR",
         "_load_ms": 441,
         "_ttfb_ms": 108,
-        "_load_start": 1355,
+        "_load_start": 1356,
         "_load_start_float": 1355.9280000001988,
         "_bytesIn": 392,
         "_objectSize": 30,
@@ -8903,9 +8904,9 @@
         "_protocol": "HTTP/2",
         "_dns_start": 1307,
         "_dns_end": 1307,
-        "_connect_start": 1355,
-        "_connect_end": 1403,
-        "_ssl_start": 1371,
+        "_connect_start": 1307,
+        "_connect_end": 1323,
+        "_ssl_start": 1323,
         "_ssl_end": 1355,
         "_securityDetails": {
           "protocol": "TLS 1.3",
@@ -9243,17 +9244,17 @@
         "_download_ms": 333,
         "_all_ms": 441,
         "_created": 1304.2260000001988,
-        "_connectTimeMs": 1774902642753,
-        "_connectEndTimeMs": 1774902642801,
-        "_sslStartTimeMs": 1774902642769,
-        "_ttfb_start": 1355,
-        "_ttfb_end": 1511,
-        "_download_start": 1511,
-        "_download_end": 1844,
-        "_all_end": 1844
+        "_connectTimeMs": 1775432878607,
+        "_connectEndTimeMs": 1775432878655,
+        "_sslStartTimeMs": 1775432878623,
+        "_ttfb_start": 1356,
+        "_ttfb_end": 1462,
+        "_download_start": 1462,
+        "_download_end": 1795,
+        "_all_end": 1795
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.787Z",
+        "startedDateTime": "2026-04-05T23:47:58.675Z",
         "time": 110,
         "pageref": "page_1_0_1",
         "request": {
@@ -9429,7 +9430,7 @@
           "receive": 34
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "258",
         "_chunks": [
           {
             "ts": 1500,
@@ -9455,7 +9456,7 @@
         "_request_type": "Other",
         "_load_ms": 110,
         "_ttfb_ms": 76,
-        "_load_start": 1389,
+        "_load_start": 1390,
         "_load_start_float": 1389.52199999948,
         "_bytesIn": 1650,
         "_objectSize": 1345,
@@ -9526,15 +9527,15 @@
         "_download_ms": 34,
         "_all_ms": 110,
         "_created": 1372.0539999994799,
-        "_ttfb_start": 1389,
-        "_ttfb_end": 1465,
-        "_download_start": 1465,
-        "_download_end": 1499,
-        "_all_end": 1499
+        "_ttfb_start": 1390,
+        "_ttfb_end": 1448,
+        "_download_start": 1448,
+        "_download_end": 1482,
+        "_all_end": 1482
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.788Z",
-        "time": 325,
+        "startedDateTime": "2026-04-05T23:47:58.680Z",
+        "time": 325.7490234375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -9757,11 +9758,11 @@
           "connect": 48,
           "ssl": 48,
           "send": 0,
-          "wait": 145,
+          "wait": 145.7490234375,
           "receive": 128
         },
         "serverIPAddress": "",
-        "connection": "conn_req_28",
+        "connection": "414",
         "_chunks": [
           {
             "ts": 1517,
@@ -9795,7 +9796,7 @@
         "_request_type": "Other",
         "_load_ms": 221,
         "_ttfb_ms": 93,
-        "_load_start": 1390,
+        "_load_start": 1391,
         "_load_start_float": 1390.8899999980683,
         "_bytesIn": 47604,
         "_objectSize": 47572,
@@ -9806,12 +9807,12 @@
         "_contentEncoding": "br",
         "_socket": 414,
         "_protocol": "h3",
-        "_dns_start": 1390,
-        "_dns_end": 1394,
-        "_connect_start": 1394,
-        "_connect_end": 1442,
-        "_ssl_start": 1394,
-        "_ssl_end": 1390,
+        "_dns_start": 1378,
+        "_dns_end": 1382,
+        "_connect_start": 1383,
+        "_connect_end": 1383,
+        "_ssl_start": 1383,
+        "_ssl_end": 1431,
         "_securityDetails": {
           "protocol": "QUIC",
           "keyExchange": "",
@@ -10057,19 +10058,19 @@
         "_download_ms": 128,
         "_all_ms": 221,
         "_created": 1377.2509999980684,
-        "_dnsTimeMs": 1774902642788,
-        "_dnsEndTimeMs": 1774902642792,
-        "_connectTimeMs": 1774902642792,
-        "_connectEndTimeMs": 1774902642840,
-        "_sslStartTimeMs": 1774902642792,
-        "_ttfb_start": 1390,
-        "_ttfb_end": 1535,
-        "_download_start": 1535,
-        "_download_end": 1663,
-        "_all_end": 1663
+        "_dnsTimeMs": 1775432878680,
+        "_dnsEndTimeMs": 1775432878684,
+        "_connectTimeMs": 1775432878684,
+        "_connectEndTimeMs": 1775432878732,
+        "_sslStartTimeMs": 1775432878684,
+        "_ttfb_start": 1391,
+        "_ttfb_end": 1522,
+        "_download_start": 1522,
+        "_download_end": 1650,
+        "_all_end": 1650
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.872Z",
+        "startedDateTime": "2026-04-05T23:47:58.753Z",
         "time": 67,
         "pageref": "page_1_0_1",
         "request": {
@@ -10297,7 +10298,7 @@
           "receive": 29
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1531,
@@ -10323,7 +10324,7 @@
         "_request_type": "Fetch",
         "_load_ms": 67,
         "_ttfb_ms": 38,
-        "_load_start": 1474,
+        "_load_start": 1475,
         "_load_start_float": 1474.924999997505,
         "_bytesIn": 1921,
         "_objectSize": 1889,
@@ -10408,14 +10409,14 @@
         "_download_ms": 29,
         "_all_ms": 67,
         "_created": 1450.645999997505,
-        "_ttfb_start": 1474,
-        "_ttfb_end": 1512,
-        "_download_start": 1512,
-        "_download_end": 1541,
-        "_all_end": 1541
+        "_ttfb_start": 1475,
+        "_ttfb_end": 1488,
+        "_download_start": 1488,
+        "_download_end": 1517,
+        "_all_end": 1517
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.872Z",
+        "startedDateTime": "2026-04-05T23:47:58.755Z",
         "time": 83,
         "pageref": "page_1_0_1",
         "request": {
@@ -10643,7 +10644,7 @@
           "receive": 34
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1558,
@@ -10674,7 +10675,7 @@
         "_request_type": "Script",
         "_load_ms": 83,
         "_ttfb_ms": 49,
-        "_load_start": 1474,
+        "_load_start": 1475,
         "_load_start_float": 1474.665999996766,
         "_bytesIn": 9908,
         "_objectSize": 9875,
@@ -10758,14 +10759,14 @@
         "_download_ms": 34,
         "_all_ms": 83,
         "_created": 1452.964999996766,
-        "_ttfb_start": 1474,
-        "_ttfb_end": 1523,
-        "_download_start": 1523,
-        "_download_end": 1557,
-        "_all_end": 1557
+        "_ttfb_start": 1475,
+        "_ttfb_end": 1501,
+        "_download_start": 1501,
+        "_download_end": 1535,
+        "_all_end": 1535
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.883Z",
+        "startedDateTime": "2026-04-05T23:47:58.766Z",
         "time": 64,
         "pageref": "page_1_0_1",
         "request": {
@@ -10981,7 +10982,7 @@
           "receive": 4
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -11002,7 +11003,7 @@
         "_request_type": "XHR",
         "_load_ms": 64,
         "_ttfb_ms": 60,
-        "_load_start": 1485,
+        "_load_start": 1486,
         "_load_start_float": 1485.9919999996982,
         "_bytesIn": 29,
         "_objectSize": 0,
@@ -11082,14 +11083,14 @@
         "_download_ms": 4,
         "_all_ms": 64,
         "_created": 1463.3759999996983,
-        "_ttfb_start": 1485,
-        "_ttfb_end": 1545,
-        "_download_start": 1545,
-        "_download_end": 1549,
-        "_all_end": 1549
+        "_ttfb_start": 1486,
+        "_ttfb_end": 1523,
+        "_download_start": 1523,
+        "_download_end": 1527,
+        "_all_end": 1527
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.886Z",
+        "startedDateTime": "2026-04-05T23:47:58.763Z",
         "time": 81,
         "pageref": "page_1_0_1",
         "request": {
@@ -11301,7 +11302,7 @@
           "receive": 34
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -11322,7 +11323,7 @@
         "_request_type": "Ping",
         "_load_ms": 81,
         "_ttfb_ms": 47,
-        "_load_start": 1488,
+        "_load_start": 1489,
         "_load_start_float": 1489.4959999976522,
         "_bytesIn": 26,
         "_objectSize": 0,
@@ -11402,14 +11403,14 @@
         "_download_ms": 34,
         "_all_ms": 81,
         "_created": 1460.4039999976521,
-        "_ttfb_start": 1488,
-        "_ttfb_end": 1535,
-        "_download_start": 1535,
-        "_download_end": 1569,
-        "_all_end": 1569
+        "_ttfb_start": 1489,
+        "_ttfb_end": 1507,
+        "_download_start": 1507,
+        "_download_end": 1541,
+        "_all_end": 1541
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.929Z",
+        "startedDateTime": "2026-04-05T23:47:58.816Z",
         "time": 50,
         "pageref": "page_1_0_1",
         "request": {
@@ -11621,7 +11622,7 @@
           "receive": 12
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -11642,7 +11643,7 @@
         "_request_type": "Ping",
         "_load_ms": 50,
         "_ttfb_ms": 38,
-        "_load_start": 1531,
+        "_load_start": 1532,
         "_load_start_float": 1531.9059999990823,
         "_bytesIn": 26,
         "_objectSize": 0,
@@ -11722,15 +11723,15 @@
         "_download_ms": 12,
         "_all_ms": 50,
         "_created": 1513.6019999990822,
-        "_ttfb_start": 1531,
-        "_ttfb_end": 1569,
-        "_download_start": 1569,
-        "_download_end": 1581,
-        "_all_end": 1581
+        "_ttfb_start": 1532,
+        "_ttfb_end": 1551,
+        "_download_start": 1551,
+        "_download_end": 1563,
+        "_all_end": 1563
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.939Z",
-        "time": 313,
+        "startedDateTime": "2026-04-05T23:47:58.617Z",
+        "time": 377.408935546875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
@@ -11877,11 +11878,11 @@
           "connect": 112,
           "ssl": 94,
           "send": 0,
-          "wait": 201,
+          "wait": 265.408935546875,
           "receive": 0
         },
         "serverIPAddress": "",
-        "connection": "conn_req_25",
+        "connection": "398",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -11901,7 +11902,7 @@
         "_request_type": "Preflight",
         "_load_ms": 89,
         "_ttfb_ms": 89,
-        "_load_start": 1541,
+        "_load_start": 1542,
         "_load_start_float": 1541.7129999984725,
         "_bytesIn": 0,
         "_objectSize": 0,
@@ -11913,10 +11914,10 @@
         "_protocol": "HTTP/2",
         "_dns_start": -1,
         "_dns_end": -1,
-        "_connect_start": 1541,
-        "_connect_end": 1653,
-        "_ssl_start": 1559,
-        "_ssl_end": 1541,
+        "_connect_start": 1379,
+        "_connect_end": 1397,
+        "_ssl_start": 1397,
+        "_ssl_end": 1491,
         "_securityDetails": {
           "protocol": "TLS 1.3",
           "keyExchange": "",
@@ -12241,17 +12242,17 @@
         "_download_ms": 0,
         "_all_ms": 89,
         "_created": 1314.5909999984724,
-        "_connectTimeMs": 1774902642939,
-        "_connectEndTimeMs": 1774902643051,
-        "_sslStartTimeMs": 1774902642957,
-        "_ttfb_start": 1541,
-        "_ttfb_end": 1742,
-        "_download_start": 1742,
-        "_download_end": 1742,
-        "_all_end": 1742
+        "_connectTimeMs": 1775432878617,
+        "_connectEndTimeMs": 1775432878729,
+        "_sslStartTimeMs": 1775432878635,
+        "_ttfb_start": 1542,
+        "_ttfb_end": 1579,
+        "_download_start": 1579,
+        "_download_end": 1579,
+        "_all_end": 1579
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.970Z",
+        "startedDateTime": "2026-04-05T23:47:58.866Z",
         "time": 45,
         "pageref": "page_1_0_1",
         "request": {
@@ -12479,7 +12480,7 @@
           "receive": 15
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1607,
@@ -12509,7 +12510,7 @@
         "_request_type": "Fetch",
         "_load_ms": 45,
         "_ttfb_ms": 30,
-        "_load_start": 1572,
+        "_load_start": 1573,
         "_load_start_float": 1573.4859999978737,
         "_bytesIn": 594,
         "_objectSize": 557,
@@ -12594,14 +12595,14 @@
         "_download_ms": 15,
         "_all_ms": 45,
         "_created": 1563.1169999978738,
-        "_ttfb_start": 1572,
-        "_ttfb_end": 1602,
-        "_download_start": 1602,
-        "_download_end": 1617,
-        "_all_end": 1617
+        "_ttfb_start": 1573,
+        "_ttfb_end": 1593,
+        "_download_start": 1593,
+        "_download_end": 1608,
+        "_all_end": 1608
       },
       {
-        "startedDateTime": "2026-03-30T20:30:42.970Z",
+        "startedDateTime": "2026-04-05T23:47:58.868Z",
         "time": 53,
         "pageref": "page_1_0_1",
         "request": {
@@ -12829,7 +12830,7 @@
           "receive": 12
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1626,
@@ -12860,7 +12861,7 @@
         "_request_type": "Script",
         "_load_ms": 53,
         "_ttfb_ms": 41,
-        "_load_start": 1572,
+        "_load_start": 1573,
         "_load_start_float": 1573.053999999484,
         "_bytesIn": 4862,
         "_objectSize": 4827,
@@ -12944,14 +12945,14 @@
         "_download_ms": 12,
         "_all_ms": 53,
         "_created": 1565.270999999484,
-        "_ttfb_start": 1572,
-        "_ttfb_end": 1613,
-        "_download_start": 1613,
-        "_download_end": 1625,
-        "_all_end": 1625
+        "_ttfb_start": 1573,
+        "_ttfb_end": 1606,
+        "_download_start": 1606,
+        "_download_end": 1618,
+        "_all_end": 1618
       },
       {
-        "startedDateTime": "2026-03-30T20:30:43.033Z",
+        "startedDateTime": "2026-04-05T23:47:58.934Z",
         "time": 37,
         "pageref": "page_1_0_1",
         "request": {
@@ -13183,7 +13184,7 @@
           "receive": 13
         },
         "serverIPAddress": "",
-        "connection": "",
+        "connection": "87",
         "_chunks": [
           {
             "ts": 1673,
@@ -13214,7 +13215,7 @@
         "_request_type": "Script",
         "_load_ms": 37,
         "_ttfb_ms": 24,
-        "_load_start": 1635,
+        "_load_start": 1636,
         "_load_start_float": 1636.2739999990654,
         "_bytesIn": 1085,
         "_objectSize": 1048,
@@ -13299,15 +13300,15 @@
         "_download_ms": 13,
         "_all_ms": 37,
         "_created": 1631.3589999990654,
-        "_ttfb_start": 1635,
-        "_ttfb_end": 1659,
-        "_download_start": 1659,
-        "_download_end": 1672,
-        "_all_end": 1672
+        "_ttfb_start": 1636,
+        "_ttfb_end": 1655,
+        "_download_start": 1655,
+        "_download_end": 1668,
+        "_all_end": 1668
       },
       {
-        "startedDateTime": "2026-03-30T20:30:43.746Z",
-        "time": 382,
+        "startedDateTime": "2026-04-05T23:47:59.600Z",
+        "time": 384.40087890625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -13474,11 +13475,11 @@
           "connect": 49,
           "ssl": 33,
           "send": 0,
-          "wait": 138,
+          "wait": 140.40087890625,
           "receive": 195
         },
         "serverIPAddress": "",
-        "connection": "conn_req_37",
+        "connection": "500",
         "_chunks": [
           {
             "ts": 2634,
@@ -13504,7 +13505,7 @@
         "_request_type": "XHR",
         "_load_ms": 284,
         "_ttfb_ms": 89,
-        "_load_start": 2348,
+        "_load_start": 2349,
         "_load_start_float": 2349.490999997717,
         "_bytesIn": 375,
         "_objectSize": 131,
@@ -13517,10 +13518,10 @@
         "_protocol": "HTTP/2",
         "_dns_start": 2300,
         "_dns_end": 2300,
-        "_connect_start": 2348,
-        "_connect_end": 2397,
-        "_ssl_start": 2364,
-        "_ssl_end": 2348,
+        "_connect_start": 2300,
+        "_connect_end": 2316,
+        "_ssl_start": 2316,
+        "_ssl_end": 2349,
         "_securityDetails": {
           "protocol": "TLS 1.3",
           "keyExchange": "",
@@ -13752,18 +13753,18 @@
         "_download_ms": 195,
         "_all_ms": 284,
         "_created": 2297.5989999977173,
-        "_connectTimeMs": 1774902643746,
-        "_connectEndTimeMs": 1774902643795,
-        "_sslStartTimeMs": 1774902643762,
-        "_ttfb_start": 2348,
-        "_ttfb_end": 2486,
-        "_download_start": 2486,
-        "_download_end": 2681,
-        "_all_end": 2681
+        "_connectTimeMs": 1775432879600,
+        "_connectEndTimeMs": 1775432879649,
+        "_sslStartTimeMs": 1775432879616,
+        "_ttfb_start": 2349,
+        "_ttfb_end": 2437,
+        "_download_start": 2437,
+        "_download_end": 2632,
+        "_all_end": 2632
       },
       {
-        "startedDateTime": "2026-03-30T20:30:43.791Z",
-        "time": 205,
+        "startedDateTime": "2026-04-05T23:47:59.607Z",
+        "time": 241.419921875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
@@ -13890,11 +13891,11 @@
           "connect": 52,
           "ssl": 36,
           "send": 0,
-          "wait": 153,
+          "wait": 189.419921875,
           "receive": 0
         },
         "serverIPAddress": "",
-        "connection": "conn_req_38",
+        "connection": "492",
         "_chunks": [],
         "_run": 1,
         "_cached": 0,
@@ -13914,7 +13915,7 @@
         "_request_type": "Preflight",
         "_load_ms": 101,
         "_ttfb_ms": 101,
-        "_load_start": 2393,
+        "_load_start": 2394,
         "_load_start_float": 2393.610999999987,
         "_bytesIn": 0,
         "_objectSize": 0,
@@ -13926,9 +13927,9 @@
         "_protocol": "HTTP/2",
         "_dns_start": -1,
         "_dns_end": -1,
-        "_connect_start": 2393,
-        "_connect_end": 2445,
-        "_ssl_start": 2409,
+        "_connect_start": 2341,
+        "_connect_end": 2357,
+        "_ssl_start": 2357,
         "_ssl_end": 2393,
         "_securityDetails": {
           "protocol": "TLS 1.3",
@@ -14150,14 +14151,14 @@
         "_download_ms": 0,
         "_all_ms": 101,
         "_created": 2304.579999999987,
-        "_connectTimeMs": 1774902643791,
-        "_connectEndTimeMs": 1774902643843,
-        "_sslStartTimeMs": 1774902643807,
-        "_ttfb_start": 2393,
-        "_ttfb_end": 2546,
-        "_download_start": 2546,
-        "_download_end": 2546,
-        "_all_end": 2546
+        "_connectTimeMs": 1775432879607,
+        "_connectEndTimeMs": 1775432879659,
+        "_sslStartTimeMs": 1775432879623,
+        "_ttfb_start": 2394,
+        "_ttfb_end": 2493,
+        "_download_start": 2493,
+        "_download_end": 2493,
+        "_all_end": 2493
       }
     ]
   }
