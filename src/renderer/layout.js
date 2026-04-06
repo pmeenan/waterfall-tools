@@ -287,23 +287,7 @@ export class Layout {
             };
         });
 
-        console.groupCollapsed(`Waterfall Render Bounds: ${processedRows.length} requests`);
-        console.table(processedRows.map(r => {
-            let host = '';
-            try {
-                if (r.url) host = new URL(r.url, 'http://localhost').hostname;
-            } catch (e) {}
-            return {
-                index: r.index,
-                host: host,
-                ttfbStart: r.ttfbStart,
-                load_start: entries[r.index]?._load_start,
-                ttfb_start: entries[r.index]?._ttfb_start,
-                connectEnd: r.connectEnd,
-                ttfbEnd: r.ttfbEnd
-            };
-        }));
-        console.groupEnd();
+
 
         if (endTimeOverride !== null && endTimeOverride > 0) {
             maxTime = Math.max(0, endTimeOverride);

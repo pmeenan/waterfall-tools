@@ -277,9 +277,6 @@ export class WaterfallTools {
             console.warn(`[getPageResource] pageData not found for ${pageId}`);
             return null;
         }
-        
-        console.log(`[getPageResource] Evaluated mapping bounds for ${pageId} - Run: ${pageData._run}, Cached: ${pageData._cached}`);
-
         if (resourceType === 'screenshot' && pageData._screenshot) {
             const str = pageData._screenshot;
             if (str.startsWith('data:image/')) {
@@ -320,14 +317,12 @@ export class WaterfallTools {
         if (resourceType === 'screenshot') {
             const jpgFile = `${runNum}${cachedStr}_screen.jpg`;
             const pngFile = `${runNum}${cachedStr}_screen.png`;
-            console.log(`[getPageResource] Searching archive for '${jpgFile}' or '${pngFile}'`);
             targetFile = this.data._zipFiles.find(f => f === jpgFile || f.endsWith(`/${jpgFile}`));
             mimeType = 'image/jpeg';
             if (!targetFile) {
                 targetFile = this.data._zipFiles.find(f => f === pngFile || f.endsWith(`/${pngFile}`));
                 if (targetFile) mimeType = 'image/png';
             }
-            console.log(`[getPageResource] Found targetFile mapping natively:`, targetFile || 'null');
         } else if (resourceType === 'trace') {
             const traceFile = `${runNum}${cachedStr}_trace.json.gz`;
             targetFile = this.data._zipFiles.find(f => f === traceFile || f.endsWith(`/${traceFile}`));
@@ -363,7 +358,6 @@ export class WaterfallTools {
 
         const zip = new ZipReader(this.data._opfsStorage);
         await zip.init();
-        console.log(`[getPageResource] zip init resolved. fetching stream for ${targetFile}`);
         let stream = await zip.getFileStream(targetFile);
         if (!stream) {
             console.warn(`[getPageResource] getFileStream returned null for target: ${targetFile}`);

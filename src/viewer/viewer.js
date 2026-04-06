@@ -267,9 +267,7 @@ async function renderTiles(pushHistory = true) {
         let imgUrl = null;
         
         try {
-            console.log(`[viewer.js] Requesting screenshot for ${pageId}...`);
             const resource = await waterfallTool.getPageResource(pageId, 'screenshot');
-            console.log(`[viewer.js] Resource resolved for ${pageId}:`, resource ? resource.mimeType : 'null');
             if (resource && resource.url) {
                 imgUrl = resource.url;
                 activeBlobUrls.push(imgUrl);
