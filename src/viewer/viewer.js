@@ -1,5 +1,6 @@
 import { WaterfallTools } from '../core/waterfall-tools.js';
 import { identifyFormatFromBuffer } from '../inputs/orchestrator.js';
+import { Layout } from '../renderer/layout.js';
 
 const ui = {
     loading: document.getElementById('loading'),
@@ -238,6 +239,39 @@ function getMetricItemHtml(label, value) {
     `;
 }
 
+function highlightSyntax(code, lang) {
+    if (code === undefined || code === null) return '';
+    let html = String(code).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (lang === 'json') {
+        html = html.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            let cls = 'hl-number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'hl-key';
+                } else {
+                    cls = 'hl-string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'hl-boolean';
+            } else if (/null/.test(match)) {
+                cls = 'hl-null';
+            }
+            return '<span class="' + cls + '">' + match + '</span>';
+        });
+    } else if (lang === 'html') {
+        html = html.replace(/(&lt;\/?[a-zA-Z0-9\-:]+)(.*?)(&gt;)/g, function(match, p1, p2, p3) {
+            let attrs = p2.replace(/([a-zA-Z0-9\-]+)(=)(&quot;.*?&quot;|&#39;.*?&#39;|".*?"|'.*?')/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>');
+            return '<span class="hl-tag">' + p1 + '</span>' + attrs + '<span class="hl-tag">' + p3 + '</span>';
+        });
+    } else if (lang === 'css') {
+        html = html.replace(/([a-zA-Z0-9\-]+)(\s*:)([^;]+)(;)/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>$4');
+    } else if (lang === 'js') {
+        html = html.replace(/\b(const|let|var|function|return|if|else|for|while|class|import|export|true|false|null)\b/g, '<span class="hl-keyword">$1</span>');
+        html = html.replace(/('[^']*'|"[^"]*"|`[^`]*`)/g, '<span class="hl-string">$1</span>');
+    }
+    return html;
+}
+
 function renderSummary(pageData) {
     if (!ui.summaryView) return;
     ui.summaryView.innerHTML = `
@@ -328,39 +362,6 @@ function renderSummary(pageData) {
             </div>
         </div>
     `;
-
-    function highlightSyntax(code, lang) {
-        if (code === undefined || code === null) return '';
-        let html = String(code).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        if (lang === 'json') {
-            html = html.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                let cls = 'hl-number';
-                if (/^"/.test(match)) {
-                    if (/:$/.test(match)) {
-                        cls = 'hl-key';
-                    } else {
-                        cls = 'hl-string';
-                    }
-                } else if (/true|false/.test(match)) {
-                    cls = 'hl-boolean';
-                } else if (/null/.test(match)) {
-                    cls = 'hl-null';
-                }
-                return '<span class="' + cls + '">' + match + '</span>';
-            });
-        } else if (lang === 'html') {
-            html = html.replace(/(&lt;\/?[a-zA-Z0-9\-:]+)(.*?)(&gt;)/g, function(match, p1, p2, p3) {
-                let attrs = p2.replace(/([a-zA-Z0-9\-]+)(=)(&quot;.*?&quot;|&#39;.*?&#39;|".*?"|'.*?')/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>');
-                return '<span class="hl-tag">' + p1 + '</span>' + attrs + '<span class="hl-tag">' + p3 + '</span>';
-            });
-        } else if (lang === 'css') {
-            html = html.replace(/([a-zA-Z0-9\-]+)(\s*:)([^;]+)(;)/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>$4');
-        } else if (lang === 'js') {
-            html = html.replace(/\b(const|let|var|function|return|if|else|for|while|class|import|export|true|false|null)\b/g, '<span class="hl-keyword">$1</span>');
-            html = html.replace(/('[^']*'|"[^"]*"|`[^`]*`)/g, '<span class="hl-string">$1</span>');
-        }
-        return html;
-    }
 
     if (pageData._custom) {
         let customKeys = [];
@@ -606,6 +607,239 @@ async function renderTiles(pushHistory = true) {
     }
 }
 
+function renderRequestTab(request, reqNum) {
+    console.log(`[viewer.js] renderRequestTab triggered. Num:`, reqNum, `Request:`, request);
+    const tabId = `req-${reqNum}`;
+    
+    let existingTab = document.querySelector(`.viewer-tab[data-tab-id="${tabId}"]`);
+    if (existingTab) {
+        console.log(`[viewer.js] Tab already exists, clicking it.`);
+        existingTab.click();
+        return;
+    }
+    
+    console.log(`[viewer.js] Creating new tab wrapper`);
+    const tab = document.createElement('div');
+    tab.className = 'viewer-tab';
+    tab.dataset.tabId = tabId;
+    tab.draggable = true;
+    
+    let mime = request._contentType || request.mimeType || '';
+    const urlStr = request.url || request._URL || '';
+    const colors = Layout.getRequestColors(mime, urlStr);
+    
+    const bgColor = `rgb(${colors.ttfb.join(',')})`;
+    const borderColor = `rgb(${colors.download.join(',')})`;
+    
+    tab.style.backgroundColor = bgColor;
+    tab.style.setProperty('--req-border-color', borderColor);
+    tab.style.padding = '8px 10px'; // make tab narrower
+    
+    tab.innerHTML = `
+        <span class="tab-title" style="color: #000;">${reqNum}</span>
+        <button class="tab-close" style="background:transparent; border:none; margin-left:8px; cursor:pointer; font-size:10px; color:#000;">✖</button>
+    `;
+    
+    ui.viewerTabs.appendChild(tab);
+    
+    tab.querySelector('.tab-close').addEventListener('click', (e) => {
+        e.stopPropagation();
+        tab.remove();
+        const content = document.getElementById(`view-${tabId}`);
+        if (content) content.remove();
+        if (tab.classList.contains('active')) {
+            const sumTab = document.querySelector('.viewer-tab[data-tab-id="summary"]');
+            if (sumTab) sumTab.click();
+        }
+    });
+
+    const contentPane = document.createElement('div');
+    contentPane.id = `view-${tabId}`;
+    contentPane.className = 'tab-content req-tab-content';
+    
+    let parsedUrl = urlStr;
+    let host = '';
+    try {
+        const u = new URL(urlStr);
+        parsedUrl = u.toString();
+        host = u.host;
+    } catch (e) {
+        // Leave as is if invalid URL
+    }
+
+    const val = (v) => (v !== undefined && v !== null) ? v : '';
+
+    const toggleIconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
+    const toggleIconSvgCollapsed = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+    
+    const createSectionHeader = (title, collapsed, copyId) => {
+        let copyBtn = copyId ? `<button class="copy-btn" data-copy-target="${copyId}" style="background:transparent;border:none;cursor:pointer;margin-left:8px;" title="Copy to clipboard" onclick="event.stopPropagation();">📋</button>` : '';
+        return `
+            <div class="req-section-header" onclick="
+                this.parentElement.classList.toggle('collapsed');
+                const svg = this.querySelector('svg polyline');
+                if (this.parentElement.classList.contains('collapsed')) {
+                    svg.setAttribute('points', '6 9 12 15 18 9');
+                } else {
+                    svg.setAttribute('points', '18 15 12 9 6 15');
+                }
+            ">
+                <div style="display:flex; align-items:center;">${title}${copyBtn}</div>
+                ${collapsed ? toggleIconSvgCollapsed : toggleIconSvg}
+            </div>
+        `;
+    };
+
+    let detailsHtml = `
+        <div class="req-section">
+            ${createSectionHeader('Details', false, false)}
+            <div class="req-section-body">
+                <table class="req-details-table">
+                    <tr><td>URL</td><td>${parsedUrl}</td></tr>
+                    <tr><td>Loaded By</td><td>${val(request._initiator_detail || request._initiator)}</td></tr>
+                    <tr><td>Document</td><td>${val(request._documentURL)}</td></tr>
+                    <tr><td colspan="2" class="req-group-header">Request</td></tr>
+                    <tr class="req-group-item"><td>Host</td><td>${val(request._host || host)}</td></tr>
+                    <tr class="req-group-item"><td>IP</td><td>${val(request.serverIPAddress || request.serverIp || request._ip_addr)}</td></tr>
+                    <tr class="req-group-item"><td>Error/Status Code</td><td>${val(request.status)} ${val(request.statusText) || val(request._error)}</td></tr>
+                    <tr class="req-group-item"><td>Priority</td><td>${val(request._priority || request._initialPriority)}</td></tr>
+                    <tr class="req-group-item"><td>Protocol</td><td>${val(request.httpVersion || request._protocol)}</td></tr>
+                    <tr class="req-group-item"><td>Request ID</td><td>${val(request._request_id || request._id || request.id)}</td></tr>
+                    <tr class="req-group-item"><td>Render Blocking Status</td><td>${val(request._renderBlocking)}</td></tr>
+                    <tr><td colspan="2" class="req-group-header">Timing</td></tr>
+                    <tr class="req-group-item"><td>Time to First Byte</td><td>${request._ttfb_ms !== undefined ? request._ttfb_ms + ' ms' : ''}</td></tr>
+                    <tr class="req-group-item"><td>Content Download</td><td>${(request._download_end && request._download_start) ? Math.round(request._download_end - request._download_start) + ' ms' : ''}</td></tr>
+                    <tr><td colspan="2" class="req-group-header">Size</td></tr>
+                    <tr class="req-group-item"><td>Bytes In (downloaded)</td><td>${humanizeBytes(val(request._bytesIn || request.bytes_in)) || ''}</td></tr>
+                    <tr class="req-group-item"><td>Uncompressed Size</td><td>${humanizeBytes(val(request._objectSizeUncompressed || request.objectSizeUncompressed)) || ''}</td></tr>
+                    <tr class="req-group-item"><td>Bytes Out (uploaded)</td><td>${humanizeBytes(val(request._bytesOut || request.bytes_out)) || ''}</td></tr>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    // Store stringified targets safely outside for clipboard
+    const clipboardPayloads = {};
+    
+    const formatHeaders = (headersArr, copyId) => {
+        if (!headersArr || !headersArr.length) return 'None';
+        let rawStr = '';
+        let hHtml = '<table class="req-details-table">';
+        for (const h of headersArr) {
+            hHtml += `<tr><td>${h.name}</td><td>${h.value}</td></tr>`;
+            rawStr += `${h.name}: ${h.value}\n`;
+        }
+        hHtml += '</table>';
+        if (copyId) clipboardPayloads[copyId] = rawStr;
+        return hHtml;
+    };
+
+    let reqHeadersHtml = `
+        <div class="req-section collapsed">
+            ${createSectionHeader('Request Headers', true, 'reqHeaders')}
+            <div class="req-section-body">
+                ${formatHeaders(request.headers || [], 'reqHeaders')}
+            </div>
+        </div>
+    `;
+
+    let resHeadersHtml = `
+        <div class="req-section collapsed">
+            ${createSectionHeader('Response Headers', true, 'resHeaders')}
+            <div class="req-section-body">
+                ${formatHeaders(request.responseHeaders || [], 'resHeaders')}
+            </div>
+        </div>
+    `;
+
+    let rawJson = '';
+    try {
+        const rawReq = {};
+        for(let key in request) {
+            if(key !== 'body') rawReq[key] = request[key];
+        }
+        
+        const cache = new Set();
+        const safeString = JSON.stringify(rawReq, (key, value) => {
+            if (typeof value === 'object' && value !== null) {
+                if (cache.has(value)) return '[Circular]';
+                cache.add(value);
+            }
+            return value;
+        }, 2);
+        
+        rawJson = highlightSyntax(safeString, 'json');
+    } catch (e) {
+        rawJson = highlightSyntax('{\n  "error": "Could not serialize raw details"\n}', 'json');
+    }
+
+    let rawDetailsHtml = `
+        <div class="req-section collapsed">
+            <div class="req-section-header" onclick="this.parentElement.classList.toggle('collapsed');">
+                Raw Details
+            </div>
+            <div class="req-section-body">
+                <pre class="req-code-block">${rawJson}</pre>
+            </div>
+        </div>
+    `;
+
+    let bodyHtml = '';
+    if (request.body && typeof request.body === 'string') {
+        const bd = request.body;
+        bodyHtml = `
+            <div class="req-section collapsed">
+                <div class="req-section-header" onclick="this.parentElement.classList.toggle('collapsed');">
+                    <span>Response Body</span>
+                    <button class="copy-btn copy-body-btn" style="margin-left: auto;">📋 Copy</button>
+                </div>
+                <div class="req-section-body">
+                    <pre class="req-code-block">${highlightSyntax(bd, 'text')}</pre>
+                </div>
+            </div>
+        `;
+    }
+
+    let previewHtml = '';
+    if (request._isImage && request._url) {
+        previewHtml = `
+            <div class="req-section">
+                ${createSectionHeader('Preview', false, false)}
+                <div class="req-section-body" style="display:flex; justify-content:center; background:#f0f0f0;">
+                    <img src="${request._url}" style="max-width:100%; max-height:400px; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYV2NkYGAwYkADjDA+A0Q5aJICAMCkAho2q2q/AAAAAElFTkSuQmCC');">
+                </div>
+            </div>
+        `;
+    }
+
+    contentPane.innerHTML = detailsHtml + reqHeadersHtml + resHeadersHtml + bodyHtml + previewHtml + rawDetailsHtml;
+    
+    // Bind copy events natively immediately after injection!
+    contentPane.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const targetId = btn.dataset.copyTarget;
+            const textToCopy = clipboardPayloads[targetId];
+            if (textToCopy) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalTitle = btn.title;
+                    btn.title = "Copied!";
+                    btn.innerHTML = "✅";
+                    setTimeout(() => {
+                        btn.title = originalTitle;
+                        btn.innerHTML = "📋";
+                    }, 1000);
+                });
+            }
+        });
+    });
+
+    console.log(`[viewer.js] Appending HTML to tabs-body and issuing click! Html length:`, contentPane.innerHTML.length);
+    document.querySelector('.tabs-body').appendChild(contentPane);
+    
+    // Simulate click to focus newly minted tab natively
+    tab.click();
+}
+
 async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = true) {
     if (pushHistory) history.pushState({ view: 'waterfall', pageId }, '');
     ui.tileView.classList.add('hidden');
@@ -700,6 +934,58 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     } catch (e) {
         console.warn(`[viewer.js] Failed to fetch netlog data for ${pageId}:`, e);
     }
+
+    renderOptions.onHover = (data) => {
+        const tooltip = document.getElementById('waterfall-tooltip');
+        console.log('[viewer.js] onHover event raised with data:', data);
+        if (!tooltip) {
+            console.warn('[viewer.js] Tooltip element missing in DOM!');
+            return;
+        }
+        if (!data) {
+            console.log('[viewer.js] data is null, hiding tooltip');
+            tooltip.classList.add('hidden');
+            return;
+        }
+        
+        let url = data.request.url || data.request._URL || '';
+        console.log('[viewer.js] parsed URL for tooltip:', url);
+        
+        // Handle truncation in middle if > 100 chars
+        if (url.length > 100) {
+            url = url.substring(0, 50) + ' ... ' + url.substring(url.length - 45);
+        }
+        
+        tooltip.textContent = url;
+        tooltip.classList.remove('hidden');
+        
+        if (data.event) {
+            let x = data.event.clientX + 15;
+            let y = data.event.clientY + 15;
+            
+            // Re-calculate bounds
+            if (x + tooltip.offsetWidth > window.innerWidth) {
+                x = window.innerWidth - tooltip.offsetWidth - 10;
+            }
+            if (y + tooltip.offsetHeight > window.innerHeight) {
+                y = window.innerHeight - tooltip.offsetHeight - 10;
+            }
+            console.log('[viewer.js] Translating tooltip to X:', x, ' Y:', y);
+            tooltip.classList.remove('hidden');
+            tooltip.style.display = 'block';
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = '1';
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        } else {
+            console.warn('[viewer.js] Missing event object in hovering data block');
+        }
+    };
+
+    renderOptions.onClick = (data) => {
+        if (!data || !data.request) return;
+        renderRequestTab(data.request, data.index + 1);
+    };
 
     rendererCanvas = await waterfallTool.renderTo(ui.waterfallView, renderOptions);
     
@@ -893,6 +1179,9 @@ async function initViewer() {
         }
     });
 
+    // Initially hide settings
+    if (ui.btnSettings) ui.btnSettings.style.display = 'none';
+
     // Settings Bindings
     const overlayInputMapping = {
         'ui-show-page-metrics': 'showPageMetrics',
@@ -939,10 +1228,15 @@ async function initViewer() {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
 
             if (tabId === 'waterfall') {
+                ui.btnSettings.style.display = 'block';
                 ui.waterfallView.classList.add('active');
                 // Ensure canvas resizes properly if needed
                 if (rendererCanvas) window.dispatchEvent(new Event('resize'));
-            } else if (tabId === 'summary') {
+            } else {
+                ui.btnSettings.style.display = 'none';
+            }
+            
+            if (tabId === 'summary') {
                 if (ui.summaryView) ui.summaryView.classList.add('active');
             } else if (tabId === 'lighthouse') {
                 if (ui.lighthouseView) ui.lighthouseView.classList.add('active');
@@ -962,6 +1256,10 @@ async function initViewer() {
                     pendingTabLoads.netlog();
                     delete pendingTabLoads.netlog;
                 }
+            } else {
+                // Handle dynamic tabs like req-1, req-2
+                const content = document.getElementById(`view-${tabId}`);
+                if (content) content.classList.add('active');
             }
         });
     }

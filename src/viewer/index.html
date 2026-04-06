@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Waterfall Viewer</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./style.css?v=2">
 </head>
 <body>
     <div id="loading" class="hidden">
@@ -134,11 +134,12 @@
                     <label><input type="checkbox" id="ui-show-js" checked> JS Execution Time</label>
                     <label><input type="checkbox" id="ui-show-wait" checked> Wait Time (white)</label>
                     <label><input type="checkbox" id="ui-show-legend" checked> Legend</label>
-                </div>
-            </div>
         </div>
     </div>
 
-    <script type="module" src="./viewer.js"></script>
+    <!-- Tooltip for hover interactions -->
+    <div id="waterfall-tooltip" class="hidden"></div>
+
+    <script type="module" src="./viewer.js?v=3"></script>
 </body>
 </html>

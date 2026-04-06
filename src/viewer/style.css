@@ -299,6 +299,7 @@ body, html {
     padding: 8px 16px;
     border-radius: 6px 6px 0 0;
     border: 1px solid transparent;
+    border-top: 3px solid transparent;
     border-bottom: none;
     cursor: pointer;
     font-size: 0.95rem;
@@ -315,6 +316,7 @@ body, html {
     background: #fff;
     color: var(--primary-color);
     border-color: #ccc;
+    border-top: 3px solid var(--req-border-color, #005cc5);
     font-weight: 600;
     position: relative;
     /* Overlay the bottom border of the header to make it look connected */
@@ -826,3 +828,140 @@ body, html {
 .hl-tag { color: #22863a; }
 .hl-attr { color: #6f42c1; }
 .hl-keyword { color: #d73a49; font-weight: bold; }
+
+/* Tooltip Styles */
+#waterfall-tooltip {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #333;
+    
+    /* Truncate long URLs in the middle usually involves JS or clever flex, but we'll use ellipsis at end if css only, but user asked for "middle" truncation, so we will generate the string in JS with middle truncation. Standard CSS works well. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 4px;
+}
+
+/* Request Detail Tab Styles */
+.req-tab-content {
+    padding: 20px;
+    overflow-y: auto;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #333;
+}
+
+.req-section {
+    margin-bottom: 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.req-section-header {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.req-section-header:hover {
+    background: #f0f0f0;
+}
+
+.req-section-body {
+    padding: 15px;
+}
+
+.req-section.collapsed .req-section-body {
+    display: none;
+}
+
+.req-details-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.req-group-header {
+    font-weight: 600;
+    color: #444;
+    background: #fdfdfd;
+    padding-top: 15px !important;
+    padding-bottom: 5px !important;
+    border-bottom: 1px solid #eee;
+}
+
+.req-group-item td:first-child {
+    padding-left: 20px !important;
+}
+
+.req-details-table td {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.req-details-table td:first-child {
+    font-weight: 600;
+    width: 250px;
+    color: #555;
+}
+
+.req-details-table td:last-child {
+    word-break: break-all;
+}
+
+.req-details-table tr:last-child td {
+    border-bottom: none;
+}
+
+.req-code-block {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 500px;
+    overflow-y: auto;
+    background: #fdfdfd;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.req-preview-controls {
+    margin-bottom: 15px;
+}
+
+.req-preview-controls button {
+    padding: 6px 12px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.req-preview-controls button:hover {
+    background: #e0e0e0;
+}
+
+.req-preview-content img {
+    max-width: 100%;
+    border: 1px solid #ccc;
+    background: #f0f0f0; /* in case image is transparent */
+}

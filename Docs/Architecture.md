@@ -102,7 +102,7 @@ graph TD
 │   │   └── conductor.js    # Main API interface
 │   ├── viewer/             # Self-contained, full-featured standalone frontend UI
 │   │   ├── index.html      # Main presentation container
-│   │   ├── viewer.js       # App controller handling loading, drag-and-drop, and history API
+│   │   ├── viewer.js       # App controller handling loading, layout routing, drag-and-drop, history API, interactions (tooltips), and generating dynamic Request Detail Tabs
 │   │   └── public/         # Self-hosted static dependencies copied natively via Vite
 │   │       └── netlog-viewer/ # Standalone compiled Chrome NetLog viewer HTML bundle
 │   ├── platforms/          # Environment-specific implementations (e.g., File I/O vs Fetch)

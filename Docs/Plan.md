@@ -110,6 +110,8 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Integrate native self-hosted Chrome NetLog and Perfetto Trace viewers as standalone iframe tabs to explore low-level network logging artifacts organically.
 - [x] Support drag-and-drop structural rearranging of waterfall viewer tabs paired with horizontal overflow scrolling and visual boundary indicators.
 - [x] Polish settings overlay and Viewer UI styling strictly deploying native vanilla CSS components matching a premium presentation.
+- [x] Add dynamic tooltip formatting revealing truncated request URLs upon canvas mouse hover bounds.
+- [x] Architect dynamic Request Detail Tabs spawned via waterfall request clicks mapping comprehensive headers, timings, sizes, raw JSON configurations, and lazily-loaded interactive visual resource previews natively.
 
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.

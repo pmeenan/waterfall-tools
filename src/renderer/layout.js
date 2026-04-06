@@ -98,18 +98,22 @@ export class Layout {
         if (!entries || entries.length === 0) {
             return { rows: [], dimensions: { canvasWidth, canvasHeight: 0, maxTime: 0, labelsWidth: 0, widthPerMs: 0 }};
         }
+        let rawEntries = entries;
+        entries = Array.from(rawEntries);
+        // Map original index backwards to securely map hover payloads
+        entries.forEach((e, i) => e._originalIndex = i);
 
-        // Apply reqFilter (e.g. "1,2,5-10")
-        if (options.reqFilter && typeof options.reqFilter === 'string') {
-            const parts = options.reqFilter.split(',').map(s => s.trim());
-            const allowedIndices = new Set();
+        let allowedIndices = new Set();
+        if (options.reqFilter && options.reqFilter.trim() !== '') {
+            const parts = options.reqFilter.split(',');
             parts.forEach(p => {
+                p = p.trim();
                 if (p.includes('-')) {
-                    const bounds = p.split('-');
-                    const s = parseInt(bounds[0], 10);
-                    const e = parseInt(bounds[1], 10);
-                    if (!isNaN(s) && !isNaN(e)) {
-                        for(let i=s; i<=e; i++) allowedIndices.add(i);
+                    const [s, e] = p.split('-');
+                    const start = parseInt(s, 10);
+                    const end = parseInt(e, 10);
+                    if (!isNaN(start) && !isNaN(end)) {
+                        for (let i = start; i <= end; i++) allowedIndices.add(i);
                     }
                 } else {
                     const idx = parseInt(p, 10);
@@ -265,7 +269,8 @@ export class Layout {
             maxTime = Math.max(maxTime, end - baseMs);
             
             return {
-                index,
+                index: entry._originalIndex,
+                viewIndex: index,
                 url: this.formatUrl(entry.url),
                 time: timeTotal,
                 start,

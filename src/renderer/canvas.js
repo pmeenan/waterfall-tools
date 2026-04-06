@@ -49,6 +49,9 @@ export class WaterfallCanvas {
                 if (this.lastHoveredIndex !== target.index) {
                     this.lastHoveredIndex = target.index;
                     hoverChanged = true;
+                } else if (typeof this.options.onHover === 'function') {
+                    // Update location smoothly while inside the row!
+                    this.options.onHover({ index: target.index, request: this.rawEntries[target.index], event: e });
                 }
             } else {
                 if (this.lastHoveredIndex !== null) {
@@ -58,11 +61,11 @@ export class WaterfallCanvas {
             }
             
             if (hoverChanged && typeof this.options.onHover === 'function') {
-                this.options.onHover(target ? { index: target.index, request: this.rawEntries[target.index] } : null);
+                this.options.onHover(target ? { index: target.index, request: this.rawEntries[target.index], event: e } : null);
             }
         });
 
-        this.canvas.addEventListener('mouseleave', () => {
+        this.canvas.addEventListener('mouseleave', (e) => {
             if (this.lastHoveredIndex !== null) {
                 this.lastHoveredIndex = null;
                 if (typeof this.options.onHover === 'function') {
@@ -74,14 +77,14 @@ export class WaterfallCanvas {
         this.canvas.addEventListener('click', (e) => {
             if (typeof this.options.onClick === 'function') {
                 const target = this._getInteractionTarget(e.offsetX, e.offsetY);
-                this.options.onClick(target ? { index: target.index, request: this.rawEntries[target.index] } : null);
+                this.options.onClick(target ? { index: target.index, request: this.rawEntries[target.index], event: e } : null);
             }
         });
 
         this.canvas.addEventListener('dblclick', (e) => {
             if (typeof this.options.onDoubleClick === 'function') {
                 const target = this._getInteractionTarget(e.offsetX, e.offsetY);
-                this.options.onDoubleClick(target ? { index: target.index, request: this.rawEntries[target.index] } : null);
+                this.options.onDoubleClick(target ? { index: target.index, request: this.rawEntries[target.index], event: e } : null);
             }
         });
     }
