@@ -608,17 +608,14 @@ async function renderTiles(pushHistory = true) {
 }
 
 function renderRequestTab(request, reqNum) {
-    console.log(`[viewer.js] renderRequestTab triggered. Num:`, reqNum, `Request:`, request);
     const tabId = `req-${reqNum}`;
     
     let existingTab = document.querySelector(`.viewer-tab[data-tab-id="${tabId}"]`);
     if (existingTab) {
-        console.log(`[viewer.js] Tab already exists, clicking it.`);
         existingTab.click();
         return;
     }
     
-    console.log(`[viewer.js] Creating new tab wrapper`);
     const tab = document.createElement('div');
     tab.className = 'viewer-tab';
     tab.dataset.tabId = tabId;
@@ -669,23 +666,29 @@ function renderRequestTab(request, reqNum) {
 
     const val = (v) => (v !== undefined && v !== null) ? v : '';
 
-    const toggleIconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
-    const toggleIconSvgCollapsed = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+    const toggleIconSvg = `<svg class="acc-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
+    const toggleIconSvgCollapsed = `<svg class="acc-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
     
     const createSectionHeader = (title, collapsed, copyId) => {
-        let copyBtn = copyId ? `<button class="copy-btn" data-copy-target="${copyId}" style="background:transparent;border:none;cursor:pointer;margin-left:8px;" title="Copy to clipboard" onclick="event.stopPropagation();">📋</button>` : '';
+        let copyBtn = copyId ? `
+            <button class="copy-btn" data-copy-target="${copyId}" title="Copy" onclick="event.stopPropagation();">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy
+            </button>` : '';
         return `
             <div class="req-section-header" onclick="
                 this.parentElement.classList.toggle('collapsed');
-                const svg = this.querySelector('svg polyline');
+                const svg = this.querySelector('svg.acc-icon polyline');
                 if (this.parentElement.classList.contains('collapsed')) {
                     svg.setAttribute('points', '6 9 12 15 18 9');
                 } else {
                     svg.setAttribute('points', '18 15 12 9 6 15');
                 }
-            ">
-                <div style="display:flex; align-items:center;">${title}${copyBtn}</div>
-                ${collapsed ? toggleIconSvgCollapsed : toggleIconSvg}
+            " style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center;">
+                    ${collapsed ? toggleIconSvgCollapsed : toggleIconSvg}
+                    <span style="margin-left: 8px;">${title}</span>
+                </div>
+                ${copyBtn}
             </div>
         `;
     };
@@ -735,8 +738,8 @@ function renderRequestTab(request, reqNum) {
     };
 
     let reqHeadersHtml = `
-        <div class="req-section collapsed">
-            ${createSectionHeader('Request Headers', true, 'reqHeaders')}
+        <div class="req-section">
+            ${createSectionHeader('Request Headers', false, 'reqHeaders')}
             <div class="req-section-body">
                 ${formatHeaders(request.headers || [], 'reqHeaders')}
             </div>
@@ -744,8 +747,8 @@ function renderRequestTab(request, reqNum) {
     `;
 
     let resHeadersHtml = `
-        <div class="req-section collapsed">
-            ${createSectionHeader('Response Headers', true, 'resHeaders')}
+        <div class="req-section">
+            ${createSectionHeader('Response Headers', false, 'resHeaders')}
             <div class="req-section-body">
                 ${formatHeaders(request.responseHeaders || [], 'resHeaders')}
             </div>
@@ -775,9 +778,7 @@ function renderRequestTab(request, reqNum) {
 
     let rawDetailsHtml = `
         <div class="req-section collapsed">
-            <div class="req-section-header" onclick="this.parentElement.classList.toggle('collapsed');">
-                Raw Details
-            </div>
+            ${createSectionHeader('Raw Details', true, false)}
             <div class="req-section-body">
                 <pre class="req-code-block">${rawJson}</pre>
             </div>
@@ -789,10 +790,7 @@ function renderRequestTab(request, reqNum) {
         const bd = request.body;
         bodyHtml = `
             <div class="req-section collapsed">
-                <div class="req-section-header" onclick="this.parentElement.classList.toggle('collapsed');">
-                    <span>Response Body</span>
-                    <button class="copy-btn copy-body-btn" style="margin-left: auto;">📋 Copy</button>
-                </div>
+                ${createSectionHeader('Response Body', true, false)}
                 <div class="req-section-body">
                     <pre class="req-code-block">${highlightSyntax(bd, 'text')}</pre>
                 </div>
@@ -801,19 +799,20 @@ function renderRequestTab(request, reqNum) {
     }
 
     let previewHtml = '';
-    if (request._isImage && request._url) {
+    const isImg = mime.toLowerCase().includes('image');
+    if (isImg && parsedUrl) {
         previewHtml = `
             <div class="req-section">
                 ${createSectionHeader('Preview', false, false)}
-                <div class="req-section-body" style="display:flex; justify-content:center; background:#f0f0f0;">
-                    <img src="${request._url}" style="max-width:100%; max-height:400px; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYV2NkYGAwYkADjDA+A0Q5aJICAMCkAho2q2q/AAAAAElFTkSuQmCC');">
+                <div class="req-section-body req-preview-container" style="display:flex; justify-content:center; background:#f0f0f0;">
+                    <img src="${parsedUrl}" style="max-width:100%; max-height:400px; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYV2NkYGAwYkADjDA+A0Q5aJICAMCkAho2q2q/AAAAAElFTkSuQmCC');">
                 </div>
             </div>
         `;
     }
 
     contentPane.innerHTML = detailsHtml + reqHeadersHtml + resHeadersHtml + bodyHtml + previewHtml + rawDetailsHtml;
-    
+
     // Bind copy events natively immediately after injection!
     contentPane.querySelectorAll('.copy-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -822,18 +821,18 @@ function renderRequestTab(request, reqNum) {
             if (textToCopy) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
                     const originalTitle = btn.title;
+                    const originalHtml = btn.innerHTML;
                     btn.title = "Copied!";
-                    btn.innerHTML = "✅";
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied`;
                     setTimeout(() => {
                         btn.title = originalTitle;
-                        btn.innerHTML = "📋";
-                    }, 1000);
+                        btn.innerHTML = originalHtml;
+                    }, 2000);
                 });
             }
         });
     });
 
-    console.log(`[viewer.js] Appending HTML to tabs-body and issuing click! Html length:`, contentPane.innerHTML.length);
     document.querySelector('.tabs-body').appendChild(contentPane);
     
     // Simulate click to focus newly minted tab natively
@@ -937,19 +936,15 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
 
     renderOptions.onHover = (data) => {
         const tooltip = document.getElementById('waterfall-tooltip');
-        console.log('[viewer.js] onHover event raised with data:', data);
-        if (!tooltip) {
-            console.warn('[viewer.js] Tooltip element missing in DOM!');
-            return;
-        }
+        if (!tooltip) return;
+        
         if (!data) {
-            console.log('[viewer.js] data is null, hiding tooltip');
-            tooltip.classList.add('hidden');
+            ui.waterfallView.removeAttribute('title');
             return;
         }
         
         let url = data.request.url || data.request._URL || '';
-        console.log('[viewer.js] parsed URL for tooltip:', url);
+        ui.waterfallView.title = url;
         
         // Handle truncation in middle if > 100 chars
         if (url.length > 100) {
@@ -957,7 +952,6 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         }
         
         tooltip.textContent = url;
-        tooltip.classList.remove('hidden');
         
         if (data.event) {
             let x = data.event.clientX + 15;
@@ -970,15 +964,8 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
             if (y + tooltip.offsetHeight > window.innerHeight) {
                 y = window.innerHeight - tooltip.offsetHeight - 10;
             }
-            console.log('[viewer.js] Translating tooltip to X:', x, ' Y:', y);
-            tooltip.classList.remove('hidden');
-            tooltip.style.display = 'block';
-            tooltip.style.visibility = 'visible';
-            tooltip.style.opacity = '1';
             tooltip.style.left = x + 'px';
             tooltip.style.top = y + 'px';
-        } else {
-            console.warn('[viewer.js] Missing event object in hovering data block');
         }
     };
 
