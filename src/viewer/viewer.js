@@ -24,6 +24,11 @@ const ui = {
     traceFrame: document.getElementById('trace-frame'),
     traceOverlay: document.getElementById('trace-overlay'),
     traceOverlayContent: document.getElementById('trace-overlay-content'),
+    tabNetlog: document.getElementById('tab-netlog'),
+    netlogView: document.getElementById('netlog-view'),
+    netlogFrame: document.getElementById('netlog-frame'),
+    netlogOverlay: document.getElementById('netlog-overlay'),
+    netlogOverlayContent: document.getElementById('netlog-overlay-content'),
     viewerTabs: document.getElementById('viewer-tabs')
 };
 
@@ -61,7 +66,7 @@ function loadTracePerfetto(traceBuffer) {
                 setTimeout(() => {
                     ui.traceOverlay.style.display = 'none';
                     window.removeEventListener('message', onMessage);
-                }, 200);
+                }, 1500);
             }
         }
     };
@@ -80,6 +85,82 @@ function loadTracePerfetto(traceBuffer) {
         }
     };
     ui.traceFrame.addEventListener('load', onLoad, { once: true });
+}
+
+function loadNetlog(netlogBuffer) {
+    ui.netlogOverlay.style.display = 'flex';
+    ui.netlogOverlayContent.innerText = 'Loading netlog viewer...';
+    
+    if (ui.netlogFrame.src === 'about:blank' || !ui.netlogFrame.src) {
+        ui.netlogFrame.src = 'netlog-viewer/index.html';
+    }
+
+    let loaded = false;
+
+    const onLoad = async () => {
+        if (loaded) return;
+        ui.netlogOverlayContent.innerText = 'Loading Netlog Data...';
+        
+        let finalBuffer = netlogBuffer;
+        try {
+            const uint8View = netlogBuffer instanceof Uint8Array ? netlogBuffer : new Uint8Array(netlogBuffer);
+            // Check for gzip magic bytes
+            if (uint8View.length > 2 && uint8View[0] === 0x1f && uint8View[1] === 0x8b) {
+                ui.netlogOverlayContent.innerText = 'Decompressing Netlog...';
+                const ds = new DecompressionStream('gzip');
+                const writer = ds.writable.getWriter();
+                writer.write(uint8View);
+                writer.close();
+                const response = new Response(ds.readable);
+                finalBuffer = await response.arrayBuffer();
+            }
+        } catch (e) {
+            console.error('[viewer.js] Failed to decompress netlog buffer:', e);
+        }
+
+        ui.netlogOverlayContent.innerText = 'Parsing Netlog Data...';
+
+        // Use timeout to let the external viewer finish parsing the DOM and initializing globals
+        setTimeout(() => {
+            try {
+                const cw = ui.netlogFrame.contentWindow;
+                if (cw && cw.window && cw.window.ImportView) {
+                    const iv = cw.window.ImportView.getInstance();
+                    
+                    // Intercept the final asynchronous phase of FileReader natively loading the file
+                    const originalOnLoad = iv.onLoadLogFile;
+                    iv.onLoadLogFile = function(logFile, event) {
+                        originalOnLoad.call(iv, logFile, event);
+                        cw.window.location.hash = '#events';
+                        
+                        // Drop the overlay only after the massive table DOM updates are fully rendered
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                ui.netlogOverlay.style.display = 'none';
+                            });
+                        });
+                    };
+
+                    const file = new File([finalBuffer], 'netlog.json', {type: 'application/json'});
+                    iv.loadLogFile(file);
+                    loaded = true;
+                } else {
+                    console.warn('[viewer.js] Error invoking Netlog Viewer: ImportView not found on window');
+                    ui.netlogOverlay.style.display = 'none';
+                }
+            } catch (e) {
+                console.warn('[viewer.js] Error invoking Netlog Viewer API:', e);
+                ui.netlogOverlay.style.display = 'none';
+            }
+        }, 1000);
+    };
+
+    ui.netlogFrame.addEventListener('load', onLoad, { once: true });
+    
+    // In case of rapid toggling where the iframe is already loaded
+    if (ui.netlogFrame.contentWindow && ui.netlogFrame.contentWindow.document && ui.netlogFrame.contentWindow.document.readyState === 'complete' && ui.netlogFrame.src !== 'about:blank' && ui.netlogFrame.src !== '') {
+        onLoad();
+    }
 }
 
 function showLoading(text = 'Loading...') {
@@ -311,6 +392,8 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     if (ui.lighthouseFrame) ui.lighthouseFrame.src = 'about:blank';
     if (ui.tabTrace) ui.tabTrace.classList.add('hidden');
     if (ui.traceFrame) ui.traceFrame.src = 'about:blank';
+    if (ui.tabNetlog) ui.tabNetlog.classList.add('hidden');
+    if (ui.netlogFrame) ui.netlogFrame.src = 'about:blank';
 
     try {
         const lhResource = await waterfallTool.getPageResource(pageId, 'lighthouse');
@@ -335,6 +418,18 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         }
     } catch (e) {
         console.warn(`[viewer.js] Failed to fetch trace data for ${pageId}:`, e);
+    }
+
+    try {
+        const netlogResource = await waterfallTool.getPageResource(pageId, 'netlog');
+        if (netlogResource && netlogResource.buffer && ui.tabNetlog) {
+            ui.tabNetlog.classList.remove('hidden');
+            pendingTabLoads.netlog = () => {
+                loadNetlog(netlogResource.buffer);
+            };
+        }
+    } catch (e) {
+        console.warn(`[viewer.js] Failed to fetch netlog data for ${pageId}:`, e);
     }
 
     rendererCanvas = await waterfallTool.renderTo(ui.waterfallView, renderOptions);
@@ -589,6 +684,12 @@ async function initViewer() {
                 if (pendingTabLoads.trace) {
                     pendingTabLoads.trace();
                     delete pendingTabLoads.trace;
+                }
+            } else if (tabId === 'netlog') {
+                if (ui.netlogView) ui.netlogView.classList.add('active');
+                if (pendingTabLoads.netlog) {
+                    pendingTabLoads.netlog();
+                    delete pendingTabLoads.netlog;
                 }
             }
         });

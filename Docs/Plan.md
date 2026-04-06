@@ -63,6 +63,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Integrate UI Control Overlay in `index.html` mapping settings dynamically seamlessly.
 - [x] Include Lighthouse HTML iframe integration inside the viewer organically tied to extended HAR structures.
 - [x] Integrate Perfetto Trace Viewer iframe UI securely with dynamic PING layout loading and lazy tab execution.
+- [x] Integrate NetLog Viewer iframe UI supporting both standalone files and WPTAgent nested netlogs (`*_netlog.txt.gz`).
 - [x] Build Connection View (stacking multiplexed requests organically natively matching WebPageTest features) internally within `layout.js` layout passes.
 - [x] Allow bounds clamping for `startTime` and `endTime` zooming natively gracefully.
 - [x] Expose `viewer.js` UI states mapping directly into explicit `rendererCanvas.render()` toggle flags allowing dynamic redraws.
@@ -106,6 +107,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Build a dedicated multi-page thumbnail grid view (`tileView`) automatically surfacing metrics (Load, FCP, LCP, Bytes) alongside mini-waterfalls for inputs tracing multiple runs.
 - [x] Implement scalable request truncation rendering (`thumbMaxReqs`) utilizing a custom native HTML5 `<canvas>` "torn page" vector overlay to highlight sliced data elegantly without destroying the layout loop limits.
 - [x] Add true browser `History API` tracking allowing users to easily traverse back and forward across `tileView` and active waterfall pages using their native browser actions safely.
+- [x] Integrate native self-hosted Chrome NetLog and Perfetto Trace viewers as standalone iframe tabs to explore low-level network logging artifacts organically.
 - [x] Polish settings overlay and Viewer UI styling strictly deploying native vanilla CSS components matching a premium presentation.
 
 ## Phase 9: Environment Adapters & Image Generation

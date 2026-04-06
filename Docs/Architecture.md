@@ -44,7 +44,7 @@ graph TD
     subgraph Embed ["Embeddable Viewers (embed/)"]
         DirectEmbed[renderTo API Embedding]
         Iframe[Iframe / Query Params]
-        External[External Viewers <br/> Perfetto / DevTools]
+        External[External Viewers <br/> Perfetto / DevTools / NetLog Viewer]
     end
 
     %% Connections
@@ -102,7 +102,9 @@ graph TD
 │   │   └── conductor.js    # Main API interface
 │   ├── viewer/             # Self-contained, full-featured standalone frontend UI
 │   │   ├── index.html      # Main presentation container
-│   │   └── viewer.js       # App controller handling loading, drag-and-drop, and history API
+│   │   ├── viewer.js       # App controller handling loading, drag-and-drop, and history API
+│   │   └── public/         # Self-hosted static dependencies copied natively via Vite
+│   │       └── netlog-viewer/ # Standalone compiled Chrome NetLog viewer HTML bundle
 │   ├── platforms/          # Environment-specific implementations (e.g., File I/O vs Fetch)
 │   │   ├── browser/
 │   │   └── node/

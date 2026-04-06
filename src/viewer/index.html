@@ -69,6 +69,9 @@
                 <div class="viewer-tab hidden" data-tab-id="trace" id="tab-trace">
                     <span class="tab-title">Trace</span>
                 </div>
+                <div class="viewer-tab hidden" data-tab-id="netlog" id="tab-netlog">
+                    <span class="tab-title">NetLog</span>
+                </div>
             </div>
             <button id="btn-settings">⚙️ Options</button>
         </header>
@@ -84,6 +87,14 @@
                     </div>
                 </div>
                 <iframe id="trace-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+            <div id="netlog-view" class="tab-content" style="background: #fff;">
+                <div id="netlog-overlay">
+                    <div id="netlog-overlay-content">
+                        Loading netlog viewer...
+                    </div>
+                </div>
+                <iframe id="netlog-frame" style="width: 100%; height: 100%; border: none;"></iframe>
             </div>
         </div>
     </div>

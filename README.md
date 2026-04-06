@@ -150,6 +150,8 @@ By passing your target DOM container and your preferred options (which can inclu
 The library includes a pre-built, production-ready standalone viewer application. This is ideal for distributing as a static HTML page, embedding cleanly via an `iframe`, or using as a dedicated full-page waterfall tool without building your own UI.
 If you load a HAR file containing multiple testing iterations (such as WebPageTest's First and Repeat views), the viewer will automatically present an interactive mathematical **Thumbnail Grid View** cleanly surfacing the respective Paint metrics, load times, and request counts before drilling into specific traces.
 
+Additionally, the Viewer embraces integrated tab-switching capabilities routing dynamically to self-hosted embedded instances of the **Perfetto Trace Viewer** and the legacy **Chrome NetLog Viewer**, allowing comprehensive exploration of native Chrome DevTools metrics, timeline processing, and raw socket-level network events interactively!
+
 ### Using the Viewer
 
 You can dynamically configure the viewer using URL query parameters that identically map to the configuration options available in `WaterfallTools.getDefaultOptions()`. The viewer seamlessly tracks states natively using the browser's **History API**, enabling smooth "Back" and "Forward" navigation across nested waterfalls and thumbnail overviews.

@@ -301,6 +301,11 @@ export class WaterfallTools {
             return { url: URL.createObjectURL(blob), mimeType: 'application/json', buffer: this._rawBuffer };
         }
 
+        if (resourceType === 'netlog' && this._sourceFormat === 'netlog' && this._rawBuffer) {
+            const blob = new Blob([this._rawBuffer], { type: 'application/json' });
+            return { url: URL.createObjectURL(blob), mimeType: 'application/json', buffer: this._rawBuffer };
+        }
+
         if (!this.data._opfsStorage || !this.data._zipFiles) {
             console.warn(`[getPageResource] Aborting: Missing _opfsStorage (${!!this.data._opfsStorage}) or _zipFiles (${!!this.data._zipFiles})`);
             return null;
@@ -328,8 +333,12 @@ export class WaterfallTools {
             targetFile = this.data._zipFiles.find(f => f === traceFile || f.endsWith(`/${traceFile}`));
             mimeType = 'application/json';
         } else if (resourceType === 'netlog') {
-            const netlogFile = `${runNum}${cachedStr}_netlog.json.gz`;
-            targetFile = this.data._zipFiles.find(f => f === netlogFile || f.endsWith(`/${netlogFile}`));
+            const netlogFileJson = `${runNum}${cachedStr}_netlog.json.gz`;
+            const netlogFileTxt = `${runNum}${cachedStr}_netlog.txt.gz`;
+            targetFile = this.data._zipFiles.find(f => f === netlogFileJson || f.endsWith(`/${netlogFileJson}`));
+            if (!targetFile) {
+                 targetFile = this.data._zipFiles.find(f => f === netlogFileTxt || f.endsWith(`/${netlogFileTxt}`));
+            }
             mimeType = 'application/json';
         } else if (resourceType === 'tcpdump') {
             const pcapFile = `${runNum}${cachedStr}_tcpdump.cap.gz`;
