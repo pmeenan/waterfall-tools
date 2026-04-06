@@ -6,6 +6,7 @@ const ui = {
     loadingText: document.getElementById('loading-text'),
     dropZone: document.getElementById('drop-zone'),
     canvasContainer: document.getElementById('canvas-container'),
+    summaryView: document.getElementById('summary-view'),
     waterfallView: document.getElementById('waterfall-view'),
     fileInput: document.getElementById('file-input'),
     uploadBtn: document.getElementById('upload-btn'),
@@ -237,6 +238,270 @@ function getMetricItemHtml(label, value) {
     `;
 }
 
+function renderSummary(pageData) {
+    if (!ui.summaryView) return;
+    ui.summaryView.innerHTML = `
+        <div class="summary-header">
+            <h2>Performance Summary</h2>
+        </div>
+    `;
+
+    let startRender = pageData._render;
+    if (startRender === undefined && pageData.pageTimings && pageData.pageTimings._startRender > 0) {
+        startRender = pageData.pageTimings._startRender;
+    }
+
+    const getRating = (val, thresholds) => {
+        if (val === undefined || val === null || val === 'N/A') return '';
+        const num = parseFloat(val);
+        if (isNaN(num)) return '';
+        if (num <= thresholds[0]) return 'good';
+        if (num <= thresholds[1]) return 'warning';
+        return 'poor';
+    };
+
+    let clsValue = pageData._CumulativeLayoutShift;
+    if (clsValue === undefined) clsValue = pageData['chromeUserTiming.CumulativeLayoutShift'];
+    if (clsValue === undefined) clsValue = pageData['_chromeUserTiming.CumulativeLayoutShift'];
+    if (clsValue === undefined && Array.isArray(pageData._chromeUserTiming)) {
+        const clsEvent = pageData._chromeUserTiming.find(e => e.name === 'CumulativeLayoutShift');
+        if (clsEvent) clsValue = clsEvent.value !== undefined ? clsEvent.value : clsEvent.time;
+    }
+    if (clsValue === undefined && Array.isArray(pageData.chromeUserTiming)) {
+        const clsEvent = pageData.chromeUserTiming.find(e => e.name === 'CumulativeLayoutShift');
+        if (clsEvent) clsValue = clsEvent.value !== undefined ? clsEvent.value : clsEvent.time;
+    }
+
+    let clsDisplay = null;
+    let clsRaw = null;
+    if (clsValue !== undefined && clsValue !== null && clsValue !== 'N/A' && !isNaN(parseFloat(clsValue))) {
+        clsRaw = parseFloat(clsValue);
+        clsDisplay = clsRaw.toFixed(3);
+    }
+
+    const metricsGroup = [
+        { label: 'Time to First Byte', value: humanizeMs(pageData._TTFB !== undefined ? pageData._TTFB : pageData._ttfb_ms) },
+        { label: 'Start Render', value: humanizeMs(startRender) },
+        { label: 'First Contentful Paint', value: humanizeMs(pageData._firstContentfulPaint) },
+        { label: 'Speed Index', value: pageData._SpeedIndex !== undefined ? parseInt(pageData._SpeedIndex) : null },
+        { label: 'Largest Contentful Paint', value: humanizeMs(pageData._LargestContentfulPaint), rating: getRating(pageData._LargestContentfulPaint, [2500, 4000]) },
+        { label: 'Cumulative Layout Shift', value: clsDisplay, rating: getRating(clsRaw, [0.1, 0.25]) },
+        { label: 'Total Blocking Time', value: humanizeMs(pageData._TotalBlockingTime), rating: getRating(pageData._TotalBlockingTime, [200, 600]) },
+        { label: 'Doc Complete', value: humanizeMs(pageData._docTime) },
+        { label: 'Doc Requests', value: pageData._requestsDoc },
+        { label: 'Doc Bytes', value: humanizeBytes(pageData._bytesInDoc) },
+        { label: 'Total Time', value: humanizeMs(pageData._fullyLoaded !== undefined ? pageData._fullyLoaded : pageData._loadTime) },
+        { label: 'Total Requests', value: pageData._requestsFull !== undefined ? pageData._requestsFull : pageData._requests },
+        { label: 'Page Weight', value: humanizeBytes(pageData._bytesIn) }
+    ];
+
+    let gridHtml = '<div class="summary-grid">';
+    for (const m of metricsGroup) {
+        if (m.value !== null && m.value !== undefined && m.value !== 'N/A') {
+            const ratingClass = m.rating ? ` metric-bg-${m.rating}` : '';
+            gridHtml += `
+                <div class="summary-metric${ratingClass}">
+                    <span class="summary-metric-label">${m.label}</span>
+                    <span class="summary-metric-value">${m.value}</span>
+                </div>
+            `;
+        }
+    }
+    gridHtml += '</div>';
+
+    ui.summaryView.innerHTML += `
+        <div class="summary-section">
+            <div class="summary-section-header" onclick="
+                this.parentElement.classList.toggle('collapsed');
+                const svg = this.querySelector('svg polyline');
+                if (this.parentElement.classList.contains('collapsed')) {
+                    svg.setAttribute('points', '6 9 12 15 18 9');
+                } else {
+                    svg.setAttribute('points', '18 15 12 9 6 15');
+                }
+            ">
+                Top-Level Metrics
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+            </div>
+            <div class="summary-section-body">
+                ${gridHtml}
+            </div>
+        </div>
+    `;
+
+    function highlightSyntax(code, lang) {
+        if (code === undefined || code === null) return '';
+        let html = String(code).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        if (lang === 'json') {
+            html = html.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'hl-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'hl-key';
+                    } else {
+                        cls = 'hl-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'hl-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'hl-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        } else if (lang === 'html') {
+            html = html.replace(/(&lt;\/?[a-zA-Z0-9\-:]+)(.*?)(&gt;)/g, function(match, p1, p2, p3) {
+                let attrs = p2.replace(/([a-zA-Z0-9\-]+)(=)(&quot;.*?&quot;|&#39;.*?&#39;|".*?"|'.*?')/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>');
+                return '<span class="hl-tag">' + p1 + '</span>' + attrs + '<span class="hl-tag">' + p3 + '</span>';
+            });
+        } else if (lang === 'css') {
+            html = html.replace(/([a-zA-Z0-9\-]+)(\s*:)([^;]+)(;)/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>$4');
+        } else if (lang === 'js') {
+            html = html.replace(/\b(const|let|var|function|return|if|else|for|while|class|import|export|true|false|null)\b/g, '<span class="hl-keyword">$1</span>');
+            html = html.replace(/('[^']*'|"[^"]*"|`[^`]*`)/g, '<span class="hl-string">$1</span>');
+        }
+        return html;
+    }
+
+    if (pageData._custom) {
+        let customKeys = [];
+        if (Array.isArray(pageData._custom)) {
+            customKeys = pageData._custom;
+        } else if (typeof pageData._custom === 'object') {
+            customKeys = Object.keys(pageData._custom);
+        }
+        
+        customKeys.sort((a, b) => a.localeCompare(b));
+
+        if (customKeys.length > 0) {
+            let customHtml = '<div class="custom-metrics-grid">';
+            
+            for (const key of customKeys) {
+                let val = '';
+                if (Array.isArray(pageData._custom)) {
+                    val = pageData['_' + key];
+                } else {
+                    val = pageData._custom[key];
+                }
+                
+                if (val !== undefined && val !== null) {
+                    let formatted = '';
+                    let lang = 'text';
+
+                    if (typeof val === 'object') {
+                        formatted = JSON.stringify(val, null, 2);
+                        lang = 'json';
+                    } else if (typeof val === 'string') {
+                        let parsedObj = null;
+                        try {
+                            parsedObj = JSON.parse(val);
+                        } catch (e) {}
+
+                        if (parsedObj !== null && typeof parsedObj === 'object') {
+                            formatted = JSON.stringify(parsedObj, null, 2);
+                            lang = 'json';
+                        } else {
+                            formatted = val;
+                            if (formatted.trim().startsWith('<')) {
+                                lang = 'html';
+                            } else if (['css', 'style'].some(t => key.toLowerCase().includes(t))) {
+                                lang = 'css';
+                            } else if (['js', 'script'].some(t => key.toLowerCase().includes(t))) {
+                                lang = 'js';
+                            }
+                        }
+                    } else {
+                        formatted = val;
+                        lang = 'json'; // Numbers/booleans
+                    }
+
+                    const highlighted = highlightSyntax(formatted, lang);
+                    const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+
+                    customHtml += `
+                        <div class="custom-metric-card">
+                            <div class="custom-metric-header">
+                                <span>${key}</span>
+                                <div class="cm-actions">
+                                    <button class="expand-indicator hidden" id="cm-${safeKey}-expand" onclick="
+                                        const c = document.getElementById('cm-${safeKey}-container');
+                                        if (c.classList.contains('clipped')) {
+                                            c.classList.remove('clipped');
+                                            this.innerHTML = '<svg viewBox=\\'0 0 24 24\\' width=\\'16\\' height=\\'16\\' stroke=\\'currentColor\\' stroke-width=\\'2\\' fill=\\'none\\' stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\'><polyline points=\\'18 15 12 9 6 15\\'></polyline></svg>';
+                                            this.title = 'Collapse';
+                                        } else {
+                                            c.classList.add('clipped');
+                                            this.innerHTML = '<svg viewBox=\\'0 0 24 24\\' width=\\'16\\' height=\\'16\\' stroke=\\'currentColor\\' stroke-width=\\'2\\' fill=\\'none\\' stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\'><polyline points=\\'6 9 12 15 18 9\\'></polyline></svg>';
+                                            this.title = 'Expand';
+                                        }
+                                    " title="Expand">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </button>
+                                    <button class="copy-btn" data-copy-id="cm-${safeKey}" title="Copy">📋 Copy</button>
+                                </div>
+                            </div>
+                            <div class="custom-metric-content clipped" id="cm-${safeKey}-container">
+                                <pre id="cm-${safeKey}-val">${highlighted}</pre>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            customHtml += '</div>';
+
+            ui.summaryView.innerHTML += `
+                <div class="summary-section">
+            <div class="summary-section-header" onclick="
+                this.parentElement.classList.toggle('collapsed');
+                const svg = this.querySelector('svg polyline');
+                if (this.parentElement.classList.contains('collapsed')) {
+                    svg.setAttribute('points', '6 9 12 15 18 9');
+                } else {
+                    svg.setAttribute('points', '18 15 12 9 6 15');
+                }
+            ">
+                Custom Metrics
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+            </div>
+                    <div class="summary-section-body">
+                        ${customHtml}
+                    </div>
+                </div>
+            `;
+
+            // Display expand indicators dynamically
+            requestAnimationFrame(() => {
+                for (const key of customKeys) {
+                    const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+                    const preEl = document.getElementById('cm-' + safeKey + '-val');
+                    const containerEl = document.getElementById('cm-' + safeKey + '-container');
+                    const btnEl = document.getElementById('cm-' + safeKey + '-expand');
+                    if (preEl && containerEl && btnEl) {
+                        if (preEl.scrollHeight > containerEl.clientHeight + 4) {
+                            btnEl.classList.remove('hidden');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    ui.summaryView.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = e.target.getAttribute('data-copy-id');
+            const preEl = document.getElementById(id + '-val');
+            if (preEl) {
+                // Use innerText directly to ignore syntax HL spans securely
+                navigator.clipboard.writeText(preEl.innerText).then(() => {
+                    const originalText = e.target.innerText;
+                    e.target.innerText = '✅ Copied!';
+                    setTimeout(() => { e.target.innerText = originalText; }, 2000);
+                });
+            }
+        });
+    });
+}
+
 async function renderTiles(pushHistory = true) {
     if (pushHistory) history.pushState({ view: 'tiles' }, '');
     ui.canvasContainer.classList.add('hidden');
@@ -379,11 +644,17 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
 
     // Reset tabs
     document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
-    const waterfallTab = document.querySelector('.viewer-tab[data-tab-id="waterfall"]');
-    if (waterfallTab) waterfallTab.classList.add('active');
+    // Select summary by default instead of waterfall
+    const summaryTab = document.querySelector('.viewer-tab[data-tab-id="summary"]');
+    if (summaryTab) summaryTab.classList.add('active');
     
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    ui.waterfallView.classList.add('active');
+    if (ui.summaryView) ui.summaryView.classList.add('active');
+
+    // Render the summary internally
+    if (typeof renderSummary === 'function' && pageData) {
+        renderSummary(pageData);
+    }
 
     pendingTabLoads = {};
     if (ui.tabLighthouse) ui.tabLighthouse.classList.add('hidden');
@@ -671,6 +942,8 @@ async function initViewer() {
                 ui.waterfallView.classList.add('active');
                 // Ensure canvas resizes properly if needed
                 if (rendererCanvas) window.dispatchEvent(new Event('resize'));
+            } else if (tabId === 'summary') {
+                if (ui.summaryView) ui.summaryView.classList.add('active');
             } else if (tabId === 'lighthouse') {
                 if (ui.lighthouseView) ui.lighthouseView.classList.add('active');
                 if (pendingTabLoads.lighthouse) {

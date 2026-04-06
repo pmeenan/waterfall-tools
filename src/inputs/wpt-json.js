@@ -71,11 +71,8 @@ function processWPTView(viewData, runStr, cachedNum, har) {
     };
     
     const bloatNames = new Set([
-        'generated-html', 
-        'almanac', 
         'bodies', 
         'response_body', 
-        'response_body_almanac', 
         'thumbnails', 
         'images', 
         'videoFrames'
@@ -334,11 +331,8 @@ export async function processWPTFileNode(input, options = {}) {
     });
 
     const bloatNames = new Set([
-        'generated-html', 
-        'almanac', 
         'bodies', 
         'response_body', 
-        'response_body_almanac', 
         'thumbnails', 
         'images', 
         'videoFrames'

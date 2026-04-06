@@ -62,7 +62,10 @@
             <div class="tabs-scroll-wrapper" id="tabs-scroll-wrapper">
                 <button id="tab-scroll-left" class="tab-scroll-btn hidden">◀</button>
                 <div class="tabs-container" id="viewer-tabs">
-                    <div class="viewer-tab active" data-tab-id="waterfall" draggable="true">
+                    <div class="viewer-tab active" data-tab-id="summary" id="tab-summary" draggable="true">
+                        <span class="tab-title">Summary</span>
+                    </div>
+                    <div class="viewer-tab" data-tab-id="waterfall" id="tab-waterfall" draggable="true">
                         <span id="viewer-title" class="tab-title">Waterfall</span>
                     </div>
                     <div class="viewer-tab hidden" data-tab-id="lighthouse" id="tab-lighthouse" draggable="true">
@@ -80,7 +83,8 @@
             <button id="btn-settings">⚙️ Options</button>
         </header>
         <div class="tabs-body">
-            <div id="waterfall-view" class="tab-content active"></div>
+            <div id="summary-view" class="tab-content active" style="padding: 20px; overflow-y: auto; background: #fff;"></div>
+            <div id="waterfall-view" class="tab-content"></div>
             <div id="lighthouse-view" class="tab-content" style="background: #fff;">
                 <iframe id="lighthouse-frame" style="width: 100%; height: 100%; border: none;"></iframe>
             </div>
