@@ -233,18 +233,62 @@ body, html {
 }
 
 /* Tab Strip Styles */
+.tabs-scroll-wrapper {
+    display: flex;
+    flex: 1;
+    position: relative;
+    align-items: flex-end; /* Align tabs to bottom */
+    overflow: hidden;
+    min-width: 0; /* Important for flex children to allow shrinking */
+}
+
+.tab-scroll-btn {
+    background: #f5f7f9;
+    border: none;
+    cursor: pointer;
+    padding: 8px 6px;
+    font-size: 0.8rem;
+    color: #555;
+    z-index: 10;
+    transition: color 0.15s, background 0.15s;
+    display: flex;
+    align-items: center;
+    /* Draw over the border to match tabs */
+    margin-bottom: -1px;
+    border-bottom: 1px solid #ccc;
+    height: 100%;
+}
+.tab-scroll-btn:hover {
+    color: var(--primary-color);
+    background: #e0e4e8;
+}
+
 .tabs-container {
     display: flex;
     flex: 1;
     overflow-x: auto;
     white-space: nowrap;
     gap: 4px;
+    scroll-behavior: smooth;
     /* Hide scrollbar for tabs */
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 .tabs-container::-webkit-scrollbar {
     display: none;
+}
+
+.viewer-tab.dragging {
+    opacity: 0.5;
+    border-style: dashed;
+    border-color: var(--primary-color);
+}
+
+.viewer-tab.drag-over-left {
+    border-left: 2px solid var(--primary-color);
+}
+.viewer-tab.drag-over-right {
+    border-right: 2px solid var(--primary-color);
 }
 
 .viewer-tab {

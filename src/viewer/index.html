@@ -59,19 +59,23 @@
     <div id="canvas-container" class="hidden">
         <header class="viewer-header has-tabs">
             <button id="btn-back-tiles" class="hidden">🔙 Back to Runs</button>
-            <div class="tabs-container" id="viewer-tabs">
-                <div class="viewer-tab active" data-tab-id="waterfall">
-                    <span id="viewer-title" class="tab-title">Waterfall</span>
+            <div class="tabs-scroll-wrapper" id="tabs-scroll-wrapper">
+                <button id="tab-scroll-left" class="tab-scroll-btn hidden">◀</button>
+                <div class="tabs-container" id="viewer-tabs">
+                    <div class="viewer-tab active" data-tab-id="waterfall" draggable="true">
+                        <span id="viewer-title" class="tab-title">Waterfall</span>
+                    </div>
+                    <div class="viewer-tab hidden" data-tab-id="lighthouse" id="tab-lighthouse" draggable="true">
+                        <span class="tab-title">Lighthouse</span>
+                    </div>
+                    <div class="viewer-tab hidden" data-tab-id="trace" id="tab-trace" draggable="true">
+                        <span class="tab-title">Trace</span>
+                    </div>
+                    <div class="viewer-tab hidden" data-tab-id="netlog" id="tab-netlog" draggable="true">
+                        <span class="tab-title">NetLog</span>
+                    </div>
                 </div>
-                <div class="viewer-tab hidden" data-tab-id="lighthouse" id="tab-lighthouse">
-                    <span class="tab-title">Lighthouse</span>
-                </div>
-                <div class="viewer-tab hidden" data-tab-id="trace" id="tab-trace">
-                    <span class="tab-title">Trace</span>
-                </div>
-                <div class="viewer-tab hidden" data-tab-id="netlog" id="tab-netlog">
-                    <span class="tab-title">NetLog</span>
-                </div>
+                <button id="tab-scroll-right" class="tab-scroll-btn hidden">▶</button>
             </div>
             <button id="btn-settings">⚙️ Options</button>
         </header>

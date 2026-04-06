@@ -108,6 +108,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Implement scalable request truncation rendering (`thumbMaxReqs`) utilizing a custom native HTML5 `<canvas>` "torn page" vector overlay to highlight sliced data elegantly without destroying the layout loop limits.
 - [x] Add true browser `History API` tracking allowing users to easily traverse back and forward across `tileView` and active waterfall pages using their native browser actions safely.
 - [x] Integrate native self-hosted Chrome NetLog and Perfetto Trace viewers as standalone iframe tabs to explore low-level network logging artifacts organically.
+- [x] Support drag-and-drop structural rearranging of waterfall viewer tabs paired with horizontal overflow scrolling and visual boundary indicators.
 - [x] Polish settings overlay and Viewer UI styling strictly deploying native vanilla CSS components matching a premium presentation.
 
 ## Phase 9: Environment Adapters & Image Generation

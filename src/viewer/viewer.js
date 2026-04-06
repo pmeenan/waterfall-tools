@@ -716,6 +716,118 @@ async function initViewer() {
             }
         }
     });
+
+    // Tab drag and drop
+    let draggedTab = null;
+
+    if (ui.viewerTabs) {
+        ui.viewerTabs.addEventListener('dragstart', (e) => {
+            const tab = e.target.closest('.viewer-tab');
+            if (!tab) return;
+            draggedTab = tab;
+            setTimeout(() => tab.classList.add('dragging'), 0);
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', tab.dataset.tabId);
+        });
+
+        ui.viewerTabs.addEventListener('dragend', (e) => {
+            const tab = e.target.closest('.viewer-tab');
+            if (tab) tab.classList.remove('dragging');
+            draggedTab = null;
+            ui.viewerTabs.querySelectorAll('.viewer-tab').forEach(t => {
+                t.classList.remove('drag-over-left', 'drag-over-right');
+            });
+        });
+
+        ui.viewerTabs.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const targetTab = e.target.closest('.viewer-tab');
+            if (!targetTab || targetTab === draggedTab) return;
+            
+            const rect = targetTab.getBoundingClientRect();
+            const midpoint = rect.x + rect.width / 2;
+            
+            ui.viewerTabs.querySelectorAll('.viewer-tab').forEach(t => {
+                t.classList.remove('drag-over-left', 'drag-over-right');
+            });
+            
+            if (e.clientX < midpoint) {
+                targetTab.classList.add('drag-over-left');
+            } else {
+                targetTab.classList.add('drag-over-right');
+            }
+        });
+
+        ui.viewerTabs.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const targetTab = e.target.closest('.viewer-tab');
+            if (!targetTab || targetTab === draggedTab || !draggedTab) return;
+
+            const rect = targetTab.getBoundingClientRect();
+            const midpoint = rect.x + rect.width / 2;
+            
+            if (e.clientX < midpoint) {
+                ui.viewerTabs.insertBefore(draggedTab, targetTab);
+            } else {
+                ui.viewerTabs.insertBefore(draggedTab, targetTab.nextSibling);
+            }
+            
+            ui.viewerTabs.querySelectorAll('.viewer-tab').forEach(t => {
+                t.classList.remove('drag-over-left', 'drag-over-right');
+            });
+            
+            if (typeof checkTabScroll === 'function') checkTabScroll();
+        });
+    }
+
+    // Tab Scrolling
+    const tabsContainer = document.getElementById('viewer-tabs');
+    const scrollLeftBtn = document.getElementById('tab-scroll-left');
+    const scrollRightBtn = document.getElementById('tab-scroll-right');
+    
+    function checkTabScroll() {
+        if (!tabsContainer || !scrollLeftBtn || !scrollRightBtn) return;
+        
+        if (tabsContainer.scrollWidth > tabsContainer.clientWidth) {
+            if (tabsContainer.scrollLeft > 0) {
+                scrollLeftBtn.classList.remove('hidden');
+            } else {
+                scrollLeftBtn.classList.add('hidden');
+            }
+            
+            if (tabsContainer.scrollLeft + tabsContainer.clientWidth < tabsContainer.scrollWidth - 1) {
+                scrollRightBtn.classList.remove('hidden');
+            } else {
+                scrollRightBtn.classList.add('hidden');
+            }
+        } else {
+            scrollLeftBtn.classList.add('hidden');
+            scrollRightBtn.classList.add('hidden');
+        }
+    }
+    
+    if (tabsContainer) {
+        tabsContainer.addEventListener('scroll', checkTabScroll);
+        window.addEventListener('resize', checkTabScroll);
+        
+        const observer = new MutationObserver(checkTabScroll);
+        observer.observe(tabsContainer, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+        
+        if (scrollLeftBtn) {
+            scrollLeftBtn.addEventListener('click', () => {
+                tabsContainer.scrollBy({ left: -150, behavior: 'smooth' });
+            });
+        }
+        
+        if (scrollRightBtn) {
+            scrollRightBtn.addEventListener('click', () => {
+                tabsContainer.scrollBy({ left: 150, behavior: 'smooth' });
+            });
+        }
+        
+        // Initial check
+        setTimeout(checkTabScroll, 100);
+    }
 }
 
 initViewer();
