@@ -17,7 +17,10 @@ export class Netlog {
         this.marked_start_time = null;
         this.start_time = null;
         this.constants = null;
-        this.bodies = {}; 
+        this.bodies = {};
+        // Track the first HTTP "date:" response header for monotonic-to-epoch conversion.
+        // Stored as { epochMs, monotonicMs } once extracted.
+        this.dateHeaderEpoch = null;
         
         this.netlog.url_request = {};
         this.netlog.socket = {};
@@ -617,6 +620,20 @@ export class Netlog {
             entry.response_headers = params.headers;
             if (entry.first_byte === undefined) entry.first_byte = event.time;
             entry.end = event.time;
+            // Extract the first HTTP "date:" header to compute monotonic-to-epoch offset
+            if (!this.dateHeaderEpoch && Array.isArray(params.headers)) {
+                for (const h of params.headers) {
+                    const lower = (typeof h === 'string') ? h.toLowerCase() : '';
+                    if (lower.startsWith('date:')) {
+                        const dateVal = h.substring(5).trim();
+                        const parsed = Date.parse(dateVal);
+                        if (!isNaN(parsed)) {
+                            this.dateHeaderEpoch = { epochMs: parsed, monotonicMs: event.time };
+                            break;
+                        }
+                    }
+                }
+            }
         }
         if (params.headers && name === 'HTTP_TRANSACTION_READ_EARLY_HINTS_RESPONSE_HEADERS') {
             entry.early_hint_headers = params.headers;

@@ -294,9 +294,22 @@ export async function processChromeTraceFileNode(input, options = {}) {
         let final_start_time = base_time_microseconds / 1000.0;
 
         // Apply monotonic-to-epoch offset if we extracted one from HTTP date headers.
+        // Chrome traces use CLOCK_MONOTONIC (system uptime) for timestamps. To produce
+        // valid absolute epoch values we need a mapping from monotonic → real time.
+        // The netlog parser extracts this from the first HTTP "date:" response header.
         if (final_start_time < 946684800000) { // looks like monotonic, not epoch
-            const now = Date.now();
-            final_start_time = now;
+            if (netlog.dateHeaderEpoch) {
+                // dateHeaderEpoch.epochMs = real wall-clock ms when the date header was received
+                // dateHeaderEpoch.monotonicMs = monotonic ms of that same event
+                // final_start_time is in monotonic ms, so shift it to epoch ms
+                const offsetMs = netlog.dateHeaderEpoch.epochMs - netlog.dateHeaderEpoch.monotonicMs;
+                final_start_time = final_start_time + offsetMs;
+            } else {
+                // No date header found in the trace; fall back to Date.now() which will
+                // produce non-deterministic absolute timestamps but keeps the relative
+                // timing correct.
+                final_start_time = Date.now();
+            }
         }
 
         // Create a quick lookup for timeline requests by URL
