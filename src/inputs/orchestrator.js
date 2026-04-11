@@ -5,12 +5,14 @@ import { processChromeTraceFileNode } from './chrome-trace.js';
 import { processNetlogFileNode } from './netlog.js';
 import { processTcpdumpNode } from './tcpdump.js';
 import { processWptagentZip } from './wptagent.js';
+import { processPerfettoFileNode } from './perfetto.js';
 
 export const parsers = {
     'har': processHARFileNode,
     'wpt': processWPTFileNode,
     'cdp': processCDPFileNode,
     'chrome-trace': processChromeTraceFileNode,
+    'perfetto': processPerfettoFileNode,
     'netlog': processNetlogFileNode,
     'tcpdump': processTcpdumpNode,
     'wptagent': processWptagentZip
@@ -75,6 +77,10 @@ function concatUint8Arrays(arrays) {
 
 function finishSniffing(text, resolve) {
     const minText = text.replace(/\s/g, '');
+
+    // Perfetto binary parsing sniff: It frequently contains typical Perfetto metadata strings
+    // even though it is mostly binary characters natively.
+    if (text.includes('org.chromium.trace_metadata') || text.includes('Perfetto v') || text.includes('TracePacket')) return resolve({ format: 'perfetto' });
 
     if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) return resolve({ format: 'netlog' });
     if (minText.includes('CLIENT_RANDOM') || minText.includes('CLIENT_HANDSHAKE_TRAFFIC_SECRET') || minText.includes('CLIENT_TRAFFIC_SECRET_0')) return resolve({ format: 'keylog' });
@@ -169,6 +175,25 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
         const magicLE = readUint32LE(textBuf, 0);
         if ([0xa1b2c3d4, 0xd4c3b2a1, 0x0a0d0d0a].includes(magic) || [0xa1b2c3d4, 0xd4c3b2a1, 0x0a0d0d0a].includes(magicLE)) {
             return { format: 'tcpdump', isGz };
+        }
+    }
+
+    // Heuristically detect Perfetto by checking first TracePacket tag bytes safely
+    if (textBuf.length >= 4 && textBuf[0] === 0x0a) {
+        // Tag 0x0a is Field 1 (TracePacket), WireType 2 (length-delimited).
+        // Let's decode the length varint.
+        let len = 0; let shift = 0; let o = 1; let valid = true;
+        while(o < textBuf.length && o < 5) {
+            let b = textBuf[o++];
+            len |= (b & 0x7f) << shift;
+            shift += 7;
+            if (!(b & 0x80)) break;
+        }
+        // If length fits reasonably or if we see another TracePacket soon, it is highly likely Perfetto.
+        if (textBuf.length > o + len) {
+            if (textBuf[o + len] === 0x0a) {
+                 return { format: 'perfetto', isGz };
+            }
         }
     }
 

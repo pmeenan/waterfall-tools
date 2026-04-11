@@ -16,7 +16,7 @@ graph TD
     %% Inputs
     subgraph Inputs ["Input Processors (inputs/)"]
         HARv1[HAR format]
-        ChromeTrace[Chrome Trace & CDP]
+        ChromeTrace[Chrome Trace, CDP & Perfetto]
         WPT[WPT Format & Netlog]
         Custom[Custom JSON]
         Tcpdump[PCAP / PCAPNG Captures]
@@ -81,6 +81,7 @@ graph TD
 │   │   │   └── tcpdump/    # Deep packet inspection modular helpers (TLS, QUIC, TCP/UDP)
 │   │   ├── har.js          # Standard HAR passthrough
 │   │   ├── chrome-trace.js
+│   │   ├── perfetto.js     # Perfetto protobuf binary parser
 │   │   ├── wpt-json.js     # WebPageTest pipeline
 │   │   ├── netlog.js       # Raw Chrome proxy tracker
 │   │   ├── cdp.js          # Chrome DevTools network protocols

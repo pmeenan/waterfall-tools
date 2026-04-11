@@ -293,9 +293,10 @@ export class WaterfallTools {
             return { url, mimeType: 'text/html' };
         }
 
-        if (resourceType === 'trace' && this._sourceFormat === 'chrome-trace' && this._rawBuffer) {
-            const blob = new Blob([this._rawBuffer], { type: 'application/json' });
-            return { url: URL.createObjectURL(blob), mimeType: 'application/json', buffer: this._rawBuffer };
+        if (resourceType === 'trace' && (this._sourceFormat === 'chrome-trace' || this._sourceFormat === 'perfetto') && this._rawBuffer) {
+            const mimeType = this._sourceFormat === 'chrome-trace' ? 'application/json' : 'application/octet-stream';
+            const blob = new Blob([this._rawBuffer], { type: mimeType });
+            return { url: URL.createObjectURL(blob), mimeType, buffer: this._rawBuffer };
         }
 
         if (resourceType === 'netlog' && this._sourceFormat === 'netlog' && this._rawBuffer) {

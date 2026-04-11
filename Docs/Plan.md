@@ -19,6 +19,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Add decoding, processing, and validation for Netlog formats (`src/inputs/netlog.js`).
 - [x] Add decoding, processing, and validation for Chrome Dev Tools Protocol (CDP) formats (`src/inputs/cdp.js`).
 - [x] Add decoding, processing, and validation for Chromium trace formats (`src/inputs/chrome-trace.js`).
+- [x] Add pure-vanilla JS streaming decoding and transcoding for binary Perfetto protobuf formats natively mapping to chrome-trace layouts (`src/inputs/utilities/perfetto/decoder.js`).
 - [x] Add decoding, processing, and validation for tcpdump formats (`src/inputs/tcpdump.js`), executed in the following sub-steps:
   *(Note: The underlying binary streamer `PcapParser` processes `Uint8Array` chunks natively. PCAPNG support is implemented based on the spec but contains TODOs marking missing IDB timestamp mappings pending `pcapng` file-based tests. The parser itself handles initial structural decoding out to `Ethernet, IPv4/6, TCP, UDP` fields.)*
   - [x] **Capture Parsing:** Parse the capture file into packets.
