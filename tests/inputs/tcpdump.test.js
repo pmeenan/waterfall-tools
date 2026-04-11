@@ -26,6 +26,12 @@ describe('Tcpdump Processor', () => {
         // Validate custom extensions
         expect(['TCP', 'QUIC']).toContain(har.log.entries[0]._protocol);
 
+        // Verify that response bodies are extracted for at least some entries
+        const entriesWithBody = har.log.entries.filter(
+            e => e.response && e.response.content && e.response.content.text
+        );
+        expect(entriesWithBody.length).toBeGreaterThan(0);
+
         // Scrub dynamic keys before comparison
         har.log.pages.forEach(p => p.startedDateTime = "SCRUBBED");
         har.log.entries.forEach(e => {
@@ -39,6 +45,11 @@ describe('Tcpdump Processor', () => {
                 wait: 0,
                 receive: 0
             };
+            // Strip large body content to keep fixture manageable
+            if (e.response && e.response.content) {
+                delete e.response.content.text;
+                delete e.response.content.encoding;
+            }
         });
 
         const scrubbedHarStr = JSON.parse(JSON.stringify(har));

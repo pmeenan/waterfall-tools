@@ -204,7 +204,7 @@ export async function processTcpdumpNode(input, options = {}) {
         }
         if (options.debug) console.log(`[tcpdump.js] Successfully verified ${udpCount} UDP connections`);
 
-        const dataResult = buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups());
+        const dataResult = await buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups());
         return dataResult;
 
     } catch (e) {
@@ -217,7 +217,107 @@ export async function processTcpdumpNode(input, options = {}) {
     }
 }
 
-function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
+/**
+ * Concatenates body data chunks from HTTP decoders into a single Uint8Array.
+ * Handles both HTTP/1 & HTTP/2 chunks ({bytes: Uint8Array}) and HTTP/3 blocks
+ * ({bytes: Uint8Array[]}) transparently.
+ */
+function concatenateBodyChunks(dataChunks) {
+    let totalLen = 0;
+    for (const chunk of dataChunks) {
+        if (Array.isArray(chunk.bytes)) {
+            for (const b of chunk.bytes) totalLen += b.byteLength || b.length || 0;
+        } else if (chunk.bytes) {
+            totalLen += chunk.bytes.byteLength || chunk.bytes.length || 0;
+        }
+    }
+    if (totalLen === 0) return null;
+
+    const combined = new Uint8Array(totalLen);
+    let offset = 0;
+    for (const chunk of dataChunks) {
+        if (Array.isArray(chunk.bytes)) {
+            for (const b of chunk.bytes) {
+                combined.set(b, offset);
+                offset += b.byteLength || b.length || 0;
+            }
+        } else if (chunk.bytes) {
+            combined.set(chunk.bytes, offset);
+            offset += chunk.bytes.byteLength || chunk.bytes.length || 0;
+        }
+    }
+    return combined;
+}
+
+/**
+ * Extracts response body bytes from parsed data chunks, decompresses if the
+ * response uses gzip/deflate content-encoding, base64-encodes the result,
+ * and stores it on the request entry as body + bodyEncoding.
+ */
+async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry) {
+    try {
+        const combined = concatenateBodyChunks(dataChunks);
+        if (!combined) return;
+
+        let bodyBytes = combined;
+
+        // Decompress if content-encoding header is present
+        const ceHeader = responseHeaders.find(h => h.name.toLowerCase() === 'content-encoding');
+        if (ceHeader) {
+            const encoding = ceHeader.value.toLowerCase().trim();
+            // DecompressionStream supports 'gzip', 'deflate', and 'deflate-raw' in
+            // evergreen browsers and Node 18+. Brotli ('br') is not universally
+            // supported so we skip decompression for it and store raw bytes.
+            let algo = null;
+            if (encoding === 'gzip') algo = 'gzip';
+            else if (encoding === 'deflate') algo = 'deflate';
+            if (algo) {
+                try {
+                    const ds = new DecompressionStream(algo);
+                    const writer = ds.writable.getWriter();
+                    const reader = ds.readable.getReader();
+                    // Catch writer-side errors to prevent unhandled rejections when
+                    // the underlying data is truncated or not actually compressed
+                    const writePromise = writer.write(combined)
+                        .then(() => writer.close())
+                        .catch(() => {});
+
+                    const parts = [];
+                    let totalDecompressed = 0;
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        parts.push(value);
+                        totalDecompressed += value.length;
+                    }
+                    await writePromise;
+
+                    bodyBytes = new Uint8Array(totalDecompressed);
+                    let off = 0;
+                    for (const part of parts) {
+                        bodyBytes.set(part, off);
+                        off += part.length;
+                    }
+                } catch (_) {
+                    // Decompression failed — store raw wire bytes as fallback
+                }
+            }
+        }
+
+        // Convert Uint8Array to base64 using chunked String.fromCharCode
+        // to avoid call-stack limits on large bodies
+        let binary = '';
+        for (let i = 0; i < bodyBytes.length; i++) {
+            binary += String.fromCharCode(bodyBytes[i]);
+        }
+        reqEntry.body = btoa(binary);
+        reqEntry.bodyEncoding = 'base64';
+    } catch (_) {
+        // Body extraction failed — skip silently rather than breaking the request
+    }
+}
+
+async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
     const data = {
         metadata: { format: 'tcpdump' },
         pages: {
@@ -237,7 +337,9 @@ function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookup
     };
 
     let reqIndex = 0;
-    
+    // Async body extraction tasks — processed in parallel after all connections are mapped
+    const bodyTasks = [];
+
     // Process DNS
     for (let i = 0; i < dnsLookups.length; i++) {
         const lookup = dnsLookups[i];
@@ -353,7 +455,7 @@ function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookup
             }
 
             const reqId = `req_${reqIndex++}`;
-            data.pages["page_0"].requests[reqId] = {
+            const reqEntry = {
                 url: req.url || `http://${conn.serverIp}/`,
                 method: req.method || 'GET',
                 status: resStatus,
@@ -372,6 +474,12 @@ function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookup
                 stream_id: req.streamId || null,
                 _protocol: isUdp ? "QUIC" : "TCP"
             };
+            data.pages["page_0"].requests[reqId] = reqEntry;
+
+            // Schedule async body extraction (decompression + base64 encoding)
+            if (req.data && req.data.length > 0) {
+                bodyTasks.push(extractAndStoreBody(req.data, resHeaders, reqEntry));
+            }
         }
     };
 
@@ -480,7 +588,12 @@ function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookup
     for (const conn of udpConnections) {
         if (conn.http3 && conn.http3.size > 0) mapConnection(conn, true, extractHttp3);
     }
-    
+
+    // Resolve all pending body extractions (decompression + base64) in parallel
+    if (bodyTasks.length > 0) {
+        await Promise.all(bodyTasks);
+    }
+
     let globalEarliestMs = Number.MAX_SAFE_INTEGER;
     const reqs = Object.values(data.pages["page_0"].requests);
     if (reqs.length > 0) {
