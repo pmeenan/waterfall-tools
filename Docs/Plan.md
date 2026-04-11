@@ -114,6 +114,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Polish settings overlay and Viewer UI styling strictly deploying native vanilla CSS components matching a premium presentation.
 - [x] Add dynamic tooltip formatting revealing truncated request URLs upon canvas mouse hover bounds.
 - [x] Architect dynamic Request Detail Tabs spawned via waterfall request clicks mapping comprehensive headers, timings, sizes, raw JSON configurations, and lazily-loaded interactive visual resource previews natively.
+- [x] Extract and link response bodies from nested `_bodies.zip` archives in WPTAgent ZIP inputs, storing them as base64-encoded `response.content.text` on matching HAR entries.
 
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.

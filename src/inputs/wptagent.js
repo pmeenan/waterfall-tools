@@ -155,6 +155,77 @@ export async function processWptagentZip(input, options = {}) {
         throw new Error("Invalid wptagent zip: missing devtools_requests payload files.");
     }
 
+    // Extract response bodies from nested _bodies.zip archives and link them to matching HAR entries.
+    // Body files are referenced by the `_body_file` custom property on each entry (set during
+    // processWPTView from the original devtools_requests `body_file` field).
+    const bodiesRegex = /^(\d+)(_Cached)?_bodies\.zip$/;
+    for (const file of fileList) {
+        const match = file.match(bodiesRegex);
+        if (!match) continue;
+
+        const runStr = match[1];
+        const cachedNum = match[2] ? 1 : 0;
+
+        // Extract the nested bodies zip into a temporary storage so ZipReader can random-access it
+        const bodiesStorageName = `${hashName}_bodies_${runStr}_${cachedNum}`;
+        let bodiesStorage = null;
+        try {
+            bodiesStorage = await createStorage(bodiesStorageName);
+            const bodiesStream = await zip.getFileStream(file);
+            if (!bodiesStream) continue;
+            await bodiesStorage.writeStream(bodiesStream);
+
+            const bodiesZip = new ZipReader(bodiesStorage);
+            await bodiesZip.init();
+            const bodyFiles = new Set(bodiesZip.getFileList());
+
+            // Walk HAR entries matching this run/cached combination and attach bodies
+            for (const entry of outputHar.log.entries) {
+                if (entry._run !== parseInt(runStr, 10) || entry._cached !== cachedNum) continue;
+                const bodyFile = entry._body_file;
+                if (!bodyFile || !bodyFiles.has(bodyFile)) continue;
+
+                const bodyStream = await bodiesZip.getFileStream(bodyFile);
+                if (!bodyStream) continue;
+
+                // Read the body file contents into a single Uint8Array
+                const reader = bodyStream.getReader();
+                const chunks = [];
+                let totalLen = 0;
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    chunks.push(value);
+                    totalLen += value.length;
+                }
+                const fullArr = new Uint8Array(totalLen);
+                let offset = 0;
+                for (const c of chunks) {
+                    fullArr.set(c, offset);
+                    offset += c.length;
+                }
+
+                // Encode as base64 and store on the HAR entry's response content
+                // Using chunked btoa to avoid call-stack limits on large bodies
+                let binary = '';
+                for (let i = 0; i < fullArr.length; i++) {
+                    binary += String.fromCharCode(fullArr[i]);
+                }
+                entry.response.content.text = btoa(binary);
+                entry.response.content.encoding = 'base64';
+            }
+        } catch (e) {
+            if (options.debug) {
+                console.error(`[wptagent] Failed to extract bodies from ${file}:`, e);
+            }
+        } finally {
+            // Clean up the temporary bodies storage immediately
+            if (bodiesStorage) {
+                try { await bodiesStorage.destroy(); } catch (_) { /* ignore cleanup errors */ }
+            }
+        }
+    }
+
     // Parse any progress.csv matching run identifiers for utilization mapping
     const progressRegex = /^(\d+)(_Cached)?_progress\.csv(\.gz)?$/;
     for (const file of fileList) {
