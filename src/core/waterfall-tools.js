@@ -174,6 +174,13 @@ export class WaterfallTools {
                 }
                 req.id = reqId;
 
+                // Filter out non-http protocols strictly
+                const u = req.url ? req.url.toLowerCase() : '';
+                if (!u.startsWith('http://') && !u.startsWith('https://')) {
+                    delete page.requests[reqId];
+                    continue;
+                }
+
                 if (req.connection_id && (!connectionMap[req.connection_id] || req.time_start < connectionMap[req.connection_id].time)) {
                     connectionMap[req.connection_id] = { id: reqId, time: req.time_start };
                 }

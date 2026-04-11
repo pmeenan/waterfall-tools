@@ -181,13 +181,15 @@ export class Layout {
             let timeTotal = 0;
             
             // Allow Absolute timing mapping bypassing standard sequential HAR chaining universally
-            let hasAbsoluteTimings = entry._load_start !== undefined || entry._dns_start !== undefined || entry._ttfb_start !== undefined;
+            let hasAbsoluteTimings = entry._load_start !== undefined || entry._start !== undefined || entry._dns_start !== undefined || entry._ttfb_start !== undefined;
             
             let baseEpoch = entry.time_start;
+            let startOrigin = entry._load_start !== undefined ? entry._load_start : (entry._start !== undefined ? entry._start : undefined);
+            
             if (entry._created !== undefined) {
                 baseEpoch = entry.time_start - entry._created;
-            } else if (hasAbsoluteTimings && entry._load_start !== undefined && entry._load_start >= 0) {
-                baseEpoch = entry.time_start - entry._load_start;
+            } else if (hasAbsoluteTimings && startOrigin !== undefined && startOrigin >= 0) {
+                baseEpoch = entry.time_start - startOrigin;
             }
             
             let blockedEnd, dnsStart, dnsEnd, connectStart, connectEnd, sslStart, sslEnd, requestStart, ttfb, end;
@@ -198,7 +200,7 @@ export class Layout {
                     start = baseEpoch + entry._dns_start;
                 }
                 
-                blockedEnd = baseEpoch + (entry._load_start || entry._ttfb_start || 0); // Queue finishes right when the request loads
+                blockedEnd = baseEpoch + (startOrigin !== undefined ? startOrigin : (entry._ttfb_start !== undefined ? entry._ttfb_start : 0)); // Queue finishes right when the request loads
                 
                 dnsStart = (entry._dns_start !== undefined && entry._dns_start >= 0) ? baseEpoch + entry._dns_start : blockedEnd;
                 dnsEnd = (entry._dns_end !== undefined && entry._dns_end >= 0) ? baseEpoch + entry._dns_end : dnsStart;
@@ -209,10 +211,10 @@ export class Layout {
                 sslStart = (entry._ssl_start !== undefined && entry._ssl_start >= 0) ? baseEpoch + entry._ssl_start : connectEnd;
                 sslEnd = (entry._ssl_end !== undefined && entry._ssl_end >= 0) ? baseEpoch + entry._ssl_end : sslStart;
                 
-                requestStart = baseEpoch + (entry._load_start !== undefined ? entry._load_start : (entry._ttfb_start !== undefined ? entry._ttfb_start : (sslEnd - baseEpoch)));
-                ttfb = baseEpoch + (entry._ttfb_end !== undefined ? entry._ttfb_end : (entry._ttfb_start !== undefined ? entry._ttfb_start : (entry._load_start !== undefined ? entry._load_start : (requestStart - baseEpoch))));
+                requestStart = baseEpoch + (startOrigin !== undefined ? startOrigin : (entry._ttfb_start !== undefined ? entry._ttfb_start : (sslEnd - baseEpoch)));
+                ttfb = baseEpoch + (entry._ttfb_end !== undefined ? entry._ttfb_end : (entry._first_byte !== undefined ? entry._first_byte : (entry._ttfb_start !== undefined ? entry._ttfb_start : (startOrigin !== undefined ? startOrigin : (requestStart - baseEpoch)))));
                 
-                end = baseEpoch + (entry._download_end !== undefined ? entry._download_end : (entry._load_end !== undefined ? entry._load_end : (entry._ttfb_end !== undefined ? entry._ttfb_end : (ttfb - baseEpoch))));
+                end = baseEpoch + (entry._download_end !== undefined ? entry._download_end : (entry._end !== undefined ? entry._end : (entry._load_end !== undefined ? entry._load_end : (entry._ttfb_end !== undefined ? entry._ttfb_end : (entry._first_byte !== undefined ? entry._first_byte : (ttfb - baseEpoch))))));
                 timeTotal = end - start;
                 
             } else {

@@ -143,17 +143,18 @@ export class WaterfallCanvas {
         if (pageData && pageData.requests) {
             this.rawEntries = Object.values(pageData.requests);
             const getSortEpoch = (req) => {
-                let hasAbsoluteTimings = req._load_start !== undefined || req._dns_start !== undefined || req._ttfb_start !== undefined;
+                let hasAbsoluteTimings = req._load_start !== undefined || req._start !== undefined || req._dns_start !== undefined || req._ttfb_start !== undefined;
                 if (hasAbsoluteTimings) {
                     let baseEpoch = 0; // Relative sorting
-                    let blockedEnd = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : 0));
+                    let startOrigin = req._load_start !== undefined ? req._load_start : (req._start !== undefined ? req._start : undefined);
+                    let blockedEnd = baseEpoch + (startOrigin !== undefined ? startOrigin : (req._ttfb_start !== undefined ? req._ttfb_start : 0));
                     let dnsStart = (req._dns_start !== undefined && req._dns_start >= 0) ? baseEpoch + req._dns_start : blockedEnd;
                     let dnsEnd = (req._dns_end !== undefined && req._dns_end >= 0) ? baseEpoch + req._dns_end : dnsStart;
                     let connectStart = (req._connect_start !== undefined && req._connect_start >= 0) ? baseEpoch + req._connect_start : dnsEnd;
                     let connectEnd = (req._connect_end !== undefined && req._connect_end >= 0) ? baseEpoch + req._connect_end : connectStart;
                     let sslStart = (req._ssl_start !== undefined && req._ssl_start >= 0) ? baseEpoch + req._ssl_start : connectEnd;
                     let sslEnd = (req._ssl_end !== undefined && req._ssl_end >= 0) ? baseEpoch + req._ssl_end : sslStart;
-                    let requestStart = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : (sslEnd - baseEpoch)));
+                    let requestStart = baseEpoch + (startOrigin !== undefined ? startOrigin : (req._ttfb_start !== undefined ? req._ttfb_start : (sslEnd - baseEpoch)));
                     return Math.max(requestStart, connectEnd);
                 }
                 

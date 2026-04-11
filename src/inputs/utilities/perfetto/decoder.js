@@ -31,6 +31,7 @@ export class PerfettoDecoder {
         this.names = new Map();
         this.debugNames = new Map();
         this.tracks = new Map(); // uuid -> {pid, tid, name}
+        this.seqTimestamps = new Map();
         
         this.leftover = null;
         this.firstEvent = true;
@@ -144,7 +145,19 @@ export class PerfettoDecoder {
                     this.names.set(seqId, new Map());
                     this.categories.set(seqId, new Map());
                     this.debugNames.set(seqId, new Map());
+                    this.seqTimestamps.set(seqId, 0);
                 }
+            } else if (fR === 13 && wR === 0) { // sequence_flags
+                const flR = readVarint(data, peekO);
+                if ((Number(flR[0]) & 1) === 1) { // SEQ_INCREMENTAL_STATE_CLEARED
+                    this.names.set(seqId, new Map());
+                    this.categories.set(seqId, new Map());
+                    this.debugNames.set(seqId, new Map());
+                    this.seqTimestamps.set(seqId, 0);
+                }
+            } else if (fR === 8 && wR === 0) { // timestamp
+                const tR = readVarint(data, peekO);
+                ts = Number(tR[0]);
             }
             peekO += this._skip(data, peekO, wR);
         }
@@ -190,14 +203,10 @@ export class PerfettoDecoder {
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
             
-            if (field === 8 && wire === 0) { // timestamp
-                const tV = readVarint(data, o);
-                o += tV[1];
-                ts = Number(tV[0]);
-            } else if (field === 11 && wire === 2) { // track_event
+            if (field === 11 && wire === 2) { // track_event
                 const teLenR = readVarint(data, o);
                 o += teLenR[1];
-                trackEvent = this._parseTrackEvent(data, o, Number(teLenR[0]), seqNames, seqDebugNames);
+                trackEvent = this._parseTrackEvent(data, o, Number(teLenR[0]), seqNames, seqDebugNames, seqId, ts);
                 o += Number(teLenR[0]);
             } else {
                 o += this._skip(data, o, wire);
@@ -205,7 +214,7 @@ export class PerfettoDecoder {
         }
         
         if (trackEvent) {
-            trackEvent.ts = ts;
+            if (trackEvent.ts === undefined) trackEvent.ts = ts;
             this._emitTraceEvent(trackEvent, controller, seqNames, seqCats);
         }
     }
@@ -219,7 +228,7 @@ export class PerfettoDecoder {
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
             
-            if (wire === 2 && (field === 2 || field === 3 || field === 6)) {
+            if (wire === 2 && (field === 1 || field === 2 || field === 3 || field === 6)) {
                 const innerLenR = readVarint(data, o);
                 o += innerLenR[1];
                 const innerEnd = o + Number(innerLenR[0]);
@@ -245,8 +254,8 @@ export class PerfettoDecoder {
                 }
                 
                 if (field === 2) seqNames.set(iid, name);
-                else if (field === 6) seqDebugNames.set(iid, name);
-                else seqCats.set(iid, name);
+                else if (field === 3 || field === 6) seqDebugNames.set(iid, name);
+                else if (field === 1) seqCats.set(iid, name);
             } else {
                 o += this._skip(data, o, wire);
             }
@@ -315,18 +324,28 @@ export class PerfettoDecoder {
         this.tracks.set(uuid, { pid, tid, name: trackName });
     }
     
-    _parseTrackEvent(data, startOffset, len, seqNames, seqDebugNames) {
+    _parseTrackEvent(data, startOffset, len, seqNames, seqDebugNames, seqId, packetTs) {
         const endOffset = startOffset + len;
         let o = startOffset;
         
         const trackEvent = { args: {}, _categories: [], _categories_str: [] };
+        let delta = null;
+        let absTs = null;
         
         while (o < endOffset) {
             const vR = readVarint(data, o); o += vR[1];
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
             
-            if (field === 3 && wire === 0) { // category_iid
+            if (field === 16 && wire === 0) { // timestamp_delta_us
+                const tV = readVarint(data, o);
+                o += tV[1];
+                delta = Number(BigInt.asIntN(64, tV[0]));
+            } else if (field === 17 && wire === 0) { // timestamp_absolute_us
+                const tV = readVarint(data, o);
+                o += tV[1];
+                absTs = Number(BigInt.asIntN(64, tV[0]));
+            } else if (field === 3 && wire === 0) { // category_iid
                 const cV = readVarint(data, o);
                 trackEvent._categories.push(Number(cV[0]));
                 o += cV[1];
@@ -364,10 +383,52 @@ export class PerfettoDecoder {
                 const arg = this._parseDebugAnnotation(data, o, dEnd, seqDebugNames, seqNames);
                 if (arg.name) trackEvent.args[arg.name] = arg.value;
                 o = dEnd;
+            } else if (field === 6 && wire === 2) { // legacy_event
+                const lLen = readVarint(data, o); o += lLen[1];
+                const lEnd = o + Number(lLen[0]);
+                while (o < lEnd) {
+                    const lV = readVarint(data, o); o += lV[1];
+                    const lw = Number(lV[0] & 7n); const lf = Number(lV[0] >> 3n);
+                    if (lf === 6 && lw === 0) { // unscoped_id
+                        const v = readVarint(data, o); o += v[1];
+                        trackEvent.id = v[0].toString(16);
+                    } else if (lf === 7 && lw === 0) { // local_id
+                        const v = readVarint(data, o); o += v[1];
+                        trackEvent.id2 = { local: "0x" + v[0].toString(16) };
+                    } else if (lf === 8 && lw === 0) { // global_id
+                        const v = readVarint(data, o); o += v[1];
+                        trackEvent.id2 = { global: "0x" + v[0].toString(16) };
+                    } else if (lf === 11 && lw === 0) { // bind_id
+                        const v = readVarint(data, o); o += v[1];
+                        trackEvent.bind_id = "0x" + v[0].toString(16);
+                    } else {
+                        o += this._skip(data, o, lw);
+                    }
+                }
             } else {
                 o += this._skip(data, o, wire);
             }
         }
+        
+        let currentTs = this.seqTimestamps.get(seqId) || 0;
+        
+        if (absTs !== null) {
+            currentTs = absTs;
+            this.seqTimestamps.set(seqId, currentTs);
+        } else if (delta !== null) {
+            if (currentTs === 0 && packetTs > 0) {
+                currentTs = packetTs;
+            }
+            currentTs += delta;
+            this.seqTimestamps.set(seqId, currentTs);
+        } else {
+            if (packetTs > 0 && currentTs === 0) {
+                currentTs = packetTs;
+            }
+            this.seqTimestamps.set(seqId, currentTs);
+        }
+        
+        trackEvent.ts = currentTs;
         
         return trackEvent;
     }
@@ -397,6 +458,8 @@ export class PerfettoDecoder {
             } else if (af === 4 && aw === 0) { // int_value
                 const iv = readVarint(data, o); o+=iv[1]; value = Number(iv[0]);
             } else if (af === 5 && aw === 1) { // double_value (64-bit float raw)
+                const view = new DataView(data.buffer, data.byteOffset + o, 8); 
+                value = view.getFloat64(0, true); 
                 o+=8;
             } else if (af === 6 && aw === 2) { // string_value
                 const sl = readVarint(data, o); o+=sl[1];
@@ -490,6 +553,14 @@ export class PerfettoDecoder {
         const jsonEvent = {
             cat, name, ph, ts: event.ts, pid, tid, args: event.args
         };
+        
+        if (event.id !== undefined) jsonEvent.id = event.id;
+        if (event.id2 !== undefined) jsonEvent.id2 = event.id2;
+        if (event.bind_id !== undefined) jsonEvent.bind_id = event.bind_id;
+        
+        if (jsonEvent.id === undefined && jsonEvent.id2 === undefined && event.track_uuid !== undefined) {
+             jsonEvent.id2 = { local: "0x" + event.track_uuid.toString(16) };
+        }
         
         const prefix = this.firstEvent ? '' : ',\n';
         this.firstEvent = false;

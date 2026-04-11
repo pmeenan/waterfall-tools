@@ -578,6 +578,11 @@ export class Netlog {
         
         if (params.method !== undefined) entry.method = params.method;
         if (params.url !== undefined) entry.url = params.url.split('#')[0];
+        
+        if (params.request_headers && params.request_headers.headers) {
+            entry.request_headers = params.request_headers.headers;
+            if (params.request_headers.line !== undefined) entry.line = params.request_headers.line;
+        }
 
         if (entry.start === undefined && name === 'HTTP_TRANSACTION_SEND_REQUEST') entry.start = event.time;
         
@@ -816,7 +821,7 @@ export class Netlog {
                 delete request.hash;
             }
 
-            if (request.phantom === undefined && request.request_headers !== undefined) {
+            if (request.phantom === undefined) {
                 requests.push(request);
             }
         }
@@ -1075,12 +1080,22 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
 
     if (Array.isArray(requests)) {
         for (const req of requests) {
+            
+            // Enforce Monotonic Strictness across the entire downstream generator organically natively
+            if (req.start !== undefined) {
+                if (req.first_byte !== undefined && req.first_byte < req.start) req.first_byte = req.start;
+                if (req.end !== undefined && req.end < req.start) req.end = req.start;
+            }
+            if (req.first_byte !== undefined && req.end !== undefined && req.end < req.first_byte) {
+                req.end = req.first_byte;
+            }
+
             let blocked = -1;
-            if (req.created >= 0) {
-                if (req.dns_start >= req.created) blocked = req.dns_start - req.created;
-                else if (req.connect_start >= req.created) blocked = req.connect_start - req.created;
-                else if (req.ssl_start >= req.created) blocked = req.ssl_start - req.created;
-                else if (req.ttfb_start >= req.created) blocked = req.ttfb_start - req.created;
+            if (req.created !== undefined) {
+                if (req.dns_start !== undefined && req.dns_start >= req.created) blocked = req.dns_start - req.created;
+                else if (req.connect_start !== undefined && req.connect_start >= req.created) blocked = req.connect_start - req.created;
+                else if (req.ssl_start !== undefined && req.ssl_start >= req.created) blocked = req.ssl_start - req.created;
+                else if (req.start !== undefined && req.start >= req.created) blocked = req.start - req.created;
             }
             const dns = (req.dns_end !== undefined && req.dns_start !== undefined) ? (req.dns_end - req.dns_start) : -1;
             let connect = -1;
@@ -1089,12 +1104,12 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
             }
             const ssl = (req.ssl_end !== undefined && req.ssl_start !== undefined) ? (req.ssl_end - req.ssl_start) : -1;
             
-            const ttfb_start = req.start !== undefined ? req.start : -1;
-            const ttfb_end = req.first_byte !== undefined ? req.first_byte : -1;
-            const wait = (ttfb_end >= 0 && ttfb_start >= 0 && ttfb_end >= ttfb_start) ? (ttfb_end - ttfb_start) : -1;
+            const ttfb_start = req.start;
+            const ttfb_end = req.first_byte;
+            const wait = (ttfb_end !== undefined && ttfb_start !== undefined && ttfb_end >= ttfb_start) ? (ttfb_end - ttfb_start) : -1;
             
-            const req_end = req.end !== undefined ? req.end : -1;
-            const receive = (req_end >= 0 && ttfb_end >= 0 && req_end >= ttfb_end) ? (req_end - ttfb_end) : -1;
+            const req_end = req.end;
+            const receive = (req_end !== undefined && ttfb_end !== undefined && req_end >= ttfb_end) ? (req_end - ttfb_end) : -1;
 
             let time = 0;
             if (blocked > 0) time += blocked;
@@ -1183,7 +1198,7 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
                     queryString: []
                 },
                 response: {
-                    status: parsedStatus !== -1 ? parsedStatus : (req.responseCode !== undefined ? parseInt(req.responseCode) : -1),
+                    status: parsedStatus !== -1 ? parsedStatus : (req.status !== undefined && req.status !== 0 ? req.status : (req.responseCode !== undefined ? parseInt(req.responseCode) : -1)),
                     statusText: parsedStatusText,
                     httpVersion: parsedHttpVersion || req.protocol || '',
                     headersSize: -1,

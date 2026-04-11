@@ -104,26 +104,6 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 // 1. Process Netlog
                 if (cat === 'netlog' || cat.includes('netlog')) {
                     netlog.addTraceEvent(trace_event);
-                    
-                    // Attempt wall-clock extraction from the first HTTP response "date:" header
-                    // that appears in netlog HEADERS_RECEIVED events.
-                    if (monotonicToEpochOffsetUs === null && trace_event.ts > 0 &&
-                        trace_event.args && trace_event.args.params && trace_event.args.params.headers) {
-                        const headers = trace_event.args.params.headers;
-                        if (Array.isArray(headers)) {
-                            for (const h of headers) {
-                                if (typeof h === 'string' && h.toLowerCase().startsWith('date:')) {
-                                    const dateVal = h.substring(5).trim();
-                                    const parsed = Date.parse(dateVal);
-                                    if (!isNaN(parsed) && parsed > 946684800000) { // sanity: after year 2000
-                                        // parsed is real epoch in ms, trace_event.ts is monotonic in µs
-                                        monotonicToEpochOffsetUs = (parsed * 1000) - trace_event.ts;
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
                     return;
                 }
                 
@@ -135,13 +115,22 @@ export async function processChromeTraceFileNode(input, options = {}) {
                         }
                     }
                     if (name.includes('domContentLoadedEventStart') || name === 'domContentLoaded') {
-                        if (start_time !== null) pageTimings.onContentLoad = (trace_event.ts - start_time) / 1000.0;
+                        if (start_time !== null) pageTimings.onContentLoad = trace_event.ts;
                     }
                     if (name.includes('loadEventStart') || name === 'load') {
-                        if (start_time !== null) pageTimings.onLoad = (trace_event.ts - start_time) / 1000.0;
+                        if (start_time !== null) pageTimings.onLoad = trace_event.ts;
                     }
                     if (name.includes('firstContentfulPaint') || name === 'firstContentfulPaint') {
-                        if (start_time !== null) pageTimings._startRender = (trace_event.ts - start_time) / 1000.0;
+                        if (start_time !== null) {
+                            pageTimings._startRender = trace_event.ts;
+                            pageTimings._firstContentfulPaint = trace_event.ts;
+                        }
+                    }
+                    if (name.includes('largestContentfulPaint::Candidate') || name === 'largestContentfulPaint::Candidate') {
+                        if (start_time !== null) pageTimings._LargestContentfulPaint = trace_event.ts;
+                    }
+                    if (name === 'LayoutShift' && trace_event.args && trace_event.args.data && trace_event.args.data.score) {
+                        pageTimings._CumulativeLayoutShift = (pageTimings._CumulativeLayoutShift || 0) + trace_event.args.data.score;
                     }
                     // Capture generic user marks (usually blink.user_timing)
                     if (cat.includes('blink.user_timing') && start_time !== null && trace_event.ts >= start_time) {
@@ -149,7 +138,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
                         if (!standardIgnores.has(name) && !name.startsWith('requestStart')) {
                             // Only capture instantaneous Marks (phase 'R', 'I' or just simple markers) or Starts
                             if (trace_event.ph === 'R' || trace_event.ph === 'I' || trace_event.ph === 'b') {
-                                custom_user_marks[name] = (trace_event.ts - start_time) / 1000.0;
+                                custom_user_marks[name] = trace_event.ts;
                             }
                         }
                     }
@@ -189,28 +178,40 @@ export async function processChromeTraceFileNode(input, options = {}) {
                             if (data.requestMethod) req.method = data.requestMethod;
                             if (data.initiator) req.initiator = data.initiator;
                             if (data.resourceType) req.resourceType = data.resourceType;
+                            
+                            if (data.headers) {
+                                req.request_headers = [];
+                                if (Array.isArray(data.headers)) {
+                                    for (const h of data.headers) {
+                                        req.request_headers.push(`${h.name}: ${h.value}`);
+                                    }
+                                } else {
+                                    for (const [k, v] of Object.entries(data.headers)) {
+                                        req.request_headers.push(`${k}: ${v}`);
+                                    }
+                                }
+                            }
                         } else if (name === 'ResourceReceiveResponse' && data) {
                             if (data.statusCode) req.status = data.statusCode;
                             if (data.mimeType) req.mimeType = data.mimeType;
-                            if (data.headers) req.responseHeaders = data.headers;
-                            if (data.timing) {
-                                req.timing = data.timing;
-                                // Fallback wall-clock extraction from devtools.timeline timing.requestTime
-                                // timing.requestTime is in seconds from CLOCK_MONOTONIC
-                                // We can also check response headers for a Date header here
-                                if (monotonicToEpochOffsetUs === null && data.timing.requestTime > 0 && data.headers) {
-                                    for (const hdr of Object.values(data.headers)) {
-                                        if (typeof hdr === 'string' && (hdr.toLowerCase().startsWith('date:') || hdr.toLowerCase().startsWith('date'))) {
-                                            const dateStr = hdr.replace(/^date:\s*/i, '').trim();
-                                            const parsed = Date.parse(dateStr);
-                                            if (!isNaN(parsed) && parsed > 946684800000) {
-                                                // timing.requestTime is in seconds, convert to µs
-                                                monotonicToEpochOffsetUs = (parsed * 1000) - (data.timing.requestTime * 1000000);
-                                            }
-                                            break;
-                                        }
+                            if (data.protocol) req.protocol = data.protocol;
+                            
+                            if (data.headers) {
+                                req.response_headers = [];
+                                if (Array.isArray(data.headers)) {
+                                    for (const h of data.headers) {
+                                        req.response_headers.push(`${h.name}: ${h.value}`);
+                                    }
+                                } else {
+                                    for (const [k, v] of Object.entries(data.headers)) {
+                                        req.response_headers.push(`${k}: ${v}`);
                                     }
                                 }
+                            }
+                            
+                            if (data.timing) {
+                                req.timing = data.timing;
+                                // Fallback wall-clock extraction removed to natively protect trace_event.ts monotonic scaling cleanly.
                             }
                         } else if (name === 'ResourceReceivedData' && data) {
                             if (data.encodedDataLength) req.bytesIn += data.encodedDataLength;
@@ -254,37 +255,48 @@ export async function processChromeTraceFileNode(input, options = {}) {
         let unlinked_sockets = results ? (results.unlinked_sockets || []) : [];
         let unlinked_dns = results ? (results.unlinked_dns || []) : [];
         
-        let offset = 0;
-        if (results && results.start_time !== undefined && start_time !== null) {
-            offset = results.start_time - start_time;
+        // Correct massive divergence offsets where Perfetto maps timeline threads natively as Epoch but network threads as Monotonic Uptime natively.
+        let timeline_epoch_offset_ms = 0;
+        for (const tl of Object.values(timeline_requests)) {
+             if (tl.requestTime !== undefined && tl.timing && tl.timing.requestTime) {
+                 const opaqueMs = tl.timing.requestTime * 1000.0;
+                 const diffMs = opaqueMs - tl.requestTime;
+                 if (Math.abs(diffMs) > 60000) { timeline_epoch_offset_ms = diffMs; }
+                 break;
+             }
         }
-
-        if (offset !== 0 && requests.length > 0) {
-            const times = ['dns_start', 'dns_end', 'connect_start', 'connect_end', 'ssl_start', 'ssl_end', 'start', 'created', 'first_byte', 'end'];
-            for (const req of requests) {
-                for (const tname of times) {
-                    if (req[tname] !== undefined) req[tname] += offset;
+        
+        if (timeline_epoch_offset_ms !== 0) {
+            for (const [reqId, tl_req] of Object.entries(timeline_requests)) {
+                // The base bounds (requestTime, finishTime) are already correctly zero-indexed.
+                // The inner `timing` block natively preserves the massive OS clock string in args.
+                // Thus, we subtract the massive diff to zero-index the inner timing array natively.
+                if (tl_req.timing && tl_req.timing.requestTime) {
+                    tl_req.timing.requestTime -= (timeline_epoch_offset_ms / 1000.0);
+                }
+                
+                // DevTools natively stamps `finishTime` as monotonic uptime bounds exactly mirroring timeline alignments natively
+                if (tl_req.finishTime && tl_req.finishTime > 10000000) {
+                     tl_req.finishTime -= timeline_epoch_offset_ms;
                 }
             }
         }
-        
-        // final_start_time is in MILLISECONDS (from microsecond start_time / 1000)
-        // But it's still in monotonic time. We need to convert to real epoch.
-        let final_start_time = (start_time !== null) ? (start_time / 1000.0) : ((results && results.start_time !== undefined) ? (results.start_time / 1000.0) : 0);
+
+        let base_time_microseconds = Number.MAX_VALUE;
+        if (start_time !== null && start_time < base_time_microseconds) base_time_microseconds = start_time;
+        if (results && results.start_time !== undefined && results.start_time < base_time_microseconds) base_time_microseconds = results.start_time;
+        for (const tl of Object.values(timeline_requests)) {
+            if (tl.requestTime !== undefined && (tl.requestTime * 1000.0) < base_time_microseconds) base_time_microseconds = tl.requestTime * 1000.0;
+            if (tl.timing && tl.timing.requestTime && (tl.timing.requestTime * 1000000.0) < base_time_microseconds) base_time_microseconds = tl.timing.requestTime * 1000000.0;
+        }
+        if (base_time_microseconds === Number.MAX_VALUE) base_time_microseconds = 0;
+
+        let final_start_time = base_time_microseconds / 1000.0;
 
         // Apply monotonic-to-epoch offset if we extracted one from HTTP date headers.
-        // monotonicToEpochOffsetUs is in microseconds. Convert us -> ms and add to final_start_time.
-        if (monotonicToEpochOffsetUs !== null) {
-            final_start_time += monotonicToEpochOffsetUs / 1000.0;
-            if (options.debug) console.log(`[chrome-trace.js] Applied monotonic-to-epoch offset: ${monotonicToEpochOffsetUs} µs. Epoch start: ${new Date(final_start_time).toISOString()}`);
-        } else {
-            // Fallback: use Date.now() as an approximation. The relative timings will be correct
-            // but absolute wall-clock dates will be approximate.
-            if (final_start_time < 946684800000) { // looks like monotonic, not epoch
-                const now = Date.now();
-                if (options.debug) console.log(`[chrome-trace.js] No wall-clock reference found. Using Date.now() as epoch approximation.`);
-                final_start_time = now;
-            }
+        if (final_start_time < 946684800000) { // looks like monotonic, not epoch
+            const now = Date.now();
+            final_start_time = now;
         }
 
         // Create a quick lookup for timeline requests by URL
@@ -308,11 +320,15 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 if (req.type === undefined && matched_timeline_req.resourceType) req.type = matched_timeline_req.resourceType;
                 if ((!req.bytesIn || req.bytesIn === 0) && matched_timeline_req.bytesIn) req.bytesIn = matched_timeline_req.bytesIn;
                 if (!req.mimeType && matched_timeline_req.mimeType) req.mimeType = matched_timeline_req.mimeType;
+                
+                if ((!req.request_headers || req.request_headers.length === 0) && matched_timeline_req.request_headers && matched_timeline_req.request_headers.length > 0) {
+                    req.request_headers = matched_timeline_req.request_headers;
+                }
+                if ((!req.response_headers || req.response_headers.length === 0) && matched_timeline_req.response_headers && matched_timeline_req.response_headers.length > 0) {
+                    req.response_headers = matched_timeline_req.response_headers;
+                }
             }
         }
-
-        // Determine base_time in microseconds natively allowing fallback loop subtraction
-        let base_time_microseconds = (start_time !== null) ? start_time : ((results && results.start_time !== undefined) ? results.start_time : 0);
 
         if (base_time_microseconds === 0) {
             let earliest_ms = Number.MAX_VALUE;
@@ -324,25 +340,6 @@ export async function processChromeTraceFileNode(input, options = {}) {
             if (earliest_ms !== Number.MAX_VALUE) {
                 base_time_microseconds = earliest_ms * 1000.0; // scale back to MICROSECONDS
                 final_start_time = earliest_ms; // map back for HAR entries natively
-                
-                // Critical step: If netlog events bypassed absolute start_time subtraction earlier
-                // due to start_time missing from raw chunks, apply the subtracted base fallback now
-                for (const req of requests) {
-                    const times = ['dns_start', 'dns_end', 'connect_start', 'connect_end', 'ssl_start', 'ssl_end', 'start', 'created', 'first_byte', 'end'];
-                    for (const tname of times) {
-                        if (req[tname] !== undefined) req[tname] -= base_time_microseconds;
-                    }
-                    if (req.chunks_in) {
-                        for (const chunk of req.chunks_in) {
-                            chunk.ts -= base_time_microseconds;
-                        }
-                    }
-                    if (req.chunks_out) {
-                        for (const chunk of req.chunks_out) {
-                            chunk.ts -= base_time_microseconds;
-                        }
-                    }
-                }
             }
         }
 
@@ -356,6 +353,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 netlog_id: reqId,
                 url: tl_req.url,
                 method: tl_req.method || 'GET',
+                protocol: tl_req.protocol || '',
                 status: tl_req.status || 0,
                 priority: tl_req.priority || 'Lowest',
                 renderBlocking: tl_req.renderBlocking,
@@ -364,7 +362,8 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 type: tl_req.resourceType,
                 mimeType: tl_req.mimeType,
                 bytesIn: tl_req.bytesIn || 0,
-                responseHeaders: tl_req.responseHeaders || []
+                request_headers: tl_req.request_headers || [],
+                response_headers: tl_req.response_headers || []
             };
             
             // Expected bounds track strictly microsecond ranges relative to base arrays naturally.
@@ -418,11 +417,18 @@ export async function processChromeTraceFileNode(input, options = {}) {
             const page = har.log.pages[0];
             page.title = 'Chrome Trace Default View';
             if (!page.pageTimings) page.pageTimings = {};
-            if (pageTimings.onLoad > 0) page.pageTimings.onLoad = pageTimings.onLoad;
-            if (pageTimings.onContentLoad > 0) page.pageTimings.onContentLoad = pageTimings.onContentLoad;
-            if (pageTimings._startRender > 0) page.pageTimings._startRender = pageTimings._startRender;
+            if (pageTimings.onLoad > 0) page.pageTimings.onLoad = (pageTimings.onLoad - base_time_microseconds) / 1000.0;
+            if (pageTimings.onContentLoad > 0) page.pageTimings.onContentLoad = (pageTimings.onContentLoad - base_time_microseconds) / 1000.0;
+            if (pageTimings._startRender > 0) page.pageTimings._startRender = (pageTimings._startRender - base_time_microseconds) / 1000.0;
+            if (pageTimings._firstContentfulPaint > 0) page._firstContentfulPaint = (pageTimings._firstContentfulPaint - base_time_microseconds) / 1000.0;
+            if (pageTimings._LargestContentfulPaint > 0) page._LargestContentfulPaint = (pageTimings._LargestContentfulPaint - base_time_microseconds) / 1000.0;
+            if (pageTimings._CumulativeLayoutShift > 0) page._CumulativeLayoutShift = pageTimings._CumulativeLayoutShift;
+            
             if (Object.keys(custom_user_marks).length > 0) {
-                page._userTimes = custom_user_marks;
+                page._userTimes = {};
+                for (const [evtName, evtTs] of Object.entries(custom_user_marks)) {
+                    page._userTimes[evtName] = (evtTs - base_time_microseconds) / 1000.0;
+                }
             }
             
             // Map main thread events securely
