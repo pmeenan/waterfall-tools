@@ -506,11 +506,11 @@ export class WaterfallTools {
                             httpVersion: req.httpVersion || 'HTTP/1.1',
                             cookies: [],
                             headers: req.responseHeaders || [],
-                            content: {
+                            content: Object.assign({
                                 size: req.bytes_in || 0,
                                 mimeType: req.mimeType || '',
                                 compression: 0
-                            },
+                            }, req.body !== undefined ? { text: req.body, encoding: req.bodyEncoding || undefined } : {}),
                             redirectURL: "",
                             headersSize: -1,
                             bodySize: req.bytes_in || 0

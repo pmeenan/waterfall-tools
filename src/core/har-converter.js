@@ -162,6 +162,14 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
                 _chunks: entry._chunks || []
             };
             
+            // Transfer response body content if present (e.g., from netlog decoded bytes or standard HAR)
+            if (entry.response && entry.response.content && entry.response.content.text !== undefined) {
+                data.pages[pageId].requests[reqId].body = entry.response.content.text;
+                if (entry.response.content.encoding) {
+                    data.pages[pageId].requests[reqId].bodyEncoding = entry.response.content.encoding;
+                }
+            }
+
             // Map ALL custom HAR properties inherently preventing data loss across ingestion streams
             for (const key of Object.keys(entry)) {
                 if (key.startsWith('_') && data.pages[pageId].requests[reqId][key] === undefined) {

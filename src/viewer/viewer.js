@@ -786,21 +786,69 @@ function renderRequestTab(request, reqNum) {
     `;
 
     let bodyHtml = '';
-    if (request.body && typeof request.body === 'string') {
-        const bd = request.body;
-        bodyHtml = `
-            <div class="req-section collapsed">
-                ${createSectionHeader('Response Body', true, false)}
-                <div class="req-section-body">
-                    <pre class="req-code-block">${highlightSyntax(bd, 'text')}</pre>
-                </div>
-            </div>
-        `;
-    }
-
     let previewHtml = '';
-    const isImg = mime.toLowerCase().includes('image');
-    if (isImg && parsedUrl) {
+    const mimeLower = mime.toLowerCase();
+    const isImg = mimeLower.includes('image');
+    const isTextual = mimeLower.includes('text/') || mimeLower.includes('json') ||
+                      mimeLower.includes('javascript') || mimeLower.includes('xml') ||
+                      mimeLower.includes('css') || mimeLower.includes('svg');
+
+    if (request.body !== undefined && request.body !== null) {
+        const isBase64 = request.bodyEncoding === 'base64';
+
+        if (isImg && isBase64) {
+            // Render image bodies as actual images from base64 data using a data URI
+            const imgMime = mimeLower.includes('/') ? mimeLower : 'image/png';
+            previewHtml = `
+                <div class="req-section">
+                    ${createSectionHeader('Preview', false, false)}
+                    <div class="req-section-body req-preview-container" style="display:flex; justify-content:center; background:#f0f0f0;">
+                        <img src="data:${imgMime};base64,${request.body}" style="max-width:100%; max-height:400px; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYV2NkYGAwYkADjDA+A0Q5aJICAMCkAho2q2q/AAAAAElFTkSuQmCC');">
+                    </div>
+                </div>
+            `;
+        } else if (isTextual) {
+            // For text content: decode base64 to string if needed, then syntax-highlight
+            let bodyText;
+            if (isBase64) {
+                try {
+                    bodyText = new TextDecoder().decode(Uint8Array.from(atob(request.body), c => c.charCodeAt(0)));
+                } catch (e) {
+                    bodyText = '[Could not decode response body]';
+                }
+            } else {
+                bodyText = String(request.body);
+            }
+            // Pick syntax highlighting language from MIME type
+            let lang = 'text';
+            if (mimeLower.includes('json')) lang = 'json';
+            else if (mimeLower.includes('html') || mimeLower.includes('svg') || mimeLower.includes('xml')) lang = 'html';
+            else if (mimeLower.includes('css')) lang = 'css';
+            else if (mimeLower.includes('javascript')) lang = 'js';
+            bodyHtml = `
+                <div class="req-section collapsed">
+                    ${createSectionHeader('Response Body', true, 'resBody')}
+                    <div class="req-section-body">
+                        <pre class="req-code-block">${highlightSyntax(bodyText, lang)}</pre>
+                    </div>
+                </div>
+            `;
+            clipboardPayloads['resBody'] = bodyText;
+        } else {
+            // Binary content that isn't an image — show size info
+            const bodyLen = typeof request.body === 'string' ? request.body.length : 0;
+            const approxBytes = isBase64 ? Math.floor(bodyLen * 3 / 4) : bodyLen;
+            bodyHtml = `
+                <div class="req-section collapsed">
+                    ${createSectionHeader('Response Body', true, false)}
+                    <div class="req-section-body">
+                        <pre class="req-code-block">Binary content (${humanizeBytes(approxBytes)})</pre>
+                    </div>
+                </div>
+            `;
+        }
+    } else if (isImg && parsedUrl) {
+        // Fallback: no embedded body but we have a URL for the image
         previewHtml = `
             <div class="req-section">
                 ${createSectionHeader('Preview', false, false)}

@@ -1010,8 +1010,20 @@ export class Netlog {
                 }
                 if (this.bodies[request.netlog_id] && this.bodies[request.netlog_id].length > 0) {
                     try {
-                        let combinedBase64 = this.bodies[request.netlog_id].join('');
-                        request.encoded_body = combinedBase64;
+                        // Each chunk is independently base64-encoded; joining them directly
+                        // produces invalid base64 due to padding characters ('=') in the middle.
+                        // Decode each chunk to bytes, concatenate, then re-encode to a single
+                        // valid base64 string.
+                        const chunks = this.bodies[request.netlog_id];
+                        let totalLen = 0;
+                        const decoded = chunks.map(c => {
+                            const bin = atob(c);
+                            totalLen += bin.length;
+                            return bin;
+                        });
+                        let combined = '';
+                        for (const part of decoded) combined += part;
+                        request.encoded_body = btoa(combined);
                     } catch (e) {}
                 }
             }

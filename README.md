@@ -8,6 +8,7 @@ Waterfall Tools is a robust, performant library for parsing, analyzing, and visu
 - **Core Orchestrator (`WaterfallTools`)**: Unified API that identifies format types automatically, parsing them uniformly into strict structurally-sound relational payloads.
 - **Isomorphic Architecture**: The core generative pipelines naturally run natively inside Node.js and directly alongside Vite projects inside modern Browsers without requiring any polyfills — all binary and cryptographic operations use browser-native Web APIs (`Uint8Array`, `DataView`, `WebCrypto`, `DecompressionStream`).
 - **Zero DOM-Bloat Canvas Renderer**: Scales cleanly to visually render 50 or 50,000 requests smoothly, mitigating severe `O(N)` UI thrashing typical in trace viewer projects.
+- **Response Body Inspection**: When response bodies are available (e.g., from Netlog decoded bytes or standard HAR `response.content.text`), the viewer displays them with syntax highlighting for text formats (HTML, CSS, JS, JSON, XML) and renders images inline. Binary content shows size information.
 
 For a deeper dive into the system's design architecture, logic conventions, and folder hierarchy, see [Docs/Architecture.md](Docs/Architecture.md).
 
