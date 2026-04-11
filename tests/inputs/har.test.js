@@ -86,7 +86,9 @@ describe('HAR Input Processor', () => {
         expect(result.log.creator.name).toBe("waterfall-tools");
 
         const rawHar = getRawJSON(inputPath);
-        expect(result.log.entries.length).toBe(rawHar.log.entries?.length || 0);
+        // Firefox HAR may contain data: URLs which are filtered out by the library
+        const nonDataEntries = rawHar.log.entries.filter(e => !e.request.url.startsWith('data:'));
+        expect(result.log.entries.length).toBe(nonDataEntries.length);
         expect(result.log.pages.length).toBe(rawHar.log.pages?.length || 0);
     });
 
