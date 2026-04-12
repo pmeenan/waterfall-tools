@@ -117,6 +117,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Extract and link response bodies from nested `_bodies.zip` archives in WPTAgent ZIP inputs, storing them as base64-encoded `response.content.text` on matching HAR entries.
 - [x] Prevent OOM crashes on subsequent file Drag-and-Drop operations by thoroughly garbage-collecting blob URLs, discarding dynamic viewer tabs, and safely detaching OPFS storage instances naturally prior to WaterfallTools reconstruction.
 - [x] Incorporate project logo and favicon into the landing page for better branding.
+- [x] Integrate a generic Service Worker (`sw.js`) implementing a Stale-While-Revalidate caching strategy enabling offline operation for the standalone viewer.
 
 ## Phase 8b: Progress Reporting & Async Performance
 **Goal:** Prevent browser "script taking too long" dialogs and provide user feedback during large file processing.

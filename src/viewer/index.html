@@ -158,6 +158,15 @@
     <!-- Tooltip for hover interactions -->
     <div id="waterfall-tooltip"></div>
 
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
     <script type="module" src="./viewer.js?v=4"></script>
 </body>
 </html>

@@ -38,3 +38,4 @@ Thumbs.db
 *.swo
 Sample/Implementations/webpagetest
 Sample/Implementations/wptagent
+deploy.sh

@@ -1117,8 +1117,11 @@ function resetWaterfallUI() {
 async function resetViewerState() {
     resetWaterfallUI();
     
-    if (typeof waterfallTool !== 'undefined' && waterfallTool && typeof waterfallTool.destroy === 'function') {
-        await waterfallTool.destroy();
+    if (typeof waterfallTool !== 'undefined' && waterfallTool) {
+        if (typeof waterfallTool.destroy === 'function') {
+            await waterfallTool.destroy();
+        }
+        waterfallTool = null;
     }
 
     if (typeof ui !== 'undefined' && ui.tileGrid) {
@@ -1286,7 +1289,11 @@ async function initViewer() {
 
     // Nav Bindings
     ui.btnBackTiles.addEventListener('click', () => {
-         renderTiles();
+         if (typeof history !== 'undefined' && history.state) {
+             history.back();
+         } else {
+             renderTiles();
+         }
     });
 
     ui.btnSettings.addEventListener('click', () => {
@@ -1386,16 +1393,21 @@ async function initViewer() {
                 if (content) content.classList.add('active');
             }
             
-            // Push history naturally when the user manually switches tabs (prevent looped updates from script-driven popstates)
+            // Replace history naturally when the user manually switches tabs (prevent bloated history stacks)
             if (e.isTrusted && rendererCanvas && rendererCanvas.options && rendererCanvas.options.pageId) {
-                history.pushState({ view: 'waterfall', pageId: rendererCanvas.options.pageId, tabId: tabId }, '');
+                history.replaceState({ view: 'waterfall', pageId: rendererCanvas.options.pageId, tabId: tabId }, '');
             }
         });
     }
 
     // History API bindings
     window.addEventListener('popstate', (e) => {
-        if (!waterfallTool || !waterfallTool.data || !waterfallTool.data.pages) return;
+        if (!waterfallTool || !waterfallTool.data || !waterfallTool.data.pages) {
+            ui.canvasContainer.classList.add('hidden');
+            ui.tileView.classList.add('hidden');
+            ui.dropZone.classList.remove('hidden');
+            return;
+        }
         const state = e.state;
         if (state) {
             if (state.view === 'tiles') {
@@ -1416,14 +1428,10 @@ async function initViewer() {
                 }
             }
         } else {
-            const keys = Object.keys(waterfallTool.data.pages);
-            if (keys.length > 1) renderTiles(false);
-            else if (keys.length === 1) renderWaterfall(keys[0], {}, false);
-            else {
-                ui.canvasContainer.classList.add('hidden');
-                ui.tileView.classList.add('hidden');
-                ui.dropZone.classList.remove('hidden');
-            }
+            resetViewerState();
+            ui.canvasContainer.classList.add('hidden');
+            ui.tileView.classList.add('hidden');
+            ui.dropZone.classList.remove('hidden');
         }
     });
 
