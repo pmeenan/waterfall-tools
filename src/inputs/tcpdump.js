@@ -3,6 +3,7 @@ import { TcpReconstructor } from './utilities/tcpdump/tcp-reconstructor.js';
 import { UdpReconstructor } from './utilities/tcpdump/udp-reconstructor.js';
 import { decodeProtocol } from './utilities/tcpdump/protocol-sniffer.js';
 import { decodeUdpProtocol } from './utilities/tcpdump/udp-sniffer.js';
+import { decompressBody } from '../core/decompress.js';
 
 export async function processTcpdumpNode(input, options = {}) {
     let stream = input;
@@ -251,8 +252,9 @@ function concatenateBodyChunks(dataChunks) {
 
 /**
  * Extracts response body bytes from parsed data chunks, decompresses if the
- * response uses gzip/deflate content-encoding, base64-encodes the result,
- * and stores it on the request entry as body + bodyEncoding.
+ * response uses a supported content-encoding (gzip, deflate, br, zstd),
+ * base64-encodes the result, and stores it on the request entry as
+ * body + bodyEncoding.
  */
 async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry) {
     try {
@@ -261,46 +263,16 @@ async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry) {
 
         let bodyBytes = combined;
 
-        // Decompress if content-encoding header is present
+        // Decompress if content-encoding header is present.
+        // decompressBody handles gzip, deflate, br, and zstd — using native
+        // DecompressionStream where available and pure-JS fallbacks for brotli
+        // and zstd when the native API doesn't support them.
         const ceHeader = responseHeaders.find(h => h.name.toLowerCase() === 'content-encoding');
         if (ceHeader) {
-            const encoding = ceHeader.value.toLowerCase().trim();
-            // DecompressionStream supports 'gzip', 'deflate', and 'deflate-raw' in
-            // evergreen browsers and Node 18+. Brotli ('br') is not universally
-            // supported so we skip decompression for it and store raw bytes.
-            let algo = null;
-            if (encoding === 'gzip') algo = 'gzip';
-            else if (encoding === 'deflate') algo = 'deflate';
-            if (algo) {
-                try {
-                    const ds = new DecompressionStream(algo);
-                    const writer = ds.writable.getWriter();
-                    const reader = ds.readable.getReader();
-                    // Catch writer-side errors to prevent unhandled rejections when
-                    // the underlying data is truncated or not actually compressed
-                    const writePromise = writer.write(combined)
-                        .then(() => writer.close())
-                        .catch(() => {});
-
-                    const parts = [];
-                    let totalDecompressed = 0;
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-                        parts.push(value);
-                        totalDecompressed += value.length;
-                    }
-                    await writePromise;
-
-                    bodyBytes = new Uint8Array(totalDecompressed);
-                    let off = 0;
-                    for (const part of parts) {
-                        bodyBytes.set(part, off);
-                        off += part.length;
-                    }
-                } catch (_) {
-                    // Decompression failed — store raw wire bytes as fallback
-                }
+            try {
+                bodyBytes = await decompressBody(combined, ceHeader.value);
+            } catch (_) {
+                // Decompression failed — store raw wire bytes as fallback
             }
         }
 
