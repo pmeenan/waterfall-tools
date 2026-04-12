@@ -219,6 +219,7 @@ function getOptionsFromUrl() {
     const options = WaterfallTools.getDefaultOptions();
     
     if (params.has('pageId')) options.pageId = params.get('pageId');
+    if (params.has('page')) options.pageId = params.get('page');
     if (params.has('connectionView')) options.connectionView = params.get('connectionView') === 'true' || params.get('connectionView') === '1';
     if (params.has('thumbnailView')) options.thumbnailView = params.get('thumbnailView') === 'true' || params.get('thumbnailView') === '1';
     if (params.has('minWidth')) options.minWidth = parseInt(params.get('minWidth'), 10);
@@ -238,6 +239,21 @@ function getOptionsFromUrl() {
     if (params.has('showWait')) options.showWait = params.get('showWait') !== 'false' && params.get('showWait') !== '0';
     if (params.has('showLegend')) options.showLegend = params.get('showLegend') !== 'false' && params.get('showLegend') !== '0';
     if (params.has('thumbMaxReqs')) options.thumbMaxReqs = parseInt(params.get('thumbMaxReqs'), 10);
+
+    if (params.has('options')) {
+        const optsKeyVals = params.get('options').split(',');
+        for (const kv of optsKeyVals) {
+            const parts = kv.split(':');
+            if (parts.length === 2) {
+                const key = parts[0].trim();
+                let val = parts[1].trim();
+                if (val === 'true') val = true;
+                else if (val === 'false') val = false;
+                else if (!isNaN(val) && val !== '') val = Number(val);
+                options[key] = val;
+            }
+        }
+    }
 
     return options;
 }
@@ -646,7 +662,7 @@ function renderRequestTab(request, reqNum) {
 
     let existingTab = document.querySelector(`.viewer-tab[data-tab-id="${tabId}"]`);
     if (existingTab) {
-        existingTab.click();
+        if (!existingTab.classList.contains('active')) existingTab.click();
         return;
     }
     
@@ -1088,6 +1104,44 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     document.getElementById('ui-show-js').checked = renderOptions.showJsTiming;
     document.getElementById('ui-show-wait').checked = renderOptions.showWait;
     document.getElementById('ui-show-legend').checked = renderOptions.showLegend;
+    
+    // Check for explicit tab auto-loading without flashing
+    const params = new URLSearchParams(window.location.search);
+    if (!rendererCanvas._tabHandled && params.has('tab')) {
+        let requestedTab = params.get('tab');
+        rendererCanvas._tabHandled = true; // only do this once
+        
+        let tabToClick = null;
+        if (requestedTab.startsWith('Request')) {
+            const matchId = requestedTab.substring(7);
+            const pData = waterfallTool.getPage(pageId, { includeRequests: true });
+            let reqs = [];
+            if (pData && pData.requests) {
+                reqs = Array.isArray(pData.requests) ? pData.requests : Object.values(pData.requests);
+            }
+            const reqIdx = reqs.findIndex((r, i) => {
+                return (r && (r._request_id == matchId || r._id == matchId || r.id == matchId)) || ((i + 1).toString() === matchId);
+            });
+            
+            if (reqIdx !== -1) {
+                renderRequestTab(reqs[reqIdx], reqIdx + 1);
+                tabToClick = document.querySelector(`.viewer-tab[data-tab-id="req-${reqIdx + 1}"]`);
+            }
+        } else {
+            tabToClick = document.querySelector(`.viewer-tab[data-tab-id="${requestedTab}"]`);
+        }
+        
+        if (tabToClick) {
+            tabToClick.click();
+        }
+    }
+    
+    const activeTab = document.querySelector('.viewer-tab.active');
+    if (activeTab && activeTab.dataset.tabId === 'waterfall' && ui.btnSettings) {
+        ui.btnSettings.style.display = 'block';
+    }
+    
+    updateUrlWithCurrentState();
 }
 
 function resetWaterfallUI() {
@@ -1146,24 +1200,29 @@ async function processData(arrayBuffer, options = {}, keylogArrayBuffer = null) 
 
         await waterfallTool.loadBuffer(arrayBuffer, loadOptions);
 
-        hideLoading();
-        ui.dropZone.classList.add('hidden');
+        // Determine active view before hiding loader so UI doesn't visually jump
+        const loadPageOverride = Object.keys(waterfallTool.data.pages).length > 1 ? options.pageId : null;
 
         const pageKeys = Object.keys(waterfallTool.data.pages);
-        if (pageKeys.length > 1) {
+        if (pageKeys.length > 1 && !loadPageOverride) {
             if (options.historyMode === 'replace') {
                 if (typeof history !== 'undefined') history.replaceState({ view: 'tiles' }, '');
                 await renderTiles(false);
             } else {
                 await renderTiles();
             }
-        } else if (pageKeys.length === 1) {
+            hideLoading();
+            ui.dropZone.classList.add('hidden');
+        } else {
+            const pageToRender = loadPageOverride || pageKeys[0];
             if (options.historyMode === 'replace') {
-                if (typeof history !== 'undefined') history.replaceState({ view: 'waterfall', pageId: pageKeys[0] }, '');
-                await renderWaterfall(pageKeys[0], options, false);
+                if (typeof history !== 'undefined') history.replaceState({ view: 'waterfall', pageId: pageToRender }, '');
+                await renderWaterfall(pageToRender, options, false);
             } else {
-                await renderWaterfall(pageKeys[0], options);
+                await renderWaterfall(pageToRender, options);
             }
+            hideLoading();
+            ui.dropZone.classList.add('hidden');
         }
 
     } catch (e) {
@@ -1214,6 +1273,60 @@ async function processFiles(files) {
     }
 }
 
+function updateUrlWithCurrentState() {
+    if (typeof history === 'undefined' || !window.location) return;
+    
+    try {
+        const urlObj = new URL(window.location.href);
+        const params = urlObj.searchParams;
+        
+        if (waterfallTool && rendererCanvas && rendererCanvas.options) {
+            const currentOpts = rendererCanvas.options;
+            
+            if (waterfallTool.data && waterfallTool.data.pages && Object.keys(waterfallTool.data.pages).length <= 1) {
+                params.delete('page');
+            } else {
+                params.set('page', currentOpts.pageId);
+            }
+            
+            // Generate non-default options list
+            const defaultOpts = WaterfallTools.getDefaultOptions();
+            let optionOverrides = [];
+            for (const key of Object.keys(defaultOpts)) {
+                if (key === 'pageId') continue;
+                if (currentOpts[key] !== undefined && currentOpts[key] !== defaultOpts[key]) {
+                    optionOverrides.push(`${key}:${currentOpts[key]}`);
+                }
+            }
+            if (optionOverrides.length > 0) {
+                params.set('options', optionOverrides.join(','));
+            } else {
+                params.delete('options');
+            }
+        }
+        
+        // Tab Extraction
+        const activeTab = document.querySelector('.viewer-tab.active');
+        if (activeTab) {
+            const tabId = activeTab.dataset.tabId;
+            if (tabId === 'waterfall') {
+                params.delete('tab');
+            } else if (tabId && tabId.startsWith('req-')) {
+                params.set('tab', 'Request' + tabId.substring(4));
+            } else if (tabId) {
+                params.set('tab', tabId);
+            }
+        } else {
+            params.delete('tab');
+        }
+        
+        // Push strictly as a replace state to prevent muddying navigation linearly
+        history.replaceState(history.state, '', urlObj.toString());
+    } catch (e) {
+        console.warn('Failed formatting sync URL parameters:', e);
+    }
+}
+
 window.WaterfallViewer = {
     loadData: async (bufferOrFile, options = {}) => {
         await resetViewerState();
@@ -1242,27 +1355,10 @@ window.WaterfallViewer = {
 };
 
 async function initViewer() {
+    const urlOptions = getOptionsFromUrl();
     const params = new URLSearchParams(window.location.search);
     const srcUrl = params.get('src');
 
-    if (srcUrl) {
-        try {
-            await resetViewerState();
-            showLoading(`Downloading: ${srcUrl}`);
-            const response = await fetch(srcUrl);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            showLoading("Processing Network Data...");
-            const buffer = await response.arrayBuffer();
-            await processData(buffer, { historyMode: 'replace' });
-        } catch(e) {
-            console.error(e);
-            showError(`Failed fetching remote file: ${e.message}`);
-        }
-    } else {
-        ui.dropZone.classList.remove('hidden');
-    }
-    
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         document.body.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
     });
@@ -1322,6 +1418,8 @@ async function initViewer() {
 
     // Initially hide settings
     if (ui.btnSettings) ui.btnSettings.style.display = 'none';
+    
+    // Evaluate Data happens at the very bottom
 
     // Settings Bindings
     const overlayInputMapping = {
@@ -1342,6 +1440,7 @@ async function initViewer() {
     document.querySelectorAll('input[name="ui-view-type"]').forEach(el => {
         el.addEventListener('change', (e) => {
             window.WaterfallViewer.updateOptions({ connectionView: e.target.value === 'connection' });
+            updateUrlWithCurrentState();
         });
     });
 
@@ -1352,6 +1451,7 @@ async function initViewer() {
                 const optKey = overlayInputMapping[id];
                 const optVal = e.target.checked;
                 window.WaterfallViewer.updateOptions({ [optKey]: optVal });
+                updateUrlWithCurrentState();
             });
         }
     });
@@ -1407,6 +1507,8 @@ async function initViewer() {
             if (e.isTrusted && rendererCanvas && rendererCanvas.options && rendererCanvas.options.pageId) {
                 history.replaceState({ view: 'waterfall', pageId: rendererCanvas.options.pageId, tabId: tabId }, '');
             }
+            
+            updateUrlWithCurrentState();
         });
     }
 
@@ -1555,6 +1657,27 @@ async function initViewer() {
         
         // Initial check
         setTimeout(checkTabScroll, 100);
+    }
+    
+    // Evaluate Data natively now that all event bindings are configured
+    if (srcUrl) {
+        try {
+            await resetViewerState();
+            showLoading(`Downloading: ${srcUrl}`);
+            const response = await fetch(srcUrl);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            showLoading("Processing Network Data...");
+            const buffer = await response.arrayBuffer();
+            
+            const processOpts = Object.assign({}, urlOptions, { historyMode: 'replace' });
+            await processData(buffer, processOpts);
+        } catch(e) {
+            console.error(e);
+            showError(`Failed fetching remote file: ${e.message}`);
+        }
+    } else {
+        ui.dropZone.classList.remove('hidden');
     }
 }
 

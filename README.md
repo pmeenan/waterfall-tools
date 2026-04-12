@@ -176,10 +176,16 @@ Additionally, the Viewer embraces integrated tab-switching capabilities routing 
 
 ### Using the Viewer
 
-You can dynamically configure the viewer using URL query parameters that identically map to the configuration options available in `WaterfallTools.getDefaultOptions()`. The viewer seamlessly tracks states natively using the browser's **History API**, enabling smooth "Back" and "Forward" navigation across nested waterfalls and thumbnail overviews.
+You can dynamically configure the viewer using URL query parameters that map seamlessly to the internal state matrix. The viewer actively tracks states natively using the browser's **History API**, dynamically updating the URL bar as you click around, enabling perfectly reproducible and shareable configurations.
+
+**Viewer Query Parameters:**
+- `src=<url>` : Points to the remote file to download and load automatically.
+- `page=<index>` : Opens deeply into a specific multi-page iteration (aliasing `pageId`). Skips the thumbnail grid entirely if matching successfully.
+- `tab=<name>` : Skips directly to a specified tab (`summary`, `waterfall`, `trace`, `lighthouse`, `netlog`). Can cleanly auto-generate dynamic detail tabs referencing `RequestX` (e.g., `&tab=Request10` jumps right to the respective Request Details).
+- `options=<csv>` : Pass targeted viewer config properties strictly overriding defaults in a `key:val` format minimizing URL length (e.g., `options=showCpu:false,showBw:false`).
 
 ```
-https://your-domain.com/viewer/?src=https://example.com/trace.json.gz&showCpu=false&viewType=connection
+https://your-domain.com/viewer/?src=https://example.com/trace.json.gz&page=1_Cached&tab=Request10&options=showCpu:false,showWait:false
 ```
 
 Alternatively, if no `src` parameter is provided, the viewer automatically presents a clean drag-and-drop file upload interface.
