@@ -147,6 +147,9 @@ Example:
 }
 ```
 
+### Tcpdump Bandwidth & Chunk Timing
+When processing PCAP captures, the tcpdump processor estimates the maximum download bandwidth by running a 100ms sliding window over all server-to-client packets in the capture. This value (in Kbps) is stored as `_bwDown` on the page object, enabling the canvas renderer to calculate per-chunk download durations for granular waterfall visualization. Individual response data chunks from HTTP/1, HTTP/2 DATA frames, and HTTP/3 DATA frames are mapped to `_chunks` arrays with absolute millisecond timestamps and byte counts. HTTP/2 stream priority is parsed from HEADERS frames (when the PRIORITY flag is set) and standalone PRIORITY frames, mapping the weight to Chrome-compatible priority strings (Highest/High/Medium/Low/Lowest). HTTP/3 priority is extracted from the `priority` request header using RFC 9218 Extensible Priorities urgency values. Request overhead (`_bytesOut`) is estimated from serialized request headers, and uncompressed response sizes (`_objectSizeUncompressed`) are tracked when content-encoding decompression produces a different size than the wire bytes.
+
 ### Multi-File Archives & OPFS Integration
 When processing complex multi-asset packages natively encapsulating several files uniquely (e.g., `wptagent` ZIP archives chaining JSON traces, netlogs, and screenshots), parsers MUST mitigate memory bloat forcefully. The architecture seamlessly utilizes the Web **Origin Private File System (OPFS)** natively paired dynamically with the `Web Locks API`. This bridges native unzipped file assets precisely through `data._opfsStorage` and `data._zipFiles` boundaries inherently, granting the main library unified mechanisms (`getPageResource()`) to securely map isolated Blob URLs natively to images or raw string chunks efficiently dynamically on-demand, without permanently unpacking and exhausting available RAM natively.
 

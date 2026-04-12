@@ -4,7 +4,7 @@ Waterfall Tools is a robust, performant library for parsing, analyzing, and visu
 
 ## Features
 
-- **Format Agnostic**: Easily parses `HAR`, `Netlog`, `Chrome Trace`, `Perfetto Protobuf`, `CDP`, `WebPageTest JSON`, and raw `TCPDUMP` captures (with automatic TLS/QUIC payload decryption support).
+- **Format Agnostic**: Easily parses `HAR`, `Netlog`, `Chrome Trace`, `Perfetto Protobuf`, `CDP`, `WebPageTest JSON`, and raw `TCPDUMP` captures (with automatic TLS/QUIC payload decryption, bandwidth estimation, per-chunk download timing, and HTTP/2 & HTTP/3 priority extraction).
 - **Core Orchestrator (`WaterfallTools`)**: Unified API that identifies format types automatically, parsing them uniformly into strict structurally-sound relational payloads.
 - **Isomorphic Architecture**: The core generative pipelines naturally run natively inside Node.js and directly alongside Vite projects inside modern Browsers without requiring any polyfills — all binary and cryptographic operations use browser-native Web APIs (`Uint8Array`, `DataView`, `WebCrypto`, `DecompressionStream`).
 - **Zero DOM-Bloat Canvas Renderer**: Scales cleanly to visually render 50 or 50,000 requests smoothly, mitigating severe `O(N)` UI thrashing typical in trace viewer projects.

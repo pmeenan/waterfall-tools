@@ -206,7 +206,7 @@ export async function processTcpdumpNode(input, options = {}) {
         }
         if (options.debug) console.log(`[tcpdump.js] Successfully verified ${udpCount} UDP connections`);
 
-        const dataResult = await buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups());
+        const dataResult = await buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups(), packets);
         return dataResult;
 
     } catch (e) {
@@ -272,6 +272,11 @@ async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry) {
         if (ceHeader) {
             try {
                 bodyBytes = await decompressBody(combined, ceHeader.value);
+                // Track the uncompressed size when content was actually compressed
+                // (decompressed bytes differ from wire bytes)
+                if (bodyBytes.length !== combined.length) {
+                    reqEntry._objectSizeUncompressed = bodyBytes.length;
+                }
             } catch (_) {
                 // Decompression failed — store raw wire bytes as fallback
             }
@@ -290,7 +295,79 @@ async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry) {
     }
 }
 
-async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookups) {
+/**
+ * Estimates the maximum download bandwidth (in Kbps) using a sliding window
+ * over all captured packets. Considers only server-to-client traffic (packets
+ * where the destination port is ephemeral / > 1024 and source port is well-known).
+ * Uses a 100ms sliding window to smooth out burst noise, then picks the peak
+ * observed throughput as the bandwidth ceiling for chunk timing visualization.
+ *
+ * @param {Array} packets - Raw parsed packets from PcapParser
+ * @param {Array} tcpConnections - Decoded TCP connections (used to identify server IPs/ports)
+ * @param {Array} udpConnections - Decoded UDP connections
+ * @returns {number} Maximum bandwidth in Kbps (kilobits per second), or 0 if insufficient data
+ */
+function calculateMaxBandwidth(packets, tcpConnections, udpConnections) {
+    if (!packets || packets.length < 2) return 0;
+
+    // Build a set of server endpoints (ip:port) to identify inbound traffic
+    const serverEndpoints = new Set();
+    for (const conn of tcpConnections) {
+        serverEndpoints.add(`${conn.serverIp}:${conn.serverPort}`);
+    }
+    for (const conn of udpConnections) {
+        serverEndpoints.add(`${conn.serverIp}:${conn.serverPort}`);
+    }
+
+    // Collect all inbound (server-to-client) data packets with timestamps
+    // Each entry: { time (seconds), bytes (payload length on wire) }
+    const inboundPackets = [];
+    for (const pkt of packets) {
+        if (!pkt.ip || !pkt.transport || !pkt.payload) continue;
+        const payloadLen = pkt.payload.length;
+        if (payloadLen === 0) continue;
+
+        // Check if this packet is from a known server endpoint (server → client)
+        const srcKey = `${pkt.ip.srcIP}:${pkt.transport.srcPort}`;
+        if (serverEndpoints.has(srcKey)) {
+            inboundPackets.push({ time: pkt.time, bytes: payloadLen });
+        }
+    }
+
+    if (inboundPackets.length < 2) return 0;
+
+    // Sort chronologically (should already be, but enforce)
+    inboundPackets.sort((a, b) => a.time - b.time);
+
+    // Sliding window: 100ms window, find the peak bytes/sec throughput
+    const windowSec = 0.1;
+    let maxBytesPerSec = 0;
+    let windowStart = 0;
+    let windowBytes = 0;
+
+    for (let i = 0; i < inboundPackets.length; i++) {
+        windowBytes += inboundPackets[i].bytes;
+
+        // Shrink window from the left until it fits within windowSec
+        while (inboundPackets[i].time - inboundPackets[windowStart].time > windowSec) {
+            windowBytes -= inboundPackets[windowStart].bytes;
+            windowStart++;
+        }
+
+        const elapsed = inboundPackets[i].time - inboundPackets[windowStart].time;
+        if (elapsed > 0.001) { // Avoid division by near-zero
+            const bps = windowBytes / elapsed;
+            if (bps > maxBytesPerSec) maxBytesPerSec = bps;
+        }
+    }
+
+    // Convert bytes/sec → Kbps (kilobits per second)
+    // maxBytesPerSec * 8 = bits/sec, / 1000 = Kbps
+    const kbps = (maxBytesPerSec * 8) / 1000.0;
+    return Math.round(kbps);
+}
+
+async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookups, packets) {
     const data = {
         metadata: { format: 'tcpdump' },
         pages: {
@@ -308,6 +385,14 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
         quic_connections: {},
         dns: {}
     };
+
+    // Estimate max download bandwidth from raw packet timing using a sliding window.
+    // This value (in Kbps) is stored on the page and used by the renderer to calculate
+    // how long each chunk took to download, enabling granular chunk visualization.
+    const maxBw = calculateMaxBandwidth(packets, tcpConnections, udpConnections);
+    if (maxBw > 0) {
+        data.pages["page_0"]._bwDown = maxBw;
+    }
 
     let reqIndex = 0;
     // Async body extraction tasks — processed in parallel after all connections are mapped
@@ -427,6 +512,65 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                 if(statusHeader) resStatus = parseInt(statusHeader.value) || resStatus;
             }
 
+            // Build chunk timing array from response data blocks.
+            // Each chunk records { ts: absolute_ms, bytes: byteCount } matching the
+            // format expected by the canvas renderer for granular download visualization.
+            const chunks = [];
+            if (req.data && req.data.length > 0) {
+                for (const d of req.data) {
+                    const chunkBytes = d.length || (d.bytes ? (Array.isArray(d.bytes)
+                        ? d.bytes.reduce((acc, b) => acc + (b.byteLength || b.length || 0), 0)
+                        : (d.bytes.byteLength || d.bytes.length || 0)) : 0);
+                    if (chunkBytes > 0) {
+                        chunks.push({ ts: d.time * 1000, bytes: chunkBytes });
+                    }
+                }
+            }
+
+            // Calculate bytes out (request overhead sent to server).
+            // For HTTP/1.1: request line + headers. For HTTP/2+: header frame sizes.
+            // We estimate from the serialized request headers as a reasonable approximation.
+            let bytesOut = 0;
+            if (req.method && req.url) {
+                // Request line: "METHOD /path HTTP/1.1\r\n"
+                bytesOut += (req.method.length + 1 + req.url.length + 1 + (req.httpVersion || 'HTTP/1.1').length + 2);
+            }
+            for (const h of harHeaders) {
+                // Each header: "Name: Value\r\n"
+                bytesOut += (h.name.length + 2 + h.value.length + 2);
+            }
+            bytesOut += 2; // trailing \r\n
+
+            // Extract priority from the protocol decoder output.
+            // HTTP/2: parsed from PRIORITY frames / HEADERS priority field (weight → string).
+            // HTTP/3: extracted from the 'priority' request header (RFC 9218 u=N urgency).
+            let priority = null;
+            if (req.priority) {
+                // HTTP/2 decoded priority object: { weight, priority, exclusive, dependency }
+                if (typeof req.priority === 'object' && req.priority.priority) {
+                    priority = req.priority.priority;
+                } else if (typeof req.priority === 'string') {
+                    priority = req.priority;
+                }
+            }
+            // For HTTP/3, check the 'priority' request header (RFC 9218 Extensible Priorities)
+            if (!priority && harHeaders.length > 0) {
+                const priHeader = harHeaders.find(h => h.name.toLowerCase() === 'priority');
+                if (priHeader) {
+                    // Parse "u=N" urgency from the structured header value
+                    // u=0 is highest urgency, u=7 is lowest
+                    const match = priHeader.value.match(/u=(\d)/);
+                    if (match) {
+                        const urgency = parseInt(match[1]);
+                        if (urgency <= 1) priority = 'Highest';
+                        else if (urgency <= 2) priority = 'High';
+                        else if (urgency <= 3) priority = 'Medium';
+                        else if (urgency <= 5) priority = 'Low';
+                        else priority = 'Lowest';
+                    }
+                }
+            }
+
             const reqId = `req_${reqIndex++}`;
             const reqEntry = {
                 url: req.url || `http://${conn.serverIp}/`,
@@ -438,6 +582,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                 responseHeaders: resHeaders,
                 mimeType: contentType,
                 bytes_in: bytesIn,
+                _bytesOut: bytesOut,
                 serverIp: conn.serverIp,
                 time_start: timeMs,
                 first_data_time: firstDataTimeMs,
@@ -445,7 +590,9 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                 connection_id: conn.id.toString(),
                 dns_query_id: dnsId,
                 stream_id: req.streamId || null,
-                _protocol: isUdp ? "QUIC" : "TCP"
+                _protocol: isUdp ? "QUIC" : "TCP",
+                _chunks: chunks,
+                _priority: priority
             };
             data.pages["page_0"].requests[reqId] = reqEntry;
 
@@ -508,6 +655,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                 responseHeaders: stream.headers.server ? stream.headers.server.filter(h => !h.name.startsWith(':')) : [],
                 statusCode: status, data: stream.data.server || [],
                 httpVersion: "HTTP/2", streamId: id,
+                priority: stream.priority || null,
                 _firstServerTimeMs: stream.headers.serverTime || null,
                 _lastServerTimeMs: stream.data.server && stream.data.server.length > 0 ? stream.data.server[stream.data.server.length - 1].time : (stream.headers.serverTime || null)
             });

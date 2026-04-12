@@ -10,7 +10,8 @@
         "id": "page_0",
         "title": "https://ogads-pa.clients6.google.com/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/GetAsyncData",
         "startedDateTime": "SCRUBBED",
-        "pageTimings": {}
+        "pageTimings": {},
+        "_bwDown": 24322
       }
     ],
     "entries": [
@@ -76,7 +77,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 112,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566229106.035,
+            "bytes": 55479
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 185125,
         "_dnsTimeMs": 1774566229053.918,
         "_dnsEndTimeMs": 1774566229054.3162,
         "_connectTimeMs": 1774566229106.035,
@@ -157,7 +167,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 82,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566229290.131,
+            "bytes": 1330
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 2922,
         "_load_start": 236,
         "_ttfb_start": 236,
         "_ttfb_end": 238,
@@ -231,7 +250,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566229314.613,
+            "bytes": 365017
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 1028346,
         "_load_start": 260,
         "_ttfb_start": 260,
         "_ttfb_end": 264,
@@ -297,7 +325,15 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 82,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566229408.373,
+            "bytes": 660
+          }
+        ],
+        "_priority": null,
         "_load_start": 354,
         "_ttfb_start": 354,
         "_ttfb_end": 383,
@@ -491,7 +527,15 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c08:0:0:0:5e",
         "connection": "2600:1900:4090:1d:0:1:0:0:46807-2607:f8b0:4004:c08:0:0:0:5e:443",
+        "_bytesOut": 794,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566229462.396,
+            "bytes": 39516
+          }
+        ],
+        "_priority": "Highest",
         "_load_start": 408,
         "_ttfb_start": 408,
         "_ttfb_end": 412,
@@ -685,7 +729,15 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c08:0:0:0:5e",
         "connection": "2600:1900:4090:1d:0:1:0:0:46807-2607:f8b0:4004:c08:0:0:0:5e:443",
+        "_bytesOut": 787,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566229467.598,
+            "bytes": 15436
+          }
+        ],
+        "_priority": "Highest",
         "_load_start": 413,
         "_ttfb_start": 413,
         "_ttfb_end": 424,
@@ -879,7 +931,15 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c08:0:0:0:5e",
         "connection": "2600:1900:4090:1d:0:1:0:0:46807-2607:f8b0:4004:c08:0:0:0:5e:443",
+        "_bytesOut": 783,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566229457.1682,
+            "bytes": 15344
+          }
+        ],
+        "_priority": "Highest",
         "_dnsTimeMs": 1774566229328.6929,
         "_dnsEndTimeMs": 1774566229329.9192,
         "_connectTimeMs": 1774566229390.6838,
@@ -1076,7 +1136,52 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c21:0:0:0:5e",
         "connection": "2600:1900:4090:1d:0:1:0:0:40738-2607:f8b0:4004:c21:0:0:0:5e:443",
+        "_bytesOut": 862,
         "_protocol": "TCP",
+        "_chunks": [
+          {
+            "ts": 1774566229536.657,
+            "bytes": 8192
+          },
+          {
+            "ts": 1774566229540.376,
+            "bytes": 8192
+          },
+          {
+            "ts": 1774566229554.761,
+            "bytes": 8192
+          },
+          {
+            "ts": 1774566229559.116,
+            "bytes": 8192
+          },
+          {
+            "ts": 1774566229562.877,
+            "bytes": 8192
+          },
+          {
+            "ts": 1774566229567.885,
+            "bytes": 8192
+          },
+          {
+            "ts": 1774566229571.325,
+            "bytes": 8192
+          },
+          {
+            "ts": 1774566229574.193,
+            "bytes": 8192
+          },
+          {
+            "ts": 1774566229577.676,
+            "bytes": 8192
+          },
+          {
+            "ts": 1774566229580.248,
+            "bytes": 7508
+          }
+        ],
+        "_priority": "Low",
+        "_objectSizeUncompressed": 223260,
         "_dnsTimeMs": 1774566229374.6282,
         "_dnsEndTimeMs": 1774566229378.248,
         "_connectTimeMs": 1774566229415.273,
@@ -1160,7 +1265,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566229616.3162,
+            "bytes": 112
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 102,
         "_load_start": 562,
         "_ttfb_start": 562,
         "_ttfb_end": 604,
@@ -1350,7 +1464,16 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c21:0:0:0:5e",
         "connection": "2600:1900:4090:1d:0:1:0:0:40738-2607:f8b0:4004:c21:0:0:0:5e:443",
+        "_bytesOut": 885,
         "_protocol": "TCP",
+        "_chunks": [
+          {
+            "ts": 1774566229650.2012,
+            "bytes": 1582
+          }
+        ],
+        "_priority": "Lowest",
+        "_objectSizeUncompressed": 5610,
         "_load_start": 594,
         "_ttfb_start": 594,
         "_ttfb_end": 596,
@@ -1420,7 +1543,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 115,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 638,
         "_ttfb_start": 638,
         "_ttfb_end": 646,
@@ -1490,7 +1616,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 115,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 691,
         "_ttfb_start": 691,
         "_ttfb_end": 696,
@@ -1560,7 +1689,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 115,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 910,
         "_ttfb_start": 910,
         "_ttfb_end": 916,
@@ -1634,7 +1766,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566230043.8599,
+            "bytes": 40818
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 121661,
         "_load_start": 989,
         "_ttfb_start": 989,
         "_ttfb_end": 996,
@@ -1708,7 +1849,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566230048.4941,
+            "bytes": 1359
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 12323,
         "_load_start": 994,
         "_ttfb_start": 994,
         "_ttfb_end": 1003,
@@ -1774,7 +1924,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 82,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1013,
         "_ttfb_start": 1013,
         "_ttfb_end": 1021,
@@ -1848,7 +2001,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566230217.157,
+            "bytes": 1899
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 2879,
         "_load_start": 1163,
         "_ttfb_start": 1163,
         "_ttfb_end": 1237,
@@ -1922,7 +2084,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566230250.9712,
+            "bytes": 2159
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 5006,
         "_load_start": 1197,
         "_ttfb_start": 1197,
         "_ttfb_end": 1203,
@@ -1992,7 +2163,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 115,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1204,
         "_ttfb_start": 1204,
         "_ttfb_end": 1212,
@@ -2062,7 +2236,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 115,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1207,
         "_ttfb_start": 1207,
         "_ttfb_end": 1215,
@@ -2136,7 +2313,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566230291.631,
+            "bytes": 112
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 102,
         "_load_start": 1237,
         "_ttfb_start": 1237,
         "_ttfb_end": 1260,
@@ -2210,7 +2396,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566230324.1091,
+            "bytes": 358
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 783,
         "_load_start": 1270,
         "_ttfb_start": 1270,
         "_ttfb_end": 1273,
@@ -2284,7 +2479,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566230345.132,
+            "bytes": 75680
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 241344,
         "_load_start": 1291,
         "_ttfb_start": 1291,
         "_ttfb_end": 1295,
@@ -2358,7 +2562,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566230353.334,
+            "bytes": 54992
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 190233,
         "_load_start": 1299,
         "_ttfb_start": 1299,
         "_ttfb_end": 1305,
@@ -2420,7 +2633,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 82,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1373,
         "_ttfb_start": 1373,
         "_ttfb_end": 1379,
@@ -2606,7 +2822,16 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c21:0:0:0:5e",
         "connection": "2600:1900:4090:1d:0:1:0:0:40738-2607:f8b0:4004:c21:0:0:0:5e:443",
+        "_bytesOut": 854,
         "_protocol": "TCP",
+        "_chunks": [
+          {
+            "ts": 1774566230530.926,
+            "bytes": 1345
+          }
+        ],
+        "_priority": "High",
+        "_objectSizeUncompressed": 1322,
         "_load_start": 1475,
         "_ttfb_start": 1475,
         "_ttfb_end": 1476,
@@ -2840,7 +3065,16 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:41242",
+        "_bytesOut": 1143,
         "_protocol": "QUIC",
+        "_chunks": [
+          {
+            "ts": 1774566230527.3098,
+            "bytes": 47572
+          }
+        ],
+        "_priority": "Low",
+        "_objectSizeUncompressed": 175424,
         "_connectTimeMs": 1774566230481.102,
         "_connectEndTimeMs": 1774566230503.977,
         "_sslStartTimeMs": 1774566230481.102,
@@ -2904,7 +3138,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1511,
         "_ttfb_start": 1511
       },
@@ -2957,7 +3194,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1519,
         "_ttfb_start": 1519
       },
@@ -3010,7 +3250,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1522,
         "_ttfb_start": 1522
       },
@@ -3067,7 +3310,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 115,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1539,
         "_ttfb_start": 1539
       },
@@ -3124,7 +3370,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 115,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1572,
         "_ttfb_start": 1572
       },
@@ -3282,7 +3531,10 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c23:0:0:0:5f",
         "connection": "2600:1900:4090:1d:0:1:0:0:56358-2607:f8b0:4004:c23:0:0:0:5f:443",
+        "_bytesOut": 618,
         "_protocol": "TCP",
+        "_chunks": [],
+        "_priority": "High",
         "_dnsTimeMs": 1774566230396.012,
         "_dnsEndTimeMs": 1774566230399.363,
         "_connectTimeMs": 1774566230457.649,
@@ -3349,7 +3601,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1608,
         "_ttfb_start": 1608
       },
@@ -3402,7 +3657,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1613,
         "_ttfb_start": 1613
       },
@@ -3455,7 +3713,10 @@
         },
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_bytesOut": 95,
         "_protocol": "QUIC",
+        "_chunks": [],
+        "_priority": null,
         "_load_start": 1672,
         "_ttfb_start": 1672
       },
@@ -3669,7 +3930,15 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c23:0:0:0:5f",
         "connection": "2600:1900:4090:1d:0:1:0:0:56364-2607:f8b0:4004:c23:0:0:0:5f:443",
+        "_bytesOut": 1475,
         "_protocol": "TCP",
+        "_chunks": [
+          {
+            "ts": 1774566230855.161,
+            "bytes": 285
+          }
+        ],
+        "_priority": "High",
         "_connectTimeMs": 1774566230714.333,
         "_connectEndTimeMs": 1774566230714.9092,
         "_sslStartTimeMs": 1774566230766.1382,
@@ -3817,7 +4086,10 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c25:0:0:0:8a",
         "connection": "2600:1900:4090:1d:0:1:0:0:42948-2607:f8b0:4004:c25:0:0:0:8a:443",
+        "_bytesOut": 549,
         "_protocol": "TCP",
+        "_chunks": [],
+        "_priority": "High",
         "_dnsTimeMs": 1774566231382.2588,
         "_dnsEndTimeMs": 1774566231387.879,
         "_connectTimeMs": 1774566231415.89,
@@ -4021,7 +4293,15 @@
         },
         "serverIPAddress": "2607:f8b0:4004:c25:0:0:0:8a",
         "connection": "2600:1900:4090:1d:0:1:0:0:42956-2607:f8b0:4004:c25:0:0:0:8a:443",
+        "_bytesOut": 1339,
         "_protocol": "TCP",
+        "_chunks": [
+          {
+            "ts": 1774566231696.72,
+            "bytes": 382
+          }
+        ],
+        "_priority": "High",
         "_connectTimeMs": 1774566231574.0671,
         "_connectEndTimeMs": 1774566231574.6282,
         "_sslStartTimeMs": 1774566231624.9858,
@@ -4129,7 +4409,16 @@
         },
         "serverIPAddress": "10.20.0.3",
         "connection": "10.20.0.3:48326-169.254.169.254:80",
+        "_bytesOut": 249,
         "_protocol": "TCP",
+        "_chunks": [
+          {
+            "ts": 1774566232540.584,
+            "bytes": 8464
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 13242,
         "_connectTimeMs": null,
         "_connectEndTimeMs": null,
         "_sslStartTimeMs": 1774566232540.584,
@@ -4235,7 +4524,16 @@
         },
         "serverIPAddress": "10.20.0.3",
         "connection": "10.20.0.3:48444-169.254.169.254:80",
+        "_bytesOut": 249,
         "_protocol": "TCP",
+        "_chunks": [
+          {
+            "ts": 1774566234048.136,
+            "bytes": 8464
+          }
+        ],
+        "_priority": null,
+        "_objectSizeUncompressed": 13242,
         "_connectTimeMs": null,
         "_connectEndTimeMs": null,
         "_sslStartTimeMs": 1774566234048.136,
