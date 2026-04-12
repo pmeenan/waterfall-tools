@@ -115,6 +115,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Add dynamic tooltip formatting revealing truncated request URLs upon canvas mouse hover bounds.
 - [x] Architect dynamic Request Detail Tabs spawned via waterfall request clicks mapping comprehensive headers, timings, sizes, raw JSON configurations, and lazily-loaded interactive visual resource previews natively.
 - [x] Extract and link response bodies from nested `_bodies.zip` archives in WPTAgent ZIP inputs, storing them as base64-encoded `response.content.text` on matching HAR entries.
+- [x] Prevent OOM crashes on subsequent file Drag-and-Drop operations by thoroughly garbage-collecting blob URLs, discarding dynamic viewer tabs, and safely detaching OPFS storage instances naturally prior to WaterfallTools reconstruction.
 
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.

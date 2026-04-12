@@ -505,13 +505,14 @@ function renderSummary(pageData) {
 
 async function renderTiles(pushHistory = true) {
     if (pushHistory) history.pushState({ view: 'tiles' }, '');
+    
+    // Purge specific waterfall viewer properties BEFORE rendering dozens of thumbnails
+    resetWaterfallUI();
+    
     ui.canvasContainer.classList.add('hidden');
     ui.tileView.classList.remove('hidden');
     ui.tileGrid.innerHTML = '';
     const pageKeys = Object.keys(waterfallTool.data.pages);
-
-    activeBlobUrls.forEach(url => URL.revokeObjectURL(url));
-    activeBlobUrls = [];
 
     for (const pageId of pageKeys) {
         const pageData = waterfallTool.getPage(pageId, { includeRequests: true });
@@ -610,6 +611,11 @@ async function renderTiles(pushHistory = true) {
 function renderRequestTab(request, reqNum) {
     const tabId = `req-${reqNum}`;
     
+    // Push the state into the browser's history queue so the back button correctly backs out of the request tab!
+    if (typeof history !== 'undefined' && rendererCanvas && rendererCanvas.options && rendererCanvas.options.pageId) {
+        history.pushState({ view: 'waterfall', pageId: rendererCanvas.options.pageId, tabId: tabId }, '');
+    }
+
     let existingTab = document.querySelector(`.viewer-tab[data-tab-id="${tabId}"]`);
     if (existingTab) {
         existingTab.click();
@@ -617,7 +623,7 @@ function renderRequestTab(request, reqNum) {
     }
     
     const tab = document.createElement('div');
-    tab.className = 'viewer-tab';
+    tab.className = 'viewer-tab req-tab';
     tab.dataset.tabId = tabId;
     tab.draggable = true;
     
@@ -859,7 +865,16 @@ function renderRequestTab(request, reqNum) {
         `;
     }
 
-    contentPane.innerHTML = detailsHtml + reqHeadersHtml + resHeadersHtml + bodyHtml + previewHtml + rawDetailsHtml;
+    contentPane.innerHTML = `
+        <div class="req-top-grid">
+            ${detailsHtml}
+            ${reqHeadersHtml}
+            ${resHeadersHtml}
+        </div>
+        ${bodyHtml}
+        ${previewHtml}
+        ${rawDetailsHtml}
+    `;
 
     // Bind copy events natively immediately after injection!
     contentPane.querySelectorAll('.copy-btn').forEach(btn => {
@@ -925,12 +940,16 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
 
     // Reset tabs
     document.querySelectorAll('.viewer-tab').forEach(t => t.classList.remove('active'));
-    // Select summary by default instead of waterfall
-    const summaryTab = document.querySelector('.viewer-tab[data-tab-id="summary"]');
-    if (summaryTab) summaryTab.classList.add('active');
+    
+    // Select waterfall by default explicitly instead of summary matching new visual focus points
+    const wfTab = document.querySelector('.viewer-tab[data-tab-id="waterfall"]');
+    if (wfTab) wfTab.classList.add('active');
     
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    if (ui.summaryView) ui.summaryView.classList.add('active');
+    if (ui.waterfallView) ui.waterfallView.classList.add('active');
+    ui.btnSettings.style.display = 'block';
+    
+    if (rendererCanvas) window.dispatchEvent(new Event('resize'));
 
     // Render the summary internally
     if (typeof renderSummary === 'function' && pageData) {
@@ -1043,12 +1062,45 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     document.getElementById('ui-show-legend').checked = renderOptions.showLegend;
 }
 
+function resetWaterfallUI() {
+    if (typeof pendingTabLoads !== 'undefined') {
+        pendingTabLoads = {};
+    }
+
+    if (rendererCanvas) {
+        rendererCanvas.destroy();
+        rendererCanvas = null;
+    }
+
+    document.querySelectorAll('.viewer-tab.req-tab, .req-tab-content').forEach(el => el.remove());
+
+    if (typeof activeBlobUrls !== 'undefined' && Array.isArray(activeBlobUrls)) {
+        activeBlobUrls.forEach(url => URL.revokeObjectURL(url));
+        activeBlobUrls.length = 0;
+    }
+
+    if (typeof ui !== 'undefined') {
+        if (ui.lighthouseFrame) ui.lighthouseFrame.src = 'about:blank';
+        if (ui.traceFrame) ui.traceFrame.src = 'about:blank';
+        if (ui.netlogFrame) ui.netlogFrame.src = 'about:blank';
+    }
+}
+
+async function resetViewerState() {
+    resetWaterfallUI();
+    
+    if (typeof waterfallTool !== 'undefined' && waterfallTool && typeof waterfallTool.destroy === 'function') {
+        await waterfallTool.destroy();
+    }
+
+    if (typeof ui !== 'undefined' && ui.tileGrid) {
+        ui.tileGrid.innerHTML = '';
+    }
+}
+
 async function processData(arrayBuffer, options = {}, keylogArrayBuffer = null) {
     try {
-        if (rendererCanvas) {
-            rendererCanvas.destroy();
-            rendererCanvas = null;
-        }
+        await resetViewerState();
 
         waterfallTool = new WaterfallTools();
         
@@ -1078,6 +1130,10 @@ async function processData(arrayBuffer, options = {}, keylogArrayBuffer = null) 
 
 async function processFiles(files) {
     if (files.length === 0) return;
+    
+    // Purge old viewer components dynamically BEFORE huge file allocations trigger OOM
+    await resetViewerState();
+    
     showLoading('Parsing files...');
 
     try {
@@ -1085,11 +1141,11 @@ async function processFiles(files) {
         let keylogFile = null;
 
         if (files.length === 2) {
-            const arr0 = await files[0].arrayBuffer();
-            const format0 = (await identifyFormatFromBuffer(arr0)).format;
+            const arr0 = await files[0].slice(0, 65536).arrayBuffer();
+            const format0 = (await identifyFormatFromBuffer(new Uint8Array(arr0))).format;
 
-            const arr1 = await files[1].arrayBuffer();
-            const format1 = (await identifyFormatFromBuffer(arr1)).format;
+            const arr1 = await files[1].slice(0, 65536).arrayBuffer();
+            const format1 = (await identifyFormatFromBuffer(new Uint8Array(arr1))).format;
 
             if (format0 === 'tcpdump' && format1 === 'keylog') {
                 mainFile = files[0];
@@ -1116,6 +1172,7 @@ async function processFiles(files) {
 
 window.WaterfallViewer = {
     loadData: async (bufferOrFile, options = {}) => {
+        await resetViewerState();
         showLoading('Loading Programmatically...');
         if (bufferOrFile instanceof File || bufferOrFile instanceof Blob) {
             const buf = await bufferOrFile.arrayBuffer();
@@ -1146,6 +1203,7 @@ async function initViewer() {
 
     if (srcUrl) {
         try {
+            await resetViewerState();
             showLoading(`Downloading: ${srcUrl}`);
             const response = await fetch(srcUrl);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1296,6 +1354,11 @@ async function initViewer() {
                 const content = document.getElementById(`view-${tabId}`);
                 if (content) content.classList.add('active');
             }
+            
+            // Push history naturally when the user manually switches tabs (prevent looped updates from script-driven popstates)
+            if (e.isTrusted && rendererCanvas && rendererCanvas.options && rendererCanvas.options.pageId) {
+                history.pushState({ view: 'waterfall', pageId: rendererCanvas.options.pageId, tabId: tabId }, '');
+            }
         });
     }
 
@@ -1307,7 +1370,19 @@ async function initViewer() {
             if (state.view === 'tiles') {
                 renderTiles(false);
             } else if (state.view === 'waterfall' && state.pageId) {
-                renderWaterfall(state.pageId, {}, false);
+                if (!ui.canvasContainer.classList.contains('hidden') && rendererCanvas && rendererCanvas.options.pageId === state.pageId) {
+                    // Intelligently jump seamlessly visually if already residing tightly inside the same page architecture natively
+                    const tabId = state.tabId || 'waterfall';
+                    const tab = document.querySelector(`.viewer-tab[data-tab-id="${tabId}"]`);
+                    if (tab) tab.click();
+                } else {
+                    renderWaterfall(state.pageId, {}, false).then(() => {
+                        if (state.tabId) {
+                            const tab = document.querySelector(`.viewer-tab[data-tab-id="${state.tabId}"]`);
+                            if (tab) tab.click();
+                        }
+                    });
+                }
             }
         } else {
             const keys = Object.keys(waterfallTool.data.pages);
