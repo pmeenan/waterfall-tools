@@ -118,17 +118,12 @@ This document breaks down the development of the Waterfall Tools library into in
 
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.
-- [ ] Add explicit platform abstraction definitions within `src/platforms/`.
-- [ ] Prepare Node integrations targeting offscreen canvas or node-canvas counterparts.
-- [ ] Implement `src/outputs/image.js` to digest render data straight into raw image buffer sets / Base64 serialization outputs snapshotting views.
-- [ ] Implement `src/outputs/thumbnail.js` for scaled-down structural representations equivalent to complete image generation maps.
+- [x] Add explicit platform abstraction definitions within `src/platforms/`.
+- [x] Prepare Node integrations targeting offscreen canvas or node-canvas counterparts.
+- [x] Implement `src/outputs/image.js` to digest render data straight into raw image buffer sets / Base64 serialization outputs snapshotting views.
+- [x] Implement `src/outputs/thumbnail.js` for scaled-down structural representations equivalent to complete image generation maps.
 
-## Phase 10: Headless External Viewers Extension
-**Goal:** Expose compatibility channels sending intermediate payloads accurately directly into alternative rendering viewers.
-- [ ] Engineer wrapper bridging in `src/embed/external/perfetto.js` pushing Extended HAR representations uniformly into Perfetto UI layers.
-- [ ] Connect structured HAR objects appropriately into hosted versions matching embedded Chrome DevTools network tab ingestion format guidelines.
-
-## Phase 11: Filmstrip View Integration (Future Roadmap)
+## Phase 10: Filmstrip View Integration (Future Roadmap)
 **Goal:** Construct visual timestamp representations displaying exact render screenshots above waterfall requests over time.
 - [ ] Add explicit intermediary references coupling standard timeline moments to image frames natively into standard HAR output objects.
 - [ ] Bootstrap `src/filmstrip/` interfaces configured to inject array bundles composing individual images or trace screenshots efficiently.

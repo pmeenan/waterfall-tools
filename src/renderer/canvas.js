@@ -10,32 +10,39 @@ export class WaterfallCanvas {
             showLegend: true
         }, options);
         
-        // Remove existing canvas children natively if reloading dynamically
-        while(this.container.firstChild) {
-            this.container.removeChild(this.container.firstChild);
-        }
-
-        this.canvas = document.createElement('canvas');
-        this.container.appendChild(this.canvas);
-        this.ctx = this.canvas.getContext('2d', { alpha: false }); // Opaque for speed
-        
         this.rawEntries = [];
         this.pageObj = null;
         this.pendingRender = null;
         this.drawnRows = null;
         this.lastHoveredIndex = null;
         
-        this._bindEvents();
-        
-        this.resizeObserver = new ResizeObserver(() => {
-            this._requestRender();
-        });
-        this.resizeObserver.observe(this.container);
+        if (this.container) {
+            // Remove existing canvas children natively if reloading dynamically
+            while(this.container.firstChild) {
+                this.container.removeChild(this.container.firstChild);
+            }
+
+            this.canvas = document.createElement('canvas');
+            this.container.appendChild(this.canvas);
+            this.ctx = this.canvas.getContext('2d', { alpha: false }); // Opaque for speed
+            
+            this._bindEvents();
+            
+            this.resizeObserver = new ResizeObserver(() => {
+                this._requestRender();
+            });
+            this.resizeObserver.observe(this.container);
+        } else if (this.options.canvas) {
+            this.canvas = this.options.canvas;
+            this.ctx = this.canvas.getContext('2d', { alpha: false });
+        }
     }
     
     destroy() {
-        this.resizeObserver.disconnect();
-        if (this.canvas.parentNode) {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
+        if (this.canvas && this.canvas.parentNode) {
             this.canvas.parentNode.removeChild(this.canvas);
         }
     }
@@ -176,11 +183,18 @@ export class WaterfallCanvas {
     }
     
     _requestRender() {
-        if (this.pendingRender) cancelAnimationFrame(this.pendingRender);
-        this.pendingRender = requestAnimationFrame(() => {
+        if (this.pendingRender) {
+            if (typeof cancelAnimationFrame !== 'undefined') {
+                cancelAnimationFrame(this.pendingRender);
+            } else {
+                clearTimeout(this.pendingRender);
+            }
+        }
+        
+        const renderLogic = () => {
             if (!this.rawEntries || this.rawEntries.length === 0) return;
             
-            const clientWidth = this.container.clientWidth;
+            const clientWidth = this.container ? this.container.clientWidth : (this.options.width || 800);
             const minW = this.options.thumbnailView ? 0 : this.options.minWidth;
             const canvasWidth = Math.max(minW, clientWidth);
             
@@ -188,7 +202,16 @@ export class WaterfallCanvas {
             this.drawnRows = Layout.calculateRows(this.rawEntries, canvasWidth, layoutOptions);
             
             this.draw(this.drawnRows.rows, this.drawnRows.dimensions, this.drawnRows.pageEvents);
-        });
+        };
+        
+        if (typeof requestAnimationFrame !== 'undefined') {
+            this.pendingRender = requestAnimationFrame(renderLogic);
+        } else if (typeof setTimeout !== 'undefined') {
+            this.pendingRender = setTimeout(renderLogic, 0);
+        } else {
+            // Synchronous fallback natively if env supports neither completely
+            renderLogic();
+        }
     }
 
     scaleRgb(rgb, factor) {
@@ -339,9 +362,11 @@ export class WaterfallCanvas {
     }
 
     draw(rows, dimensions, pageEvents = {}) {
-        const dpr = window.devicePixelRatio || 1;
-        this.canvas.style.width = dimensions.canvasWidth + 'px';
-        this.canvas.style.height = dimensions.canvasHeight + 'px';
+        const dpr = (typeof window !== 'undefined' && window.devicePixelRatio) ? window.devicePixelRatio : 1;
+        if (this.canvas.style) {
+            this.canvas.style.width = dimensions.canvasWidth + 'px';
+            this.canvas.style.height = dimensions.canvasHeight + 'px';
+        }
         this.canvas.width = dimensions.canvasWidth * dpr;
         this.canvas.height = dimensions.canvasHeight * dpr;
         

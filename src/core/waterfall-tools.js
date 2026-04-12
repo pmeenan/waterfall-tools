@@ -610,4 +610,23 @@ export class WaterfallTools {
         canvasRenderer.render(pageData);
         return canvasRenderer;
     }
+
+    /**
+     * Headless generation of an image buffer (PNG/JPEG).
+     * Works natively both in Browsers (via OffscreenCanvas/createElement) and Node.js (via optionally installed @napi-rs/canvas)
+     * @param {string} pageId - Target page ID to render.
+     * @param {Object} options - Configurable rendering constraints (e.g. { format: 'png', quality: 0.85, width: 1200 })
+     * @returns {Promise<{ buffer: Uint8Array, mimeType: string, width: number, height: number }>}
+     */
+    async generateImage(pageId, options = {}) {
+        const { generateImage: genImg } = await import('../outputs/image.js');
+        
+        if (!pageId) {
+            const keys = Object.keys(this.data.pages);
+            if (keys.length === 0) throw new Error("No pages available to render.");
+            pageId = keys[0];
+        }
+        
+        return await genImg(this, pageId, options);
+    }
 }
