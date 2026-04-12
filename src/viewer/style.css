@@ -102,6 +102,7 @@ body, html {
 }
 
 .landing-content {
+    position: relative;
     width: 90%;
     max-width: 900px;
     padding: 3rem;
@@ -119,6 +120,28 @@ body, html {
     background: #e9f5ff;
     transform: scale(1.02);
     box-shadow: 0 15px 40px rgba(0, 102, 204, 0.2);
+}
+
+.landing-logo {
+    position: absolute;
+    left: 2.5rem;
+    top: 2.5rem;
+    width: 100px;
+    height: auto;
+    border-radius: 20px;
+    margin-bottom: 0;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    border: 3px solid #ffffff;
+    z-index: 20;
+}
+
+@media (max-width: 768px) {
+    .landing-logo {
+        position: relative;
+        left: 0;
+        top: 0;
+        margin-bottom: 1.5rem;
+    }
 }
 
 .landing-content h2 {

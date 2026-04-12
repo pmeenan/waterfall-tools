@@ -4,6 +4,12 @@ import { resolve } from 'path';
 
 export default defineConfig({
   root: 'src/demo',
+  resolve: {
+    alias: {
+      'platform-canvas-impl': resolve(__dirname, 'src/platforms/browser/canvas-browser.js'),
+      'platform-storage-impl': resolve(__dirname, 'src/platforms/browser/storage-browser.js')
+    }
+  },
   plugins: [
     nodePolyfills({
       include: ['buffer', 'util'],

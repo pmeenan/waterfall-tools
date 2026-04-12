@@ -61,6 +61,8 @@ async function runRollup(entryName, aliasMap, outDir, externalDeps, stubName, is
         const stubContent = `export * from './${mainEntry.fileName}';\n`;
         await fs.writeFile(resolve(__dirname, `../${outDir}/${stubName}`), stubContent);
     }
+    
+    return mainEntry ? mainEntry.fileName : null;
 }
 
 async function runBuilds() {
@@ -86,7 +88,23 @@ async function runBuilds() {
     });
 
     console.log('\n[3/3] Building Core API (Browser Target)...');
-    await runRollup('core/waterfall-tools.js', browserAlias, 'dist/browser/waterfall-tools', externalDepsCore, 'waterfall-tools.es.js', true);
+    const browserFileName = await runRollup('core/waterfall-tools.js', browserAlias, 'dist/browser/waterfall-tools', externalDepsCore, 'waterfall-tools.es.js', true);
+
+    if (browserFileName) {
+        const indexPath = resolve(__dirname, '../dist/browser/index.html');
+        let indexHtml = await fs.readFile(indexPath, 'utf-8');
+        
+        // Rewrite importmap to direct hash
+        indexHtml = indexHtml.replace('./waterfall-tools/waterfall-tools.es.js', `./waterfall-tools/${browserFileName}`);
+        
+        // Inject modulepreload after the main JS payload
+        indexHtml = indexHtml.replace(
+            /(<script type="module".*?src="[^"]+"><\/script>)/,
+            `$1\n  <link rel="modulepreload" href="./waterfall-tools/${browserFileName}">`
+        );
+        
+        await fs.writeFile(indexPath, indexHtml);
+    }
 
     console.log('\nAll builds completed successfully! Compressing browser assets...');
 
