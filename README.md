@@ -244,5 +244,9 @@ npm run dev:demo
 npm run build:demo
 ```
 
+## License
+
+This project is licensed under the Apache 2.0 License. It is completely free to use without restrictions. The repository and its dependency tree are explicitly designed to be unencumbered and do not include any GPL (General Public License) code or dependencies of any flavor.
+
 ---
 *Note: This repository is actively iterated with strict multi-page layout rendering architectures mapping native WPT JSON runs seamlessly offline without framework bloat.*
