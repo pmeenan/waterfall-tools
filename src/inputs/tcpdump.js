@@ -4,6 +4,7 @@ import { UdpReconstructor } from './utilities/tcpdump/udp-reconstructor.js';
 import { decodeProtocol } from './utilities/tcpdump/protocol-sniffer.js';
 import { decodeUdpProtocol } from './utilities/tcpdump/udp-sniffer.js';
 import { decompressBody } from '../core/decompress.js';
+import { sniffMimeType } from '../core/har-converter.js';
 
 export async function processTcpdumpNode(input, options = {}) {
     let stream = input;
@@ -564,6 +565,15 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
     // Resolve all pending body extractions (decompression + base64) in parallel
     if (bodyTasks.length > 0) {
         await Promise.all(bodyTasks);
+    }
+
+    // Sniff MIME type from body content for requests missing Content-Type headers
+    // (e.g. partially-decoded QUIC/TLS flows where headers couldn't be extracted)
+    for (const req of Object.values(data.pages["page_0"].requests)) {
+        if (!req.mimeType && req.body) {
+            const sniffed = sniffMimeType(req.body, req.bodyEncoding);
+            if (sniffed) req.mimeType = sniffed;
+        }
     }
 
     let globalEarliestMs = Number.MAX_SAFE_INTEGER;

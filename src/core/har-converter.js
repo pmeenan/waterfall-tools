@@ -1,3 +1,118 @@
+/**
+ * Sniff the MIME type from response body content when the Content-Type header is missing.
+ * Examines the first bytes of the decoded body to detect HTML, JavaScript, CSS,
+ * common image formats (JPEG, PNG, GIF, WebP, AVIF, HEIC), and fonts (WOFF, WOFF2, TTF, OTF).
+ * @param {string} bodyText - The body text (may be base64-encoded)
+ * @param {string} [encoding] - 'base64' if the body is base64-encoded
+ * @returns {string} Detected MIME type, or empty string if unrecognized
+ */
+export function sniffMimeType(bodyText, encoding) {
+    if (!bodyText || typeof bodyText !== 'string') return '';
+
+    let sample;
+    if (encoding === 'base64') {
+        // Decode a small portion — 1024 base64 chars yields ~768 decoded bytes
+        try {
+            sample = atob(bodyText.substring(0, 1024));
+        } catch (e) {
+            return '';
+        }
+    } else {
+        sample = bodyText.substring(0, 1024);
+    }
+
+    // --- Binary format detection via magic bytes (checked before text trimming) ---
+    // atob returns a binary string where charCodeAt maps directly to byte values
+    if (sample.length >= 4) {
+        const b0 = sample.charCodeAt(0);
+        const b1 = sample.charCodeAt(1);
+        const b2 = sample.charCodeAt(2);
+
+        // JPEG: FF D8 FF
+        if (b0 === 0xFF && b1 === 0xD8 && b2 === 0xFF) return 'image/jpeg';
+
+        // PNG: 89 50 4E 47 (\x89PNG)
+        if (b0 === 0x89 && sample.substring(1, 4) === 'PNG') return 'image/png';
+
+        // GIF87a / GIF89a
+        if (sample.substring(0, 4) === 'GIF8') return 'image/gif';
+
+        // WebP: RIFF at 0-3, WEBP at 8-11
+        if (sample.length >= 12 && sample.substring(0, 4) === 'RIFF' && sample.substring(8, 12) === 'WEBP') return 'image/webp';
+
+        // ISOBMFF containers (AVIF / HEIC): ftyp box marker at offset 4, brand at offset 8
+        if (sample.length >= 12 && sample.substring(4, 8) === 'ftyp') {
+            const brand = sample.substring(8, 12);
+            if (brand === 'avif' || brand === 'avis') return 'image/avif';
+            if (brand === 'heic' || brand === 'heix' || brand === 'hevc' || brand === 'hevx' || brand === 'mif1') return 'image/heic';
+        }
+
+        // WOFF: wOFF
+        if (sample.substring(0, 4) === 'wOFF') return 'font/woff';
+        // WOFF2: wOF2
+        if (sample.substring(0, 4) === 'wOF2') return 'font/woff2';
+        // TrueType: 00 01 00 00
+        if (b0 === 0x00 && b1 === 0x01 && b2 === 0x00 && sample.charCodeAt(3) === 0x00) return 'font/ttf';
+        // OpenType/CFF: OTTO
+        if (sample.substring(0, 4) === 'OTTO') return 'font/otf';
+    }
+
+    // Trim leading whitespace and BOM for text-based pattern matching
+    const trimmed = sample.replace(/^[\s\uFEFF\xEF\xBB\xBF]+/, '');
+    if (!trimmed) return '';
+    const lower = trimmed.toLowerCase();
+
+    // --- HTML detection ---
+    if (lower.startsWith('<!doctype') ||
+        lower.startsWith('<html') ||
+        lower.startsWith('<head') ||
+        lower.startsWith('<body')) {
+        return 'text/html';
+    }
+    // HTML comment followed by document structure
+    if (lower.startsWith('<!--') &&
+        (lower.includes('<html') || lower.includes('<head') || lower.includes('<!doctype'))) {
+        return 'text/html';
+    }
+
+    // --- CSS detection (check before JS since @import could appear in both) ---
+    if (lower.startsWith('@charset') || lower.startsWith('@import') ||
+        lower.startsWith('@media') || lower.startsWith('@font-face') ||
+        lower.startsWith('@keyframes') || lower.startsWith('@layer') ||
+        lower.startsWith('@supports') || lower.startsWith('@namespace')) {
+        return 'text/css';
+    }
+    // CSS selector patterns followed by property declarations — e.g. "body { margin: 0 }"
+    if (/^[a-z*#.:\[_][^{]*\{[^}]*[;:]/i.test(trimmed)) {
+        if (/\b(display|margin|padding|color|background|font-|border|width|height|position|overflow|text-align|flex|grid)\s*:/i.test(trimmed)) {
+            return 'text/css';
+        }
+    }
+
+    // --- JavaScript detection ---
+    // Common leading tokens in JS files
+    if (lower.startsWith('(function') || lower.startsWith('function ') || lower.startsWith('function(') ||
+        lower.startsWith('var ') || lower.startsWith('let ') || lower.startsWith('const ') ||
+        lower.startsWith('"use strict"') || lower.startsWith("'use strict'") ||
+        lower.startsWith('import ') || lower.startsWith('export ') ||
+        lower.startsWith('window.') || lower.startsWith('document.') ||
+        lower.startsWith('self.') || lower.startsWith('globalthis.')) {
+        return 'application/javascript';
+    }
+    // Minified JS patterns: !function(...), (()=>{, (() => {
+    if (trimmed.startsWith('!function') || /^\(\s*\(\s*\)/.test(trimmed) ||
+        /^\(\s*function\s*\(/.test(trimmed) || trimmed.startsWith('void function')) {
+        return 'application/javascript';
+    }
+    // JS with leading single-line or block comment
+    if ((lower.startsWith('//') || lower.startsWith('/*')) &&
+        /\b(function[ (]|var |let |const |import |export |return[ ;]|=>)\b/.test(sample)) {
+        return 'application/javascript';
+    }
+
+    return '';
+}
+
 export function buildWaterfallDataFromHar(harLog, format = 'har') {
     const data = {
         metadata: { format },
@@ -167,6 +282,17 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
                 data.pages[pageId].requests[reqId].body = entry.response.content.text;
                 if (entry.response.content.encoding) {
                     data.pages[pageId].requests[reqId].bodyEncoding = entry.response.content.encoding;
+                }
+            }
+
+            // Sniff MIME type from body content when Content-Type header is missing.
+            // This ensures correct waterfall coloring and viewer body display for
+            // requests where headers were unavailable (e.g. partially-decoded QUIC/TLS flows).
+            const req = data.pages[pageId].requests[reqId];
+            if (!req.mimeType && req.body) {
+                const sniffed = sniffMimeType(req.body, req.bodyEncoding);
+                if (sniffed) {
+                    req.mimeType = sniffed;
                 }
             }
 

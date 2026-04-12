@@ -58,7 +58,7 @@
           ],
           "content": {
             "size": 55479,
-            "mimeType": "",
+            "mimeType": "text/html",
             "compression": 0
           },
           "redirectURL": "",
@@ -279,7 +279,7 @@
           ],
           "content": {
             "size": 660,
-            "mimeType": "",
+            "mimeType": "image/webp",
             "compression": 0
           },
           "redirectURL": "",
@@ -2192,7 +2192,7 @@
           ],
           "content": {
             "size": 358,
-            "mimeType": "",
+            "mimeType": "text/css",
             "compression": 0
           },
           "redirectURL": "",
