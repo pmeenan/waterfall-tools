@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 import { PerfettoDecoder } from './utilities/perfetto/decoder.js';
 import { processChromeTraceFileNode } from './chrome-trace.js';
 

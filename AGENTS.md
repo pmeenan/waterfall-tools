@@ -301,3 +301,7 @@ When working on this codebase, you must adhere to the following strict architect
     - Captures from real websites (e.g., CNN) routinely contain thousands of UDP connections on port 443 — most being STUN/TURN/WebRTC traffic, not QUIC. The UDP sniffer's check (`firstByte & 0x40`) matches 75% of random byte values, causing `decodeQuic` to be called on non-QUIC connections.
     - Without mitigation, each non-QUIC connection brute-forces 21 candidate CID lengths × all key pairs × 2 directions × WebCrypto AEAD operations per packet. With thousands of connections, this causes multi-minute hangs or "script taking too long" dialogs.
     - **Fix:** The QUIC decoder tracks `consecutiveFailures` — packets that fail AEAD decryption in sequence without any success. After `MAX_CONSECUTIVE_FAILURES` (5 packets), the decoder bails out of the entire connection. The counter only increments when `forwardKeys === null` (no keys have ever been established for this connection), so legitimate connections with sporadic packet loss or key rotation are not affected.
+
+68. **Dependency Licensing**:
+    - All introduced dependencies MUST use an unencumbered license like MIT, BSD, Apache 2, ISC or MPL. 
+    - Any dependency that uses any flavor of the GPL (General Public License) is expressly prohibited.

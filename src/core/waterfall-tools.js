@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 import { identifyFormat, identifyFormatFromBuffer, parsers } from '../inputs/orchestrator.js';
 import { ZipReader } from '../inputs/utilities/zip.js';
 import { cleanupOrphans } from '../platforms/storage.js';

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 import { createStorage } from '../platforms/storage.js';
 import { ZipReader } from './utilities/zip.js';
 import { getBaseWptHar, processWPTFlatStreamNode, formatWptUtilization } from './wpt-json.js';

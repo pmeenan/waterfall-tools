@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 export async function createStorage(hash) {
     if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.getDirectory) {
         const { BrowserStorage } = await import('./browser/storage-browser.js');

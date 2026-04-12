@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 export class TlsKeyLog {
     constructor() {
         this.keys = new Map();

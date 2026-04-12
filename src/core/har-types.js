@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 /**
  * @fileoverview Extended HAR Types definitions for Waterfall Tools
  * Uses JSDoc syntax to provide type safety in IDEs for plain Vanilla JS natively.

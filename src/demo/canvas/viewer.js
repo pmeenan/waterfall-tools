@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 import { WaterfallTools } from '../../core/waterfall-tools.js';
 import { identifyFormatFromBuffer } from '../../inputs/orchestrator.js';
 

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 import { PcapParser } from './utilities/tcpdump/pcap-parser.js';
 import { TcpReconstructor } from './utilities/tcpdump/tcp-reconstructor.js';
 import { UdpReconstructor } from './utilities/tcpdump/udp-reconstructor.js';

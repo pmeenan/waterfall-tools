@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 import { deriveTrafficKeys, generateHeaderProtectionMask, decryptQuicPayload } from './quic-crypto.js';
 import { QuicBuffer } from './quic-buffer.js';
 

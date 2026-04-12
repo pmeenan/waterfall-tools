@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 const concatUint8Arrays = (arrays) => {
     let totalLen = 0;
     for (const arr of arrays) totalLen += arr.length;

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 /**
  * @fileoverview Pure browser-native HPACK decoder (RFC 7541) for HTTP/2 header decompression.
  * Operates entirely on Uint8Array — zero Node.js Buffer dependency.

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 /**
  * Sniff the MIME type from response body content when the Content-Type header is missing.
  * Examines the first bytes of the decoded body to detect HTML, JavaScript, CSS,

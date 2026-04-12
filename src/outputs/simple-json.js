@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 /**
  * Generates a simplified, flat JSON representation from an Extended HAR object.
  * This distills the complex HAR schema down to a simple array of objects 

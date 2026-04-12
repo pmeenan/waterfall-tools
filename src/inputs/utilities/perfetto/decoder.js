@@ -1,3 +1,8 @@
+/*
+ * Copyright 2006 Patrick Meenan
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 /**
  * Lightweight, 100% Vanilla JS streaming Perfetto Protobuf decoder.
  * Reads binary track_event/interned_data packets and transforms them into
