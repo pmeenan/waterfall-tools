@@ -1151,9 +1151,19 @@ async function processData(arrayBuffer, options = {}, keylogArrayBuffer = null) 
 
         const pageKeys = Object.keys(waterfallTool.data.pages);
         if (pageKeys.length > 1) {
-            await renderTiles();
+            if (options.historyMode === 'replace') {
+                if (typeof history !== 'undefined') history.replaceState({ view: 'tiles' }, '');
+                await renderTiles(false);
+            } else {
+                await renderTiles();
+            }
         } else if (pageKeys.length === 1) {
-            await renderWaterfall(pageKeys[0], options);
+            if (options.historyMode === 'replace') {
+                if (typeof history !== 'undefined') history.replaceState({ view: 'waterfall', pageId: pageKeys[0] }, '');
+                await renderWaterfall(pageKeys[0], options, false);
+            } else {
+                await renderWaterfall(pageKeys[0], options);
+            }
         }
 
     } catch (e) {
@@ -1210,9 +1220,9 @@ window.WaterfallViewer = {
         showLoading('Loading Programmatically...');
         if (bufferOrFile instanceof File || bufferOrFile instanceof Blob) {
             const buf = await bufferOrFile.arrayBuffer();
-            return processData(buf, options);
+            return processData(buf, Object.assign({}, options, { historyMode: 'replace' }));
         } else if (bufferOrFile instanceof ArrayBuffer) {
-            return processData(bufferOrFile, options);
+            return processData(bufferOrFile, Object.assign({}, options, { historyMode: 'replace' }));
         }
         showError("Invalid data format mapping correctly. Requires Blob or ArrayBuffer.");
     },
@@ -1244,7 +1254,7 @@ async function initViewer() {
             
             showLoading("Processing Network Data...");
             const buffer = await response.arrayBuffer();
-            await processData(buffer);
+            await processData(buffer, { historyMode: 'replace' });
         } catch(e) {
             console.error(e);
             showError(`Failed fetching remote file: ${e.message}`);

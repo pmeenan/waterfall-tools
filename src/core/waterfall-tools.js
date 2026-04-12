@@ -325,7 +325,9 @@ export class WaterfallTools {
         }
 
         if (!this.data._opfsStorage || !this.data._zipFiles) {
-            console.warn(`[getPageResource] Aborting: Missing _opfsStorage (${!!this.data._opfsStorage}) or _zipFiles (${!!this.data._zipFiles})`);
+            if (this.options && this.options.debug) {
+                console.warn(`[getPageResource] Aborting: Missing _opfsStorage (${!!this.data._opfsStorage}) or _zipFiles (${!!this.data._zipFiles})`);
+            }
             return null;
         }
 

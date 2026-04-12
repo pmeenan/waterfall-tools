@@ -24,7 +24,7 @@ npm install waterfall-tools
 Ensure your build system supports generic ESModules (`"type": "module"` natively out-of-the-box). The single interface for the library is the `WaterfallTools` class.
 
 > [!NOTE]
-> **Optional Asset Bundles:** The built dist binaries purposefully compartmentalize `tcpdump-[hash].js` (PCAP processing) and `decompress-[hash].js` (WASM-based Brotli fallback) from the main core library. 
+> **Optional Asset Bundles:** The built dist binaries purposefully compartmentalize `tcpdump-[hash].js` (tcpdump processing) and `decompress-[hash].js` (tcpdump Brotli decompression) from the main core library. 
 > To serve the simplest single-file integration, you can safely host only the core `waterfall-[hash].js` and its proxy stub `waterfall-tools.es.js`! The library will gracefully degrade if it cannot dynamically reach the separated supplement chunks over the network.
 
 ### Processing a Local File (Node.js)
