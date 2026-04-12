@@ -19,9 +19,11 @@
  *     if decompression fails, fall back to the pure-JS `fzstd` package (~8 KB).
  *
  * All fallback imports are dynamic (`import()`) so bundlers can tree-shake
+ * All fallback imports are dynamic (`import()`) so bundlers can tree-shake
  * them when unused, and the dictionary payload for brotli is never loaded
- * unless actually needed.
+ * unless actually needed. (fzstd is statically imported per bundle constraint).
  */
+import { decompress as fzstdDecompress } from 'fzstd';
 
 /**
  * Decompresses `data` using the native DecompressionStream API.
@@ -107,8 +109,7 @@ async function decompressBrotliFallback(data) {
  * @returns {Promise<Uint8Array>}
  */
 async function decompressZstdFallback(data) {
-    const { decompress } = await import('fzstd');
-    return decompress(data);
+    return fzstdDecompress(data);
 }
 
 /**

@@ -5,6 +5,7 @@
  */
 import { decodeDns } from './dns-decoder.js';
 import { decodeQuic } from './quic-decoder.js';
+import { decodeHttp3 } from './http3-decoder.js';
 
 export async function decodeUdpProtocol(conn, keyLog, dnsRegistry, options = {}) {
     // Collect and order all 2-way UDP frames chronologically
@@ -58,7 +59,6 @@ export async function decodeUdpProtocol(conn, keyLog, dnsRegistry, options = {})
                 // Fire full HTTP/3 + QPACK Extraction natively targeting reassembled streams mapped
                 if (conn.quicParams && conn.quicParams.streams && conn.quicParams.streams.size > 0) {
                     try {
-                        const { decodeHttp3 } = await import('./http3-decoder.js');
                         conn.http3 = decodeHttp3(conn.quicParams.streams);
                         if (options.debug || globalThis.waterfallDebug) console.log(`[UDP Sniffer] HTTP/3 decoder produced: ${conn.http3 ? conn.http3.size : 0} streams for link ${conn.id}`);
                     } catch (err) {

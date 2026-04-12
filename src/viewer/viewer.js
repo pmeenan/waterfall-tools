@@ -3,9 +3,7 @@
  * Licensed under the Apache License, Version 2.0.
  * See the LICENSE file for details.
  */
-import { WaterfallTools } from '../core/waterfall-tools.js';
-import { identifyFormatFromBuffer } from '../inputs/orchestrator.js';
-import { Layout } from '../renderer/layout.js';
+import { WaterfallTools, identifyFormatFromBuffer, Layout } from 'waterfall-tools';
 
 const ui = {
     loading: document.getElementById('loading'),

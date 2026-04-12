@@ -8,8 +8,12 @@ import { TcpReconstructor } from './utilities/tcpdump/tcp-reconstructor.js';
 import { UdpReconstructor } from './utilities/tcpdump/udp-reconstructor.js';
 import { decodeProtocol } from './utilities/tcpdump/protocol-sniffer.js';
 import { decodeUdpProtocol } from './utilities/tcpdump/udp-sniffer.js';
-import { decompressBody } from '../core/decompress.js';
-import { sniffMimeType } from '../core/har-converter.js';
+
+import { TlsKeyLog } from './utilities/tcpdump/tls-keylog.js';
+import { TlsDecoder } from './utilities/tcpdump/tls-decoder.js';
+import { DnsRegistry } from './utilities/tcpdump/dns-registry.js';
+import { decodeTcpDns } from './utilities/tcpdump/tcp-dns.js';
+import { extractDohRequests } from './utilities/tcpdump/doh-decoder.js';
 
 /**
  * Yields control back to the event loop so the browser can repaint and
@@ -150,7 +154,6 @@ export async function processTcpdumpNode(input, options = {}) {
 
         let keyLogMap = null;
         if (keyLogContents) {
-            const { TlsKeyLog } = await import('./utilities/tcpdump/tls-keylog.js');
             keyLogMap = new TlsKeyLog();
             keyLogMap.parseString(keyLogContents);
         }
@@ -160,7 +163,7 @@ export async function processTcpdumpNode(input, options = {}) {
         // ── Phase 2: Decrypt TLS connections ──
         if (keyLogMap) {
             onProgress('Decrypting TLS...', 25);
-            const { TlsDecoder } = await import('./utilities/tcpdump/tls-decoder.js');
+
 
             for (let ci = 0; ci < tcpConnections.length; ci++) {
                 const conn = tcpConnections[ci];
@@ -200,9 +203,7 @@ export async function processTcpdumpNode(input, options = {}) {
         onProgress('Decoding protocols...', 50);
         await yieldToEventLoop();
 
-        const { DnsRegistry } = await import('./utilities/tcpdump/dns-registry.js');
-        const { decodeTcpDns } = await import('./utilities/tcpdump/tcp-dns.js');
-        const { extractDohRequests } = await import('./utilities/tcpdump/doh-decoder.js');
+
 
         let dnsRegistry = new DnsRegistry();
 
@@ -325,7 +326,7 @@ async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry) {
         const ceHeader = responseHeaders.find(h => h.name.toLowerCase() === 'content-encoding');
         if (ceHeader) {
             try {
-                bodyBytes = await decompressBody(combined, ceHeader.value);
+                bodyBytes = await options.deps.decompressBody(combined, ceHeader.value);
                 // Track the uncompressed size when content was actually compressed
                 // (decompressed bytes differ from wire bytes)
                 if (bodyBytes.length !== combined.length) {
@@ -777,7 +778,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
     // (e.g. partially-decoded QUIC/TLS flows where headers couldn't be extracted)
     for (const req of Object.values(data.pages["page_0"].requests)) {
         if (!req.mimeType && req.body) {
-            const sniffed = sniffMimeType(req.body, req.bodyEncoding);
+            const sniffed = options.deps.sniffMimeType(req.body, req.bodyEncoding);
             if (sniffed) req.mimeType = sniffed;
         }
     }

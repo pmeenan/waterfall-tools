@@ -6,6 +6,11 @@
 import { identifyFormat, identifyFormatFromBuffer, parsers } from '../inputs/orchestrator.js';
 import { ZipReader } from '../inputs/utilities/zip.js';
 import { cleanupOrphans } from '../platforms/storage.js';
+import { WaterfallCanvas } from '../renderer/canvas.js';
+import { generateImage } from '../outputs/image.js';
+
+export { identifyFormatFromBuffer };
+export { Layout } from '../renderer/layout.js';
 
 export class WaterfallTools {
     constructor() {
@@ -599,9 +604,6 @@ export class WaterfallTools {
     }
 
     async renderTo(container, options = {}) {
-        // Dynamically load browser-only render implementations keeping Node targets pure
-        const { WaterfallCanvas } = await import('../renderer/canvas.js');
-        
         // Find default page if not specified
         let pageId = options.pageId;
         if (!pageId) {
@@ -627,14 +629,12 @@ export class WaterfallTools {
      * @returns {Promise<{ buffer: Uint8Array, mimeType: string, width: number, height: number }>}
      */
     async generateImage(pageId, options = {}) {
-        const { generateImage: genImg } = await import('../outputs/image.js');
-        
         if (!pageId) {
             const keys = Object.keys(this.data.pages);
             if (keys.length === 0) throw new Error("No pages available to render.");
             pageId = keys[0];
         }
         
-        return await genImg(this, pageId, options);
+        return await generateImage(this, pageId, options);
     }
 }

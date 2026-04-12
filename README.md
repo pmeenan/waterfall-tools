@@ -22,10 +22,14 @@ npm install waterfall-tools
 
 Ensure your build system supports generic ESModules (`"type": "module"` natively out-of-the-box). The single interface for the library is the `WaterfallTools` class.
 
+> [!NOTE]
+> **Optional Asset Bundles:** The built dist binaries purposefully compartmentalize `tcpdump-[hash].js` (PCAP processing) and `decompress-[hash].js` (WASM-based Brotli fallback) from the main core library. 
+> To serve the simplest single-file integration, you can safely host only the core `waterfall-[hash].js` and its proxy stub `waterfall-tools.es.js`! The library will gracefully degrade if it cannot dynamically reach the separated supplement chunks over the network.
+
 ### Processing a Local File (Node.js)
 
 ```javascript
-import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
+import { WaterfallTools } from 'waterfall-tools';
 
 const wt = new WaterfallTools();
 
@@ -39,7 +43,7 @@ console.log(`Successfully generated HAR with ${waterfallHar.log.entries.length} 
 ### Processing a Stream (Browser or Node.js)
 
 ```javascript
-import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
+import { WaterfallTools } from 'waterfall-tools';
 import { Readable } from 'stream'; // Handled globally via NodeJS, polyfilled natively targeting browsers
 
 const wt = new WaterfallTools();
@@ -63,7 +67,7 @@ const waterfallHar = wt.getHar();
 ### Processing a Non-Streaming Buffer (Browser or Node.js)
 
 ```javascript
-import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
+import { WaterfallTools } from 'waterfall-tools';
 
 // When you already have the file totally loaded in memory (Buffer, ArrayBuffer, Uint8Array):
 const bufferData = await uploadedFile.arrayBuffer();
@@ -92,7 +96,7 @@ The `phase` string describes the current processing stage (e.g., `"Reading packe
 ### Loading from an External URL (Browser or Node.js)
 
 ```javascript
-import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
+import { WaterfallTools } from 'waterfall-tools';
 
 // The library automatically fetches, extracts, sniffs, and processes remote trace payloads.
 const wt = new WaterfallTools();
@@ -116,7 +120,7 @@ if (resource) {
 ### Visualizing using the View Engine (Browser Context)
 
 ```javascript
-import { WaterfallTools } from 'waterfall-tools/core/waterfall-tools.js';
+import { WaterfallTools } from 'waterfall-tools';
 
 const wt = new WaterfallTools();
 await wt.loadUrl('https://example.com/trace.json.gz');
@@ -218,18 +222,16 @@ Testing strictly relies on validating standard stream processors against native 
 npm run test
 ```
 
-### Compile Library Assets
+### Compile Library Assets & Standalone Viewer UI
 ```bash
-# Builds standardized Universal Module Definitions (UMD) & pure ESModules natively into `/dist`
+# Formats and bundles the embeddable standalone app natively into `/dist/browser/`.
+# Builds explicit ESModules using Rollup into `/dist/node/` and `/dist/browser/waterfall-tools/`.
+# All output assets natively utilize hashes (e.g. `waterfall-[hash].js`, `tcpdump-[hash].js`) mapping statically.
+# A standard proxy stub `waterfall-tools.es.js` routes elegantly mapped against hashed payloads dynamically maximizing immutable CDN cached responses.
+# Finally, all static distribution elements recursively compress into highly optimized identical `.br` (Brotli Level 11) fallback targets directly accessible via `nginx` and standard distribution engines.
 npm run build
-```
 
-### Compile Standalone Viewer UI
-```bash
-# Formats and bundles the embeddable standalone app natively into `/dist/viewer/`
-npm run build:viewer
-
-# Start local server to preview viewer wrapper natively
+# Start local server to preview viewer wrapper natively with Hot Module Replacement (HMR) attached directly to the local source files
 npm run dev:viewer
 ```
 

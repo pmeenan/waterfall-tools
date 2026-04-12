@@ -166,4 +166,10 @@ The renderer uses the native HTML5 `<canvas>` API rather than the DOM (e.g., cre
 The architecture natively accommodates integration directly securely into web apps. The `WaterfallTools.renderTo(containerElement, options)` API handles deep integrations organically, superseding any separate `div-embed.js` boilerplate. IFrame configurations rely on structured message passing or parsed query parameters for headless integration with data resources. 
 
 ## Build and Bundling
-The project should use a modern bundler like Vite or Rollup to package the library into modular ES Modules (ESM) and Universal Module Definition (UMD). The configuration must strictly support tree-shaking, removing irrelevant target platforms and components statically—so a web integration need only load the browser-renderer subsets minus node endpoints. Native APIs are favored, seamlessly scaling up to WASM when computationally expensive image/video evaluations are invoked.
+The project uses Vite (backed by Rolldown/Rollup) to package the library into modular ES Modules (ESM). The configuration must strictly support tree-shaking, preserving cross-platform aliasing (`scripts/build.js`) replacing runtime environment branches (like canvas wrappers) with statically resolvable targets securely.
+
+### Strict Artifact Generation
+To maximize load performance and caching efficiency across integrations natively, the library explicitly avoids excessive fragmentation (dozens of micro-chunks) by lifting decoupled streaming parsers (`@streamparser/json`) to static imports globally. As a baseline, the bundler generates exactly three primary payload artifacts:
+1. `waterfall-tools.es.js` - The core application logic, HTML5 canvas renderer, and standard JSON streaming processors.
+2. `tcpdump-[hash].js` - The dynamically loaded chunk isolated specifically for TCPDump, PCAP, SSL decryption, QUIC, and standard deep-packet inspection tooling natively.
+3. `decompress-[hash].js` - The dynamically loaded chunk exclusively isolating WebAssembly decompression fallbacks like `brotli-dec-wasm` protecting core payloads accurately.

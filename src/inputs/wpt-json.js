@@ -3,6 +3,7 @@
  * Licensed under the Apache License, Version 2.0.
  * See the LICENSE file for details.
  */
+import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 
 // WebPageTest JSON Input Processor
@@ -286,7 +287,6 @@ function isGzip(buffer) {
 }
 
 export async function processWPTFileNode(input, options = {}) {
-    const { JSONParser } = await import('@streamparser/json');
 
     let stream = input;
     let isGz = options.isGz === true;
@@ -432,7 +432,6 @@ export async function processWPTFileNode(input, options = {}) {
  * Appends into a shared HAR output.
  */
 export async function processWPTFlatStreamNode(input, runStr, cachedNum, outputHar, options = {}) {
-    const { JSONParser } = await import('@streamparser/json');
 
     let stream = input;
     if (options.isGz) {

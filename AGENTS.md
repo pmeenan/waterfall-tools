@@ -57,7 +57,10 @@ When working on this codebase, you must adhere to the following strict architect
 11. **Implementation Notes & Current Conventions:**
     - **Extended HAR Standard:** The complete schema definition of custom properties (e.g., `_load_ms`, `_ttfb_ms`, `_bytesIn`) derived from WebPageTest is documented definitively in `Docs/Extended-HAR-Schema.md`.
     - **Type Definitions (JSDoc):** Though the project explicitly isolates to Vanilla JavaScript, zero-compilation type safety modeling is rigorously structured via JSDoc annotations. Always reference `src/core/har-types.js` when mutating payload definitions to preserve mapping without invoking TypeScript compilers.
-    - **Vite & ESM Framework:** The library defines natively as an ES Module (`"type": "module"`). Utilizing standard Vite in library mode builds ESM and UMD packages to `/dist`. Any executing context should properly process ES `import`/`export` keywords seamlessly.
+    - **Rollup & Hashing Framework:** The core library API compiles exclusively inside pure **Rollup** passes cleanly bypassing complex Rolldown internal shims, yielding strictly three artifacts (`waterfall-[hash].js`, `tcpdump-[hash].js`, `decompress-[hash].js`). 
+    - **Stub Payload Mapping:** Embedders can dynamically link explicitly to a 41-byte `waterfall-tools.es.js` proxy file natively generated alongside the target which intrinsically imports the `waterfall-[hash].js` payload seamlessly enabling optimal 1-year max-age caching environments offline.
+    - **Brotli Static Compression Iterations:** All static artifacts within the browser/frontend path immediately compress recursively into identical `.br` counterparts using `zlib` explicitly dialed to natively run maximum generic Brotli compression (level 11) for superior pre-compressed file serving off zero-computation Edge CDNs inherently.
+    - **Zero UMD:** UMD targets are deliberately abandoned natively reflecting the strictly-ESM browser baseline.
 
 12. **Testing & Golden Fixtures:**
     - Comparing massive object payloads (such as thousands of network requests parsed from Traces) with `assert.deepStrictEqual` can hang `node:test` execution indefinitely if there are `undefined` property mismatches. Always sanitize results via `JSON.parse(JSON.stringify(result))` before asserting against disk-saved JSON fixtures.
@@ -305,3 +308,8 @@ When working on this codebase, you must adhere to the following strict architect
 68. **Dependency Licensing**:
     - All introduced dependencies MUST use an unencumbered license like MIT, BSD, Apache 2, ISC or MPL. 
     - Any dependency that uses any flavor of the GPL (General Public License) is expressly prohibited.
+
+69. **Unified Build Orchestration & Viewer Decoupling**:
+    - Production boundaries between Node.js API components, Browser API components, and the Standalone Viewer are strictly severed at build-time dynamically via `scripts/build.js` natively bridging Vite iterations transparently.
+    - Instead of bundling API utilities identically into `viewer.js`, the Standalone Viewer utilizes an HTML5 `<script type="importmap">` physically routing `import ... from 'waterfall-tools'` dynamically to the decoupled local `waterfall-tools.es.js` artifact securely generated into `/dist/browser/waterfall-tools/`.
+    - Local Hot Module Replacement (HMR) seamlessly overrides this map using `vite.dev.config.js` (`npm run dev:viewer`) dynamically aliasing the `waterfall-tools` bare specifier strictly to the root `/src/core/waterfall-tools.js` logic avoiding compilation resets beautifully seamlessly!

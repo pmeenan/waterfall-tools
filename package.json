@@ -2,12 +2,14 @@
   "name": "waterfall-tools",
   "version": "1.0.0",
   "description": "Tools for parsing and visualizing network waterfalls",
-  "main": "dist/waterfall-tools.umd.js",
-  "module": "dist/waterfall-tools.es.js",
+  "main": "dist/node/waterfall-tools.es.js",
+  "module": "dist/node/waterfall-tools.es.js",
+  "browser": "dist/browser/waterfall-tools/waterfall-tools.es.js",
   "exports": {
     ".": {
-      "import": "./dist/waterfall-tools.es.js",
-      "require": "./dist/waterfall-tools.umd.js"
+      "browser": "./dist/browser/waterfall-tools/waterfall-tools.es.js",
+      "node": "./dist/node/waterfall-tools.es.js",
+      "default": "./dist/node/waterfall-tools.es.js"
     }
   },
   "bin": {
@@ -15,11 +17,10 @@
   },
   "scripts": {
     "test": "vitest",
-    "build": "vite build",
+    "build": "node scripts/build.js",
     "dev:demo": "vite --config vite.demo.config.js",
     "build:demo": "vite build --config vite.demo.config.js",
-    "dev:viewer": "vite --config vite.viewer.config.js",
-    "build:viewer": "vite build --config vite.viewer.config.js"
+    "dev:viewer": "vite --config vite.dev.config.js"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,11 @@
   },
   "homepage": "https://github.com/pmeenan/waterfall-tools#readme",
   "devDependencies": {
+    "@rollup/plugin-alias": "^6.0.0",
+    "@rollup/plugin-commonjs": "^29.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^1.0.0",
+    "rollup": "^4.60.1",
     "vite": "^8.0.3",
     "vitest": "^4.1.2"
   },

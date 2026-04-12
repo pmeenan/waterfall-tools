@@ -9,6 +9,7 @@
  * the Waterfall Tools Extended HAR intermediary structure.
  */
 
+import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 
 /**
@@ -54,7 +55,6 @@ function isGzip(buffer) {
 }
 
 export async function processHARFileNode(input, options = {}) {
-    const { JSONParser } = await import('@streamparser/json');
 
     let stream = input;
     let isGz = options.isGz === true;

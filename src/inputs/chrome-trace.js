@@ -4,6 +4,7 @@
  * See the LICENSE file for details.
  */
 import { Netlog, normalizeNetlogToHAR } from './netlog.js';
+import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 
 const PRIORITY_MAP = {
@@ -21,7 +22,6 @@ function isGzip(buffer) {
 }
 
 export async function processChromeTraceFileNode(input, options = {}) {
-    const { JSONParser } = await import('@streamparser/json');
 
     let stream = input;
     let isGz = options.isGz === true;

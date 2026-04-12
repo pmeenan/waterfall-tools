@@ -3,6 +3,7 @@
  * Licensed under the Apache License, Version 2.0.
  * See the LICENSE file for details.
  */
+import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 import { normalizeWPT } from './wpt-json.js';
 
@@ -696,7 +697,6 @@ class DevToolsParser {
  * @returns {Promise<import('../core/har-types.js').ExtendedHAR>}
  */
 export async function processCDPFileNode(input, options = {}) {
-    const { JSONParser } = await import('@streamparser/json');
 
     let stream = input;
     let isGz = options.isGz === true;

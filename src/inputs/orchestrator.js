@@ -8,9 +8,11 @@ import { processWPTFileNode } from './wpt-json.js';
 import { processCDPFileNode } from './cdp.js';
 import { processChromeTraceFileNode } from './chrome-trace.js';
 import { processNetlogFileNode } from './netlog.js';
-import { processTcpdumpNode } from './tcpdump.js';
+
 import { processWptagentZip } from './wptagent.js';
 import { processPerfettoFileNode } from './perfetto.js';
+import { decompressBody } from '../core/decompress.js';
+import { sniffMimeType } from '../core/har-converter.js';
 
 export const parsers = {
     'har': processHARFileNode,
@@ -19,7 +21,18 @@ export const parsers = {
     'chrome-trace': processChromeTraceFileNode,
     'perfetto': processPerfettoFileNode,
     'netlog': processNetlogFileNode,
-    'tcpdump': processTcpdumpNode,
+    'tcpdump': async (input, options) => {
+        try {
+            const module = await import('./tcpdump.js');
+            if (!options.deps) options.deps = {};
+            options.deps.decompressBody = decompressBody;
+            options.deps.sniffMimeType = sniffMimeType;
+            return await module.processTcpdumpNode(input, options);
+        } catch (e) {
+            console.warn('TCPDump parser not included or failed to dynamically load:', e);
+            throw new Error('TCPDump decoding support is missing or not packaged in this build.');
+        }
+    },
     'wptagent': processWptagentZip
 };
 
