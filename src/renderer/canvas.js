@@ -619,8 +619,16 @@ export class WaterfallCanvas {
                 const barY1 = drawY1;
                 const barY2 = Math.max(barY1 + 1, drawY2);
                 
-                // State lines (wait -> dns -> connect -> ssl)
-                if (this.options.showWait !== false && !this.options.connectionView && sWait < sTtfb) this.drawBar(sWait, sTtfb, stateY1, stateY2, row.colors.wait, true);
+                // State lines (queueing wait -> dns -> connect -> ssl)
+                let sQueueStart = xScaler(row.blockedStart - baseStartMs);
+                // Queueing legitimately ends the exact instant any network phase actively begins.
+                let firstNetworkPhase = Math.min(row.dnsStart, row.connectStart, row.ttfbStart);
+                let actualQueueEnd = Math.min(row.blockedEnd, firstNetworkPhase);
+                let sActualQueueEnd = xScaler(Math.max(row.blockedStart, actualQueueEnd) - baseStartMs);
+                
+                if (this.options.showWait !== false && !this.options.connectionView && sQueueStart < sActualQueueEnd) {
+                    this.drawBar(sQueueStart, sActualQueueEnd, stateY1, stateY2, row.colors.wait, true);
+                }
                 if (sDns < sDnsEnd) this.drawBar(sDns, sDnsEnd, stateY1, stateY2, row.colors.dns, true);
                 if (sConn < sConnEnd) this.drawBar(sConn, sConnEnd, stateY1, stateY2, row.colors.connect, true);
                 if (sSsl < sSslEnd) this.drawBar(sSsl, sSslEnd, stateY1, stateY2, row.colors.ssl, true);

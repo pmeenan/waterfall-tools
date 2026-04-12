@@ -180,6 +180,7 @@ You can dynamically configure the viewer using URL query parameters that map sea
 
 **Viewer Query Parameters:**
 - `src=<url>` : Points to the remote file to download and load automatically.
+- `keylog=<url>` : Points to the remote TLS keylog file to use in conjunction with `src` when loading raw packet captures (e.g., tcpdump/pcap files).
 - `page=<index>` : Opens deeply into a specific multi-page iteration (aliasing `pageId`). Skips the thumbnail grid entirely if matching successfully.
 - `tab=<name>` : Skips directly to a specified tab (`summary`, `waterfall`, `trace`, `lighthouse`, `netlog`). Can cleanly auto-generate dynamic detail tabs referencing `RequestX` (e.g., `&tab=Request10` jumps right to the respective Request Details).
 - `options=<csv>` : Pass targeted viewer config properties strictly overriding defaults in a `key:val` format minimizing URL length (e.g., `options=showCpu:false,showBw:false`).

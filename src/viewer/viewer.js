@@ -1694,6 +1694,8 @@ async function initViewer() {
     }
     
     // Evaluate Data natively now that all event bindings are configured
+    const keylogUrl = params.get('keylog');
+
     if (srcUrl) {
         try {
             await resetViewerState();
@@ -1701,11 +1703,22 @@ async function initViewer() {
             const response = await fetch(srcUrl);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             
+            let keylogBuffer = null;
+            if (keylogUrl) {
+                showLoading(`Downloading keylog: ${keylogUrl}`);
+                const keylogResponse = await fetch(keylogUrl);
+                if (keylogResponse.ok) {
+                    keylogBuffer = await keylogResponse.arrayBuffer();
+                } else {
+                    console.warn(`Failed to fetch keylog: HTTP ${keylogResponse.status}`);
+                }
+            }
+            
             showLoading("Processing Network Data...");
             const buffer = await response.arrayBuffer();
             
             const processOpts = Object.assign({}, urlOptions, { historyMode: 'replace' });
-            await processData(buffer, processOpts);
+            await processData(buffer, processOpts, keylogBuffer);
         } catch(e) {
             console.error(e);
             showError(`Failed fetching remote file: ${e.message}`);

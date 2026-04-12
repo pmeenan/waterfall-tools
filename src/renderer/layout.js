@@ -196,7 +196,7 @@ export class Layout {
             } else if (hasAbsoluteTimings && startOrigin !== undefined && startOrigin >= 0) {
                 baseEpoch = entry.time_start - startOrigin;
             }
-            
+            let blockedStart = baseEpoch; // Natively start at 0-offset unless purely sequential overrides it.
             let blockedEnd, dnsStart, dnsEnd, connectStart, connectEnd, sslStart, sslEnd, requestStart, ttfb, end;
 
             if (hasAbsoluteTimings) {
@@ -237,6 +237,7 @@ export class Layout {
                 end = entry.time_start + timeTotal;
                 if (entry.time_end && entry.time_end > end) end = entry.time_end;
                 
+                blockedStart = entry.time_start;
                 blockedEnd = entry.time_start;
                 if (entry.timings && entry.timings.blocked > 0) blockedEnd = entry.time_start + entry.timings.blocked;
                 
@@ -283,10 +284,10 @@ export class Layout {
                 start,
                 end,
                 status: entry.status,
-                blockedEnd,
-                dnsStart, dnsEnd: connectStart,
-                connectStart, connectEnd: sslStart,
-                sslStart, sslEnd: requestStart,
+                blockedStart, blockedEnd,
+                dnsStart, dnsEnd,
+                connectStart, connectEnd,
+                sslStart, sslEnd,
                 ttfbStart: requestStart,
                 ttfbEnd: ttfb,
                 downloadStart: ttfb,
