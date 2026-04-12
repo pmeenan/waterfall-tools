@@ -6,6 +6,8 @@
 import { processTcpdumpNode } from '../tcpdump.js';
 import fs from 'node:fs';
 import path from 'node:path';
+import { decompressBody } from '../../core/decompress.js';
+import { sniffMimeType } from '../../core/har-converter.js';
 
 async function run() {
     const args = process.argv.slice(2);
@@ -35,6 +37,9 @@ async function run() {
     try {
         const startTime = Date.now();
         const options = keyLogPath ? { keyLogPath } : {};
+        if (!options.deps) options.deps = {};
+        options.deps.decompressBody = decompressBody;
+        options.deps.sniffMimeType = sniffMimeType;
         
         const extendedHar = await processTcpdumpNode(inputPath, options);
         

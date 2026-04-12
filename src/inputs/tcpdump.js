@@ -260,7 +260,7 @@ export async function processTcpdumpNode(input, options = {}) {
         onProgress('Building waterfall...', 85);
         await yieldToEventLoop();
 
-        const dataResult = await buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups(), packets, onProgress);
+        const dataResult = await buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups(), packets, options, onProgress);
         onProgress('Complete', 100);
         return dataResult;
 
@@ -312,7 +312,7 @@ function concatenateBodyChunks(dataChunks) {
  * base64-encodes the result, and stores it on the request entry as
  * body + bodyEncoding.
  */
-async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry) {
+async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry, options) {
     try {
         const combined = concatenateBodyChunks(dataChunks);
         if (!combined) return;
@@ -424,7 +424,7 @@ function calculateMaxBandwidth(packets, tcpConnections, udpConnections) {
     return Math.round(kbps);
 }
 
-async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookups, packets, onProgress = () => {}) {
+async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookups, packets, options = {}, onProgress = () => {}) {
     const data = {
         metadata: { format: 'tcpdump' },
         pages: {
@@ -655,7 +655,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
 
             // Schedule async body extraction (decompression + base64 encoding)
             if (req.data && req.data.length > 0) {
-                bodyTasks.push(extractAndStoreBody(req.data, resHeaders, reqEntry));
+                bodyTasks.push(extractAndStoreBody(req.data, resHeaders, reqEntry, options));
             }
         }
     };

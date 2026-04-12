@@ -1393,6 +1393,40 @@ async function initViewer() {
         if (e.target.files.length > 0) processFiles(e.target.files);
     });
 
+    const urlInput = document.getElementById('url-input');
+    const urlLoadBtn = document.getElementById('url-load-btn');
+    if (urlInput && urlLoadBtn) {
+        const handleUrlLoad = async () => {
+            const urlVal = urlInput.value.trim();
+            if (urlVal) {
+                console.log("Attempting to load URL payload natively:", urlVal);
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('src', urlVal);
+                if (typeof history !== 'undefined') history.pushState(history.state, '', newUrl.toString());
+                
+                try {
+                    await resetViewerState();
+                    showLoading(`Downloading: ${urlVal}`);
+                    const response = await fetch(urlVal);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    showLoading("Processing Network Data...");
+                    const buffer = await response.arrayBuffer();
+                    
+                    const processOpts = Object.assign({}, getOptionsFromUrl(), { historyMode: 'replace' });
+                    await processData(buffer, processOpts);
+                } catch(e) {
+                    console.error("URL Load Error:", e);
+                    showError(`Failed fetching remote file: ${e.message}`);
+                }
+            }
+        };
+        urlLoadBtn.addEventListener('click', handleUrlLoad);
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleUrlLoad();
+        });
+    }
+
     // Nav Bindings
     ui.btnBackTiles.addEventListener('click', () => {
          if (typeof history !== 'undefined' && history.state) {

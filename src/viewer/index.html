@@ -51,8 +51,13 @@
                 </div>
             </div>
 
+            <div class="url-section" style="margin: 0 auto 2rem auto; width: fit-content; display: flex; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px;">
+                <input type="text" id="url-input" placeholder="Enter remote URL to load (e.g. https://...)" style="padding: 14px 20px; min-width: 400px; border: 1px solid var(--border-color); border-radius: 8px 0 0 8px; font-size: 1rem; outline: none; border-right: none; box-sizing: border-box;">
+                <button id="url-load-btn" style="padding: 14px 24px; font-size: 1rem; font-weight: 600; cursor: pointer; background-color: var(--primary-color); color: white; border: none; border-radius: 0 8px 8px 0; transition: background-color 0.2s, box-shadow 0.2s;">Load</button>
+            </div>
+
             <div class="upload-section">
-                <p class="upload-hint">Drag & Drop anywhere to load your files, or input them locally</p>
+                <p class="upload-hint">...or Drag & Drop anywhere to load your files, or input them locally</p>
                 <input type="file" id="file-input" multiple class="hidden">
                 <button id="upload-btn">Select File(s)</button>
                 <p class="sub-hint">For tcpdump with TLS Decryption, select or drop both the <code>.cap.gz</code> and your SSL keylog file together.</p>

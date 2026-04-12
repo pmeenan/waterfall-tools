@@ -188,7 +188,7 @@ You can dynamically configure the viewer using URL query parameters that map sea
 https://your-domain.com/viewer/?src=https://example.com/trace.json.gz&page=1_Cached&tab=Request10&options=showCpu:false,showWait:false
 ```
 
-Alternatively, if no `src` parameter is provided, the viewer automatically presents a clean drag-and-drop file upload interface.
+Alternatively, if no `src` parameter is provided, the viewer automatically presents a clean URL entry bar and a drag-and-drop file upload interface.
 
 ### Iframe Programmatic API
 
