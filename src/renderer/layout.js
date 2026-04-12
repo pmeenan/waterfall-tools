@@ -196,8 +196,8 @@ export class Layout {
             } else if (hasAbsoluteTimings && startOrigin !== undefined && startOrigin >= 0) {
                 baseEpoch = entry.time_start - startOrigin;
             }
-            let blockedStart = baseEpoch; // Natively start at 0-offset unless purely sequential overrides it.
-            let blockedEnd, dnsStart, dnsEnd, connectStart, connectEnd, sslStart, sslEnd, requestStart, ttfb, end;
+            // Define references. blockedStart is determined contextually per-strategy preventing baseline 0 fallbacks natively.
+            let blockedStart, blockedEnd, dnsStart, dnsEnd, connectStart, connectEnd, sslStart, sslEnd, requestStart, ttfb, end;
 
             if (hasAbsoluteTimings) {
                 // Universal Absolute bounds (natively defined by WPT specifications)
@@ -207,6 +207,9 @@ export class Layout {
                 
                 blockedEnd = baseEpoch + (startOrigin !== undefined ? startOrigin : (entry._ttfb_start !== undefined ? entry._ttfb_start : 0)); // Queue finishes right when the request loads
                 
+                // If queueing start is definitively unknown, explicitly erase graphical queue widths by locking strictly to blockedEnd bounds.
+                blockedStart = entry._created !== undefined ? baseEpoch + entry._created : blockedEnd;
+
                 dnsStart = (entry._dns_start !== undefined && entry._dns_start >= 0) ? baseEpoch + entry._dns_start : blockedEnd;
                 dnsEnd = (entry._dns_end !== undefined && entry._dns_end >= 0) ? baseEpoch + entry._dns_end : dnsStart;
                 
