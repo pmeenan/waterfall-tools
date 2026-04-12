@@ -122,9 +122,3 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Prepare Node integrations targeting offscreen canvas or node-canvas counterparts.
 - [x] Implement `src/outputs/image.js` to digest render data straight into raw image buffer sets / Base64 serialization outputs snapshotting views.
 - [x] Implement `src/outputs/thumbnail.js` for scaled-down structural representations equivalent to complete image generation maps.
-
-## Phase 10: Filmstrip View Integration (Future Roadmap)
-**Goal:** Construct visual timestamp representations displaying exact render screenshots above waterfall requests over time.
-- [ ] Add explicit intermediary references coupling standard timeline moments to image frames natively into standard HAR output objects.
-- [ ] Bootstrap `src/filmstrip/` interfaces configured to inject array bundles composing individual images or trace screenshots efficiently.
-- [ ] Build renderer sub-layers synchronizing active progression cursor overlays mapping trace screenshots alongside specific timeframe elements live.
