@@ -57,11 +57,11 @@ export async function decodeUdpProtocol(conn, keyLog, dnsRegistry, options = {})
                         conn.http3 = decodeHttp3(conn.quicParams.streams);
                         if (options.debug || globalThis.waterfallDebug) console.log(`[UDP Sniffer] HTTP/3 decoder produced: ${conn.http3 ? conn.http3.size : 0} streams for link ${conn.id}`);
                     } catch (err) {
-                        console.error(`[UDP Sniffer] Qpack decode failed for QUIC link ${conn.id}:`, err);
+                        if (globalThis.waterfallDebug) console.error(`[UDP Sniffer] Qpack decode failed for QUIC link ${conn.id}:`, err);
                     }
                 }
             } catch (e) {
-                console.error(`[UDP Sniffer] Failed to natively decode QUIC link id ${conn.id}:`, e);
+                if (globalThis.waterfallDebug) console.error(`[UDP Sniffer] Failed to natively decode QUIC link id ${conn.id}:`, e);
             }
         }
     } else {

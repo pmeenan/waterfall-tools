@@ -23,7 +23,16 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "upgradi-insecure-requests",
+              "value": "1"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -41,6 +50,10 @@
             {
               "name": "content-encoding",
               "value": "br"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             }
           ],
           "content": {
@@ -69,14 +82,14 @@
         "_connectTimeMs": 1774566229106.035,
         "_connectEndTimeMs": 1774566229132.7441,
         "_sslStartTimeMs": 1774566229106.035,
-        "_load_start": 122,
+        "_load_start": 52,
         "_dns_start": 0,
         "_dns_end": 0,
         "_connect_start": 52,
         "_connect_end": 78,
         "_ssl_start": 52,
-        "_ssl_end": 122,
-        "_ttfb_start": 122,
+        "_ssl_end": 52,
+        "_ttfb_start": 52,
         "_ttfb_end": 122,
         "_download_start": 122,
         "_download_end": 138,
@@ -91,7 +104,12 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -113,6 +131,10 @@
             {
               "name": "x-content-type-options",
               "value": "nosniff"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             }
           ],
           "content": {
@@ -136,8 +158,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 238,
-        "_ttfb_start": 238,
+        "_load_start": 236,
+        "_ttfb_start": 236,
         "_ttfb_end": 238,
         "_download_start": 238,
         "_download_end": 238,
@@ -152,7 +174,16 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -174,6 +205,10 @@
             {
               "name": "x-content-type-options",
               "value": "nosniff"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             }
           ],
           "content": {
@@ -197,8 +232,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 264,
-        "_ttfb_start": 264,
+        "_load_start": 260,
+        "_ttfb_start": 260,
         "_ttfb_end": 264,
         "_download_start": 264,
         "_download_end": 434,
@@ -213,7 +248,12 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -227,6 +267,10 @@
             {
               "name": "accept-ranges",
               "value": "bytes"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             },
             {
               "name": "x-content-type-options",
@@ -254,8 +298,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 383,
-        "_ttfb_start": 383,
+        "_load_start": 354,
+        "_ttfb_start": 354,
         "_ttfb_end": 383,
         "_download_start": 383,
         "_download_end": 383,
@@ -1056,6 +1100,80 @@
         "pageref": "page_0",
         "request": {
           "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "strict-transport-security",
+              "value": "max-age=31536000"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
+          "content": {
+            "size": 112,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 112
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 562,
+        "_ttfb_start": 562,
+        "_ttfb_end": 604,
+        "_download_start": 604,
+        "_download_end": 608,
+        "_all_end": 608
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
           "url": "https://www.gstatic.com/og/_/ss/k=og.asy.td_rzgIyaAQ.L.W.O/m=ll_tdm,adcgm3,ll_fw,abld/excm=/d=1/ed=1/ct=zgms/rs=AA2YrTtoa50IX0QtFtEg6_eOzsn1KDMaLg",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -1245,72 +1363,24 @@
         "time": 0,
         "pageref": "page_0",
         "request": {
-          "method": "GET",
+          "method": "POST",
           "url": "https://www.google.com/",
-          "httpVersion": "HTTP/3",
-          "cookies": [],
-          "headers": [],
-          "queryString": [],
-          "headersSize": -1,
-          "bodySize": -1
-        },
-        "response": {
-          "status": 200,
-          "statusText": "",
           "httpVersion": "HTTP/3",
           "cookies": [],
           "headers": [
             {
-              "name": "x-content-type-options",
-              "value": "nosniff"
+              "name": "content-length",
+              "value": "0"
             },
             {
-              "name": "strict-transport-security",
-              "value": "max-age=31536000"
+              "name": "accept",
+              "value": "*/*"
             },
             {
-              "name": "content-encoding",
-              "value": "br"
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             }
           ],
-          "content": {
-            "size": 112,
-            "mimeType": "",
-            "compression": 0
-          },
-          "redirectURL": "",
-          "headersSize": -1,
-          "bodySize": 112
-        },
-        "cache": {},
-        "timings": {
-          "dns": -1,
-          "connect": -1,
-          "ssl": -1,
-          "send": 0,
-          "wait": 0,
-          "receive": 0
-        },
-        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
-        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
-        "_protocol": "QUIC",
-        "_load_start": 604,
-        "_ttfb_start": 604,
-        "_ttfb_end": 604,
-        "_download_start": 604,
-        "_download_end": 608,
-        "_all_end": 608
-      },
-      {
-        "startedDateTime": "SCRUBBED",
-        "time": 0,
-        "pageref": "page_0",
-        "request": {
-          "method": "GET",
-          "url": "https://www.google.com/",
-          "httpVersion": "HTTP/3",
-          "cookies": [],
-          "headers": [],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -1321,6 +1391,10 @@
           "httpVersion": "HTTP/3",
           "cookies": [],
           "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
             {
               "name": "content-length",
               "value": "0"
@@ -1347,8 +1421,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 646,
-        "_ttfb_start": 646,
+        "_load_start": 638,
+        "_ttfb_start": 638,
         "_ttfb_end": 646,
         "_download_start": 646,
         "_download_end": 648,
@@ -1359,11 +1433,24 @@
         "time": 0,
         "pageref": "page_0",
         "request": {
-          "method": "GET",
+          "method": "POST",
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "content-length",
+              "value": "0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -1374,6 +1461,10 @@
           "httpVersion": "HTTP/3",
           "cookies": [],
           "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
             {
               "name": "content-length",
               "value": "0"
@@ -1400,8 +1491,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 696,
-        "_ttfb_start": 696,
+        "_load_start": 691,
+        "_ttfb_start": 691,
         "_ttfb_end": 696,
         "_download_start": 696,
         "_download_end": 697,
@@ -1412,11 +1503,24 @@
         "time": 0,
         "pageref": "page_0",
         "request": {
-          "method": "GET",
+          "method": "POST",
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -1427,6 +1531,10 @@
           "httpVersion": "HTTP/3",
           "cookies": [],
           "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
             {
               "name": "content-length",
               "value": "0"
@@ -1453,8 +1561,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 916,
-        "_ttfb_start": 916,
+        "_load_start": 910,
+        "_ttfb_start": 910,
         "_ttfb_end": 916,
         "_download_start": 916,
         "_download_end": 916,
@@ -1469,7 +1577,16 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -1491,6 +1608,10 @@
             {
               "name": "x-content-type-options",
               "value": "nosniff"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             }
           ],
           "content": {
@@ -1514,8 +1635,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 996,
-        "_ttfb_start": 996,
+        "_load_start": 989,
+        "_ttfb_start": 989,
         "_ttfb_end": 996,
         "_download_start": 996,
         "_download_end": 1003,
@@ -1530,7 +1651,16 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -1552,6 +1682,10 @@
             {
               "name": "x-content-type-options",
               "value": "nosniff"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             }
           ],
           "content": {
@@ -1575,8 +1709,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 1003,
-        "_ttfb_start": 1003,
+        "_load_start": 994,
+        "_ttfb_start": 994,
         "_ttfb_end": 1003,
         "_download_start": 1003,
         "_download_end": 1003,
@@ -1591,7 +1725,12 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -1605,6 +1744,10 @@
             {
               "name": "strict-transport-security",
               "value": "max-age=31536000"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             },
             {
               "name": "content-length",
@@ -1632,8 +1775,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 1021,
-        "_ttfb_start": 1021,
+        "_load_start": 1013,
+        "_ttfb_start": 1013,
         "_ttfb_end": 1021,
         "_download_start": 1021,
         "_download_end": 1021,
@@ -1648,174 +1791,16 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
-          "queryString": [],
-          "headersSize": -1,
-          "bodySize": -1
-        },
-        "response": {
-          "status": 200,
-          "statusText": "",
-          "httpVersion": "HTTP/3",
-          "cookies": [],
           "headers": [
             {
-              "name": "accept-ranges",
-              "value": "bytes"
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             },
             {
-              "name": "content-encoding",
-              "value": "br"
-            },
-            {
-              "name": "x-content-type-options",
-              "value": "nosniff"
+              "name": "accept",
+              "value": "*/*"
             }
           ],
-          "content": {
-            "size": 2159,
-            "mimeType": "",
-            "compression": 0
-          },
-          "redirectURL": "",
-          "headersSize": -1,
-          "bodySize": 2159
-        },
-        "cache": {},
-        "timings": {
-          "dns": -1,
-          "connect": -1,
-          "ssl": -1,
-          "send": 0,
-          "wait": 0,
-          "receive": 0
-        },
-        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
-        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
-        "_protocol": "QUIC",
-        "_load_start": 1203,
-        "_ttfb_start": 1203,
-        "_ttfb_end": 1203,
-        "_download_start": 1203,
-        "_download_end": 1204,
-        "_all_end": 1204
-      },
-      {
-        "startedDateTime": "SCRUBBED",
-        "time": 0,
-        "pageref": "page_0",
-        "request": {
-          "method": "GET",
-          "url": "https://www.google.com/",
-          "httpVersion": "HTTP/3",
-          "cookies": [],
-          "headers": [],
-          "queryString": [],
-          "headersSize": -1,
-          "bodySize": -1
-        },
-        "response": {
-          "status": 204,
-          "statusText": "",
-          "httpVersion": "HTTP/3",
-          "cookies": [],
-          "headers": [
-            {
-              "name": "content-length",
-              "value": "0"
-            }
-          ],
-          "content": {
-            "size": 0,
-            "mimeType": "",
-            "compression": 0
-          },
-          "redirectURL": "",
-          "headersSize": -1,
-          "bodySize": 0
-        },
-        "cache": {},
-        "timings": {
-          "dns": -1,
-          "connect": -1,
-          "ssl": -1,
-          "send": 0,
-          "wait": 0,
-          "receive": 0
-        },
-        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
-        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
-        "_protocol": "QUIC",
-        "_load_start": 1212,
-        "_ttfb_start": 1212,
-        "_ttfb_end": 1212,
-        "_download_start": 1212,
-        "_download_end": 1213,
-        "_all_end": 1213
-      },
-      {
-        "startedDateTime": "SCRUBBED",
-        "time": 0,
-        "pageref": "page_0",
-        "request": {
-          "method": "GET",
-          "url": "https://www.google.com/",
-          "httpVersion": "HTTP/3",
-          "cookies": [],
-          "headers": [],
-          "queryString": [],
-          "headersSize": -1,
-          "bodySize": -1
-        },
-        "response": {
-          "status": 204,
-          "statusText": "",
-          "httpVersion": "HTTP/3",
-          "cookies": [],
-          "headers": [
-            {
-              "name": "content-length",
-              "value": "0"
-            }
-          ],
-          "content": {
-            "size": 0,
-            "mimeType": "",
-            "compression": 0
-          },
-          "redirectURL": "",
-          "headersSize": -1,
-          "bodySize": 0
-        },
-        "cache": {},
-        "timings": {
-          "dns": -1,
-          "connect": -1,
-          "ssl": -1,
-          "send": 0,
-          "wait": 0,
-          "receive": 0
-        },
-        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
-        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
-        "_protocol": "QUIC",
-        "_load_start": 1215,
-        "_ttfb_start": 1215,
-        "_ttfb_end": 1215,
-        "_download_start": 1215,
-        "_download_end": 1215,
-        "_all_end": 1215
-      },
-      {
-        "startedDateTime": "SCRUBBED",
-        "time": 0,
-        "pageref": "page_0",
-        "request": {
-          "method": "GET",
-          "url": "https://www.google.com/",
-          "httpVersion": "HTTP/3",
-          "cookies": [],
-          "headers": [],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -1833,6 +1818,10 @@
             {
               "name": "strict-transport-security",
               "value": "max-age=31536000"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             },
             {
               "name": "content-encoding",
@@ -1860,8 +1849,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 1237,
-        "_ttfb_start": 1237,
+        "_load_start": 1163,
+        "_ttfb_start": 1163,
         "_ttfb_end": 1237,
         "_download_start": 1237,
         "_download_end": 1240,
@@ -1876,7 +1865,230 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept-ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "content-encoding",
+              "value": "br"
+            },
+            {
+              "name": "x-content-type-options",
+              "value": "nosniff"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
+          "content": {
+            "size": 2159,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 2159
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1197,
+        "_ttfb_start": 1197,
+        "_ttfb_end": 1203,
+        "_download_start": 1203,
+        "_download_end": 1204,
+        "_all_end": 1204
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "POST",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1204,
+        "_ttfb_start": 1204,
+        "_ttfb_end": 1212,
+        "_download_start": 1212,
+        "_download_end": 1213,
+        "_all_end": 1213
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "POST",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            }
+          ],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1207,
+        "_ttfb_start": 1207,
+        "_ttfb_end": 1215,
+        "_download_start": 1215,
+        "_download_end": 1215,
+        "_all_end": 1215
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -1894,6 +2106,10 @@
             {
               "name": "strict-transport-security",
               "value": "max-age=31536000"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             },
             {
               "name": "content-encoding",
@@ -1921,8 +2137,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 1260,
-        "_ttfb_start": 1260,
+        "_load_start": 1237,
+        "_ttfb_start": 1237,
         "_ttfb_end": 1260,
         "_download_start": 1260,
         "_download_end": 1265,
@@ -1937,7 +2153,16 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -1955,6 +2180,10 @@
             {
               "name": "content-encoding",
               "value": "br"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             },
             {
               "name": "x-content-type-options",
@@ -1982,8 +2211,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 1273,
-        "_ttfb_start": 1273,
+        "_load_start": 1270,
+        "_ttfb_start": 1270,
         "_ttfb_end": 1273,
         "_download_start": 1273,
         "_download_end": 1273,
@@ -1998,7 +2227,16 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -2016,6 +2254,10 @@
             {
               "name": "content-encoding",
               "value": "br"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             },
             {
               "name": "x-content-type-options",
@@ -2043,8 +2285,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 1295,
-        "_ttfb_start": 1295,
+        "_load_start": 1291,
+        "_ttfb_start": 1291,
         "_ttfb_end": 1295,
         "_download_start": 1295,
         "_download_end": 1318,
@@ -2059,7 +2301,16 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -2077,6 +2328,10 @@
             {
               "name": "content-encoding",
               "value": "br"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
             },
             {
               "name": "x-content-type-options",
@@ -2104,8 +2359,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 1305,
-        "_ttfb_start": 1305,
+        "_load_start": 1299,
+        "_ttfb_start": 1299,
         "_ttfb_end": 1305,
         "_download_start": 1305,
         "_download_end": 1329,
@@ -2120,7 +2375,12 @@
           "url": "https://www.google.com/",
           "httpVersion": "HTTP/3",
           "cookies": [],
-          "headers": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
           "queryString": [],
           "headersSize": -1,
           "bodySize": -1
@@ -2131,6 +2391,10 @@
           "httpVersion": "HTTP/3",
           "cookies": [],
           "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
             {
               "name": "content-length",
               "value": "0"
@@ -2157,8 +2421,8 @@
         "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
         "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
         "_protocol": "QUIC",
-        "_load_start": 1379,
-        "_ttfb_start": 1379,
+        "_load_start": 1373,
+        "_ttfb_start": 1373,
         "_ttfb_end": 1379,
         "_download_start": 1379,
         "_download_end": 1380,
@@ -2596,6 +2860,279 @@
         "time": 0,
         "pageref": "page_0",
         "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1511,
+        "_ttfb_start": 1511
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1519,
+        "_ttfb_start": 1519
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1522,
+        "_ttfb_start": 1522
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "POST",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1539,
+        "_ttfb_start": 1539
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "POST",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "content-length",
+              "value": "0"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1572,
+        "_ttfb_start": 1572
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
           "method": "OPTIONS",
           "url": "https://ogads-pa.clients6.google.com/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/GetAsyncData",
           "httpVersion": "HTTP/2",
@@ -2762,6 +3299,165 @@
         "_download_start": 1635,
         "_download_end": 1635,
         "_all_end": 1635
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1608,
+        "_ttfb_start": 1608
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            },
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1613,
+        "_ttfb_start": 1613
+      },
+      {
+        "startedDateTime": "SCRUBBED",
+        "time": 0,
+        "pageref": "page_0",
+        "request": {
+          "method": "GET",
+          "url": "https://www.google.com/",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "Unavailable",
+              "value": "QPACK table entry unavailable"
+            }
+          ],
+          "queryString": [],
+          "headersSize": -1,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/3",
+          "cookies": [],
+          "headers": [],
+          "content": {
+            "size": 0,
+            "mimeType": "",
+            "compression": 0
+          },
+          "redirectURL": "",
+          "headersSize": -1,
+          "bodySize": 0
+        },
+        "cache": {},
+        "timings": {
+          "dns": -1,
+          "connect": -1,
+          "ssl": -1,
+          "send": 0,
+          "wait": 0,
+          "receive": 0
+        },
+        "serverIPAddress": "2001:4860:482a:7700:0:0:0:0",
+        "connection": "2001:4860:482a:7700:0:0:0:0:443-2600:1900:4090:1d:0:1:0:0:58751",
+        "_protocol": "QUIC",
+        "_load_start": 1672,
+        "_ttfb_start": 1672
       },
       {
         "startedDateTime": "SCRUBBED",

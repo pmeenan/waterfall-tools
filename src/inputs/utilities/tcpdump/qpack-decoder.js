@@ -204,32 +204,49 @@ export class QpackDecoder {
         return { value: stringVal, newOffset: strOffset + len };
     }
 
-    processEncoder(buffer) {
-        // Parses Stream ID `0x02`
+    processEncoder(buffer, midstream = false) {
+        // Parses QPACK Encoder Stream (Stream Type 0x02)
         let offset = 0;
+
+        // When the capture started mid-connection, the buffer may begin either:
+        // (a) At a clean instruction boundary (if the missing data was self-contained), or
+        // (b) In the middle of a "Set Dynamic Table Capacity" varint instruction.
+        // Try starting at offset 0 first. If that doesn't work (first byte looks like
+        // a varint continuation), scan past the continuation bytes.
+        if (midstream && buffer.length > 0) {
+            // Check if offset 0 could be a valid instruction start (bit 7 alone is ambiguous,
+            // but we can try both and the caller picks the better result).
+            // Just start at offset 0 — this handles the common case where the missing bytes
+            // were the stream type + a small capacity instruction.
+            offset = 0;
+        }
+
         while (offset < buffer.length) {
+            const prevOffset = offset;
             const b = buffer[offset];
-            
+
             if ((b & 0x80) === 0x80) {
                 // Insert with Name Reference (T=1, Static=0/1)
                 const isStatic = (b & 0x40) !== 0;
                 const nameRes = this.readInt(buffer, offset, 6, 0x3F);
                 if (!nameRes) break;
-                
+
                 const valRes = this.readString(buffer, nameRes.newOffset, 7, 0x7F);
                 if (!valRes) break;
-                
-                const nameStr = isStatic ? QPACK_STATIC_TABLE[nameRes.value].name : (this.dynamicTable[nameRes.value] ? this.dynamicTable[nameRes.value].name : 'unknown');
-                this.dynamicTable.push({ name: nameStr, value: valRes.value });
+
+                const nameStr = isStatic ? QPACK_STATIC_TABLE[nameRes.value]?.name : (this.dynamicTable[nameRes.value] ? this.dynamicTable[nameRes.value].name : 'unknown');
+                if (nameStr) {
+                    this.dynamicTable.push({ name: nameStr, value: valRes.value });
+                }
                 offset = valRes.newOffset;
             } else if ((b & 0x40) === 0x40) {
                 // Insert with Literal Name (T=0, NameLength)
                 const nameRes = this.readString(buffer, offset, 5, 0x1F);
                 if (!nameRes) break;
-                
+
                 const valRes = this.readString(buffer, nameRes.newOffset, 7, 0x7F);
                 if (!valRes) break;
-                
+
                 this.dynamicTable.push({ name: nameRes.value, value: valRes.value });
                 offset = valRes.newOffset;
             } else if ((b & 0x20) === 0x20) {
@@ -246,6 +263,11 @@ export class QpackDecoder {
                     this.dynamicTable.push({ ...this.dynamicTable[dupRes.value] });
                 }
                 offset = dupRes.newOffset;
+            }
+
+            // Safety: if no progress was made, skip one byte to avoid infinite loop
+            if (offset === prevOffset) {
+                offset++;
             }
         }
     }
