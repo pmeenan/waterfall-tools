@@ -6,18 +6,28 @@ import { decodeUdpProtocol } from './utilities/tcpdump/udp-sniffer.js';
 import { decompressBody } from '../core/decompress.js';
 import { sniffMimeType } from '../core/har-converter.js';
 
+/**
+ * Yields control back to the event loop so the browser can repaint and
+ * avoid "script is taking too long" dialogs. Uses setTimeout(0) which
+ * schedules a macrotask, guaranteeing the browser's rendering pipeline
+ * gets a chance to run.
+ */
+const yieldToEventLoop = () => new Promise(r => setTimeout(r, 0));
+
 export async function processTcpdumpNode(input, options = {}) {
     let stream = input;
     let isGz = options.isGz === true;
     let nodeFsStream = null;
     let reader = null;
 
+    const onProgress = options.onProgress || (() => {});
+    const totalBytes = options.totalBytes || 0;
     const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
 
     try {
         if (typeof input === 'string') {
             const fs = await import(/* @vite-ignore */ 'node:fs');
-            
+
             const header = new Uint8Array(2);
             let fd;
             try {
@@ -27,9 +37,9 @@ export async function processTcpdumpNode(input, options = {}) {
             } catch (e) {
                 throw e;
             }
-            
+
             isGz = header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b;
-            
+
             const { Readable } = await import(/* @vite-ignore */ 'node:stream');
             nodeFsStream = fs.createReadStream(input);
             stream = Readable.toWeb(nodeFsStream);
@@ -39,6 +49,8 @@ export async function processTcpdumpNode(input, options = {}) {
             stream = stream.pipeThrough(new DecompressionStream('gzip'));
         }
 
+        // ── Phase 1: Read and parse PCAP packets ──
+        onProgress('Reading packets...', 0);
         const packets = [];
         const tcpReconstructor = new TcpReconstructor();
         const udpReconstructor = new UdpReconstructor();
@@ -50,11 +62,19 @@ export async function processTcpdumpNode(input, options = {}) {
         });
 
         reader = stream.getReader();
+        let bytesRead = 0;
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
+            bytesRead += value.byteLength;
             parser.push(value);
+            // Stream reader yields naturally via await; report progress
+            if (totalBytes > 0) {
+                onProgress('Reading packets...', Math.round((bytesRead / totalBytes) * 25));
+            }
         }
+        onProgress('Reading packets...', 25);
+        await yieldToEventLoop();
 
         let keyLogContents = null;
         let keyLogInput = options.keyLogInput;
@@ -131,13 +151,16 @@ export async function processTcpdumpNode(input, options = {}) {
         }
 
         const tcpConnections = tcpReconstructor.getConnections();
-        
+
+        // ── Phase 2: Decrypt TLS connections ──
         if (keyLogMap) {
+            onProgress('Decrypting TLS...', 25);
             const { TlsDecoder } = await import('./utilities/tcpdump/tls-decoder.js');
-            
-            for (const conn of tcpConnections) {
+
+            for (let ci = 0; ci < tcpConnections.length; ci++) {
+                const conn = tcpConnections[ci];
                 const decoder = new TlsDecoder(keyLogMap);
-                
+
                 const interleavedChunks = [];
                 for (let chunk of conn.clientFlow.contiguousChunks) {
                     interleavedChunks.push({ dir: 0, chunk: chunk });
@@ -156,42 +179,62 @@ export async function processTcpdumpNode(input, options = {}) {
                 if (decClient.length > 0) {
                     conn.clientFlow.contiguousChunks = decClient;
                 }
-                
+
                 const decServer = decoder.getDecryptedChunks(1);
                 if (decServer.length > 0) {
                     conn.serverFlow.contiguousChunks = decServer;
                 }
+
+                // Report TLS progress per connection and yield periodically
+                onProgress(`Decrypting TLS... (${ci + 1}/${tcpConnections.length})`, 25 + Math.round(((ci + 1) / tcpConnections.length) * 25));
+                if (ci % 5 === 0) await yieldToEventLoop();
             }
         }
-        
+
+        // ── Phase 3: Decode TCP protocols ──
+        onProgress('Decoding protocols...', 50);
+        await yieldToEventLoop();
+
         const { DnsRegistry } = await import('./utilities/tcpdump/dns-registry.js');
         const { decodeTcpDns } = await import('./utilities/tcpdump/tcp-dns.js');
         const { extractDohRequests } = await import('./utilities/tcpdump/doh-decoder.js');
-        
+
         let dnsRegistry = new DnsRegistry();
 
-        // Decode protocols
-        for (const conn of tcpConnections) {
+        for (let i = 0; i < tcpConnections.length; i++) {
+            const conn = tcpConnections[i];
             try {
                 if (conn.serverPort === 53 || conn.clientPort === 53) {
                     decodeTcpDns(conn, dnsRegistry);
                 } else {
+                    if (options.debug) {
+                        const clientBytes = conn.clientFlow.contiguousChunks.reduce((s, c) => s + c.bytes.length, 0);
+                        const serverBytes = conn.serverFlow.contiguousChunks.reduce((s, c) => s + c.bytes.length, 0);
+                        console.log(`[tcpdump.js] Decoding TCP ${i}/${tcpConnections.length} → ${conn.serverIp}:${conn.serverPort} (client: ${conn.clientFlow.contiguousChunks.length} chunks/${clientBytes}B, server: ${conn.serverFlow.contiguousChunks.length} chunks/${serverBytes}B)`);
+                    }
                     decodeProtocol(conn);
                 }
             } catch (e) {
                 if (options.debug) console.error("Protocol Decoded Error:", e);
             }
+            // Report per-connection progress and yield periodically to prevent
+            // UI stalls during heavy HTTP/2 HPACK decoding or large HTTP/1 reassembly
+            onProgress(`Decoding protocols... (${i + 1}/${tcpConnections.length})`, 50 + Math.round(((i + 1) / tcpConnections.length) * 10));
+            if (i % 10 === 0) await yieldToEventLoop();
         }
-        
+
         // Identify DNS over HTTPS (DoH) mapped onto HTTP connections
         try {
             extractDohRequests(tcpConnections, dnsRegistry);
         } catch(e) {
             if (options.debug) console.error("DoH Extraction Error:", e);
         }
-        
+
+        // ── Phase 4: Decode UDP protocols (QUIC/HTTP3/DNS) ──
         const udpConnections = udpReconstructor.getConnections();
         if (options.debug) console.log(`[tcpdump.js] Start routing ${udpConnections.length} UDP connections`);
+        onProgress('Decoding UDP...', 60);
+        await yieldToEventLoop();
         let udpCount = 0;
         for (let i = 0; i < udpConnections.length; i++) {
             const conn = udpConnections[i];
@@ -203,10 +246,16 @@ export async function processTcpdumpNode(input, options = {}) {
             } catch (e) {
                  if (options.debug) console.error("UDP Decode Error:", e);
             }
+            onProgress(`Decoding UDP... (${i + 1}/${udpConnections.length})`, 60 + Math.round(((i + 1) / udpConnections.length) * 25));
         }
         if (options.debug) console.log(`[tcpdump.js] Successfully verified ${udpCount} UDP connections`);
 
-        const dataResult = await buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups(), packets);
+        // ── Phase 5: Build waterfall data ──
+        onProgress('Building waterfall...', 85);
+        await yieldToEventLoop();
+
+        const dataResult = await buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsRegistry.getLookups(), packets, onProgress);
+        onProgress('Complete', 100);
         return dataResult;
 
     } catch (e) {
@@ -282,13 +331,15 @@ async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry) {
             }
         }
 
-        // Convert Uint8Array to base64 using chunked String.fromCharCode
-        // to avoid call-stack limits on large bodies
-        let binary = '';
-        for (let i = 0; i < bodyBytes.length; i++) {
-            binary += String.fromCharCode(bodyBytes[i]);
+        // Convert Uint8Array to base64 using chunked String.fromCharCode.apply
+        // to avoid both call-stack limits (apply on 8KB slices) and O(n²) string
+        // concatenation (collect into array, join once at the end).
+        const CHUNK = 8192;
+        const parts = [];
+        for (let i = 0; i < bodyBytes.length; i += CHUNK) {
+            parts.push(String.fromCharCode.apply(null, bodyBytes.subarray(i, i + CHUNK)));
         }
-        reqEntry.body = btoa(binary);
+        reqEntry.body = btoa(parts.join(''));
         reqEntry.bodyEncoding = 'base64';
     } catch (_) {
         // Body extraction failed — skip silently rather than breaking the request
@@ -367,7 +418,7 @@ function calculateMaxBandwidth(packets, tcpConnections, udpConnections) {
     return Math.round(kbps);
 }
 
-async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookups, packets) {
+async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dnsLookups, packets, onProgress = () => {}) {
     const data = {
         metadata: { format: 'tcpdump' },
         pages: {
@@ -623,11 +674,11 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                 status = parseInt(parts[1]) || 200;
                 statusText = parts.slice(2).join(' ');
             }
-            let host = reqMsg.headers.find(h => h.name.toLowerCase() === 'host');
+            let host = reqMsg.headers ? reqMsg.headers.find(h => h.name.toLowerCase() === 'host') : null;
             let fullUrl = host ? `http://${host.value}${url}` : url;
             reqs.push({
                 time: reqMsg.time, method: method, url: fullUrl,
-                headers: reqMsg.headers, responseHeaders: resMsg.headers || [],
+                headers: reqMsg.headers || [], responseHeaders: resMsg.headers || [],
                 statusCode: status, statusText: statusText, data: resMsg.data || [],
                 httpVersion: "HTTP/1.1",
                 _firstServerTimeMs: resMsg.time,
@@ -712,6 +763,8 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
 
     // Resolve all pending body extractions (decompression + base64) in parallel
     if (bodyTasks.length > 0) {
+        onProgress('Extracting bodies...', 90);
+        await yieldToEventLoop();
         await Promise.all(bodyTasks);
     }
 

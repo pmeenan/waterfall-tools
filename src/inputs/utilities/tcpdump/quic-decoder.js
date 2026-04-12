@@ -82,7 +82,19 @@ export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
         }
     }
 
+    // Track consecutive decryption failures. If we fail on the first N packets
+    // without any successful decryption, this isn't a QUIC connection we can
+    // decode (likely STUN/TURN/DTLS WebRTC traffic that happens to have bit 6
+    // set). Bail out early to avoid brute-forcing all key × CID combinations
+    // on thousands of non-QUIC UDP connections.
+    let consecutiveFailures = 0;
+    const MAX_CONSECUTIVE_FAILURES = 5;
+
     for (const chunk of chunks) {
+        // Bail out of the entire connection if too many consecutive packets
+        // failed decryption — this isn't a QUIC connection we can decode.
+        if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) break;
+
         const chunkBytes = chunk.bytes;
         const isClient = chunk.isClient;
         let chunkOffset = 0;
@@ -90,7 +102,7 @@ export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
         while (chunkOffset < chunkBytes.length) {
             try {
                 const firstByte = chunkBytes[chunkOffset];
-                
+
                 // RFC 9000 Section 17: Fixed Bit (0x40) must be 1. Note: STUN packets have 0x00.
                 if ((firstByte & 0x40) === 0) {
                     break; // Not a QUIC packet or a version we support, discard rest of UDP payload
@@ -335,7 +347,7 @@ export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
                             const rangeCount = qBuffer.readVarInt();
                             qBuffer.readVarInt(); // First Range
                             if (rangeCount !== null) {
-                                for (let i = 0; i < rangeCount; i++) {
+                                for (let i = 0; i < rangeCount && qBuffer.remaining > 0; i++) {
                                     qBuffer.readVarInt(); // Gap
                                     qBuffer.readVarInt(); // Range Length
                                 }
@@ -429,9 +441,15 @@ export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
                     }
 
                     streams.push({ time: chunk.time, type: '1-RTT', decryptedLength: decrypted.length });
+                    consecutiveFailures = 0; // Reset on success
                 } else {
                     if (globalThis.waterfallDebug) console.log(`[QUIC Decoder] AEAD Failed mapping 1-RTT for target packet (likely missing key or wrong connection).`);
                     streams.push({ time: chunk.time, type: '1-RTT', error: 'AEAD Failed' });
+                    // Only count failures toward the bail-out limit when we have
+                    // never established keys. Once keys are found, sporadic failures
+                    // are expected (key rotation, padding, reordering) and shouldn't
+                    // cause an early abort.
+                    if (!forwardKeys) consecutiveFailures++;
                 }
             }
         } catch (e) {

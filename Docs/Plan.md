@@ -117,6 +117,14 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Extract and link response bodies from nested `_bodies.zip` archives in WPTAgent ZIP inputs, storing them as base64-encoded `response.content.text` on matching HAR entries.
 - [x] Prevent OOM crashes on subsequent file Drag-and-Drop operations by thoroughly garbage-collecting blob URLs, discarding dynamic viewer tabs, and safely detaching OPFS storage instances naturally prior to WaterfallTools reconstruction.
 
+## Phase 8b: Progress Reporting & Async Performance
+**Goal:** Prevent browser "script taking too long" dialogs and provide user feedback during large file processing.
+- [x] Add `options.onProgress(phase, percent)` callback support to all input parsers for real-time progress reporting.
+- [x] Insert `setTimeout(0)` yield points between major processing phases and within long synchronous loops in the tcpdump parser.
+- [x] Pass `totalBytes` automatically from `loadBuffer()` so parsers can estimate stream-reading progress.
+- [x] Fix O(n²) base64 body encoding in `tcpdump.js` and `wptagent.js` (replaced char-by-char `String.fromCharCode` loop with chunked `String.fromCharCode.apply` + `join`).
+- [x] Add CSS-animated progress bar UI to the standalone viewer (`#progress-container`, `#progress-bar`).
+
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.
 - [x] Add explicit platform abstraction definitions within `src/platforms/`.

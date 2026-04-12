@@ -289,6 +289,9 @@ export async function processWPTFileNode(input, options = {}) {
     let reader = null;
     let output = null;
 
+    const onProgress = options.onProgress || (() => {});
+    const totalBytes = options.totalBytes || 0;
+
     // Isomorphic workaround for Node 22 Web Stream premature event loop exit bug
     const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
 
@@ -376,8 +379,10 @@ export async function processWPTFileNode(input, options = {}) {
     
     const pipeline = stream.pipeThrough(new TextDecoderStream());
     reader = pipeline.getReader();
-    
+
+    onProgress('Parsing WPT data...', 0);
     let chunkCount = 0;
+    let bytesRead = 0;
     while (true) {
         const { done, value } = await reader.read();
         chunkCount++;
@@ -386,8 +391,11 @@ export async function processWPTFileNode(input, options = {}) {
             if (options.debug) console.log("Stream Done!");
             break;
         }
+        bytesRead += value.length;
         parser.write(value);
+        if (totalBytes > 0) onProgress('Parsing WPT data...', Math.round((bytesRead / totalBytes) * 90));
     }
+    onProgress('Building waterfall...', 90);
     if (options.debug) console.log("Finished WPT loop.");
     
     } catch (e) {

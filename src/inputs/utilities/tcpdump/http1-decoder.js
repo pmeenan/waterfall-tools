@@ -63,34 +63,52 @@ class Http1Parser {
         }
     }
 
-    // Attempt to read until \r\n\r\n
+    // Attempt to read until \r\n\r\n.
+    // Builds a single contiguous buffer incrementally and searches only from
+    // the overlap region where the CRLF2 delimiter could span two chunks,
+    // avoiding the prior O(n²) pattern of re-concatenating and re-scanning
+    // the entire accumulator on every iteration. Also caps at 256KB to bail
+    // out quickly on non-HTTP data (e.g. encrypted streams falsely sniffed
+    // as HTTP/1.1).
     _readHeaders() {
-        let matchIdx = -1;
         let cIdx = this.chunkIdx;
         let cOffset = this.offset;
-        
-        let accumulator = [];
-        let totalLen = 0;
+
+        let buffer = null;       // Single growing buffer
+        let searchFrom = 0;      // Byte offset to start searching from
+        const MAX_HEADER_SCAN = 262144; // 256KB — no valid HTTP header is this large
 
         while (cIdx < this.chunks.length) {
             const buf = this.chunks[cIdx].bytes;
-            const avail = buf.length - cOffset;
-            accumulator.push(buf.subarray(cOffset));
-            totalLen += avail;
-            
-            // Check if we have \r\n\r\n
-            const concatBuf = concatUint8Arrays(accumulator);
-            let idx = indexOfSequence(concatBuf, CRLF2);
-            if (idx !== -1) {
-                // Found boundaries
-                const headersRaw = concatBuf.subarray(0, idx + 4);
-                
-                // Now consume this exact amount from the actual stream
-                const time = this.chunks[this.chunkIdx].time; // Time of first chunk 
-                this._consume(idx + 4);
-                
-                return { time, bytes: headersRaw };
+            const slice = buf.subarray(cOffset);
+
+            // Grow the buffer by appending the new slice
+            if (!buffer) {
+                buffer = new Uint8Array(slice);
+            } else {
+                const newBuf = new Uint8Array(buffer.length + slice.length);
+                newBuf.set(buffer);
+                newBuf.set(slice, buffer.length);
+                buffer = newBuf;
             }
+
+            // Search only from where the 4-byte sequence could span the boundary
+            // between the previously scanned region and the newly appended bytes.
+            const start = Math.max(0, searchFrom - 3);
+            for (let i = start; i <= buffer.length - 4; i++) {
+                if (buffer[i] === 13 && buffer[i + 1] === 10 &&
+                    buffer[i + 2] === 13 && buffer[i + 3] === 10) {
+                    const headersRaw = buffer.subarray(0, i + 4);
+                    const time = this.chunks[this.chunkIdx].time;
+                    this._consume(i + 4);
+                    return { time, bytes: headersRaw };
+                }
+            }
+            searchFrom = buffer.length;
+
+            // Bail out if we've scanned past any reasonable header size —
+            // this data is almost certainly not HTTP.
+            if (buffer.length > MAX_HEADER_SCAN) return null;
 
             cIdx++;
             cOffset = 0;
@@ -102,17 +120,24 @@ class Http1Parser {
     _readLengthBody(len) {
         let extractedChunks = [];
         while (this.bodyRemaining > 0 && this.chunkIdx < this.chunks.length) {
-            const time = this.chunks[this.chunkIdx].time;
             const c = this.chunks[this.chunkIdx].bytes;
             const avail = c.length - this.offset;
-            
+
+            // Skip empty chunks to prevent infinite loop (see parse() comment)
+            if (avail <= 0) {
+                this.chunkIdx++;
+                this.offset = 0;
+                continue;
+            }
+
+            const time = this.chunks[this.chunkIdx].time;
             const take = Math.min(avail, this.bodyRemaining);
             extractedChunks.push({
                 time,
                 length: take,
                 bytes: c.subarray(this.offset, this.offset + take)
             });
-            
+
             this.bodyRemaining -= take;
             this._consume(take);
         }
@@ -150,6 +175,17 @@ class Http1Parser {
 
     parse() {
         while (this.chunkIdx < this.chunks.length) {
+            // Skip zero-length chunks that would stall progress. TLS decryption
+            // can produce empty records (alerts, ChangeCipherSpec, close_notify)
+            // and TCP reconstruction may emit empty segments from ACK-only packets.
+            // Without this guard, _consume(0) is a no-op and body processing
+            // states loop forever on the same chunkIdx.
+            if (this.chunks[this.chunkIdx].bytes.length - this.offset <= 0) {
+                this.chunkIdx++;
+                this.offset = 0;
+                continue;
+            }
+
             if (this.state === 'HEADERS') {
                 const headersObj = this._readHeaders();
                 if (!headersObj) break; // Incomplete headers

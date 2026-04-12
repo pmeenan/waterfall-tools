@@ -48,6 +48,30 @@ body, html {
     color: var(--text-color);
 }
 
+#progress-container {
+    width: 300px;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    margin-top: 0.75rem;
+    overflow: hidden;
+}
+
+#progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--primary-color);
+    border-radius: 4px;
+    transition: width 0.15s ease-out;
+}
+
+#progress-detail {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: #888888;
+    min-height: 1.2em;
+}
+
 .spinner {
     width: 40px;
     height: 40px;

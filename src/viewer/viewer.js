@@ -5,6 +5,9 @@ import { Layout } from '../renderer/layout.js';
 const ui = {
     loading: document.getElementById('loading'),
     loadingText: document.getElementById('loading-text'),
+    progressContainer: document.getElementById('progress-container'),
+    progressBar: document.getElementById('progress-bar'),
+    progressDetail: document.getElementById('progress-detail'),
     dropZone: document.getElementById('drop-zone'),
     canvasContainer: document.getElementById('canvas-container'),
     summaryView: document.getElementById('summary-view'),
@@ -171,10 +174,32 @@ function showLoading(text = 'Loading...') {
     ui.dropZone.classList.add('hidden');
     ui.canvasContainer.classList.add('hidden');
     ui.tileView.classList.add('hidden');
+    // Reset progress bar to hidden state
+    ui.progressContainer.classList.add('hidden');
+    ui.progressDetail.classList.add('hidden');
+    ui.progressBar.style.width = '0%';
+    ui.progressDetail.textContent = '';
+}
+
+/**
+ * Updates the progress bar during file processing.
+ * @param {string} phase - Description of current processing phase
+ * @param {number} percent - 0-100 progress value
+ */
+function updateProgress(phase, percent) {
+    // Show the progress elements on first call
+    if (ui.progressContainer.classList.contains('hidden')) {
+        ui.progressContainer.classList.remove('hidden');
+        ui.progressDetail.classList.remove('hidden');
+    }
+    ui.loadingText.textContent = phase;
+    ui.progressBar.style.width = `${Math.min(100, Math.max(0, percent))}%`;
 }
 
 function hideLoading() {
     ui.loading.classList.add('hidden');
+    ui.progressContainer.classList.add('hidden');
+    ui.progressDetail.classList.add('hidden');
 }
 
 function showError(msg) {
@@ -1103,8 +1128,11 @@ async function processData(arrayBuffer, options = {}, keylogArrayBuffer = null) 
         await resetViewerState();
 
         waterfallTool = new WaterfallTools();
-        
-        const loadOptions = { debug: false };
+
+        const loadOptions = {
+            debug: false,
+            onProgress: (phase, percent) => updateProgress(phase, percent)
+        };
         if (keylogArrayBuffer) {
              const blob = new Blob([keylogArrayBuffer]);
              loadOptions.keyLogInput = await fileToReadable(blob);

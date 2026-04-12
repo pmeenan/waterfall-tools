@@ -698,6 +698,9 @@ export async function processCDPFileNode(input, options = {}) {
     let nodeFsStream = null;
     let reader = null;
 
+    const onProgress = options.onProgress || (() => {});
+    const totalBytes = options.totalBytes || 0;
+
     const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
 
     try {
@@ -742,12 +745,17 @@ export async function processCDPFileNode(input, options = {}) {
         
         const pipeline = stream.pipeThrough(new TextDecoderStream());
         reader = pipeline.getReader();
-        
+
+        onProgress('Parsing CDP events...', 0);
+        let bytesRead = 0;
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
+            bytesRead += value.length;
             parser.write(value);
+            if (totalBytes > 0) onProgress('Parsing CDP events...', Math.round((bytesRead / totalBytes) * 80));
         }
+        onProgress('Processing events...', 80);
 
         if (options.debug) console.log(`[cdp.js] Successfully parsed ${events.length} CDP events.`);
         const devToolsParser = new DevToolsParser();

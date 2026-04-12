@@ -205,13 +205,14 @@ export async function processWptagentZip(input, options = {}) {
                     offset += c.length;
                 }
 
-                // Encode as base64 and store on the HAR entry's response content
-                // Using chunked btoa to avoid call-stack limits on large bodies
-                let binary = '';
-                for (let i = 0; i < fullArr.length; i++) {
-                    binary += String.fromCharCode(fullArr[i]);
+                // Encode as base64 using chunked String.fromCharCode.apply
+                // to avoid both call-stack limits and O(n²) string concatenation
+                const CHUNK = 8192;
+                const parts = [];
+                for (let i = 0; i < fullArr.length; i += CHUNK) {
+                    parts.push(String.fromCharCode.apply(null, fullArr.subarray(i, i + CHUNK)));
                 }
-                entry.response.content.text = btoa(binary);
+                entry.response.content.text = btoa(parts.join(''));
                 entry.response.content.encoding = 'base64';
             }
         } catch (e) {

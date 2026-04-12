@@ -1281,6 +1281,9 @@ export async function processNetlogFileNode(input, options = {}) {
     let nodeFsStream = null;
     let reader = null;
 
+    const onProgress = options.onProgress || (() => {});
+    const totalBytes = options.totalBytes || 0;
+
     const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
 
     try {
@@ -1314,7 +1317,10 @@ export async function processNetlogFileNode(input, options = {}) {
 
         const netlog = new Netlog();
         let started = false;
-        
+
+        onProgress('Parsing netlog...', 0);
+        let bytesRead = 0;
+
         // Native stream line splitting generator
         async function* getLines(reader) {
             let remainder = '';
@@ -1327,6 +1333,8 @@ export async function processNetlogFileNode(input, options = {}) {
                     }
                     break;
                 }
+                bytesRead += value.length;
+                if (totalBytes > 0) onProgress('Parsing netlog...', Math.round((bytesRead / totalBytes) * 80));
                 const lines = (remainder + value).split('\n');
                 remainder = lines.pop(); // last element is either empty (if ended in \n) or the remainder
                 for (const line of lines) yield line;
@@ -1356,6 +1364,7 @@ export async function processNetlogFileNode(input, options = {}) {
             }
         }
 
+        onProgress('Processing events...', 80);
         if (options.debug) console.log(`[netlog.js] Finished reading stream data.`);
         const results = netlog.postProcessEvents();
         let requests = [];

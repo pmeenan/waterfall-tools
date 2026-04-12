@@ -73,6 +73,22 @@ const wt = new WaterfallTools();
 await wt.loadBuffer(bufferData);
 ```
 
+### Progress Tracking (Browser)
+
+When processing large files in the browser, you can pass an `onProgress` callback to receive real-time updates. This keeps the UI responsive and enables progress bar rendering.
+
+```javascript
+const wt = new WaterfallTools();
+await wt.loadBuffer(bufferData, {
+    onProgress: (phase, percent) => {
+        console.log(`${phase} — ${percent}%`);
+        // Update your progress bar UI here
+    }
+});
+```
+
+The `phase` string describes the current processing stage (e.g., `"Reading packets..."`, `"Decrypting TLS..."`, `"Building waterfall..."`). The `percent` value ranges from 0 to 100. The tcpdump parser reports the most granular progress across 5 distinct phases; other parsers report stream-reading progress proportional to bytes consumed.
+
 ### Loading from an External URL (Browser or Node.js)
 
 ```javascript

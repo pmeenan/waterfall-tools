@@ -120,6 +120,9 @@ export class WaterfallTools {
         if (isGz !== undefined) streamOptions.isGz = isGz;
         if (hasTraceEventsWrapper !== undefined) streamOptions.hasTraceEventsWrapper = hasTraceEventsWrapper;
 
+        // Pass total buffer size so stream-based parsers can estimate progress
+        streamOptions.totalBytes = buf.byteLength;
+
         this._sourceFormat = format;
         this._rawBuffer = buf.buffer; // Store ArrayBuffer
 

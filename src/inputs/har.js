@@ -57,6 +57,9 @@ export async function processHARFileNode(input, options = {}) {
     let reader = null;
     let output = null;
 
+    const onProgress = options.onProgress || (() => {});
+    const totalBytes = options.totalBytes || 0;
+
     // Isomorphic workaround for Node 22 Web Stream premature event loop exit bug
     const keepAlive = globalThis.setInterval ? globalThis.setInterval(() => {}, 1000) : null;
 
@@ -102,13 +105,18 @@ export async function processHARFileNode(input, options = {}) {
     
     const pipeline = stream.pipeThrough(new TextDecoderStream());
     reader = pipeline.getReader();
-    
+
+    onProgress('Parsing HAR...', 0);
+    let bytesRead = 0;
     while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        bytesRead += value.length;
         parser.write(value);
+        if (totalBytes > 0) onProgress('Parsing HAR...', Math.round((bytesRead / totalBytes) * 90));
     }
-    
+    onProgress('Building waterfall...', 90);
+
     if (options.debug) console.log(`[har.js] Finished parsing HAR string structure. Returning extracted items.`);
 
     } catch (e) {
