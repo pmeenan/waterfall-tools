@@ -15,7 +15,21 @@ Following standard HAR, the generated HAR MUST include a `creator` object:
 Every request object in the `.log.entries` array maps tightly to standard HAR values (request headers, timing, sizes). We augment this with robust request-level metrics mapping from tools like WebPageTest:
 
 ### Dictionary & Array Fields
-- `_chunks` (Array): Streaming chunks representations.
+- `_chunks` (Array): Per-chunk response body delivery records. Each entry: `{ ts, bytes, inflated? }`
+  where `ts` is the absolute millisecond timestamp, `bytes` is the wire-byte count for that delivery,
+  and `inflated` (optional) is the decoded/uncompressed byte count contributed by this chunk when the
+  body was content-encoded (gzip/br/zstd/deflate). When the response is uncompressed, `inflated` is
+  omitted (implicitly equal to `bytes`). The sum of `inflated` across all chunks equals the total
+  decoded body size. Sources that emit `inflated`:
+  - **netlog / chrome-trace**: populated directly from `URL_REQUEST_JOB_FILTERED_BYTES_READ` events.
+  - **WPT JSON / wptagent**: passed through from Chrome DevTools Protocol data in the upstream capture.
+  - **CDP**: populated from `Network.dataReceived.dataLength` when it differs from `encodedDataLength`.
+  - **tcpdump**: populated via streaming decompression — each wire chunk is fed individually into
+    a `DecompressionStream` (gzip/deflate/brotli) or `fzstd.Decompress` stream (zstd), and the
+    exact number of decompressed bytes emitted in response to that write is recorded as `inflated`.
+    When streaming is not available for the encoding (e.g. brotli without native
+    `DecompressionStream` support forcing the non-streaming pure-JS fallback), `inflated` is
+    omitted entirely — we never report approximate per-chunk sizes.
 - `_headers` (Object): Parsed request/response headers block.
 - `_dns_info`, `_dns_details` (Object): Detailed DNS resolution steps and host mappings.
 - `_cpuTimes`, `_js_timing` (Object): Script execution and CPU parsing metrics tied to specific payloads.

@@ -11,7 +11,7 @@ import { processNetlogFileNode } from './netlog.js';
 
 import { processWptagentZip } from './wptagent.js';
 import { processPerfettoFileNode } from './perfetto.js';
-import { decompressBody } from '../core/decompress.js';
+import { decompressBody, decompressBodyPerChunk } from '../core/decompress.js';
 import { sniffMimeType } from '../core/har-converter.js';
 
 export const parsers = {
@@ -26,6 +26,7 @@ export const parsers = {
             const module = await import('./tcpdump.js');
             if (!options.deps) options.deps = {};
             options.deps.decompressBody = decompressBody;
+            options.deps.decompressBodyPerChunk = decompressBodyPerChunk;
             options.deps.sniffMimeType = sniffMimeType;
             return await module.processTcpdumpNode(input, options);
         } catch (e) {

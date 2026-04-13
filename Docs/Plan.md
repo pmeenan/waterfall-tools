@@ -128,6 +128,15 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Fix O(n²) base64 body encoding in `tcpdump.js` and `wptagent.js` (replaced char-by-char `String.fromCharCode` loop with chunked `String.fromCharCode.apply` + `join`).
 - [x] Add CSS-animated progress bar UI to the standalone viewer (`#progress-container`, `#progress-bar`).
 
+## Phase 8c: Per-Chunk Uncompressed Sizes
+**Goal:** Plumb decoded/uncompressed byte counts into `_chunks` across every data source that can produce them, enabling downstream tools to slice the decompressed response body by chunk delivery time.
+- [x] Preserve `inflated` on netlog `_chunks` (already captured from `URL_REQUEST_JOB_FILTERED_BYTES_READ`) through the full HAR pipeline.
+- [x] Preserve `inflated` on WPT JSON / wptagent `_chunks` via the generic `_`-prefix property mapping in `wpt-json.js`.
+- [x] Add `inflated` to CDP `_chunks` from `Network.dataReceived.dataLength` vs `encodedDataLength`.
+- [x] Add `inflated` to tcpdump `_chunks` via streaming decompression — each wire chunk is written individually to a `DecompressionStream` (gzip/deflate/brotli) or an `fzstd.Decompress` stream (zstd) and the exact number of decompressed bytes emitted per wire chunk is recorded. No proportional fallback: when streaming isn't available (pure-JS brotli), `inflated` is omitted.
+- [x] Add `decompressBodyPerChunk(wireChunks, encoding)` helper to `src/core/decompress.js` and wire it into the tcpdump parser via `options.deps.decompressBodyPerChunk` through both `orchestrator.js` and `cli/tcpdump.js`.
+- [x] Document the `_chunks[].inflated` contract in `Docs/Extended-HAR-Schema.md` and `AGENTS.md`.
+
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.
 - [x] Add explicit platform abstraction definitions within `src/platforms/`.

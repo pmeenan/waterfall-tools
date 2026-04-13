@@ -275,33 +275,60 @@ export async function processTcpdumpNode(input, options = {}) {
 }
 
 /**
+ * Flattens a single `dataChunk` (one HTTP body segment as emitted by a
+ * decoder) into a single contiguous Uint8Array. HTTP/1 and HTTP/2 store
+ * `bytes: Uint8Array`, while HTTP/3 stores `bytes: Uint8Array[]` since a
+ * single logical DATA segment may span multiple inner frames.
+ */
+function flattenChunkBytes(d) {
+    if (!d || !d.bytes) return null;
+    if (Array.isArray(d.bytes)) {
+        let total = 0;
+        for (const b of d.bytes) total += b.byteLength || b.length || 0;
+        if (total === 0) return null;
+        const out = new Uint8Array(total);
+        let off = 0;
+        for (const b of d.bytes) {
+            out.set(b, off);
+            off += b.byteLength || b.length || 0;
+        }
+        return out;
+    }
+    const len = d.bytes.byteLength || d.bytes.length || 0;
+    if (len === 0) return null;
+    return d.bytes;
+}
+
+/**
+ * Builds the ordered list of non-empty wire-chunk byte buffers from a decoder's
+ * `data` array. The filter matches the one used when populating `reqEntry._chunks`
+ * in the main mapper, so indices align 1:1 with that array.
+ */
+function extractWireChunks(dataChunks) {
+    const out = [];
+    if (!Array.isArray(dataChunks)) return out;
+    for (const d of dataChunks) {
+        const bytes = flattenChunkBytes(d);
+        if (bytes && bytes.length > 0) out.push(bytes);
+    }
+    return out;
+}
+
+/**
  * Concatenates body data chunks from HTTP decoders into a single Uint8Array.
  * Handles both HTTP/1 & HTTP/2 chunks ({bytes: Uint8Array}) and HTTP/3 blocks
  * ({bytes: Uint8Array[]}) transparently.
  */
 function concatenateBodyChunks(dataChunks) {
+    const wire = extractWireChunks(dataChunks);
     let totalLen = 0;
-    for (const chunk of dataChunks) {
-        if (Array.isArray(chunk.bytes)) {
-            for (const b of chunk.bytes) totalLen += b.byteLength || b.length || 0;
-        } else if (chunk.bytes) {
-            totalLen += chunk.bytes.byteLength || chunk.bytes.length || 0;
-        }
-    }
+    for (const b of wire) totalLen += b.length;
     if (totalLen === 0) return null;
-
     const combined = new Uint8Array(totalLen);
     let offset = 0;
-    for (const chunk of dataChunks) {
-        if (Array.isArray(chunk.bytes)) {
-            for (const b of chunk.bytes) {
-                combined.set(b, offset);
-                offset += b.byteLength || b.length || 0;
-            }
-        } else if (chunk.bytes) {
-            combined.set(chunk.bytes, offset);
-            offset += chunk.bytes.byteLength || chunk.bytes.length || 0;
-        }
+    for (const b of wire) {
+        combined.set(b, offset);
+        offset += b.length;
     }
     return combined;
 }
@@ -311,6 +338,19 @@ function concatenateBodyChunks(dataChunks) {
  * response uses a supported content-encoding (gzip, deflate, br, zstd),
  * base64-encodes the result, and stores it on the request entry as
  * body + bodyEncoding.
+ *
+ * When the body is compressed, we feed each wire chunk individually into a
+ * streaming decoder (`decompressBodyPerChunk`) so each wire chunk is tagged
+ * with the exact number of decompressed bytes the decoder emitted in response
+ * to that write. The tagged counts are written to `reqEntry._chunks[i].inflated`
+ * and sum exactly to `_objectSizeUncompressed`.
+ *
+ * If streaming isn't available for the encoding (e.g. brotli without native
+ * DecompressionStream support, so only the non-streaming pure-JS `brotli`
+ * package is usable) we fall back to one-shot decompression for the body
+ * bytes themselves but deliberately leave `inflated` unset. Missing data is
+ * preferable to proportional approximations when downstream consumers want
+ * to slice the decoded body by chunk time.
  */
 async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry, options) {
     try {
@@ -318,22 +358,49 @@ async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry, option
         if (!combined) return;
 
         let bodyBytes = combined;
-
-        // Decompress if content-encoding header is present.
-        // decompressBody handles gzip, deflate, br, and zstd — using native
-        // DecompressionStream where available and pure-JS fallbacks for brotli
-        // and zstd when the native API doesn't support them.
         const ceHeader = responseHeaders.find(h => h.name.toLowerCase() === 'content-encoding');
+
         if (ceHeader) {
-            try {
-                bodyBytes = await options.deps.decompressBody(combined, ceHeader.value);
-                // Track the uncompressed size when content was actually compressed
-                // (decompressed bytes differ from wire bytes)
+            // Try the streaming, per-chunk path first. This gives us genuine
+            // decoder-emit attribution for each wire chunk rather than a
+            // proportional guess.
+            const wireChunks = extractWireChunks(dataChunks);
+            let streamed = null;
+            if (options.deps.decompressBodyPerChunk && wireChunks.length > 0) {
+                try {
+                    streamed = await options.deps.decompressBodyPerChunk(wireChunks, ceHeader.value);
+                } catch (_) {
+                    streamed = null;
+                }
+            }
+
+            if (streamed && streamed.bytes) {
+                bodyBytes = streamed.bytes;
                 if (bodyBytes.length !== combined.length) {
                     reqEntry._objectSizeUncompressed = bodyBytes.length;
+                    // Apply per-chunk inflated counts 1:1 to _chunks. The extraction
+                    // filter in extractWireChunks matches the one used to build
+                    // _chunks earlier in the mapper so index alignment is guaranteed.
+                    if (Array.isArray(reqEntry._chunks)
+                        && reqEntry._chunks.length === streamed.perChunkInflated.length) {
+                        for (let i = 0; i < streamed.perChunkInflated.length; i++) {
+                            reqEntry._chunks[i].inflated = streamed.perChunkInflated[i];
+                        }
+                    }
                 }
-            } catch (_) {
-                // Decompression failed — store raw wire bytes as fallback
+            } else {
+                // Streaming path unavailable (e.g. pure-JS brotli fallback) or
+                // failed mid-stream. Decompress one-shot just for the body bytes.
+                // We intentionally do NOT populate `inflated` — missing data is
+                // better than wrong (proportional) data.
+                try {
+                    bodyBytes = await options.deps.decompressBody(combined, ceHeader.value);
+                    if (bodyBytes.length !== combined.length) {
+                        reqEntry._objectSizeUncompressed = bodyBytes.length;
+                    }
+                } catch (_) {
+                    // Decompression failed entirely — keep raw wire bytes as fallback
+                }
             }
         }
 

@@ -274,7 +274,7 @@ When working on this codebase, you must adhere to the following strict architect
 
 61. **Tcpdump Bandwidth Estimation & Chunk Timing:**
     - The tcpdump processor (`src/inputs/tcpdump.js`) estimates maximum download bandwidth using a 100ms sliding window over all server-to-client packets in the pcap. This is stored as `_bwDown` (in Kbps) on the page object, enabling the canvas renderer to calculate per-chunk download durations for granular visualization instead of solid download bars.
-    - Individual response data chunks from HTTP/1 body segments, HTTP/2 DATA frames, and HTTP/3 DATA frames are mapped into `_chunks` arrays with `{ ts: absoluteMs, bytes: byteCount }` matching the format expected by the canvas renderer.
+    - Individual response data chunks from HTTP/1 body segments, HTTP/2 DATA frames, and HTTP/3 DATA frames are mapped into `_chunks` arrays with `{ ts: absoluteMs, bytes: byteCount, inflated? }` matching the format expected by the canvas renderer. `inflated` is populated for content-encoded responses — see note 72 for details on per-chunk uncompressed size tracking.
     - The `calculateMaxBandwidth()` function identifies server endpoints by cross-referencing packet source IP:port against known TCP and UDP connections, then tracks peak throughput across a sliding 100ms window to avoid burst noise.
 
 62. **Tcpdump Priority Extraction:**
@@ -320,7 +320,23 @@ When working on this codebase, you must adhere to the following strict architect
     - When building isolated CLI test harnesses (e.g., `src/inputs/cli/tcpdump.js`), developers MUST ensure they explicitly instantiate and populate `options.deps` reflecting identical orchestrator mappings natively preventing `TypeError` exceptions deep within the library.
     - Internally, when executing deeply nested asynchronous extractions (like chunking HTTP chunks inside `extractAndStoreBody`), parsers MUST recursively pass down the `options` object securely ensuring downstream bounds maintain access to injected dependencies inherently avoiding `ReferenceError` crashes.
 
-71. **Connection & Queue Layout Gaps (Preconnect Rendering):**
+72. **Per-Chunk Uncompressed Sizes (`_chunks[].inflated`):**
+    - Each entry in `_chunks` may carry an optional `inflated` field representing the decoded (post content-encoding) byte count contributed by that wire chunk. Sum of `inflated` across all chunks equals the total decoded body size (`_objectSizeUncompressed`), enabling downstream consumers to slice the base64-decoded `response.content.text` by delivery time to visualize *when* each piece of the decoded payload arrived.
+    - **Core principle:** Missing data is better than wrong data. `inflated` is only populated when the underlying source can provide genuine per-chunk attribution — never via proportional/approximate distribution. Consumers that find `inflated` absent should treat it as unknown rather than inferring it.
+    - **Source behavior:**
+      - `netlog` / `chrome-trace`: populated directly from `URL_REQUEST_JOB_FILTERED_BYTES_READ` events — Chrome sets the `inflated` value on the most recently recorded wire chunk as filtered bytes are emitted from the decompressor.
+      - `wpt-json` / `wptagent`: pre-computed by Chrome DevTools Protocol upstream; flows through unchanged via the generic `_`-prefix property mapping in `processWPTView`.
+      - `cdp`: extracted from `Network.dataReceived` events where `params.dataLength` differs from `params.encodedDataLength`. Only emitted when the two differ (uncompressed chunks omit the field).
+      - `tcpdump`: computed via streaming decompression in `extractAndStoreBody()`. Each wire chunk is written individually to a streaming decoder and the exact number of decompressed bytes emitted in response to that write is recorded as that chunk's `inflated`. This mirrors real decoder behaviour — many wire chunks produce 0 bytes of output while the decoder buffers internally, then a subsequent chunk triggers a burst. If streaming isn't available for the encoding (pure-JS brotli fallback path, which has no streaming API), `inflated` is omitted entirely for that request.
+    - **Streaming decompression helper** (`src/core/decompress.js#decompressBodyPerChunk`): the shared utility input processors can use for per-chunk decompression. Dispatches to:
+      - `DecompressionStream` (gzip/deflate — always native; brotli/zstd when natively supported). Uses a parallel read-drain pattern where a background loop accumulates output bytes into a counter; after each `await writer.write(chunk)` we yield once via `await new Promise(r => setTimeout(r, 0))` so pending microtasks (reader.read() resolutions) drain before we sample the counter delta.
+      - `fzstd.Decompress` for zstd when native `DecompressionStream('zstd')` is unavailable. `fzstd`'s `ondata` callback fires synchronously from inside each `push(chunk, isLast)` call, so per-chunk attribution is exact without any event-loop yield dance.
+      - Pure-JS `brotli` package (one-shot only, no streaming API). Returns `null` from `decompressBodyPerChunk` in this case so the caller can fall back to one-shot `decompressBody` for the body bytes but skip `inflated` reporting.
+      - Must be wired into `options.deps.decompressBodyPerChunk` by both the orchestrator (`src/inputs/orchestrator.js`) and the standalone CLI (`src/inputs/cli/tcpdump.js`) — parsers that skip this wiring silently lose `inflated` reporting.
+    - Only set for compressed responses. For uncompressed responses the field is omitted — consumers should treat an absent `inflated` as equal to `bytes`.
+    - Preserved by reference through `har-converter.js` (`_chunks: entry._chunks || []`) and `waterfall-tools.js` `getHar()` (generic `_`-prefix property copy loop at line 540-544), so the field round-trips cleanly through HAR export and re-import.
+
+73. **Connection & Queue Layout Gaps (Preconnect Rendering):**
     - Network preconnect objects often trigger TCP connections and DNS lookups far earlier than when browser dispatch naturally issues the HTTP request (resulting in massive temporal gaps).
     - Under WebPageTest visualization standards, HTTP requests strictly retain ownership over these distant connection phases.
     - To accurately render these gaps, `src/renderer/layout.js` rigidly maps exact boundaries independently (`sslEnd`, `connectEnd`) and categorically rejects fallback interpolation bounds that artificially merge `sslEnd` directly into `ttfbStart`.

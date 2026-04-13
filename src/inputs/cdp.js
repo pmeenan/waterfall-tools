@@ -200,12 +200,20 @@ class DevToolsParser {
                             if (request.bytesInData === undefined) request.bytesInData = 0;
                             if (params.dataLength) request.bytesInData += params.dataLength;
                             if (request.bytesInEncoded === undefined) request.bytesInEncoded = 0;
-                            
+
+                            // CDP reports both encoded (wire) and decoded (uncompressed) lengths per
+                            // dataReceived event. Track both on the chunk as `bytes` (wire) and
+                            // `inflated` (decoded) so downstream renderers can slice the decompressed
+                            // body by delivery time. Only emit `inflated` when it differs from `bytes`.
                             if (params.encodedDataLength && params.encodedDataLength > 0) {
                                 if (request.bytesFinished === undefined) {
                                     request.bytesInEncoded += params.encodedDataLength;
                                     if (request.chunks === undefined) request.chunks = [];
-                                    request.chunks.push({ ts: timestamp, bytes: params.encodedDataLength });
+                                    const chunk = { ts: timestamp, bytes: params.encodedDataLength };
+                                    if (params.dataLength && params.dataLength !== params.encodedDataLength) {
+                                        chunk.inflated = params.dataLength;
+                                    }
+                                    request.chunks.push(chunk);
                                 }
                             } else if (params.dataLength && params.dataLength > 0) {
                                 if (request.chunks === undefined) request.chunks = [];
@@ -464,10 +472,14 @@ class DevToolsParser {
                     request.objectSizeUncompressed = Math.round(raw_request.bytesInData);
                 }
                 if (raw_request.chunks) {
-                    request.chunks = raw_request.chunks.map(chunk => ({
-                        ts: Math.round(chunk.ts - raw_page_data.startTime),
-                        bytes: chunk.bytes
-                    }));
+                    request.chunks = raw_request.chunks.map(chunk => {
+                        const out = {
+                            ts: Math.round(chunk.ts - raw_page_data.startTime),
+                            bytes: chunk.bytes
+                        };
+                        if (chunk.inflated !== undefined) out.inflated = chunk.inflated;
+                        return out;
+                    });
                 }
                 
                 if (request.bytesIn === 0 && raw_request.response && raw_request.response.headers && raw_request.response.headers['Content-Length']) {
