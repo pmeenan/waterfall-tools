@@ -127,7 +127,35 @@ async function runBuilds() {
         }
     }
 
+    async function optimizeImages(dir) {
+        let sharp;
+        try {
+            sharp = (await import('sharp')).default;
+        } catch (e) {
+            console.log('Skipping image optimization install Sharp with npm install -D sharp if needed');
+            return;
+        }
+
+        const entries = await fs.readdir(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const fullPath = resolve(dir, entry.name);
+            if (entry.isFile() && fullPath.endsWith('logo.jpg')) {
+                const buffer = await fs.readFile(fullPath);
+                
+                const resized = await sharp(buffer)
+                    .resize({ width: 100 })
+                    .jpeg({ quality: 85 })
+                    .toBuffer();
+                await fs.writeFile(fullPath, resized);
+                console.log(`Optimized ${entry.name}`);
+            } else if (entry.isDirectory()) {
+                await optimizeImages(fullPath);
+            }
+        }
+    }
+    
     await compressDirectory(resolve(__dirname, '../dist/browser'));
+    await optimizeImages(resolve(__dirname, '../dist/browser'));
     console.log('Static asset compression complete!');
 }
 

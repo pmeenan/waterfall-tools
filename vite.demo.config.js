@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { resolve } from 'path';
 
 export default defineConfig({
@@ -10,16 +9,6 @@ export default defineConfig({
       'platform-storage-impl': resolve(__dirname, 'src/platforms/browser/storage-browser.js')
     }
   },
-  plugins: [
-    nodePolyfills({
-      include: ['buffer', 'util'],
-      globals: {
-        Buffer: true,
-        global: true,
-        process: true
-      }
-    })
-  ],
   build: {
     outDir: '../../bin/demo',
     emptyOutDir: true,
