@@ -109,8 +109,10 @@ export class Layout {
         entries.forEach((e, i) => e._originalIndex = i);
 
         let allowedIndices = new Set();
-        if (options.reqFilter && options.reqFilter.trim() !== '') {
-            const parts = options.reqFilter.split(',');
+        if (options.reqFilter !== undefined && options.reqFilter !== null) {
+            const filterStr = String(options.reqFilter).trim();
+            if (filterStr !== '') {
+                const parts = filterStr.split(',');
             parts.forEach(p => {
                 p = p.trim();
                 if (p.includes('-')) {
@@ -128,6 +130,7 @@ export class Layout {
             if (allowedIndices.size > 0) {
                 // Keep only requests whose native 1-based index is in the set
                 entries = entries.filter((_, idx) => allowedIndices.has(idx + 1));
+            }
             }
         }
 
@@ -156,12 +159,18 @@ export class Layout {
             baseMs = new Date(options.page.startedDateTime).getTime() + (options.startTime * 1000);
         } else if (options.page && options.page.startedDateTime) {
             baseMs = new Date(options.page.startedDateTime).getTime();
+            if (options.startTime !== undefined && options.startTime !== null) {
+                baseMs += (options.startTime * 1000);
+            }
         } else {
             for (let i = 0; i < entries.length; i++) {
                 const temp = entries[i].time_start;
                 if (temp < baseMs) {
                     baseMs = temp;
                 }
+            }
+            if (options.startTime !== undefined && options.startTime !== null) {
+                baseMs += (options.startTime * 1000);
             }
         }
         
@@ -306,7 +315,11 @@ export class Layout {
 
 
         if (endTimeOverride !== null && endTimeOverride > 0) {
-            maxTime = Math.max(0, endTimeOverride);
+            let spanMs = endTimeOverride;
+            if (options.startTime !== undefined && options.startTime !== null) {
+                spanMs -= (options.startTime * 1000);
+            }
+            maxTime = Math.max(0, spanMs);
         }
 
         // Leave room for labels

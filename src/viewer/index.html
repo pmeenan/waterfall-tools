@@ -143,6 +143,19 @@
                     <label style="display:inline-block;"><input type="radio" name="ui-view-type" value="connection"> Connection</label>
                 </div>
                 <div class="settings-separator"></div>
+                <h4>Time Span</h4>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <input type="number" id="ui-start-time" step="any" placeholder="start (seconds)" style="flex: 1; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
+                    <span style="font-weight: 600; color: #555;">to</span>
+                    <input type="number" id="ui-end-time" step="any" placeholder="end (seconds)" style="flex: 1; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
+                </div>
+                
+                <div class="settings-separator"></div>
+                <h4>Request Filtering</h4>
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="ui-req-filter" placeholder="e.g. 1, 5-10, 15" style="width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
+                </div>
+                <div class="settings-separator"></div>
                 <h4>Rendering Features</h4>
                 <div class="settings-grid">
                     <label><input type="checkbox" id="ui-show-page-metrics" checked> Page Metrics (Lines)</label>
@@ -157,6 +170,8 @@
                     <label><input type="checkbox" id="ui-show-js" checked> JS Execution Time</label>
                     <label><input type="checkbox" id="ui-show-wait" checked> Wait Time (white)</label>
                     <label><input type="checkbox" id="ui-show-legend" checked> Legend</label>
+                </div>
+            </div>
         </div>
     </div>
 

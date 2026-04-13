@@ -243,10 +243,10 @@ function getOptionsFromUrl() {
     if (params.has('options')) {
         const optsKeyVals = params.get('options').split(',');
         for (const kv of optsKeyVals) {
-            const parts = kv.split(':');
-            if (parts.length === 2) {
-                const key = parts[0].trim();
-                let val = parts[1].trim();
+            const colonIdx = kv.indexOf(':');
+            if (colonIdx > 0) {
+                const key = kv.substring(0, colonIdx).trim();
+                let val = decodeURIComponent(kv.substring(colonIdx + 1).trim());
                 if (val === 'true') val = true;
                 else if (val === 'false') val = false;
                 else if (!isNaN(val) && val !== '') val = Number(val);
@@ -1051,8 +1051,10 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         
         if (!data) {
             ui.waterfallView.removeAttribute('title');
+            tooltip.style.display = 'none';
             return;
         }
+        tooltip.style.display = 'block';
         
         let url = data.request.url || data.request._URL || '';
         ui.waterfallView.title = url;
@@ -1104,6 +1106,13 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     document.getElementById('ui-show-js').checked = renderOptions.showJsTiming;
     document.getElementById('ui-show-wait').checked = renderOptions.showWait;
     document.getElementById('ui-show-legend').checked = renderOptions.showLegend;
+    
+    const stEl = document.getElementById('ui-start-time');
+    if (stEl) stEl.value = (renderOptions.startTime !== undefined) ? renderOptions.startTime : '';
+    const etEl = document.getElementById('ui-end-time');
+    if (etEl) etEl.value = (renderOptions.endTime !== undefined) ? renderOptions.endTime : '';
+    const rfEl = document.getElementById('ui-req-filter');
+    if (rfEl) rfEl.value = (renderOptions.reqFilter !== undefined) ? renderOptions.reqFilter : '';
     
     // Check for explicit tab auto-loading without flashing
     const params = new URLSearchParams(window.location.search);
@@ -1295,7 +1304,7 @@ function updateUrlWithCurrentState() {
             for (const key of Object.keys(defaultOpts)) {
                 if (key === 'pageId') continue;
                 if (currentOpts[key] !== undefined && currentOpts[key] !== defaultOpts[key]) {
-                    optionOverrides.push(`${key}:${currentOpts[key]}`);
+                    optionOverrides.push(`${key}:${encodeURIComponent(currentOpts[key])}`);
                 }
             }
             if (optionOverrides.length > 0) {
@@ -1476,6 +1485,28 @@ async function initViewer() {
             window.WaterfallViewer.updateOptions({ connectionView: e.target.value === 'connection' });
             updateUrlWithCurrentState();
         });
+    });
+
+    ['ui-start-time', 'ui-end-time', 'ui-req-filter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', (e) => {
+                let optKey;
+                let optVal = e.target.value;
+                if (id === 'ui-start-time') {
+                    optKey = 'startTime';
+                    optVal = optVal !== '' ? parseFloat(optVal) : undefined;
+                } else if (id === 'ui-end-time') {
+                    optKey = 'endTime';
+                    optVal = optVal !== '' ? parseFloat(optVal) : undefined;
+                } else if (id === 'ui-req-filter') {
+                    optKey = 'reqFilter';
+                    optVal = optVal !== '' ? optVal : undefined;
+                }
+                window.WaterfallViewer.updateOptions({ [optKey]: optVal });
+                updateUrlWithCurrentState();
+            });
+        }
     });
 
     Object.keys(overlayInputMapping).forEach(id => {
