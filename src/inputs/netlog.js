@@ -23,6 +23,13 @@ export class Netlog {
         this.start_time = null;
         this.constants = null;
         this.bodies = {};
+        // Real wall-clock epoch ms when this trace's tick clock began.
+        // Captured from constants.timeTickOffset (Chrome reports it as
+        // "How many milliseconds since the Unix epoch tick zero occurred"
+        // in netlog dumps). Adding any monotonic event.time tick to this
+        // value yields a true UNIX epoch ms timestamp. Falsy / missing
+        // means the dump didn't carry the offset (older Chrome builds).
+        this.timeTickOffset = 0;
         // Track the first HTTP "date:" response header for monotonic-to-epoch conversion.
         // Stored as { epochMs, monotonicMs } once extracted.
         this.dateHeaderEpoch = null;
@@ -50,6 +57,14 @@ export class Netlog {
             } else {
                 this.constants[key] = value;
             }
+        }
+        // Capture the wall-clock anchor for the trace's monotonic tick clock
+        // so downstream consumers can present real-world timestamps. The
+        // value is reported as an integer string of milliseconds since the
+        // UNIX epoch corresponding to tick value 0.
+        if (constants && constants.timeTickOffset !== undefined) {
+            const parsed = parseInt(constants.timeTickOffset, 10);
+            if (!isNaN(parsed) && parsed > 0) this.timeTickOffset = parsed;
         }
     }
 
@@ -1078,11 +1093,29 @@ export class Netlog {
         }
 
         this.netlog_requests = requests;
-        return { requests, unlinked_sockets, unlinked_dns, start_time: this.start_time };
+        return {
+            requests,
+            unlinked_sockets,
+            unlinked_dns,
+            start_time: this.start_time,
+            timeTickOffset: this.timeTickOffset
+        };
     }
 }
 
-export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, run_start_epoch) {
+/**
+ * Normalize the parser's internal request shape into Extended HAR entries.
+ *
+ * @param {Array}  requests             — postprocessed url_request records.
+ * @param {Array}  unlinked_sockets     — socket records not bound to a request.
+ * @param {Array}  unlinked_dns         — dns lookups not bound to a request.
+ * @param {number} page_start_epoch_ms  — real wall-clock UNIX epoch ms when
+ *     the trace's earliest event occurred. Callers must pre-resolve this:
+ *     for pure netlogs use `timeTickOffset + start_time` (both already in
+ *     ms); for chrome traces use the date-header-derived epoch ms; falls
+ *     back to `Date.now()` if zero/missing so the entries stay parseable.
+ */
+export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, page_start_epoch_ms) {
     const har = {
         log: {
             version: '1.2',
@@ -1095,7 +1128,7 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, r
         }
     };
 
-    const dateStr = new Date((run_start_epoch * 1000) || Date.now()).toISOString();
+    const dateStr = new Date(page_start_epoch_ms || Date.now()).toISOString();
     
     const page = {
         id: 'page_1_0_1',
@@ -1376,16 +1409,27 @@ export async function processNetlogFileNode(input, options = {}) {
         let unlinked_sockets = [];
         let unlinked_dns = [];
         let start_time = 0;
+        let timeTickOffset = 0;
 
         if (results) {
             requests = results.requests || [];
             unlinked_sockets = results.unlinked_sockets || [];
             unlinked_dns = results.unlinked_dns || [];
             start_time = results.start_time || 0;
+            timeTickOffset = results.timeTickOffset || 0;
         }
 
-        if (options.debug) console.log(`[netlog.js] Successfully normalized Netlog data. Evaluated ${requests.length} valid requests.`);
-        const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, start_time);
+        // Resolve the real wall-clock epoch ms for the trace's earliest
+        // event. `start_time` is the (monotonic) tick value of that event,
+        // already in ms; `timeTickOffset` is the wall-clock epoch ms when
+        // tick 0 occurred — adding them yields a real Date the renderer
+        // can anchor to. Without timeTickOffset the trace's anchor would
+        // collapse to 1970-era and corrupt every downstream timestamp
+        // computation that derives off `page.startedDateTime`.
+        const pageStartEpochMs = timeTickOffset > 0 ? (timeTickOffset + start_time) : 0;
+
+        if (options.debug) console.log(`[netlog.js] Successfully normalized Netlog data. Evaluated ${requests.length} valid requests. Page anchor epoch=${pageStartEpochMs} (timeTickOffset=${timeTickOffset}, start_time=${start_time}).`);
+        const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, pageStartEpochMs);
         
         // Use statically imported buildWaterfallDataFromHar
         return buildWaterfallDataFromHar(har.log, 'netlog');

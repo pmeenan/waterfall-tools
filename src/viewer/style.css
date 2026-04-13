@@ -1033,6 +1033,99 @@ body, html {
     border: 1px solid #eee;
 }
 
+/*
+ * Chunked HTML response body view.
+ *
+ * Hex-viewer-style layout: a narrow left column with the chunk's arrival
+ * timestamps and sizes, and a wide right column with the chunk's payload
+ * (syntax-highlighted). Rows alternate background shading and a thin
+ * separator line marks the boundary between consecutive chunks so the
+ * delivery cadence is visually obvious.
+ */
+.req-section-body-chunks {
+    padding: 0;
+}
+
+.req-chunked-body {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+}
+
+.req-chunk-row {
+    display: flex;
+    align-items: stretch;
+    min-height: 56px;
+    border-bottom: 1px solid #e6e6e6;
+    background: #ffffff;
+}
+
+.req-chunk-row.alt {
+    background: #f6f7f9;
+}
+
+.req-chunk-row:last-child {
+    border-bottom: none;
+}
+
+.req-chunk-meta {
+    flex: 0 0 180px;
+    padding: 10px 12px;
+    border-right: 1px solid #e6e6e6;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+    color: #444;
+    align-items: flex-start;
+    justify-content: flex-start;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+.req-chunk-time {
+    font-weight: 600;
+    color: #222;
+    white-space: nowrap;
+}
+
+.req-chunk-rel {
+    font-weight: 400;
+    color: #666;
+}
+
+.req-chunk-size {
+    color: #666;
+    white-space: nowrap;
+}
+
+.req-chunk-body {
+    flex: 1 1 auto;
+    min-width: 0; /* allow inner pre to shrink and wrap */
+    padding: 8px 12px;
+    display: flex;
+    align-items: stretch;
+}
+
+.req-chunk-code {
+    flex: 1 1 auto;
+    margin: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    /* Let each chunk use whatever vertical space it needs — the parent
+     * scroll context (the request tab body) handles overall scrolling so
+     * the reader sees a continuous unbroken document instead of fighting
+     * dozens of nested scrollbars. */
+    max-height: none;
+    overflow: visible;
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 .req-preview-controls {
     margin-bottom: 15px;
 }

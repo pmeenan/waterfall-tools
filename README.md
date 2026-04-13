@@ -176,6 +176,8 @@ If you load a HAR file containing multiple testing iterations (such as WebPageTe
 
 Additionally, the Viewer embraces integrated tab-switching capabilities routing dynamically to self-hosted embedded instances of the **Perfetto Trace Viewer** and the legacy **Chrome NetLog Viewer**, allowing comprehensive exploration of native Chrome DevTools metrics, timeline processing, and raw socket-level network events interactively!
 
+When inspecting an HTML response that has per-chunk timing data and inflated byte counts (available from `tcpdump`, `netlog`, `chrome-trace`, `cdp`, and `wptagent` inputs), the request inspector automatically renders the **Response Body** as a hex-viewer-style table — one row per delivered wire chunk, with the chunk's arrival timestamps and sizes in a narrow left column and the syntax-highlighted slice of HTML that arrived in that delivery in the wide right column. This makes it easy to visually correlate "what arrived when" against the canvas waterfall.
+
 ### Using the Viewer
 
 You can dynamically configure the viewer using URL query parameters that map seamlessly to the internal state matrix. The viewer actively tracks states natively using the browser's **History API**, dynamically updating the URL bar as you click around, enabling perfectly reproducible and shareable configurations.

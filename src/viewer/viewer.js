@@ -279,6 +279,162 @@ function humanizeMs(ms) {
     return Math.round(ms) + 'ms';
 }
 
+// Format an absolute waterfall timestamp (no sign — chunks always land
+// after the waterfall starts, and a leading "+" reads as redundant noise
+// for an absolute axis label).
+function formatAbsMs(ms) {
+    if (ms === undefined || ms === null || isNaN(ms) || !isFinite(ms)) return '—';
+    return Math.round(ms).toLocaleString() + ' ms';
+}
+
+// Format a chunk-to-chunk delta with an explicit sign so back-to-back
+// rows visually communicate the inter-arrival gap at a glance.
+function formatDeltaMs(ms) {
+    if (ms === undefined || ms === null || isNaN(ms) || !isFinite(ms)) return '—';
+    const sign = ms < 0 ? '-' : '+';
+    return sign + Math.round(Math.abs(ms)).toLocaleString() + ' ms';
+}
+
+// Render a base64-decoded HTML body as a per-chunk table when chunk timings
+// are available. Each row maps one wire chunk (sliced by inflated bytes when
+// the response is content-encoded, or by wire bytes when it isn't) so the
+// reader can correlate "what arrived when" against the canvas waterfall.
+// Returns the inner HTML for the chunk container, or null if the request
+// can't support a chunked view (no chunks, missing timings, decode failure).
+//
+// `waterfallZero` is the same anchor the canvas renderer uses (page
+// `startedDateTime` epoch ms, see layout.js#L159-L176). Passing 0 disables
+// epoch normalisation — a chunk ts is then treated as already-relative.
+function buildChunkedHtmlBody(request, waterfallZero) {
+    if (!request || request.bodyEncoding !== 'base64' || !request.body) return null;
+    const chunks = request._chunks;
+    if (!Array.isArray(chunks) || chunks.length === 0) return null;
+    // Every chunk needs a timestamp for the time labels to be meaningful.
+    if (!chunks.every(c => c && typeof c.ts === 'number')) return null;
+
+    // Decode the base64 body into a raw byte buffer once. We slice by byte
+    // counts (not character counts) so multi-byte UTF-8 sequences split across
+    // chunk boundaries are handled correctly via TextDecoder's stream mode.
+    let bytes;
+    try {
+        const binStr = atob(request.body);
+        bytes = new Uint8Array(binStr.length);
+        for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+    } catch (e) {
+        return null;
+    }
+    if (bytes.length === 0) return null;
+
+    // Per AGENTS.md note 72, an absent `inflated` should be treated as equal
+    // to `bytes` (uncompressed responses omit the field). For compressed
+    // responses inflated tracks decoder output and is what the body slice
+    // actually represents.
+    const sliceBytes = chunks.map(c => (c.inflated !== undefined ? c.inflated : (c.bytes || 0)));
+
+    // The body buffer holds the decoded payload, so cumulative inflated bytes
+    // must not exceed buffer length. Where parsers have undercounted (or the
+    // last chunk's inflated value lags), absorb the leftover into the final
+    // chunk so all body content is shown.
+    const totalSlice = sliceBytes.reduce((a, b) => a + b, 0);
+    if (totalSlice < bytes.length) {
+        sliceBytes[sliceBytes.length - 1] += (bytes.length - totalSlice);
+    } else if (totalSlice > bytes.length) {
+        // Clamp from the tail until totals match
+        let excess = totalSlice - bytes.length;
+        for (let i = sliceBytes.length - 1; i >= 0 && excess > 0; i--) {
+            const drop = Math.min(sliceBytes[i], excess);
+            sliceBytes[i] -= drop;
+            excess -= drop;
+        }
+    }
+
+    // Map any timestamp into the canvas's "relative-to-waterfall-zero" space
+    // so chunk labels line up with what's drawn in the waterfall. This
+    // mirrors `canvas.js#L883`: anything at or above the page anchor is an
+    // absolute epoch-ms reading and gets the anchor subtracted; anything
+    // below is already a relative offset (netlog/chrome-trace pre-normalise
+    // their chunks via `postProcessEvents`) and passes through untouched.
+    // Comparing against the page anchor (rather than the magic `> 1e12`
+    // threshold canvas.js uses) keeps the math correct even when a parser
+    // produces an unusually small but legitimate epoch baseline.
+    const toWaterfallMs = (ts) => {
+        if (waterfallZero > 0 && ts >= waterfallZero) return ts - waterfallZero;
+        return ts;
+    };
+
+    // The first chunk's delta is "time since the request was sent" — i.e.,
+    // wait/TTFB. We resolve the request's load-start position on the canvas
+    // by running `time_start` (an epoch-ms anchor on every parser path)
+    // through the same normalisation. For parsers that bulk-copy a small
+    // relative `_load_start` / `_start` (netlog), the result aligns
+    // identically because both `time_start` and the chunks live in the same
+    // coordinate space after normalisation.
+    const requestStartEpoch = (typeof request.time_start === 'number') ? request.time_start : null;
+    const requestLoadStartMs = requestStartEpoch !== null ? toWaterfallMs(requestStartEpoch) : null;
+
+    const decoder = new TextDecoder('utf-8', { fatal: false });
+    let offset = 0;
+    let prevAbsMs = null;
+    let html = '<div class="req-chunked-body">';
+    for (let i = 0; i < chunks.length; i++) {
+        const chunk = chunks[i];
+        const isLast = (i === chunks.length - 1);
+        const take = Math.max(0, Math.min(sliceBytes[i] || 0, bytes.length - offset));
+        const slice = bytes.subarray(offset, offset + take);
+        offset += take;
+        // stream:true keeps any partial multi-byte sequence in the decoder's
+        // internal buffer so the next chunk completes it; the final chunk
+        // flushes any trailing bytes.
+        const text = decoder.decode(slice, { stream: !isLast });
+
+        const absMs = toWaterfallMs(chunk.ts);
+        // Inter-chunk delta: first chunk = (chunk - request load start);
+        // subsequent chunks = (chunk - previous chunk). Both rest entirely
+        // on values that already share the canvas's coordinate space, so
+        // there's no need to ever round-trip through real epoch ms here.
+        let deltaMs = null;
+        if (prevAbsMs !== null) {
+            deltaMs = absMs - prevAbsMs;
+        } else if (requestLoadStartMs !== null) {
+            deltaMs = absMs - requestLoadStartMs;
+        }
+        prevAbsMs = absMs;
+
+        const inflatedBytes = (chunk.inflated !== undefined) ? chunk.inflated : null;
+        const wireBytes = (typeof chunk.bytes === 'number') ? chunk.bytes : null;
+        let sizeStr;
+        if (inflatedBytes !== null && wireBytes !== null && inflatedBytes !== wireBytes) {
+            // Compressed: show decoded / wire side-by-side
+            sizeStr = `${humanizeBytes(inflatedBytes) || '0 B'} &middot; ${humanizeBytes(wireBytes) || '0 B'} wire`;
+        } else if (inflatedBytes !== null) {
+            sizeStr = humanizeBytes(inflatedBytes) || '0 B';
+        } else if (wireBytes !== null) {
+            sizeStr = humanizeBytes(wireBytes) || '0 B';
+        } else {
+            sizeStr = '—';
+        }
+
+        const deltaLabel = (deltaMs !== null) ? ` <span class="req-chunk-rel">(${formatDeltaMs(deltaMs)})</span>` : '';
+        const altClass = (i % 2) ? ' alt' : '';
+        // Render the body slice with HTML highlighting. A slice may end
+        // mid-tag (perfectly valid for streamed HTML); the highlighter
+        // tolerates this — unmatched tag fragments simply remain unstyled.
+        html += `
+            <div class="req-chunk-row${altClass}">
+                <div class="req-chunk-meta">
+                    <div class="req-chunk-time" title="Absolute waterfall time / delta from prior chunk (first chunk: from request sent)">
+                        ${formatAbsMs(absMs)}${deltaLabel}
+                    </div>
+                    <div class="req-chunk-size">${sizeStr}</div>
+                </div>
+                <div class="req-chunk-body"><pre class="req-code-block req-chunk-code">${highlightSyntax(text, 'html')}</pre></div>
+            </div>
+        `;
+    }
+    html += '</div>';
+    return html;
+}
+
 function getMetricItemHtml(label, value) {
     if (!value || value === 'N/A') return '';
     return `
@@ -885,14 +1041,58 @@ function renderRequestTab(request, reqNum) {
             else if (mimeLower.includes('html') || mimeLower.includes('svg') || mimeLower.includes('xml')) lang = 'html';
             else if (mimeLower.includes('css')) lang = 'css';
             else if (mimeLower.includes('javascript')) lang = 'js';
-            bodyHtml = `
-                <div class="req-section collapsed">
-                    ${createSectionHeader('Response Body', true, 'resBody')}
-                    <div class="req-section-body">
-                        <pre class="req-code-block">${highlightSyntax(bodyText, lang)}</pre>
+
+            // For HTML responses with chunk timing data, render a per-chunk
+            // table so the reader can see what arrived in each delivery slot
+            // alongside its waterfall-relative timestamp. Falls back to the
+            // standard single-block view if chunks aren't present/parseable.
+            let chunkedHtml = null;
+            if (mimeLower.includes('html')) {
+                // Resolve the canvas's "zero point" exactly the way
+                // layout.js does (see src/renderer/layout.js#L159-L176):
+                // prefer the active page's `startedDateTime`, otherwise
+                // fall back to the earliest `time_start` across the page's
+                // entries. This guarantees chunk timestamps line up with
+                // what's actually drawn in the waterfall.
+                let waterfallZero = 0;
+                const pageId = (rendererCanvas && rendererCanvas.options) ? rendererCanvas.options.pageId : null;
+                if (pageId && waterfallTool) {
+                    const pData = waterfallTool.getPage(pageId, { includeRequests: true });
+                    if (pData && pData.startedDateTime) {
+                        waterfallZero = new Date(pData.startedDateTime).getTime();
+                    } else if (pData && pData.requests) {
+                        let earliest = Number.MAX_SAFE_INTEGER;
+                        const reqs = Array.isArray(pData.requests) ? pData.requests : Object.values(pData.requests);
+                        for (const r of reqs) {
+                            if (typeof r.time_start === 'number' && r.time_start < earliest) {
+                                earliest = r.time_start;
+                            }
+                        }
+                        if (earliest !== Number.MAX_SAFE_INTEGER) waterfallZero = earliest;
+                    }
+                }
+                chunkedHtml = buildChunkedHtmlBody(request, waterfallZero);
+            }
+
+            if (chunkedHtml) {
+                bodyHtml = `
+                    <div class="req-section collapsed">
+                        ${createSectionHeader('Response Body (by chunk)', true, 'resBody')}
+                        <div class="req-section-body req-section-body-chunks">
+                            ${chunkedHtml}
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                bodyHtml = `
+                    <div class="req-section collapsed">
+                        ${createSectionHeader('Response Body', true, 'resBody')}
+                        <div class="req-section-body">
+                            <pre class="req-code-block">${highlightSyntax(bodyText, lang)}</pre>
+                        </div>
+                    </div>
+                `;
+            }
             clipboardPayloads['resBody'] = bodyText;
         } else {
             // Binary content that isn't an image — show size info

@@ -137,6 +137,22 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Add `decompressBodyPerChunk(wireChunks, encoding)` helper to `src/core/decompress.js` and wire it into the tcpdump parser via `options.deps.decompressBodyPerChunk` through both `orchestrator.js` and `cli/tcpdump.js`.
 - [x] Document the `_chunks[].inflated` contract in `Docs/Extended-HAR-Schema.md` and `AGENTS.md`.
 
+## Phase 8d: Chunked HTML Response Body Viewer
+**Goal:** Visualize *what arrived when* by rendering chunked HTML responses as a hex-viewer-style table in the standalone viewer's request inspector.
+- [x] Add `buildChunkedHtmlBody(request, waterfallZero)` in `src/viewer/viewer.js` that decodes the base64 body once, slices by `inflated` byte counts (falling back to wire `bytes` when absent per AGENTS note 72), and reassembles UTF-8 across chunk boundaries via streaming `TextDecoder`.
+- [x] Wire the helper into `renderRequestTab` for HTML responses, resolving `waterfallZero` exactly the way `layout.js#L159-L176` does: prefer `pageData.startedDateTime` epoch ms, fall back to scanning the page's entries for the earliest `time_start`. Falls back transparently to the standard single-block view when chunks lack timestamps or the body can't be decoded.
+- [x] Add CSS for the `.req-chunked-body` table layout in `src/viewer/style.css` — alternating row shading, 56px min-height for label visibility, narrow flex left column for timestamps + sizes, wide flex right column for syntax-highlighted body slices.
+- [x] Per-row label format `[absTime] ms ([±deltaTime] ms)` — `absTime` is the chunk's position on the canvas axis, `deltaTime` is the inter-arrival gap (first chunk: from the request's load start, subsequent chunks: from the previous chunk). Size labels show inflated alongside wire bytes for compressed responses (`870.05 KB · 14.06 KB wire`).
+- [x] Per-chunk body cells are vertically unconstrained (`max-height: none; overflow: visible`) so the request tab's outer scroll handles overall navigation and the reader sees a continuous unbroken document instead of fighting nested per-row scrollbars.
+
+## Phase 8e: Netlog `timeTickOffset` Page Anchor Fix
+**Goal:** Fix a long-standing netlog bug where the page `startedDateTime` would land in 1970 because the parser misread the monotonic tick `start_time` as UNIX epoch seconds.
+- [x] Capture `constants.timeTickOffset` (Chrome's wall-clock anchor for tick 0, in epoch ms) in `Netlog#setConstants` and propagate it through `postProcessEvents()` results.
+- [x] Compute `pageStartEpochMs = timeTickOffset + start_time` in `processNetlogFileNode` and pass it to `normalizeNetlogToHAR`.
+- [x] Rename `normalizeNetlogToHAR`'s last parameter from `run_start_epoch` (interpreted as seconds) to `page_start_epoch_ms` (real wall-clock epoch ms) and remove the `* 1000` multiplication.
+- [x] Update `chrome-trace.js`'s call site to pass `final_start_time` directly (it was already in ms after the HTTP `date:` header offset hack, but had to be `/ 1000.0`'d for the old seconds API).
+- [x] Regenerate the netlog golden fixtures (`tests/fixtures/netlog-google.har.json`, `netlog-amazon1.har.json`) — diff is anchor-only, every relative `_*` field is unchanged.
+
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.
 - [x] Add explicit platform abstraction definitions within `src/platforms/`.

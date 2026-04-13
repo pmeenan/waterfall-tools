@@ -434,9 +434,11 @@ export async function processChromeTraceFileNode(input, options = {}) {
              if (d.end !== undefined) d.end /= 1000.0;
         }
 
-        // normalizeNetlogToHAR natively expects `run_start_epoch` in SECONDS
-        // We divide `final_start_time` (ms) by 1000.0 to securely map it natively
-        const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, final_start_time / 1000.0);
+        // normalizeNetlogToHAR now takes the real wall-clock epoch ms for
+        // the trace's earliest event. `final_start_time` is already in ms
+        // — converted from monotonic via the HTTP "date:" header offset
+        // earlier in this function — so we pass it through unchanged.
+        const har = normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, final_start_time);
         
         // Add minimal layout mapping overrides for Chrome trace
         if (har.log && har.log.pages.length > 0) {

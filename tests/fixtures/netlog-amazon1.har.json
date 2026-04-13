@@ -9,7 +9,7 @@
       {
         "id": "page_1_0_1",
         "title": "Netlog Default View",
-        "startedDateTime": "1970-08-20T15:08:27.000Z",
+        "startedDateTime": "2026-03-26T23:56:02.636Z",
         "pageTimings": {
           "onLoad": -1,
           "onContentLoad": -1,
@@ -1045,7 +1045,7 @@
     ],
     "entries": [
       {
-        "startedDateTime": "1970-08-20T15:08:27.000Z",
+        "startedDateTime": "2026-03-26T23:56:02.636Z",
         "time": 0,
         "pageref": "page_1_0_1",
         "request": {
@@ -1113,7 +1113,7 @@
         "_all_end": 0
       },
       {
-        "startedDateTime": "1970-08-20T15:08:27.000Z",
+        "startedDateTime": "2026-03-26T23:56:02.636Z",
         "time": 0,
         "pageref": "page_1_0_1",
         "request": {
@@ -1220,8 +1220,8 @@
         "_all_end": 0
       },
       {
-        "startedDateTime": "1970-08-20T15:08:27.116Z",
-        "time": 215.9998435974121,
+        "startedDateTime": "2026-03-26T23:56:02.752Z",
+        "time": 215.999755859375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -1366,7 +1366,7 @@
           "connect": 17,
           "ssl": 43,
           "send": 0,
-          "wait": 139.9998435974121,
+          "wait": 139.999755859375,
           "receive": 5
         },
         "serverIPAddress": "",
@@ -1564,11 +1564,11 @@
             ]
           }
         },
-        "_dnsTimeMs": 20012907116,
-        "_dnsEndTimeMs": 20012907170,
-        "_connectTimeMs": 20012907170,
-        "_connectEndTimeMs": 20012907187,
-        "_sslStartTimeMs": 20012907144,
+        "_dnsTimeMs": 1774569362752,
+        "_dnsEndTimeMs": 1774569362806,
+        "_connectTimeMs": 1774569362806,
+        "_connectEndTimeMs": 1774569362823,
+        "_sslStartTimeMs": 1774569362780,
         "_load_start": 116,
         "_ttfb_start": 116,
         "_ttfb_end": 255,
@@ -1577,8 +1577,8 @@
         "_all_end": 260
       },
       {
-        "startedDateTime": "1970-08-20T15:08:27.307Z",
-        "time": 1049.9998245239258,
+        "startedDateTime": "2026-03-26T23:56:02.943Z",
+        "time": 1049.999755859375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -1723,7 +1723,7 @@
           "connect": 31,
           "ssl": 63,
           "send": 0,
-          "wait": 125.99982452392578,
+          "wait": 125.999755859375,
           "receive": 850
         },
         "serverIPAddress": "",
@@ -2276,11 +2276,11 @@
             ]
           }
         },
-        "_dnsTimeMs": 20012907307,
-        "_dnsEndTimeMs": 20012907350,
-        "_connectTimeMs": 20012907350,
-        "_connectEndTimeMs": 20012907381,
-        "_sslStartTimeMs": 20012907318,
+        "_dnsTimeMs": 1774569362943,
+        "_dnsEndTimeMs": 1774569362986,
+        "_connectTimeMs": 1774569362986,
+        "_connectEndTimeMs": 1774569363017,
+        "_sslStartTimeMs": 1774569362954,
         "_load_start": 307,
         "_ttfb_start": 307,
         "_ttfb_end": 432,
@@ -2289,7 +2289,7 @@
         "_all_end": 1282
       },
       {
-        "startedDateTime": "1970-08-20T15:08:28.572Z",
+        "startedDateTime": "2026-03-26T23:56:04.208Z",
         "time": 139,
         "pageref": "page_1_0_1",
         "request": {
@@ -2528,7 +2528,7 @@
         "_all_end": 1711
       },
       {
-        "startedDateTime": "1970-08-20T15:08:28.740Z",
+        "startedDateTime": "2026-03-26T23:56:04.376Z",
         "time": 150,
         "pageref": "page_1_0_1",
         "request": {
@@ -2777,7 +2777,7 @@
         "_all_end": 1890
       },
       {
-        "startedDateTime": "1970-08-20T15:08:28.749Z",
+        "startedDateTime": "2026-03-26T23:56:04.385Z",
         "time": 130,
         "pageref": "page_1_0_1",
         "request": {
@@ -3063,7 +3063,7 @@
         "_all_end": 1879
       },
       {
-        "startedDateTime": "1970-08-20T15:08:28.904Z",
+        "startedDateTime": "2026-03-26T23:56:04.540Z",
         "time": 150,
         "pageref": "page_1_0_1",
         "request": {
@@ -3312,7 +3312,7 @@
         "_all_end": 2054
       },
       {
-        "startedDateTime": "1970-08-20T15:08:29.080Z",
+        "startedDateTime": "2026-03-26T23:56:04.716Z",
         "time": 51,
         "pageref": "page_1_0_1",
         "request": {
@@ -3543,8 +3543,8 @@
         "_all_end": 2131
       },
       {
-        "startedDateTime": "1970-08-20T15:08:29.281Z",
-        "time": 185.9997329711914,
+        "startedDateTime": "2026-03-26T23:56:04.917Z",
+        "time": 185.999755859375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -3717,7 +3717,7 @@
           "connect": 16,
           "ssl": 44,
           "send": 0,
-          "wait": 101.9997329711914,
+          "wait": 101.999755859375,
           "receive": 13
         },
         "serverIPAddress": "",
@@ -3949,11 +3949,11 @@
         },
         "_dns_start": 2164,
         "_dns_end": 2219,
-        "_dnsTimeMs": 20012909281,
-        "_dnsEndTimeMs": 20012909336,
-        "_connectTimeMs": 20012909336,
-        "_connectEndTimeMs": 20012909352,
-        "_sslStartTimeMs": 20012909308,
+        "_dnsTimeMs": 1774569364917,
+        "_dnsEndTimeMs": 1774569364972,
+        "_connectTimeMs": 1774569364972,
+        "_connectEndTimeMs": 1774569364988,
+        "_sslStartTimeMs": 1774569364944,
         "_load_start": 2281,
         "_ttfb_start": 2281,
         "_ttfb_end": 2382,
@@ -3962,7 +3962,7 @@
         "_all_end": 2395
       },
       {
-        "startedDateTime": "1970-08-20T15:08:29.360Z",
+        "startedDateTime": "2026-03-26T23:56:04.996Z",
         "time": 58,
         "pageref": "page_1_0_1",
         "request": {
@@ -4219,7 +4219,7 @@
         "_all_end": 2418
       },
       {
-        "startedDateTime": "1970-08-20T15:08:29.360Z",
+        "startedDateTime": "2026-03-26T23:56:04.996Z",
         "time": 62,
         "pageref": "page_1_0_1",
         "request": {
@@ -4476,7 +4476,7 @@
         "_all_end": 2422
       },
       {
-        "startedDateTime": "1970-08-20T15:08:29.361Z",
+        "startedDateTime": "2026-03-26T23:56:04.997Z",
         "time": 82,
         "pageref": "page_1_0_1",
         "request": {
@@ -4741,7 +4741,7 @@
         "_all_end": 2443
       },
       {
-        "startedDateTime": "1970-08-20T15:08:29.449Z",
+        "startedDateTime": "2026-03-26T23:56:05.085Z",
         "time": 41,
         "pageref": "page_1_0_1",
         "request": {
@@ -4991,7 +4991,7 @@
         "_all_end": 2490
       },
       {
-        "startedDateTime": "1970-08-20T15:08:29.502Z",
+        "startedDateTime": "2026-03-26T23:56:05.138Z",
         "time": 31,
         "pageref": "page_1_0_1",
         "request": {
@@ -5241,8 +5241,8 @@
         "_all_end": 2533
       },
       {
-        "startedDateTime": "1970-08-20T15:08:29.560Z",
-        "time": 286.9997100830078,
+        "startedDateTime": "2026-03-26T23:56:05.196Z",
+        "time": 286.999755859375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -5343,7 +5343,7 @@
           "connect": 35,
           "ssl": 72,
           "send": 0,
-          "wait": 159.9997100830078,
+          "wait": 159.999755859375,
           "receive": 5
         },
         "serverIPAddress": "",
@@ -5563,11 +5563,11 @@
             "error": -105
           }
         },
-        "_dnsTimeMs": 20012909560,
-        "_dnsEndTimeMs": 20012909647,
-        "_connectTimeMs": 20012909647,
-        "_connectEndTimeMs": 20012909682,
-        "_sslStartTimeMs": 20012909610,
+        "_dnsTimeMs": 1774569365196,
+        "_dnsEndTimeMs": 1774569365283,
+        "_connectTimeMs": 1774569365283,
+        "_connectEndTimeMs": 1774569365318,
+        "_sslStartTimeMs": 1774569365246,
         "_load_start": 2560,
         "_ttfb_start": 2560,
         "_ttfb_end": 2719,
@@ -5576,7 +5576,7 @@
         "_all_end": 2724
       },
       {
-        "startedDateTime": "1970-08-20T15:08:30.547Z",
+        "startedDateTime": "2026-03-26T23:56:06.183Z",
         "time": 171,
         "pageref": "page_1_0_1",
         "request": {
