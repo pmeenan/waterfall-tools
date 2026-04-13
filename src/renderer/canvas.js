@@ -41,6 +41,12 @@ export class WaterfallCanvas {
             this.canvas = this.options.canvas;
             this.ctx = this.canvas.getContext('2d', { alpha: false });
         }
+        this._bindTouch();
+    }
+    
+    updateOptions(newOptions) {
+        this.options = Object.assign({}, this.options, newOptions);
+        this._requestRender();
     }
     
     destroy() {
@@ -99,6 +105,147 @@ export class WaterfallCanvas {
                 this.options.onDoubleClick(target ? { index: target.index, request: this.rawEntries[target.index], event: e } : null);
             }
         });
+    }
+
+    _bindTouch() {
+        if (!this.canvas) return;
+        this.canvas.addEventListener('touchstart', this._onTouchStart.bind(this), {passive: false});
+        this.canvas.addEventListener('touchmove', this._onTouchMove.bind(this), {passive: false});
+        this.canvas.addEventListener('touchend', this._onTouchEnd.bind(this));
+        this.canvas.addEventListener('touchcancel', this._onTouchEnd.bind(this));
+    }
+
+    _onTouchStart(e) {
+        if (!e.touches || e.touches.length === 0) return;
+        this.touchState = {
+            startX1: e.touches[0].clientX,
+            startY1: e.touches[0].clientY,
+            startX2: e.touches.length > 1 ? e.touches[1].clientX : null,
+            baseStartMs: this.options.startTime || 0,
+            baseEndMs: this.options.endTime || (this.drawnRows && this.drawnRows.dimensions ? this.drawnRows.dimensions.maxTime / 1000 : 0),
+            isPanning: false,
+            isZooming: e.touches.length > 1,
+            initialWidthMs: 0
+        };
+        if (!this.drawnRows || !this.drawnRows.dimensions || !this.drawnRows.dimensions.absoluteMaxTime) return;
+
+        if (this.touchState.isZooming) {
+            e.preventDefault();
+            const dx = Math.abs(e.touches[0].clientX - e.touches[1].clientX);
+            this.touchState.initialPinchDist = dx;
+            this.touchState.initialWidthMs = this.touchState.baseEndMs - this.touchState.baseStartMs;
+            const centerClientX = Math.min(e.touches[0].clientX, e.touches[1].clientX) + (dx / 2);
+            const rect = this.canvas.getBoundingClientRect();
+            const centerCanvasX = centerClientX - rect.left;
+            let labelsWidth = this.options.thumbnailView ? (rect.width * 0.25) : 250;
+            if (this.options.showLabels === false || this.options.overlapLabels) labelsWidth = 0;
+            const dataWidth = Math.max(1, rect.width - labelsWidth - 5);
+            this.touchState.focalRatio = Math.max(0, Math.min(1, (centerCanvasX - labelsWidth) / dataWidth));
+        }
+    }
+
+    _onTouchMove(e) {
+        if (!this.touchState || e.touches.length === 0) return;
+        const touch1 = e.touches[0];
+        if (!this.drawnRows || !this.drawnRows.dimensions || !this.drawnRows.dimensions.absoluteMaxTime) return;
+        
+        const absoluteMaxSec = this.drawnRows.dimensions.absoluteMaxTime / 1000;
+        
+        if (e.touches.length > 1) {
+            e.preventDefault();
+            if (!this.touchState.isZooming) {
+                this.touchState.isZooming = true;
+                const dx = Math.abs(touch1.clientX - e.touches[1].clientX);
+                this.touchState.initialPinchDist = dx;
+                this.touchState.baseStartMs = this.options.startTime || 0;
+                this.touchState.baseEndMs = this.options.endTime || (this.drawnRows ? this.drawnRows.dimensions.maxTime / 1000 : 0);
+                this.touchState.initialWidthMs = this.touchState.baseEndMs - this.touchState.baseStartMs;
+                const centerClientX = Math.min(touch1.clientX, e.touches[1].clientX) + (dx / 2);
+                const rect = this.canvas.getBoundingClientRect();
+                const centerCanvasX = centerClientX - rect.left;
+                let labelsWidth = this.options.thumbnailView ? (rect.width * 0.25) : 250;
+                if (this.options.showLabels === false || this.options.overlapLabels) labelsWidth = 0;
+                const dataWidth = Math.max(1, rect.width - labelsWidth - 5);
+                this.touchState.focalRatio = Math.max(0, Math.min(1, (centerCanvasX - labelsWidth) / dataWidth));
+            }
+            
+            const dx = Math.abs(touch1.clientX - e.touches[1].clientX);
+            if (this.touchState.initialPinchDist > 0 && dx > 0) {
+                const scale = this.touchState.initialPinchDist / dx;
+                let newWidthMs = this.touchState.initialWidthMs * scale;
+                if (newWidthMs > absoluteMaxSec) newWidthMs = absoluteMaxSec;
+                if (newWidthMs < 0.01) newWidthMs = 0.01;
+                
+                const focalOffsetBefore = this.touchState.initialWidthMs * this.touchState.focalRatio;
+                const focalOffsetAfter = newWidthMs * this.touchState.focalRatio;
+                
+                let newStartMs = this.touchState.baseStartMs + (focalOffsetBefore - focalOffsetAfter);
+                let newEndMs = newStartMs + newWidthMs;
+                
+                if (newStartMs < 0) {
+                    newStartMs = 0;
+                    newEndMs = newStartMs + newWidthMs;
+                }
+                if (newEndMs > absoluteMaxSec) {
+                    newEndMs = absoluteMaxSec;
+                    newStartMs = Math.max(0, newEndMs - newWidthMs);
+                }
+                
+                this.updateOptions({ startTime: newStartMs, endTime: newEndMs });
+            }
+        } else if (e.touches.length === 1) {
+            const deltaX = touch1.clientX - this.touchState.startX1;
+            const deltaY = touch1.clientY - this.touchState.startY1;
+            
+            if (!this.touchState.isPanning && Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 5) {
+                return;
+            }
+            if (Math.abs(deltaX) > 5) {
+                this.touchState.isPanning = true;
+            }
+            
+            if (this.touchState.isPanning) {
+                e.preventDefault();
+                const rect = this.canvas.getBoundingClientRect();
+                let labelsWidth = this.options.thumbnailView ? (rect.width * 0.25) : 250;
+                if (this.options.showLabels === false || this.options.overlapLabels) labelsWidth = 0;
+                
+                const dataWidth = Math.max(1, rect.width - labelsWidth - 5);
+                const currentWidthMs = (this.options.endTime || this.touchState.baseEndMs) - (this.options.startTime || this.touchState.baseStartMs);
+                
+                const msPerPixel = currentWidthMs / dataWidth;
+                const shiftMs = -deltaX * msPerPixel;
+                
+                let newStartMs = this.touchState.baseStartMs + shiftMs;
+                let newEndMs = this.touchState.baseEndMs + shiftMs;
+                
+                if (newStartMs < 0) {
+                    newStartMs = 0;
+                    newEndMs = currentWidthMs;
+                }
+                if (newEndMs > absoluteMaxSec) {
+                    newEndMs = absoluteMaxSec;
+                    newStartMs = Math.max(0, newEndMs - currentWidthMs);
+                }
+                
+                this.updateOptions({ startTime: newStartMs, endTime: newEndMs });
+            }
+        }
+    }
+
+    _onTouchEnd(e) {
+        if (!this.touchState) return;
+        if (e.touches.length === 0) {
+            this.touchState = null;
+        } else {
+             this.touchState.startX1 = e.touches[0].clientX;
+             this.touchState.startY1 = e.touches[0].clientY;
+             this.touchState.startX2 = e.touches.length > 1 ? e.touches[1].clientX : null;
+             this.touchState.baseStartMs = this.options.startTime || 0;
+             this.touchState.baseEndMs = this.options.endTime || ((this.options.startTime || 0) + (this.touchState.initialWidthMs || 0));
+             this.touchState.isPanning = false;
+             this.touchState.isZooming = e.touches.length > 1;
+        }
     }
 
     _getInteractionTarget(x, y) {
@@ -1151,15 +1298,34 @@ export class WaterfallCanvas {
             this.ctx.restore();
 
             // 9. Draw URL Labels
-            this.ctx.save();
-            this.ctx.beginPath();
-            this.ctx.rect(0, 0, Math.max(0, dimensions.labelsWidth - 2), dimensions.canvasHeight);
-            this.ctx.clip();
+            
+            let labelCtx = this.ctx;
+            const usingSplitLabels = !!this.options.labelsCanvas;
+            const labelsWidthDesktop = 250;
+            const drawLabelsWidth = usingSplitLabels ? labelsWidthDesktop : dimensions.labelsWidth;
 
-            this.ctx.textAlign = 'left';
-            if (this.options.showLabels !== false) {
+            if (usingSplitLabels) {
+                const lCanvas = this.options.labelsCanvas;
+                if (lCanvas.style) {
+                    lCanvas.style.width = labelsWidthDesktop + 'px';
+                    lCanvas.style.height = dimensions.canvasHeight + 'px';
+                }
+                lCanvas.width = labelsWidthDesktop * dpr;
+                lCanvas.height = dimensions.canvasHeight * dpr;
+                labelCtx = lCanvas.getContext('2d', { alpha: true });
+                labelCtx.scale(dpr, dpr);
+                labelCtx.clearRect(0, 0, labelsWidthDesktop, dimensions.canvasHeight);
+            } else {
+                labelCtx.save();
+                labelCtx.beginPath();
+                labelCtx.rect(0, 0, Math.max(0, drawLabelsWidth - 2), dimensions.canvasHeight);
+                labelCtx.clip();
+            }
+
+            labelCtx.textAlign = 'left';
+            if (this.options.showLabels !== false || usingSplitLabels) {
                 const fontSize = this.options.thumbnailView ? 4 : 11;
-                this.ctx.font = `${fontSize}px sans-serif`;
+                labelCtx.font = `${fontSize}px sans-serif`;
                 
                 let renderedConnectionRows = new Set();
                 let connectionDisplayIndex = 1;
@@ -1187,37 +1353,37 @@ export class WaterfallCanvas {
                         const iconY = this.options.thumbnailView ? row.y1 : row.y1 + 2;
                         
                         // Orange warning circle
-                        this.ctx.fillStyle = '#ff9900';
-                        this.ctx.beginPath();
-                        this.ctx.arc(textX + iconW / 2, iconY + iconW / 2, iconW / 2, 0, 2 * Math.PI);
-                        this.ctx.fill();
+                        labelCtx.fillStyle = '#ff9900';
+                        labelCtx.beginPath();
+                        labelCtx.arc(textX + iconW / 2, iconY + iconW / 2, iconW / 2, 0, 2 * Math.PI);
+                        labelCtx.fill();
                         
                         // White X cross lines
-                        this.ctx.strokeStyle = '#ffffff';
-                        this.ctx.lineWidth = this.options.thumbnailView ? 0.5 : 1.5;
+                        labelCtx.strokeStyle = '#ffffff';
+                        labelCtx.lineWidth = this.options.thumbnailView ? 0.5 : 1.5;
                         const pad = this.options.thumbnailView ? 1 : 4;
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(textX + pad, iconY + pad);
-                        this.ctx.lineTo(textX + iconW - pad, iconY + iconW - pad);
-                        this.ctx.moveTo(textX + iconW - pad, iconY + pad);
-                        this.ctx.lineTo(textX + pad, iconY + iconW - pad);
-                        this.ctx.stroke();
-                        this.ctx.lineWidth = 1;
+                        labelCtx.beginPath();
+                        labelCtx.moveTo(textX + pad, iconY + pad);
+                        labelCtx.lineTo(textX + iconW - pad, iconY + iconW - pad);
+                        labelCtx.moveTo(textX + iconW - pad, iconY + pad);
+                        labelCtx.lineTo(textX + pad, iconY + iconW - pad);
+                        labelCtx.stroke();
+                        labelCtx.lineWidth = 1;
 
                         textX += iconW + 4;
                     }
 
-                    this.ctx.fillStyle = textColor;
+                    labelCtx.fillStyle = textColor;
                     const prefix = this.options.connectionView ? `${connectionDisplayIndex++}. ` : `${index + 1}. `;
                     let urlText = row.url || '';
                     if (this.options.connectionView) {
                         urlText = urlText.split(' - ')[0];
                     }
                     
-                    const prefixWidth = this.ctx.measureText(prefix).width;
-                    const maxUrlWidth = dimensions.labelsWidth - textX - prefixWidth - 6; // 6px padding from line
+                    const prefixWidth = labelCtx.measureText(prefix).width;
+                    const maxUrlWidth = drawLabelsWidth - textX - prefixWidth - 6; // 6px padding from line
                     
-                    let currentUrlWidth = this.ctx.measureText(urlText).width;
+                    let currentUrlWidth = labelCtx.measureText(urlText).width;
                     if (currentUrlWidth > maxUrlWidth && urlText.length > 5 && maxUrlWidth > 10) {
                         const avgCharWidth = currentUrlWidth / urlText.length;
                         let targetLen = Math.floor(maxUrlWidth / avgCharWidth);
@@ -1227,7 +1393,7 @@ export class WaterfallCanvas {
                         while (targetLen > 4) {
                             const half = Math.floor((targetLen - 3) / 2);
                             const testUrlText = urlText.substring(0, half) + '...' + urlText.substring(urlText.length - half);
-                            if (this.ctx.measureText(testUrlText).width <= maxUrlWidth) {
+                            if (labelCtx.measureText(testUrlText).width <= maxUrlWidth) {
                                 urlText = testUrlText;
                                 break;
                             }
@@ -1235,17 +1401,27 @@ export class WaterfallCanvas {
                         }
                         if (targetLen <= 4 && urlText.length > 0) {
                             let shortText = urlText.substring(0, Math.max(1, Math.floor(maxUrlWidth / avgCharWidth))) + '..';
-                            if (this.ctx.measureText(shortText).width > maxUrlWidth) shortText = '';
+                            if (labelCtx.measureText(shortText).width > maxUrlWidth) shortText = '';
                             urlText = shortText;
                         }
                     }
                     
+                    // On secondary transparent canvas we draw a white highlight background for clarity over timelines
+                    if (usingSplitLabels) {
+                        const metricW = labelCtx.measureText(prefix + urlText).width;
+                        labelCtx.fillStyle = 'rgba(255,255,255,0.85)';
+                        labelCtx.fillRect(textX - 2, row.y1 + 1, metricW + 4, 16);
+                        labelCtx.fillStyle = textColor;
+                    }
+
                     const labelText = prefix + urlText;
                     const fontYOffset = this.options.thumbnailView ? 4 : 13;
-                    this.ctx.fillText(labelText, textX, row.y1 + fontYOffset);
+                    labelCtx.fillText(labelText, textX, row.y1 + fontYOffset);
                 });
             }
             
-            this.ctx.restore();
+            if (!usingSplitLabels) {
+                labelCtx.restore();
+            }
     }
 }

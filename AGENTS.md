@@ -342,3 +342,7 @@ When working on this codebase, you must adhere to the following strict architect
     - To accurately render these gaps, `src/renderer/layout.js` rigidly maps exact boundaries independently (`sslEnd`, `connectEnd`) and categorically rejects fallback interpolation bounds that artificially merge `sslEnd` directly into `ttfbStart`.
     - Native graphical Queueing layers (`row.colors.wait`) must strictly end immediately upon the absolute earliest boundary of any actively running network phase. This elegantly bounds queue styling independently to temporal Queue phases, eliminating spanning bounds mistakenly rendering massively long queue indicators blindly stretching across uninstrumented `tcpdump` preconnect gaps natively.
 \n- The Viewer Options UI in `src/viewer/` now supports complex non-boolean controls (like `startTime`, `endTime`, `reqFilter`) mapped generically to the canvas renderer's options object natively syncing via the URL parameters.
+
+26. **Responsive Layouts & Split Labels Render Engine:**
+    - The `WaterfallCanvas` natively exposes `options.labelsCanvas` and `options.overlapLabels` parameters enabling headless DOM-split layouts structurally isolating URL labels from the primary data rendering bounds securely.
+    - Pinch-to-zoom gestures apply intrinsic bounds checking mapping deltas implicitly onto `options.startTime` and `options.endTime` natively via bound `updateOptions(newOptions)` API routines. Layout logic avoids regenerating the full layout via `renderTo` when bounding offsets internally cleanly.

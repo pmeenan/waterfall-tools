@@ -190,6 +190,38 @@ body, html {
     line-height: 1.4;
 }
 
+.url-section {
+    margin: 0 auto 2rem auto;
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-radius: 8px;
+}
+
+#url-input {
+    padding: 14px 20px;
+    min-width: 400px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px 0 0 8px;
+    font-size: 1rem;
+    outline: none;
+    border-right: none;
+    box-sizing: border-box;
+}
+
+#url-load-btn {
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
 .upload-section {
     background: #fafafa;
     padding: 2rem;
@@ -1034,5 +1066,202 @@ body, html {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         gap: 15px;
+    }
+}
+
+/* Responsive UI Enhancements */
+.responsive-menu-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 6px;
+    margin-right: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    align-self: center;
+}
+
+#btn-close-tab {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px;
+}
+
+.tabs-body {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.labels-slider {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 250px;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    display: none; /* Only show on waterfall tab when active */
+}
+
+.labels-slider.active {
+    display: block;
+}
+
+.labels-slider.open {
+    transform: translateX(0);
+}
+
+#labels-slider-content {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#labels-slider-toggle {
+    position: absolute;
+    right: -24px;
+    top: 50%;
+    width: 24px;
+    height: 48px;
+    margin-top: -24px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--border-color);
+    border-left: none;
+    border-radius: 0 24px 24px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+    color: var(--primary-color);
+}
+
+.tab-prefix-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .responsive-menu-btn {
+        display: flex;
+    }
+    
+    .tabs-scroll-wrapper {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 250px;
+        background: white;
+        z-index: 1000;
+        flex-direction: column;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    
+    .tabs-scroll-wrapper.menu-open {
+        transform: translateX(0);
+    }
+    
+    #viewer-tabs {
+        width: 100%;
+        flex-direction: column;
+        padding: 0;
+    }
+    
+    .viewer-tab {
+        border-radius: 0;
+        border-bottom: 1px solid #eee;
+        padding: 15px 20px;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: left;
+        background: transparent;
+        justify-content: flex-start;
+    }
+    
+    .viewer-tab.active {
+        background: #f0f7ff;
+        border-left: 4px solid var(--primary-color);
+        padding-left: 16px;
+    }
+    
+    .tab-scroll-btn {
+        display: none !important;
+    }
+    
+    .tab-close {
+        display: none !important;
+    }
+    
+    #btn-close-tab:not(.hidden) {
+        display: inline-block;
+    }
+    
+    .tab-prefix-mobile {
+        display: inline;
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .features {
+        display: none;
+    }
+    
+    .url-section {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        box-shadow: none;
+        gap: 10px;
+    }
+    
+    #url-input {
+        width: 100%;
+        min-width: 0;
+        border-right: 1px solid var(--border-color);
+        border-radius: 8px;
+    }
+    
+    #url-load-btn {
+        width: auto;
+        min-width: 180px;
+        border-radius: 8px;
+    }
+    
+    .req-details-table {
+        width: 100%;
+        table-layout: fixed;
+    }
+    
+    .req-details-table td:first-child {
+        width: 40%;
+        word-wrap: break-word;
+        max-width: none;
+    }
+    
+    .req-details-table td:last-child {
+        width: 60%;
+        word-break: break-all;
     }
 }

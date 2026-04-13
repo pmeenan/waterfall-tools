@@ -173,3 +173,6 @@ To maximize load performance and caching efficiency across integrations natively
 1. `waterfall-tools.es.js` - The core application logic, HTML5 canvas renderer, and standard JSON streaming processors.
 2. `tcpdump-[hash].js` - The dynamically loaded chunk isolated specifically for TCPDump, PCAP, SSL decryption, QUIC, and standard deep-packet inspection tooling natively.
 3. `decompress-[hash].js` - The dynamically loaded chunk exclusively isolating WebAssembly decompression fallbacks like `brotli-dec-wasm` protecting core payloads accurately.
+
+## Responsive UI Boundaries & Pinch Geometry
+Mobile configurations securely trigger layout breakpoints bypassing explicit device definitions using structural flex bindings inherently ensuring 3-across grids neatly wrap appropriately across scaling devices gracefully. Touch listeners (`touchstart`, `touchmove`) attached explicitly within `WaterfallCanvas` decode multi-point geometry calculating `startTime` and `endTime` transformations intrinsically seamlessly scaling absolute grids organically horizontally while skipping standard `dpr` scaling recalculations explicitly.

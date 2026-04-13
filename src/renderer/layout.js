@@ -98,6 +98,7 @@ export class Layout {
     }
 
     static calculateRows(entries, canvasWidth = 1012, options = {}) {
+        let absoluteMaxTime = 0;
         const rowHeight = options.thumbnailView ? 4 : 18;
 
         if (!entries || entries.length === 0) {
@@ -319,14 +320,18 @@ export class Layout {
             if (options.startTime !== undefined && options.startTime !== null) {
                 spanMs -= (options.startTime * 1000);
             }
+            absoluteMaxTime = maxTime;
             maxTime = Math.max(0, spanMs);
+        } else {
+            absoluteMaxTime = maxTime;
         }
 
         // Leave room for labels
         let labelsWidth = options.thumbnailView ? (canvasWidth * 0.25) : 250;
-        if (options.showLabels === false) {
+        if (options.showLabels === false || options.overlapLabels) {
             labelsWidth = 0;
         }
+
         
         const dataWidth = canvasWidth - labelsWidth - 5;
         const widthPerMs = maxTime > 0 ? (dataWidth / maxTime) : 0;
@@ -428,6 +433,7 @@ export class Layout {
                 canvasWidth, 
                 canvasHeight: options._totalRows * rowHeight + (rowHeight * 2) + yOffset + additionalHeight, 
                 maxTime,
+                absoluteMaxTime: absoluteMaxTime,
                 baseMs,
                 labelsWidth,
                 widthPerMs,

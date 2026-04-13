@@ -37,7 +37,13 @@ const ui = {
     netlogFrame: document.getElementById('netlog-frame'),
     netlogOverlay: document.getElementById('netlog-overlay'),
     netlogOverlayContent: document.getElementById('netlog-overlay-content'),
-    viewerTabs: document.getElementById('viewer-tabs')
+    viewerTabs: document.getElementById('viewer-tabs'),
+    tabsScrollWrapper: document.getElementById('tabs-scroll-wrapper'),
+    hamburgerBtn: document.getElementById('hamburger-btn'),
+    btnCloseTab: document.getElementById('btn-close-tab'),
+    labelsSlider: document.getElementById('labels-slider'),
+    labelsSliderContent: document.getElementById('labels-slider-content'),
+    labelsSliderToggle: document.getElementById('labels-slider-toggle')
 };
 
 let waterfallTool = null;
@@ -683,7 +689,7 @@ function renderRequestTab(request, reqNum) {
     tab.style.padding = '8px 10px'; // make tab narrower
     
     tab.innerHTML = `
-        <span class="tab-title" style="color: #000;">${reqNum}</span>
+        <span class="tab-title" style="color: #000;"><span class="tab-prefix-mobile">Request </span>${reqNum}</span>
         <button class="tab-close" style="background:transparent; border:none; margin-left:8px; cursor:pointer; font-size:10px; color:#000;">✖</button>
     `;
     
@@ -695,8 +701,12 @@ function renderRequestTab(request, reqNum) {
         const content = document.getElementById(`view-${tabId}`);
         if (content) content.remove();
         if (tab.classList.contains('active')) {
-            const sumTab = document.querySelector('.viewer-tab[data-tab-id="summary"]');
-            if (sumTab) sumTab.click();
+            if (typeof history !== 'undefined' && history.state) {
+                history.back();
+            } else {
+                const sumTab = document.querySelector('.viewer-tab[data-tab-id="waterfall"]');
+                if (sumTab) sumTab.click();
+            }
         }
     });
 
@@ -966,6 +976,23 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     const urlOptions = getOptionsFromUrl();
     const renderOptions = Object.assign(urlOptions, overridingOptions);
     renderOptions.pageId = pageId;
+    
+    if (typeof window !== 'undefined') {
+        const wantsSplit = window.innerWidth <= 1200;
+        if (wantsSplit || overridingOptions.overlapLabels) {
+            renderOptions.overlapLabels = true;
+            let gc = document.getElementById('labels-canvas-element');
+            if (!gc) {
+                gc = document.createElement('canvas');
+                gc.id = 'labels-canvas-element';
+                if (ui.labelsSliderContent) ui.labelsSliderContent.appendChild(gc);
+            }
+            renderOptions.labelsCanvas = gc;
+        } else {
+            renderOptions.overlapLabels = false;
+            renderOptions.labelsCanvas = null;
+        }
+    }
 
     const pageData = waterfallTool.getPage(pageId);
     if (pageData) {
@@ -991,6 +1018,7 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     if (ui.waterfallView) ui.waterfallView.classList.add('active');
+    if (ui.labelsSlider) ui.labelsSlider.classList.add('active');
     ui.btnSettings.style.display = 'block';
     
     if (rendererCanvas) window.dispatchEvent(new Event('resize'));
@@ -1459,6 +1487,65 @@ async function initViewer() {
         }
     });
 
+    if (ui.hamburgerBtn) {
+        ui.hamburgerBtn.addEventListener('click', () => {
+            if (ui.tabsScrollWrapper) ui.tabsScrollWrapper.classList.toggle('menu-open');
+        });
+        
+        // Dismiss tap outside bounds
+        document.addEventListener('click', (e) => {
+            if (ui.tabsScrollWrapper && ui.tabsScrollWrapper.classList.contains('menu-open')) {
+                if (!ui.tabsScrollWrapper.contains(e.target) && (!ui.hamburgerBtn || !ui.hamburgerBtn.contains(e.target))) {
+                    ui.tabsScrollWrapper.classList.remove('menu-open');
+                }
+            }
+        });
+    }
+
+    if (ui.btnCloseTab) {
+        ui.btnCloseTab.addEventListener('click', () => {
+            const activeTab = document.querySelector('.viewer-tab.active');
+            if (activeTab && activeTab.querySelector('.tab-close')) {
+                activeTab.querySelector('.tab-close').click();
+            }
+        });
+    }
+
+    if (ui.labelsSliderToggle) {
+        ui.labelsSliderToggle.addEventListener('click', () => {
+            if (ui.labelsSlider) {
+                ui.labelsSlider.classList.toggle('open');
+                ui.labelsSliderToggle.textContent = ui.labelsSlider.classList.contains('open') ? '◀' : '▶';
+            }
+        });
+    }
+    
+    // Responsive Canvas Resize Observer
+    let lastLabelsOverlap = typeof window !== 'undefined' ? window.innerWidth <= 1200 : false;
+    window.addEventListener('resize', () => {
+        if (!rendererCanvas || !rendererCanvas.options) return;
+        const wantsSplit = window.innerWidth <= 1200;
+        if (wantsSplit !== lastLabelsOverlap) {
+            lastLabelsOverlap = wantsSplit;
+            const options = Object.assign({}, rendererCanvas.options);
+            options.overlapLabels = wantsSplit;
+            
+            if (wantsSplit) {
+                let gc = document.getElementById('labels-canvas-element');
+                if (!gc) {
+                    gc = document.createElement('canvas');
+                    gc.id = 'labels-canvas-element';
+                    if (ui.labelsSliderContent) ui.labelsSliderContent.appendChild(gc);
+                }
+                options.labelsCanvas = gc;
+            } else {
+                options.labelsCanvas = null;
+            }
+            rendererCanvas.updateOptions(options);
+        }
+    });
+
+
     // Initially hide settings
     if (ui.btnSettings) ui.btnSettings.style.display = 'none';
     
@@ -1533,13 +1620,23 @@ async function initViewer() {
             const tabId = tab.dataset.tabId;
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
 
+            if (ui.tabsScrollWrapper) ui.tabsScrollWrapper.classList.remove('menu-open');
+
             if (tabId === 'waterfall') {
                 ui.btnSettings.style.display = 'block';
                 ui.waterfallView.classList.add('active');
+                if (ui.labelsSlider) ui.labelsSlider.classList.add('active');
                 // Ensure canvas resizes properly if needed
                 if (rendererCanvas) window.dispatchEvent(new Event('resize'));
             } else {
                 ui.btnSettings.style.display = 'none';
+                if (ui.labelsSlider) ui.labelsSlider.classList.remove('active');
+            }
+            
+            if (tab.querySelector('.tab-close') && ui.btnCloseTab) {
+                ui.btnCloseTab.classList.remove('hidden');
+            } else if (ui.btnCloseTab) {
+                ui.btnCloseTab.classList.add('hidden');
             }
             
             if (tabId === 'summary') {

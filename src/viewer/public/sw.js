@@ -1,4 +1,4 @@
-const CACHE_NAME = 'waterfall-tools-v1';
+const CACHE_NAME = 'waterfall-tools-v3';
 
 self.addEventListener('install', (event) => {
     event.waitUntil(

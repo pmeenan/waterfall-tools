@@ -153,7 +153,9 @@ console.log(defaultOptions);
     showJsTiming: true,       // Highlight JS execution timings
     showWait: true,           // Render the wait time (TTFB) blocks
     showLegend: true,         // Render the bottom legend
-    thumbMaxReqs: 100         // Maximum requests to draw when thumbnailView=true (0 disables truncation)
+    thumbMaxReqs: 100,        // Maximum requests to draw when thumbnailView=true (0 disables truncation)
+    labelsCanvas: null,       // Optional distinct canvas mapping URL text overlays logically
+    overlapLabels: false      // Renders request rows full-width logically ignoring standard label column sizes natively
 }
 */
 
