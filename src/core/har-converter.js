@@ -164,10 +164,10 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
         }
     }
     
-    // Default page if none exist
+    // Default page if none exist (no startedDateTime yet — set below from globalEarliestMs)
     if (Object.keys(data.pages).length === 0) {
         data.pages["page_0"] = {
-            url: "", title: "", startedDateTime: new Date().toISOString(), pageTimings: {}, requests: {}
+            url: "", title: "", pageTimings: {}, requests: {}
         };
     }
 
@@ -310,8 +310,14 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
         }
     }
 
-    if (globalEarliestMs !== Number.MAX_SAFE_INTEGER && data.pages["page_0"] && !data.pages["page_0"].startedDateTime) {
-        data.pages["page_0"].startedDateTime = new Date(globalEarliestMs).toISOString();
+    // Anchor the synthetic page_0 to the earliest observed request time so the
+    // canvas renderer's baseMs aligns with actual request timestamps. Without this,
+    // bars render at negative offsets (maxTime=0) because the page anchor defaults
+    // to the current wall-clock time while requests may have occurred in the past.
+    if (data.pages["page_0"] && !data.pages["page_0"].startedDateTime) {
+        data.pages["page_0"].startedDateTime = globalEarliestMs !== Number.MAX_SAFE_INTEGER
+            ? new Date(globalEarliestMs).toISOString()
+            : new Date().toISOString();
     }
 
     return data;
