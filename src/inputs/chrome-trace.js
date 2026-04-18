@@ -6,6 +6,7 @@
 import { Netlog, normalizeNetlogToHAR } from './netlog.js';
 import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
+import { foldCpuSlices, SCRIPT_TIMING_EVENTS } from '../core/mainthread-categories.js';
 
 const PRIORITY_MAP = {
     "VeryHigh": "Highest",
@@ -19,6 +20,316 @@ const PRIORITY_MAP = {
 
 function isGzip(buffer) {
     return buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
+}
+
+/**
+ * Port of wptagent's `Trace.ProcessTimelineEvents` / `WriteCPUSlices` / `WriteScriptTimings`
+ * (Sample/Implementations/wptagent/internal/support/trace_parser.py L492-L890). Replays the
+ * raw devtools.timeline / blink.resource events into a per-thread B/E stack, selects the
+ * primary main thread, aggregates CPU time into fixed-size slices, and extracts per-URL JS
+ * execution intervals.
+ *
+ * Inputs are microsecond timestamps from the Chrome trace clock. Outputs:
+ *  - `cpu` in wptagent's `timeline_cpu.json` shape (main_thread string, slice_usecs,
+ *    total_usecs, slices: {thread: {eventName: usecs[]}}) — feed it through
+ *    `foldCpuSlices` to get the renderer-ready 5-category `_mainThreadSlices` payload.
+ *  - `scripts` mirrors `script_timing.json`: {main_thread, <thread>: {url: {eventName:
+ *    [[start_ms, end_ms], ...]}}}, ms relative to `baseUs` so consumers don't re-normalize.
+ *  - `longTasks` — top-level main-thread events ≥ 50 ms, flattened to [[startMs, endMs], ...]
+ *    with overlap coalescing so downstream renderers can shade blocking periods.
+ *
+ * `baseUs` is the HAR page-zero anchor (earliest request/navigation). Slices are keyed off
+ * it so slice index 0 aligns with canvas x=0. `startUs` is the navigationStart filter — any
+ * event whose effective start is before it is dropped (matches trace_parser's `s >= start_time`
+ * guard).
+ */
+function buildMainThreadActivity(rawEvents, baseUs, startUs, metaMainThreads, subframePids) {
+    if (!rawEvents.length) {
+        return { cpu: null, scripts: null, longTasks: [] };
+    }
+
+    // Sort by ts. Chrome emits events in rough-but-not-strict order; the B/E stack can't
+    // tolerate out-of-order entries or it pops the wrong parent.
+    rawEvents.sort((a, b) => a.ts - b.ts);
+
+    const ignoreThreads = new Set();
+    const threads = new Map();            // `pid:tid` → Map<eventName, numericId>
+    const threadStack = new Map();        // `pid:tid` → stack of open events
+    const eventNames = new Map();         // name → numericId
+    const eventNameLookup = [];           // idx → name
+    const timelineEvents = [];            // root events (tree) in ts order
+    const mainThreadCandidates = new Set(metaMainThreads);
+    let mainThread = null;                // locked in once ResourceSendRequest-with-URL fires
+    let endUs = null;
+
+    for (const evt of rawEvents) {
+        const thread = `${evt.pid}:${evt.tid}`;
+        const data = evt.data;
+
+        // Main-thread detection. Matches trace_parser.py L510-L530: the 127.0.0.1:8888
+        // synthetic request marks a thread as ignored (wptagent bootstrap traffic),
+        // and the first `isMainFrame` or `ResourceSendRequest+url` event on a thread
+        // both (a) adopts it into `threads` and (b) locks it in as `mainThread` if one
+        // isn't already selected.
+        if (data && !ignoreThreads.has(thread)) {
+            if (typeof data.url === 'string' && data.url.startsWith('http://127.0.0.1:8888')) {
+                ignoreThreads.add(thread);
+            }
+            if (mainThread === null || data.isMainFrame) {
+                const isMainFrameExplicit = data.isMainFrame === true;
+                const isResourceSendWithUrl = evt.name === 'ResourceSendRequest' && typeof data.url === 'string';
+                if (isMainFrameExplicit || isResourceSendWithUrl) {
+                    if (!threads.has(thread)) threads.set(thread, new Map());
+                    mainThread = thread;
+                    mainThreadCandidates.add(thread);
+                    // Python synthesizes dur=1 on instantaneous Resource events so the
+                    // stack logic still counts them. Mirror that.
+                    if (evt.dur === undefined) evt.dur = 1;
+                }
+            }
+        }
+
+        // Once main_thread is locked in, every non-ignored thread gets tracked so the
+        // slice aggregator has a bucket for it.
+        if (mainThread !== null && !threads.has(thread) && !ignoreThreads.has(thread) && evt.name !== 'Program') {
+            threads.set(thread, new Map());
+        }
+
+        // Stack-replay for B/E/X events. Only proceed when this thread is tracked and
+        // the event actually carries a duration or is half of a B/E pair.
+        const nameMap = threads.get(thread);
+        const hasDur = evt.dur !== undefined;
+        if (!nameMap || (!hasDur && evt.ph !== 'B' && evt.ph !== 'E')) continue;
+
+        if (!eventNames.has(evt.name)) {
+            eventNames.set(evt.name, eventNameLookup.length);
+            eventNameLookup.push(evt.name);
+        }
+        const nid = eventNames.get(evt.name);
+        if (!nameMap.has(evt.name)) nameMap.set(evt.name, nid);
+        if (!threadStack.has(thread)) threadStack.set(thread, []);
+        const stack = threadStack.get(thread);
+
+        let built = null;
+        if (evt.ph === 'E') {
+            if (stack.length > 0) {
+                const top = stack.pop();
+                if (top.n === nid) top.e = evt.ts;
+                built = top;
+            }
+        } else {
+            const ev = { t: thread, n: nid, s: evt.ts };
+            // JS attribution. Mirrors trace_parser.py L590-L600: EvaluateScript / v8.compile /
+            // v8.parseOnBackground use args.data.url; FunctionCall prefers scriptName, falling
+            // back to url (fragment-stripped).
+            if (data) {
+                if ((evt.name === 'EvaluateScript' || evt.name === 'v8.compile' || evt.name === 'v8.parseOnBackground')
+                    && typeof data.url === 'string' && data.url.startsWith('http')) {
+                    ev.js = data.url;
+                } else if (evt.name === 'FunctionCall') {
+                    if (typeof data.scriptName === 'string' && data.scriptName.startsWith('http')) {
+                        ev.js = data.scriptName;
+                    } else if (typeof data.url === 'string' && data.url.startsWith('http')) {
+                        ev.js = data.url.split('#', 1)[0];
+                    }
+                }
+            }
+            if (evt.ph === 'B') {
+                stack.push(ev);
+            } else if (hasDur) {
+                ev.e = ev.s + evt.dur;
+                built = ev;
+            }
+        }
+
+        if (built !== null && built.e !== undefined && built.s >= startUs && built.e >= built.s) {
+            if (endUs === null || built.e > endUs) endUs = built.e;
+            if (stack.length > 0) {
+                const parent = stack.pop();
+                if (!parent.c) parent.c = [];
+                parent.c.push(built);
+                stack.push(parent);
+            } else {
+                timelineEvents.push(built);
+            }
+        }
+    }
+
+    if (timelineEvents.length === 0 || endUs === null || endUs <= baseUs) {
+        return { cpu: null, scripts: null, longTasks: [] };
+    }
+
+    // Slice sizing: largest power of 10 µs that still gives us > 2000 slices. This mirrors
+    // Python's `while slice_count > 2000` loop — `last_exp` is the last exp that produced
+    // > 2000 slices, so slice_usecs = 10^last_exp.
+    const spanUs = endUs - baseUs;
+    let exp = 0, lastExp = 0;
+    let sliceCount = spanUs;
+    while (sliceCount > 2000) {
+        lastExp = exp;
+        exp++;
+        sliceCount = Math.ceil(spanUs / Math.pow(10, exp));
+    }
+    const sliceUsecs = Math.pow(10, lastExp);
+    const finalSliceCount = Math.ceil(spanUs / sliceUsecs);
+    if (finalSliceCount <= 0) {
+        return { cpu: null, scripts: null, longTasks: [] };
+    }
+
+    // Pre-allocate per-thread per-name float arrays. `total` tracks the sum across named
+    // categories so AdjustTimelineSlice can enforce the 100%-per-slot cap.
+    const slices = {};
+    for (const [thread, nameMap] of threads) {
+        const t = { total: new Array(finalSliceCount).fill(0) };
+        for (const name of nameMap.keys()) t[name] = new Array(finalSliceCount).fill(0);
+        slices[thread] = t;
+    }
+
+    const scripts = {};          // thread → url → name → output pairs (ms)
+    const longTasks = [];        // coalesced [ms_start, ms_end]
+
+    function pushLongTask(msStart, msEnd) {
+        if (!longTasks.length) { longTasks.push([msStart, msEnd]); return; }
+        const last = longTasks[longTasks.length - 1];
+        if (msStart >= last[1]) { longTasks.push([msStart, msEnd]); return; }
+        if (msEnd > last[1]) {
+            last[1] = msEnd;
+            if (msStart < last[0]) last[0] = msStart;
+        }
+    }
+
+    function adjustSlice(thread, sliceNumber, name, parentName, elapsed) {
+        if (name === parentName) return;
+        const fraction = Math.min(1.0, elapsed / sliceUsecs);
+        const t = slices[thread];
+        t[name][sliceNumber] += fraction;
+        t.total[sliceNumber] += fraction;
+        if (parentName !== null && t[parentName] && t[parentName][sliceNumber] >= fraction) {
+            t[parentName][sliceNumber] -= fraction;
+            t.total[sliceNumber] -= fraction;
+        }
+        if (t[name][sliceNumber] > 1.0) t[name][sliceNumber] = 1.0;
+        if (t.total[sliceNumber] > 1.0) {
+            let available = Math.max(0, 1.0 - fraction);
+            for (const sliceName of Object.keys(t)) {
+                if (sliceName === 'total' || sliceName === name) continue;
+                t[sliceName][sliceNumber] = Math.min(t[sliceName][sliceNumber], available);
+                available = Math.max(0, available - t[sliceName][sliceNumber]);
+            }
+            t.total[sliceNumber] = Math.min(1.0, Math.max(0, 1.0 - available));
+        }
+    }
+
+    function walk(evt, parentName, stackUsed) {
+        // Use `baseUs` as the slice origin so index 0 lines up with the HAR's page-zero.
+        // Python uses `self.start_time` because wptagent's page_start_time == start_time;
+        // for Chrome traces the netlog can start before navigation, so we key off base and
+        // let the leading slices remain empty.
+        const relStart = evt.s - baseUs;
+        const relEnd = evt.e - baseUs;
+        if (relEnd <= relStart) return;
+        const elapsed = relEnd - relStart;
+        const thread = evt.t;
+        const name = eventNameLookup[evt.n];
+
+        // Long tasks: top-level events on any tracked main-thread candidate, >= 50 ms.
+        if (parentName === null && elapsed > 50000 && mainThreadCandidates.has(thread)) {
+            pushLongTask(Math.floor(relStart / 1000), Math.ceil(relEnd / 1000));
+        }
+
+        // JS attribution: produce [start_ms, end_ms] pairs per (thread, url, eventName).
+        // De-dup by inherited stack — if an ancestor event already covers this exact
+        // (url, name) span, skip it (trace_parser.py L836-L844).
+        let nextStack = stackUsed;
+        if (evt.js) {
+            const url = evt.js;
+            const jsStart = relStart / 1000;
+            const jsEnd = relEnd / 1000;
+            if (!scripts[thread]) scripts[thread] = {};
+            const perUrl = scripts[thread][url] || (scripts[thread][url] = {});
+            const perName = perUrl[name] || (perUrl[name] = []);
+
+            let localStack = stackUsed;
+            const tu = localStack[thread];
+            const priorPeriods = tu && tu[url] && tu[url][name];
+            let covered = false;
+            if (priorPeriods) {
+                for (const p of priorPeriods) {
+                    if (p.length >= 2 && jsStart >= p[0] && jsEnd <= p[1]) { covered = true; break; }
+                }
+            }
+            if (!covered) {
+                perName.push([jsStart, jsEnd]);
+                // Shallow clone of stackUsed so sibling recursion doesn't see each other.
+                nextStack = { ...stackUsed };
+                const threadStackCopy = nextStack[thread] ? { ...nextStack[thread] } : {};
+                nextStack[thread] = threadStackCopy;
+                const urlStackCopy = threadStackCopy[url] ? { ...threadStackCopy[url] } : {};
+                threadStackCopy[url] = urlStackCopy;
+                urlStackCopy[name] = (urlStackCopy[name] || []).concat([[jsStart, jsEnd]]);
+            }
+        }
+
+        // Slice aggregation.
+        const first = Math.floor(relStart / sliceUsecs);
+        const last = Math.floor(relEnd / sliceUsecs);
+        for (let s = first; s <= last && s < finalSliceCount; s++) {
+            if (s < 0) continue;
+            const sliceStart = s * sliceUsecs;
+            const sliceEnd = sliceStart + sliceUsecs;
+            const usedStart = Math.max(sliceStart, relStart);
+            const usedEnd = Math.min(sliceEnd, relEnd);
+            const sliceElapsed = usedEnd - usedStart;
+            if (sliceElapsed > 0) adjustSlice(thread, s, name, parentName, sliceElapsed);
+        }
+
+        if (evt.c) {
+            for (const child of evt.c) walk(child, name, nextStack);
+        }
+    }
+
+    for (const evt of timelineEvents) walk(evt, null, {});
+
+    // Convert float fractions to integer µs (drop the `total` tracker along the way).
+    for (const thread of Object.keys(slices)) {
+        delete slices[thread].total;
+        for (const name of Object.keys(slices[thread])) {
+            const arr = slices[thread][name];
+            for (let i = 0; i < arr.length; i++) arr[i] = Math.round(arr[i] * sliceUsecs);
+        }
+    }
+
+    // Pick the primary main thread: candidate with the most cumulative CPU. Mirrors
+    // trace_parser.py L745-L764. Subframes are NOT excluded — Python doesn't filter them
+    // either, and dropping them would lose main-thread activity on single-process traces
+    // where the document itself is labelled Subframe. Falls back to any tracked thread
+    // if no candidates produced measurable work.
+    let candidates = [...mainThreadCandidates].filter(t => slices[t]);
+    if (candidates.length === 0) candidates = Object.keys(slices);
+    let bestThread = null;
+    let bestTotal = -1;
+    for (const t of candidates) {
+        let total = 0;
+        for (const arr of Object.values(slices[t])) {
+            for (const v of arr) total += v;
+        }
+        if (total > bestTotal) { bestTotal = total; bestThread = t; }
+    }
+    if (!bestThread && mainThread && slices[mainThread]) bestThread = mainThread;
+
+    const cpu = {
+        main_thread: bestThread,
+        main_threads: [...mainThreadCandidates],
+        subframes: [...subframePids],
+        valid: true,
+        total_usecs: spanUs,
+        slice_usecs: sliceUsecs,
+        slices
+    };
+
+    const scriptsOut = Object.keys(scripts).length ? { main_thread: bestThread, ...scripts } : null;
+
+    return { cpu, scripts: scriptsOut, longTasks };
 }
 
 export async function processChromeTraceFileNode(input, options = {}) {
@@ -85,8 +396,18 @@ export async function processChromeTraceFileNode(input, options = {}) {
 
         const netlog = new Netlog();
         const timeline_requests = {};
-        const main_thread_events = []; // For advanced UI timeline visualizations
-        
+
+        // Raw `devtools.timeline` / `blink.resource` events captured for the WriteCPUSlices +
+        // WriteScriptTimings port. Stored minimally (only the fields the stack-replay and JS
+        // attribution in `buildMainThreadActivity` need) to keep the accumulator under control
+        // on large traces — theverge ships ~300k timeline events across 20+ threads.
+        const raw_timeline_events = [];
+        const thread_names = new Map();        // `pid:tid` → thread_name from __metadata
+        const subframe_pids = new Set();       // pids the browser labelled `Subframe:`
+        const cr_renderer_threads = new Set(); // threads named CrRendererMain
+        let marker_main_thread = null;         // `pid:tid` of ResourceSendRequest=wpt-start-recording
+        let first_nav_main_thread = null;      // `pid:tid` of earliest navigationStart/fetchStart
+
         let start_time = null;
         let marked_start_time = null;
         let pageTimings = { onLoad: -1, onContentLoad: -1, _startRender: -1 };
@@ -108,19 +429,45 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 if (trace_event.ts) trace_event.ts = parseInt(trace_event.ts);
                 const cat = trace_event.cat || '';
                 const name = trace_event.name || '';
-                
+                const ph = trace_event.ph || '';
+                const args = trace_event.args;
+                const data = args && args.data ? args.data : null;
+
                 // 1. Process Netlog
                 if (cat === 'netlog' || cat.includes('netlog')) {
                     netlog.addTraceEvent(trace_event);
                     return;
                 }
-                
+
+                // 0. Thread metadata — needed before main-thread selection runs.
+                //    Chrome emits these as `ph: 'M'` with `cat: '__metadata'`. `thread_name`
+                //    is the recorded human-readable thread identifier (we key off
+                //    `CrRendererMain`); `process_labels` flagging `Subframe:` marks the pid
+                //    as a subframe so its renderer thread doesn't outrank the outermost main
+                //    frame when we pick `main_thread`.
+                if (cat === '__metadata') {
+                    const thread = `${trace_event.pid}:${trace_event.tid}`;
+                    if (name === 'thread_name' && args && args.name) {
+                        thread_names.set(thread, args.name);
+                        if (args.name === 'CrRendererMain') cr_renderer_threads.add(thread);
+                    } else if (name === 'process_labels' && args && typeof args.labels === 'string' && args.labels.startsWith('Subframe:')) {
+                        subframe_pids.add(String(trace_event.pid));
+                    }
+                    return;
+                }
+
                 // 2. Process User Timings & Navigations
                 if (cat.includes('blink.user_timing') || cat.includes('rail') || cat.includes('loading') || cat.includes('navigation')) {
                     if (marked_start_time === null && name.includes('navigationStart')) {
                         if (start_time === null || trace_event.ts < start_time) {
                             start_time = trace_event.ts;
                         }
+                    }
+                    // Mirror trace_parser.py's ProcessTraceEvent: the first navigationStart /
+                    // fetchStart pins the main thread if one isn't already locked in via
+                    // the devtools.timeline path below.
+                    if ((name === 'navigationStart' || name === 'fetchStart') && first_nav_main_thread === null) {
+                        first_nav_main_thread = `${trace_event.pid}:${trace_event.tid}`;
                     }
                     if (name.includes('domContentLoadedEventStart') || name === 'domContentLoaded') {
                         if (start_time !== null) pageTimings.onContentLoad = trace_event.ts;
@@ -154,9 +501,36 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 
                 // 3. Process Timeline requests
                 if (cat === 'devtools.timeline' || cat.includes('devtools.timeline') || cat.includes('blink.resource')) {
-                    if (name === 'ResourceSendRequest' && trace_event.args && trace_event.args.data && trace_event.args.data.url === 'http://127.0.0.1:8888/wpt-start-recording') {
+                    if (name === 'ResourceSendRequest' && data && data.url === 'http://127.0.0.1:8888/wpt-start-recording') {
                         marked_start_time = trace_event.ts;
                         start_time = trace_event.ts;
+                        marker_main_thread = `${trace_event.pid}:${trace_event.tid}`;
+                    }
+
+                    // Capture the raw event for later stack-replay (WriteCPUSlices +
+                    // WriteScriptTimings port). Filter to phases that contribute to
+                    // duration accounting — 'X' (complete w/ dur) and 'B'/'E' pairs —
+                    // plus instantaneous ResourceSend/Receive signals that the
+                    // main-thread detector needs (`isMainFrame` + url).
+                    if (ph === 'X' || ph === 'B' || ph === 'E' || name === 'ResourceSendRequest' || name === 'ResourceReceiveResponse') {
+                        // Keep only the data fields the builder actually reads. Retaining
+                        // the full `args` object balloons memory by 10× on theverge.
+                        let slimData = null;
+                        if (data) {
+                            slimData = {};
+                            if (data.url !== undefined) slimData.url = data.url;
+                            if (data.scriptName !== undefined) slimData.scriptName = data.scriptName;
+                            if (data.isMainFrame !== undefined) slimData.isMainFrame = data.isMainFrame;
+                        }
+                        raw_timeline_events.push({
+                            ph,
+                            ts: trace_event.ts,
+                            dur: trace_event.dur,
+                            name,
+                            pid: trace_event.pid,
+                            tid: trace_event.tid,
+                            data: slimData
+                        });
                     }
 
                     let request_id = null;
@@ -232,17 +606,6 @@ export async function processChromeTraceFileNode(input, options = {}) {
                     }
                 }
                 
-                // 4. Main Thread Activity extraction
-                // `dur` is natively present on Complete (Ph: "X") events in micro-seconds natively
-                if ((cat === 'toplevel' || cat.includes('devtools.timeline') || cat.includes('v8') || cat.includes('blink')) && (trace_event.dur > 0 || trace_event.ph === 'X')) {
-                    if (trace_event.ts >= 0 && trace_event.name && !trace_event.name.includes('Resource')) {
-                        main_thread_events.push({
-                            _raw_ts: trace_event.ts,
-                            duration: trace_event.dur / 1000.0, // Convert us to ms
-                            source: trace_event.name
-                        });
-                    }
-                }
             } catch (e) {
                 // Ignore single event errors
             }
@@ -458,16 +821,62 @@ export async function processChromeTraceFileNode(input, options = {}) {
                     page._userTimes[evtName] = (evtTs - base_time_microseconds) / 1000.0;
                 }
             }
-            
-            // Map main thread events securely
-            page._mainThreadEvents = main_thread_events.map(evt => {
-                const offset_time_ms = (evt._raw_ts - base_time_microseconds) / 1000.0;
-                return {
-                    time: final_start_time + offset_time_ms,
-                    duration: evt.duration,
-                    source: evt.source
-                };
-            }).filter(evt => evt.duration >= 0.1); // Discard ultra micro-events natively reducing bloat overhead
+
+            // Main-thread flame chart + per-request JS execution overlays. Port of
+            // wptagent's WriteCPUSlices / WriteScriptTimings (see buildMainThreadActivity
+            // docstring). `startUs` is navigationStart when we know it, otherwise we fall
+            // back to `base_time_microseconds` so the stack-replay has a sensible low bound.
+            const startUs = start_time !== null ? start_time : base_time_microseconds;
+            const metaMainThreads = new Set(cr_renderer_threads);
+            if (marker_main_thread) metaMainThreads.add(marker_main_thread);
+            if (first_nav_main_thread) metaMainThreads.add(first_nav_main_thread);
+            const mt = buildMainThreadActivity(
+                raw_timeline_events,
+                base_time_microseconds,
+                startUs,
+                metaMainThreads,
+                subframe_pids
+            );
+            if (mt.cpu) {
+                const folded = foldCpuSlices(mt.cpu);
+                if (folded) page._mainThreadSlices = folded;
+            }
+            if (mt.longTasks && mt.longTasks.length) {
+                page._longTasks = mt.longTasks;
+            }
+            if (mt.scripts) {
+                // Walk script timings, flatten allowlisted event names per URL, attach to
+                // the first matching HAR entry by URL. Mirrors the `$used` de-dup in
+                // Sample/Implementations/webpagetest/www/waterfall.inc#L2004-L2011.
+                const mainKey = mt.scripts.main_thread;
+                const mainThreadScripts = mainKey && mt.scripts[mainKey];
+                if (mainThreadScripts) {
+                    const perUrl = {};
+                    for (const [url, events] of Object.entries(mainThreadScripts)) {
+                        const flat = [];
+                        for (const ev of SCRIPT_TIMING_EVENTS) {
+                            const pairs = events[ev];
+                            if (!Array.isArray(pairs)) continue;
+                            for (const pair of pairs) {
+                                if (Array.isArray(pair) && pair.length >= 2
+                                    && Number.isFinite(pair[0]) && Number.isFinite(pair[1])) {
+                                    flat.push([pair[0], pair[1]]);
+                                }
+                            }
+                        }
+                        if (flat.length) perUrl[url] = flat;
+                    }
+                    const used = new Set();
+                    for (const entry of har.log.entries) {
+                        const url = entry._full_url || (entry.request && entry.request.url);
+                        if (!url || used.has(url)) continue;
+                        const pairs = perUrl[url];
+                        if (!pairs) continue;
+                        entry._js_timing = pairs;
+                        used.add(url);
+                    }
+                }
+            }
         }
         
         if (options.debug) console.log(`[chrome-trace.js] Finished applying HAR generation successfully.`);

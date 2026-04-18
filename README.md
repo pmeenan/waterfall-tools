@@ -128,7 +128,7 @@ await wt.renderTo(document.getElementById('waterfall-container'), options);
     showMarks: false,        // user timing marks
     showCpu: true,           // CPU utilization graph
     showBw: true,            // bandwidth graph
-    showMainthread: true,    // main thread flame chart (wptagent) or activity blocks
+    showMainthread: true,    // main thread flame chart (wptagent, chrome-trace) or activity blocks
     showLongtasks: true,     // long task warnings
     showMissing: false,      // ellipses for missing requests
     showLabels: true,        // row text labels
