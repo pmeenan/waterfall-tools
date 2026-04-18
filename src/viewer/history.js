@@ -71,3 +71,96 @@ export async function saveToHistory({ url, type, title = '', comment = '', testU
         transaction.onerror = () => reject(transaction.error);
     });
 }
+
+/**
+ * Retrieves all history records from IndexedDB.
+ * @returns {Promise<Array>} List of all history objects
+ */
+export async function getAllHistory() {
+    const db = await getDb();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const getReq = store.getAll();
+        
+        getReq.onsuccess = () => resolve(getReq.result || []);
+        getReq.onerror = () => reject(getReq.error);
+    });
+}
+
+/**
+ * Retrieves a single history record.
+ * @param {string} url - The URL to look up
+ * @returns {Promise<Object|null>}
+ */
+export async function getHistory(url) {
+    if (!url) return null;
+    const db = await getDb();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const getReq = store.get(url);
+        
+        getReq.onsuccess = () => resolve(getReq.result || null);
+        getReq.onerror = () => reject(getReq.error);
+    });
+}
+
+/**
+ * Updates specific fields on an existing history record.
+ * @param {string} url - Original URL as ID
+ * @param {Object} dataUpdates - Key/value pairs to merge
+ */
+export async function updateHistoryInfo(url, dataUpdates) {
+    if (!url) return;
+    const db = await getDb();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const getReq = store.get(url);
+        
+        getReq.onsuccess = () => {
+             const data = getReq.result;
+             if (data) {
+                 const newData = Object.assign({}, data, dataUpdates);
+                 store.put(newData);
+                 resolve(newData);
+             } else {
+                 reject(new Error("Record not found for update"));
+             }
+        };
+        getReq.onerror = () => reject(getReq.error);
+    });
+}
+
+/**
+ * Deletes a history record by URL.
+ * @param {string} url - The URL to delete
+ */
+export async function deleteHistory(url) {
+    if (!url) return;
+    const db = await getDb();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const req = store.delete(url);
+        
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+
+/**
+ * Deletes all history records from the store.
+ */
+export async function clearAllHistory() {
+    const db = await getDb();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const req = store.clear();
+        
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}

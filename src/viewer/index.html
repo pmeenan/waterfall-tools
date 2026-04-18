@@ -54,6 +54,7 @@
             <div class="url-section">
                 <input type="text" id="url-input" placeholder="Enter remote URL to load (e.g. https://...)">
                 <button id="url-load-btn">Load</button>
+                <button id="history-btn" class="secondary-btn">History...</button>
             </div>
 
             <div class="upload-section">
@@ -77,6 +78,43 @@
             <div style="width:30px"></div>
         </header>
         <div id="tile-grid"></div>
+    </div>
+
+    <div id="history-view" class="hidden">
+        <header class="viewer-header history-header">
+            <h1 id="history-view-title">Previously-viewed Waterfalls</h1>
+            <div class="history-controls">
+                <input type="text" id="history-filter" placeholder="Filter history...">
+                <div class="history-pagination">
+                    <select id="history-page-size" aria-label="Items per page">
+                        <option value="50">50 per page</option>
+                        <option value="100" selected>100 per page</option>
+                        <option value="500">500 per page</option>
+                        <option value="1000">1000 per page</option>
+                    </select>
+                    <button id="history-prev-btn" aria-label="Previous Page">◀</button>
+                    <span id="history-page-info">Page 1 of 1</span>
+                    <button id="history-next-btn" aria-label="Next Page">▶</button>
+                </div>
+                <button id="history-clear-btn" style="border: 1px solid #fca5a5; color: #dc2626; background: #fef2f2; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Clear History</button>
+            </div>
+        </header>
+        <div id="history-table-wrapper">
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th data-sort="testUrl">Page URL <span class="sort-icon"></span><div class="resizer"></div></th>
+                        <th data-sort="url" style="width:160px">Source <span class="sort-icon"></span><div class="resizer"></div></th>
+                        <th data-sort="type" style="width:80px">Type <span class="sort-icon"></span><div class="resizer"></div></th>
+                        <th data-sort="numPages" style="width:80px">Pages <span class="sort-icon"></span><div class="resizer"></div></th>
+                        <th data-sort="title">Description <span class="sort-icon"></span><div class="resizer"></div></th>
+                        <th data-sort="comment">Comments <span class="sort-icon"></span><div class="resizer"></div></th>
+                        <th data-sort="firstLoaded" style="width:160px" class="sort-desc">Last Viewed <span class="sort-icon">▼</span><div class="resizer"></div></th>
+                    </tr>
+                </thead>
+                <tbody id="history-tbody"></tbody>
+            </table>
+        </div>
     </div>
 
     <div id="canvas-container" class="hidden">

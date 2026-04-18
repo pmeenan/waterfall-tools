@@ -4,7 +4,7 @@
  * See the LICENSE file for details.
  */
 import { WaterfallTools, identifyFormatFromBuffer, Layout } from 'waterfall-tools';
-import { saveToHistory } from './history.js';
+import { saveToHistory, getAllHistory, updateHistoryInfo, clearAllHistory } from './history.js';
 
 const ui = {
     loading: document.getElementById('loading'),
@@ -44,7 +44,17 @@ const ui = {
     btnCloseTab: document.getElementById('btn-close-tab'),
     labelsSlider: document.getElementById('labels-slider'),
     labelsSliderContent: document.getElementById('labels-slider-content'),
-    labelsSliderToggle: document.getElementById('labels-slider-toggle')
+    labelsSliderToggle: document.getElementById('labels-slider-toggle'),
+    historyBtn: document.getElementById('history-btn'),
+    historyView: document.getElementById('history-view'),
+    historyFilter: document.getElementById('history-filter'),
+    historyPageSize: document.getElementById('history-page-size'),
+    historyPrevBtn: document.getElementById('history-prev-btn'),
+    historyNextBtn: document.getElementById('history-next-btn'),
+    historyPageInfo: document.getElementById('history-page-info'),
+    historyTable: document.getElementById('history-table'),
+    historyTbody: document.getElementById('history-tbody'),
+    historyClearBtn: document.getElementById('history-clear-btn')
 };
 
 let waterfallTool = null;
@@ -716,6 +726,7 @@ async function renderTiles(pushHistory = true) {
     // Purge specific waterfall viewer properties BEFORE rendering dozens of thumbnails
     resetWaterfallUI();
     
+    if (ui.historyView) ui.historyView.classList.add('hidden');
     ui.canvasContainer.classList.add('hidden');
     ui.tileView.classList.remove('hidden');
     ui.tileGrid.innerHTML = '';
@@ -813,6 +824,8 @@ async function renderTiles(pushHistory = true) {
              renderWaterfall(pageId);
         });
     }
+    
+    updateUrlWithCurrentState();
 }
 
 function renderRequestTab(request, reqNum) {
@@ -1159,6 +1172,7 @@ function renderRequestTab(request, reqNum) {
 
 async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = true) {
     if (pushHistory) history.pushState({ view: 'waterfall', pageId }, '');
+    if (ui.historyView) ui.historyView.classList.add('hidden');
     ui.tileView.classList.add('hidden');
     ui.canvasContainer.classList.remove('hidden');
     
@@ -1279,14 +1293,12 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         if (!tooltip) return;
         
         if (!data) {
-            ui.waterfallView.removeAttribute('title');
             tooltip.style.display = 'none';
             return;
         }
         tooltip.style.display = 'block';
         
         let url = data.request.url || data.request._URL || '';
-        ui.waterfallView.title = url;
         
         // Handle truncation in middle if > 100 chars
         if (url.length > 100) {
@@ -1404,6 +1416,9 @@ function resetWaterfallUI() {
         if (ui.traceFrame) ui.traceFrame.src = 'about:blank';
         if (ui.netlogFrame) ui.netlogFrame.src = 'about:blank';
     }
+    
+    const tooltip = document.getElementById('waterfall-tooltip');
+    if (tooltip) tooltip.style.display = 'none';
 }
 
 /**
@@ -1581,44 +1596,69 @@ function updateUrlWithCurrentState() {
         const urlObj = new URL(window.location.href);
         const params = urlObj.searchParams;
         
-        if (waterfallTool && rendererCanvas && rendererCanvas.options) {
-            const currentOpts = rendererCanvas.options;
+        // 1. Resolve Global View explicit bounds
+        if (ui.historyView && !ui.historyView.classList.contains('hidden')) {
+            params.set('view', 'history');
+            params.delete('page');
+            params.delete('tab');
+            params.delete('options');
+        } else if (!ui.tileView.classList.contains('hidden')) {
+            params.delete('view');
+            params.delete('page');
+            params.delete('tab');
+            params.delete('options');
+        } else if (!ui.canvasContainer.classList.contains('hidden')) {
+            params.delete('view');
             
-            if (waterfallTool.data && waterfallTool.data.pages && Object.keys(waterfallTool.data.pages).length <= 1) {
-                params.delete('page');
-            } else {
-                params.set('page', currentOpts.pageId);
-            }
-            
-            // Generate non-default options list
-            const defaultOpts = WaterfallTools.getDefaultOptions();
-            let optionOverrides = [];
-            for (const key of Object.keys(defaultOpts)) {
-                if (key === 'pageId') continue;
-                if (currentOpts[key] !== undefined && currentOpts[key] !== defaultOpts[key]) {
-                    optionOverrides.push(`${key}:${encodeURIComponent(currentOpts[key])}`);
+            // Map Canvas-specific configuration cleanly
+            if (waterfallTool && rendererCanvas && rendererCanvas.options) {
+                const currentOpts = rendererCanvas.options;
+                
+                if (waterfallTool.data && waterfallTool.data.pages && Object.keys(waterfallTool.data.pages).length <= 1) {
+                    params.delete('page');
+                } else {
+                    params.set('page', currentOpts.pageId);
                 }
-            }
-            if (optionOverrides.length > 0) {
-                params.set('options', optionOverrides.join(','));
+                
+                // Generate non-default options list
+                const defaultOpts = WaterfallTools.getDefaultOptions();
+                let optionOverrides = [];
+                for (const key of Object.keys(defaultOpts)) {
+                    if (key === 'pageId') continue;
+                    if (currentOpts[key] !== undefined && currentOpts[key] !== defaultOpts[key]) {
+                        optionOverrides.push(`${key}:${encodeURIComponent(currentOpts[key])}`);
+                    }
+                }
+                if (optionOverrides.length > 0) {
+                    params.set('options', optionOverrides.join(','));
+                } else {
+                    params.delete('options');
+                }
             } else {
+                params.delete('page');
                 params.delete('options');
             }
-        }
-        
-        // Tab Extraction
-        const activeTab = document.querySelector('.viewer-tab.active');
-        if (activeTab) {
-            const tabId = activeTab.dataset.tabId;
-            if (tabId === 'waterfall') {
+            
+            // Tab Extraction natively isolated to canvas visibility
+            const activeTab = document.querySelector('.viewer-tab.active');
+            if (activeTab) {
+                const tabId = activeTab.dataset.tabId;
+                if (tabId === 'waterfall') {
+                    params.delete('tab');
+                } else if (tabId && tabId.startsWith('req-')) {
+                    params.set('tab', 'Request' + tabId.substring(4));
+                } else if (tabId) {
+                    params.set('tab', tabId);
+                }
+            } else {
                 params.delete('tab');
-            } else if (tabId && tabId.startsWith('req-')) {
-                params.set('tab', 'Request' + tabId.substring(4));
-            } else if (tabId) {
-                params.set('tab', tabId);
             }
         } else {
+            // Base state (dropzone)
+            params.delete('view');
+            params.delete('page');
             params.delete('tab');
+            params.delete('options');
         }
         
         // Push strictly as a replace state to prevent muddying navigation linearly
@@ -1988,13 +2028,19 @@ async function initViewer() {
 
     // History API bindings
     window.addEventListener('popstate', (e) => {
+        const state = e.state;
+        if (state && state.view === 'history') {
+            if (typeof loadAndRenderHistory === 'function') loadAndRenderHistory();
+            return;
+        }
+        
         if (!waterfallTool || !waterfallTool.data || !waterfallTool.data.pages) {
             ui.canvasContainer.classList.add('hidden');
             ui.tileView.classList.add('hidden');
+            if (ui.historyView) ui.historyView.classList.add('hidden');
             ui.dropZone.classList.remove('hidden');
             return;
         }
-        const state = e.state;
         if (state) {
             if (state.view === 'tiles') {
                 renderTiles(false);
@@ -2017,6 +2063,7 @@ async function initViewer() {
             resetViewerState();
             ui.canvasContainer.classList.add('hidden');
             ui.tileView.classList.add('hidden');
+            if (ui.historyView) ui.historyView.classList.add('hidden');
             ui.dropZone.classList.remove('hidden');
         }
     });
@@ -2188,6 +2235,239 @@ async function initViewer() {
     } else {
         ui.dropZone.classList.remove('hidden');
     }
+}
+
+// --- History Tab UI Logic ---
+let historyData = [];
+let historySortField = 'firstLoaded';
+let historySortDesc = true;
+let historyPage = 1;
+
+async function loadAndRenderHistory() {
+    ui.canvasContainer.classList.add('hidden');
+    ui.tileView.classList.add('hidden');
+    ui.dropZone.classList.add('hidden');
+    ui.historyView.classList.remove('hidden');
+
+    historyData = await getAllHistory();
+    renderHistoryTable();
+}
+
+function renderHistoryTable() {
+    // 1. Filter
+    const query = (ui.historyFilter.value || '').toLowerCase();
+    let filtered = historyData;
+    if (query) {
+        filtered = historyData.filter(r => 
+            (r.testUrl && r.testUrl.toLowerCase().includes(query)) ||
+            (r.url && r.url.toLowerCase().includes(query)) ||
+            (r.title && r.title.toLowerCase().includes(query)) ||
+            (r.comment && r.comment.toLowerCase().includes(query)) ||
+            (r.type && r.type.toLowerCase().includes(query))
+        );
+    }
+    
+    // 2. Sort
+    filtered.sort((a, b) => {
+        let valA = a[historySortField] || '';
+        let valB = b[historySortField] || '';
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        if (valA < valB) return historySortDesc ? 1 : -1;
+        if (valA > valB) return historySortDesc ? -1 : 1;
+        return 0;
+    });
+    
+    // 3. Paginate
+    const pageSize = parseInt(ui.historyPageSize.value, 10);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+    if (historyPage > totalPages) historyPage = totalPages;
+    if (historyPage < 1) historyPage = 1;
+    
+    ui.historyPageInfo.textContent = `Page ${historyPage} of ${totalPages} (${filtered.length} total)`;
+    
+    const startIdx = (historyPage - 1) * pageSize;
+    const items = filtered.slice(startIdx, startIdx + pageSize);
+    
+    // 4. Render Headers icons
+    const ths = ui.historyTable.querySelectorAll('th');
+    ths.forEach(th => {
+        const icon = th.querySelector('.sort-icon');
+        if (icon) icon.textContent = '';
+        if (th.dataset.sort === historySortField) {
+            icon.textContent = historySortDesc ? '▼' : '▲';
+        }
+    });
+
+    // 5. Render rows
+    ui.historyTbody.innerHTML = '';
+    items.forEach(row => {
+        const tr = document.createElement('tr');
+        
+        const tdTestUrl = document.createElement('td');
+        tdTestUrl.title = row.testUrl || '';
+        tdTestUrl.textContent = row.testUrl || '';
+        
+        const tdSource = document.createElement('td');
+        tdSource.title = row.url;
+        tdSource.textContent = row.url;
+
+        const tdType = document.createElement('td');
+        tdType.textContent = row.type || '';
+        
+        const tdPages = document.createElement('td');
+        tdPages.textContent = row.numPages || 0;
+
+        const tdTitle = document.createElement('td');
+        renderEditableCell(tdTitle, row.url, 'title', row.title || '');
+
+        const tdComment = document.createElement('td');
+        renderEditableCell(tdComment, row.url, 'comment', row.comment || '');
+        
+        const tdDate = document.createElement('td');
+        const dt = row.firstLoaded ? new Date(row.firstLoaded) : new Date();
+        tdDate.textContent = dt.toLocaleString();
+        
+        tr.append(tdTestUrl, tdSource, tdType, tdPages, tdTitle, tdComment, tdDate);
+        
+        tr.addEventListener('click', (e) => {
+            if (e.target.closest('.history-inline-edit')) return;
+            // Load it seamlessly securely bypassing browser full-reloads natively
+            const urlInput = document.getElementById('url-input');
+            if (urlInput) urlInput.value = row.url;
+            document.getElementById('url-load-btn').click();
+        });
+        
+        ui.historyTbody.appendChild(tr);
+    });
+}
+
+function renderEditableCell(td, url, field, currentVal) {
+    const wrap = document.createElement('div');
+    wrap.className = 'history-inline-edit';
+    
+    const span = document.createElement('span');
+    span.style.flex = '1';
+    span.style.overflow = 'hidden';
+    span.style.textOverflow = 'ellipsis';
+    span.textContent = currentVal;
+    
+    const editBtn = document.createElement('span');
+    editBtn.className = 'edit-btn';
+    editBtn.textContent = '✏️';
+    editBtn.title = 'Edit';
+    
+    wrap.append(span, editBtn);
+    td.appendChild(wrap);
+    
+    editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        wrap.innerHTML = '';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentVal;
+        
+        const save = async () => {
+            const newVal = input.value;
+            if (newVal !== currentVal) {
+                await updateHistoryInfo(url, { [field]: newVal }).catch(e => console.warn(e));
+                const rec = historyData.find(r => r.url === url);
+                if (rec) rec[field] = newVal;
+            }
+            td.innerHTML = '';
+            renderEditableCell(td, url, field, newVal);
+        };
+        
+        input.addEventListener('blur', save);
+        input.addEventListener('keydown', (ke) => {
+            if (ke.key === 'Enter') {
+                input.blur();
+            }
+        });
+        
+        // Prevent click events natively inside input securely preventing row trigger
+        input.addEventListener('click', ev => ev.stopPropagation());
+        
+        wrap.appendChild(input);
+        input.focus();
+    });
+}
+
+// Bind History Control Listeners securely natively
+if (ui.historyFilter) {
+    ui.historyFilter.addEventListener('input', () => { historyPage = 1; renderHistoryTable(); });
+    ui.historyPageSize.addEventListener('change', () => { historyPage = 1; renderHistoryTable(); });
+    ui.historyPrevBtn.addEventListener('click', () => { if (historyPage > 1) { historyPage--; renderHistoryTable(); }});
+    ui.historyNextBtn.addEventListener('click', () => { 
+        const pageSize = parseInt(ui.historyPageSize.value, 10);
+        const totalElems = (ui.historyFilter.value) ? 
+           historyData.filter(r => (r.testUrl||'').includes(ui.historyFilter.value) || (r.url||'').includes(ui.historyFilter.value)).length :
+           historyData.length;
+        if (historyPage < Math.ceil(totalElems / pageSize)) { historyPage++; renderHistoryTable(); };
+    });
+    
+    ui.historyTable.querySelectorAll('th').forEach(th => {
+        th.addEventListener('click', (e) => {
+            if (e.target.classList.contains('resizer')) return;
+            const sortId = th.dataset.sort;
+            if (!sortId) return;
+            if (historySortField === sortId) {
+                historySortDesc = !historySortDesc;
+            } else {
+                historySortField = sortId;
+                historySortDesc = false;
+            }
+            renderHistoryTable();
+        });
+    });
+    
+    // Column Resizer bindings cleanly extracting mouse deltas securely natively
+    let resizerInfo = null;
+    ui.historyTable.querySelectorAll('.resizer').forEach(resizer => {
+        resizer.addEventListener('mousedown', (e) => {
+            const th = resizer.parentElement;
+            resizerInfo = {
+                th,
+                startX: e.pageX,
+                startWidth: th.offsetWidth
+            };
+            resizer.classList.add('resizing');
+            e.stopPropagation();
+            e.preventDefault();
+        });
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!resizerInfo) return;
+        const dx = e.pageX - resizerInfo.startX;
+        const newWidth = Math.max(50, resizerInfo.startWidth + dx);
+        resizerInfo.th.style.width = `${newWidth}px`;
+    });
+    
+    document.addEventListener('mouseup', () => {
+        if (resizerInfo) {
+            ui.historyTable.querySelectorAll('.resizer').forEach(r => r.classList.remove('resizing'));
+            resizerInfo = null;
+        }
+    });
+    
+    if (ui.historyClearBtn) {
+        ui.historyClearBtn.addEventListener('click', async () => {
+            if (confirm("Are you sure you want to delete all history of viewed waterfalls?")) {
+                await clearAllHistory().catch(e => console.error("Failed to clear history", e));
+                historyData = [];
+                historyPage = 1;
+                renderHistoryTable();
+            }
+        });
+    }
+}
+
+if (ui.historyBtn) {
+    ui.historyBtn.addEventListener('click', () => {
+        if (typeof history !== 'undefined') history.pushState({ view: 'history' }, '', '?view=history');
+        loadAndRenderHistory();
+    });
 }
 
 initViewer();
