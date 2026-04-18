@@ -1196,37 +1196,183 @@ export class WaterfallCanvas {
                     chartYOffset += blockHeight;
                 }
                 
-                // Draw Main Thread & Long Tasks (WPT format often has browser_main_thread)
-                // Also track generic `_mainThreadEvents` we will add from chrome-trace.js
+                // Draw Main Thread activity.
+                // Preferred path: wptagent-style per-slice histograms (`_mainThreadSlices`) render
+                // a flame chart — for each pixel within the data area we average the microseconds
+                // each category spent across the slices that fall under that pixel, then stack the
+                // categories into a vertical bar whose height reflects how busy the main thread
+                // was during that window.
+                // Fallback: legacy `_browser_main_thread` / `_mainThreadEvents` arrays draw
+                // discrete time-ranged blocks per event.
+                const mtSlices = page._mainThreadSlices && page._mainThreadSlices.slices && page._mainThreadSlices.slice_usecs
+                    ? page._mainThreadSlices : null;
                 const mtEvents = page._browser_main_thread || page._mainThreadEvents || [];
-                if (this.options.showMainthread && mtEvents.length > 0) {
+                if (this.options.showMainthread && (mtSlices || mtEvents.length > 0)) {
                     const blockHeight = this.options.thumbnailView ? 16 : 50;
-                    const mtTitle = !this.options.thumbnailView ? 'Main Thread' : null;
+                    const mtTitle = !this.options.thumbnailView ? 'Browser Main Thread' : null;
                     drawChartFrame(mtTitle, chartYOffset, blockHeight);
-                    
-                    mtEvents.forEach(evt => {
-                        let ts = evt.time;
-                        // Auto normalize format
-                        if (ts > 1000000000000) ts -= baseStartMs;
-                        if (ts < 0 || ts > dimensions.maxTime) return;
-                        
-                        const duration = evt.duration || 0;
-                        const src = evt.source || evt.type || '';
-                        
-                        let color = [200, 200, 200];
-                        if (src.toLowerCase().includes('script')) color = [255, 190, 80];
-                        else if (src.toLowerCase().includes('layout') || src.toLowerCase().includes('style')) color = [150, 100, 255];
-                        else if (src.toLowerCase().includes('paint')) color = [80, 200, 100];
-                        else if (src.toLowerCase().includes('parse')) color = [120, 180, 255];
-                        
-                        const sx = xScaler(ts);
-                        const ex = Math.max(sx + 1, xScaler(ts + duration));
-                        
-                        this.ctx.fillStyle = `rgb(${color.join(',')})`;
-                        const padding = this.options.thumbnailView ? 0 : 10;
-                        this.ctx.fillRect(sx, chartYOffset + padding, ex - sx, blockHeight - (padding * 2));
-                    });
-                    
+
+                    if (mtSlices) {
+                        // Stack order must stay stable so categories render in consistent bands:
+                        // Parse (bottom) → Layout → Paint → EvaluateScript → other (top).
+                        // Colors mirror the WebPageTest GD reference palette
+                        // (Sample/Implementations/webpagetest/www/waterfall.inc L441-490).
+                        const CATEGORY_COLORS = [
+                            ['ParseHTML',      'rgb(112,162,227)'],
+                            ['Layout',         'rgb(154,126,230)'],
+                            ['Paint',          'rgb(113,179,99)'],
+                            ['EvaluateScript', 'rgb(241,196,83)'],
+                            ['other',          'rgb(184,184,184)']
+                        ];
+                        const sliceUsecs = mtSlices.slice_usecs;
+                        const slicesObj = mtSlices.slices;
+                        // Each slice carries up to `sliceUsecs` microseconds of CPU time, so when
+                        // we aggregate N slices the denominator is N * sliceUsecs regardless of
+                        // how many categories are present.
+                        let sliceCount = 0;
+                        for (const arr of Object.values(slicesObj)) {
+                            if (Array.isArray(arr) && arr.length > sliceCount) sliceCount = arr.length;
+                        }
+                        const totalMs = (sliceCount * sliceUsecs) / 1000;
+                        const dataXStart = dimensions.labelsWidth + 1;
+                        const dataXEnd = dimensions.canvasWidth - 1;
+                        const dataPixelWidth = dataXEnd - dataXStart;
+                        const top = chartYOffset + 1;
+                        const bottom = chartYOffset + blockHeight - 1;
+                        const innerHeight = bottom - top;
+                        if (sliceCount > 0 && dimensions.maxTime > 0 && dataPixelWidth > 0 && innerHeight > 0) {
+                            // Two-pass render. Pass 1 folds the slice histograms into per-pixel
+                            // per-category fractions. For each pixel column we widen the sample
+                            // window to the max of (real pixel duration, 2 * slice_usecs) so
+                            // that whenever a pixel is narrower than two slices (roadtrip ships
+                            // 1 ms slices at ~1.6 ms/px) we still low-pass across slice
+                            // boundaries instead of aliasing the per-slice values — otherwise a
+                            // busy slice next to a quiet one would produce alternating tall and
+                            // short columns at the slice period. The window stays weighted by
+                            // fractional slice overlap, and the denominator stays equal to the
+                            // window duration so uniform input always integrates to uniform
+                            // output regardless of how many slices each window covers.
+                            const msPerPx = dimensions.maxTime / dataPixelWidth;
+                            const windowMs = Math.max(msPerPx, 2 * sliceUsecs / 1000);
+                            const windowHalfMs = windowMs / 2;
+                            // Slice arrays are indexed from absolute t=0 (page start), but
+                            // `dimensions.maxTime` is just the visible window's *span*. When
+                            // the caller clips the view with `startTime > 0` the pixel at
+                            // `dataXStart` maps to that offset in slice coordinates — without
+                            // applying it here, zooming into a later window reads slices from
+                            // the beginning and the flame chart comes back empty.
+                            const viewOffsetMs = this.options.startTime ? this.options.startTime * 1000 : 0;
+                            const perPixel = [];
+                            const catKeys = [];
+                            for (const [cat] of CATEGORY_COLORS) {
+                                if (slicesObj[cat]) catKeys.push(cat);
+                            }
+                            for (let x = dataXStart; x <= dataXEnd; x++) {
+                                const pixelCenterMs = viewOffsetMs + ((x - dataXStart) + 0.5) / dataPixelWidth * dimensions.maxTime;
+                                if (pixelCenterMs >= totalMs + windowHalfMs) break;
+                                const tMs0 = Math.max(0, pixelCenterMs - windowHalfMs);
+                                const tMs1 = Math.min(totalMs, pixelCenterMs + windowHalfMs);
+                                if (tMs1 <= tMs0) { perPixel.push(null); continue; }
+                                const startSliceF = (tMs0 * 1000) / sliceUsecs;
+                                const endSliceF = (tMs1 * 1000) / sliceUsecs;
+                                const iStart = Math.max(0, Math.floor(startSliceF));
+                                const iEnd = Math.min(sliceCount - 1, Math.ceil(endSliceF) - 1);
+                                if (iEnd < iStart) { perPixel.push(null); continue; }
+                                const windowUsecs = (endSliceF - startSliceF) * sliceUsecs;
+                                if (windowUsecs <= 0) { perPixel.push(null); continue; }
+                                const fractions = {};
+                                for (const cat of catKeys) {
+                                    const arr = slicesObj[cat];
+                                    let total = 0;
+                                    for (let i = iStart; i <= iEnd; i++) {
+                                        const v = arr[i];
+                                        if (!v) continue;
+                                        // Fractional overlap of slice [i, i+1) with the window
+                                        // [startSliceF, endSliceF). Assumes work is uniformly
+                                        // distributed within a slice — the only assumption
+                                        // available given the source data's granularity.
+                                        const overlap = Math.min(i + 1, endSliceF) - Math.max(i, startSliceF);
+                                        if (overlap > 0) total += v * overlap;
+                                    }
+                                    if (total > 0) fractions[cat] = total / windowUsecs;
+                                }
+                                perPixel.push(fractions);
+                            }
+                            // Pass 2 stacks the folded fractions into colored bands. For each
+                            // category we draw ONE filled polygon spanning every x column (step
+                            // function top / step function bottom) so adjacent columns share
+                            // edges inside a single path. Per-column `fillRect(x, y, 1, h)` at
+                            // fractional devicePixelRatio (1.25 / 1.5 on Windows / at browser
+                            // zoom) lands each 1-CSS-pixel rect across partial physical pixels
+                            // and source-over blends adjacent fills with antialiased edge alpha
+                            // — producing periodic darker bands of the same color at fixed CSS
+                            // intervals. One path per category eliminates the inter-column
+                            // blending entirely.
+                            const bottomY = new Array(perPixel.length);
+                            for (let xi = 0; xi < perPixel.length; xi++) bottomY[xi] = bottom;
+
+                            for (const [cat, color] of CATEGORY_COLORS) {
+                                const topY = new Array(perPixel.length);
+                                let anyContrib = false;
+                                for (let xi = 0; xi < perPixel.length; xi++) {
+                                    const fractions = perPixel[xi];
+                                    const fraction = fractions ? (fractions[cat] || 0) : 0;
+                                    const h = Math.min(innerHeight, fraction * innerHeight);
+                                    if (h >= 0.5) anyContrib = true;
+                                    topY[xi] = Math.max(top, bottomY[xi] - h);
+                                }
+                                if (!anyContrib) continue;
+
+                                // Outline the filled area as a single polygon: march left→right
+                                // along the step-function top, then right→left along the step
+                                // bottom. Every pair of lineTo calls produces a flat-top 1-px
+                                // span; the rasterizer treats the whole shape as one region so
+                                // there are no inter-column seams.
+                                this.ctx.fillStyle = color;
+                                this.ctx.beginPath();
+                                this.ctx.moveTo(dataXStart, bottomY[0]);
+                                for (let xi = 0; xi < perPixel.length; xi++) {
+                                    const x = dataXStart + xi;
+                                    this.ctx.lineTo(x, topY[xi]);
+                                    this.ctx.lineTo(x + 1, topY[xi]);
+                                }
+                                for (let xi = perPixel.length - 1; xi >= 0; xi--) {
+                                    const x = dataXStart + xi;
+                                    this.ctx.lineTo(x + 1, bottomY[xi]);
+                                    this.ctx.lineTo(x, bottomY[xi]);
+                                }
+                                this.ctx.closePath();
+                                this.ctx.fill();
+
+                                // This category's top becomes the next category's bottom.
+                                for (let xi = 0; xi < perPixel.length; xi++) bottomY[xi] = topY[xi];
+                            }
+                        }
+                    } else {
+                        mtEvents.forEach(evt => {
+                            let ts = evt.time;
+                            // Auto normalize format
+                            if (ts > 1000000000000) ts -= baseStartMs;
+                            if (ts < 0 || ts > dimensions.maxTime) return;
+
+                            const duration = evt.duration || 0;
+                            const src = evt.source || evt.type || '';
+
+                            let color = [200, 200, 200];
+                            if (src.toLowerCase().includes('script')) color = [255, 190, 80];
+                            else if (src.toLowerCase().includes('layout') || src.toLowerCase().includes('style')) color = [150, 100, 255];
+                            else if (src.toLowerCase().includes('paint')) color = [80, 200, 100];
+                            else if (src.toLowerCase().includes('parse')) color = [120, 180, 255];
+
+                            const sx = xScaler(ts);
+                            const ex = Math.max(sx + 1, xScaler(ts + duration));
+
+                            this.ctx.fillStyle = `rgb(${color.join(',')})`;
+                            const padding = this.options.thumbnailView ? 0 : 10;
+                            this.ctx.fillRect(sx, chartYOffset + padding, ex - sx, blockHeight - (padding * 2));
+                        });
+                    }
+
                     chartYOffset += blockHeight;
                 }
 

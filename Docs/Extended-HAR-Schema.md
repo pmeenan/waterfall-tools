@@ -54,6 +54,11 @@ Global WebPageTest page-level timings and context records (such as performance m
 - **Network:** `_origin_dns`, `_cookies`, `_domains`, `_breakdown`, `_requests`, `_pages`, `_unlinked_connections`, `_unlinked_dns_lookups`
 - **Audits & SEO:** `_audit_issues`, `_axe`, `_parsed_css`, `_performance`, `_privacy-sandbox`, `_robots_meta`, `_valid-head`, `_ecommerce`, `_fugu-apis`, `_generated-content`, `_origin-trials`, `_lighthouse`
 - **Timings & Visuals:** `_userTimes`, `_userTimingMeasures`, `_interactivePeriods`, `_longTasks`, `_largestPaints`, `_chromeUserTiming`, `_blinkFeatureFirstUsed`, `_consoleLog`, `_usertiming`, `_thumbnails`, `_images`, `_videoFrames`
+- **Main-thread flame chart:** `_mainThreadSlices` (Object): Per-slice histogram of primary main-thread CPU time folded into five canonical categories (`ParseHTML`, `Layout`, `Paint`, `EvaluateScript`, `other`) so the waterfall renderer can stack colored bars showing what the browser spent each time window doing. Only the primary thread is carried; background / GC helper threads are dropped.
+  - `slice_usecs` (number): Fixed slice width in microseconds (wptagent emits 10000 = 10 ms slices).
+  - `total_usecs` (number, optional): Sum of all slice widths — equals `slices[*].length * slice_usecs` when complete.
+  - `slices` (Object): Keyed by category. Each value is an array of integer microseconds spent in that category during the Nth slice. Fraction-of-slice = `value / slice_usecs`.
+  - Sources: **wptagent** (from `{run}_timeline_cpu.json.gz`, folded from Chrome's raw trace-event names via the WebPageTest category table in `Sample/Implementations/webpagetest/www/waterfall.inc#L437-L491`). Other formats (chrome-trace, perfetto) may populate this field in future releases.
 - **External Data (Often Dropped):** `_almanac`, `_CrUX`
 
 ### Scalar Fields (Partial List)

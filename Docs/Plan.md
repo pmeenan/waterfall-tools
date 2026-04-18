@@ -169,6 +169,15 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Enforce an upstream fetch timeout via `AbortController` and a Content-Length cap to keep Worker CPU/memory bounded.
 - [x] Document the lockstep sync requirement: every new input format added to the orchestrator MUST also be added to the Worker's sniff logic (`AGENTS.md` §76, `cloudflare-worker/README.md`).
 
+## Phase 8g: Main Thread Activity Flame Chart
+**Goal:** Restore the WebPageTest-style "Browser Main Thread" flame chart so `showMainthread` produces a rendered visualization rather than an empty reserved band. Starts with wptagent inputs (which ship pre-computed per-slice histograms in `[run]_timeline_cpu.json.gz`); other sources to follow in a later phase.
+- [x] Define `_mainThreadSlices` on the Extended HAR page object: `{slice_usecs, total_usecs, slices}` where `slices` maps each of five canonical categories (`ParseHTML`, `Layout`, `Paint`, `EvaluateScript`, `other`) to an array of integer microseconds per slice. Document in `Docs/Extended-HAR-Schema.md` and `src/core/har-types.js`.
+- [x] In `src/inputs/wptagent.js`, parse `[run][_Cached]_timeline_cpu.json[.gz]`, keep only the primary `main_thread` arrays, fold raw trace-event names into the five canonical categories via `MAIN_THREAD_CATEGORY_MAP` (mirrored from `Sample/Implementations/webpagetest/www/waterfall.inc` L437-L491), and attach to the matching HAR page by `_run` / `_cached`.
+- [x] Extend `src/renderer/layout.js#calculateRows` so `hasMainthread` also reserves height when `_mainThreadSlices` is present (not only legacy `_browser_main_thread`).
+- [x] Implement the flame-chart draw loop in `src/renderer/canvas.js`: for every pixel of the data area, aggregate `usecs` per category across the slices falling under that pixel, and stack colored bars bottom-up in fixed order `ParseHTML → Layout → Paint → EvaluateScript → other` using the reference WPT palette.
+- [x] Keep the legacy `_browser_main_thread` / `_mainThreadEvents` block-based rendering as a fallback when slices are absent.
+- [x] Add vitest coverage in `tests/inputs/wptagent.test.js` for category folding, slice-count parity across types, and per-slice-value bounds.
+
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.
 - [x] Add explicit platform abstraction definitions within `src/platforms/`.

@@ -419,7 +419,8 @@ export class Layout {
         const hasCpu = options.showCpu && p._utilization && p._utilization.cpu;
         const hasBw = options.showBw && p._utilization && p._utilization.bw;
         const mtEvents = p._browser_main_thread || p._mainThreadEvents || [];
-        const hasMainthread = options.showMainthread && mtEvents.length > 0;
+        const mtSlices = p._mainThreadSlices && p._mainThreadSlices.slices && p._mainThreadSlices.slice_usecs ? p._mainThreadSlices : null;
+        const hasMainthread = options.showMainthread && (mtSlices || mtEvents.length > 0);
         const longTasks = p._longTasks || [];
         const hasLongTasks = options.showLongtasks && (longTasks.length > 0 || mtEvents.length > 0);
 

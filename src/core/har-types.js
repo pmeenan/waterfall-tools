@@ -197,6 +197,7 @@
  * @property {Object} [_valid-head]
  * @property {Object} [_interactivePeriods]
  * @property {Object} [_longTasks]
+ * @property {{slice_usecs: number, total_usecs?: number, slices: Object<string, number[]>}} [_mainThreadSlices]
  * @property {Object} [_largestPaints]
  * @property {Object} [_chromeUserTiming]
  * @property {Object} [_blinkFeatureFirstUsed]
