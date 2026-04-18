@@ -153,6 +153,20 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Update `chrome-trace.js`'s call site to pass `final_start_time` directly (it was already in ms after the HTTP `date:` header offset hack, but had to be `/ 1000.0`'d for the old seconds API).
 - [x] Regenerate the netlog golden fixtures (`tests/fixtures/netlog-google.har.json`, `netlog-amazon1.har.json`) — diff is anchor-only, every relative `_*` field is unchanged.
 
+## Phase 8f: CORS Fetch Proxy (Cloudflare Worker)
+**Goal:** Provide a deploy-ready, self-contained Cloudflare Worker that acts as a CORS-friendly fetch fallback for URL-based imports when remote origins do not send `Access-Control-Allow-Origin` headers — without becoming an open proxy.
+- [x] Create the `cloudflare-worker/` top-level directory containing `worker.js` (single-file module Worker), a minimal `wrangler.toml`, and a deployment `README.md`.
+- [x] Gate all Worker logic behind `url.pathname === '/fetch'`; every other path passes through unmodified via `fetch(request)`.
+- [x] Parse the `url` query parameter, validate it's an absolute `http(s)://` URL, and block obvious SSRF targets (loopback, RFC 1918, link-local, CGNAT, `localhost`/`.local`/`.internal`, IPv4-mapped IPv6) before any upstream fetch.
+- [x] Forward the caller's real IP via `X-Forwarded-For` (appending to existing chain), `X-Real-IP`, `Forwarded` (RFC 7239 quoted), and a `Via: 1.1 waterfall-tools-proxy` header so the proxy is intentionally non-anonymizing.
+- [x] Read the first 64 KB of the upstream response, run the same format-sniff logic as `src/inputs/orchestrator.js#identifyFormatFromBuffer` (inlined into the Worker so it stays a single file), and reject with `415 unsupported_format` anything that isn't a recognised waterfall-tools input.
+- [x] Stream the matched body back to the caller by replaying the buffered sniff chunks (one-per-pull for backpressure) followed by unmodified pass-through of the remaining `reader.read()` output. No reassembly, no content transformation; `Content-Encoding` / `Content-Type` / `Content-Length` / `ETag` / `Last-Modified` / `Cache-Control` are copied verbatim.
+- [x] Add `Access-Control-Allow-Origin: *` (and `Access-Control-Expose-Headers` for the format label) so anonymous-mode `fetch()` works against the proxy.
+- [x] Implement per-IP failure rate limiting using an in-memory `Map<string, {count, firstFailureMs}>` keyed by `CF-Connecting-IP` (default 10 failures per 10 minutes → 429 until the window rolls over), with a map-size cap (default 10 000 entries). When the cap is reached and every tracked entry is still within its active window, refuse to evict (preventing unique-IP flood attacks from silently rolling real offenders off the FIFO) and **fail-closed**: reject all `/fetch` requests with 429 until the oldest tracked entry ages out.
+- [x] Reject `HEAD` on `/fetch` because there's no body to sniff; handle `OPTIONS` preflights with the appropriate CORS headers.
+- [x] Enforce an upstream fetch timeout via `AbortController` and a Content-Length cap to keep Worker CPU/memory bounded.
+- [x] Document the lockstep sync requirement: every new input format added to the orchestrator MUST also be added to the Worker's sniff logic (`AGENTS.md` §76, `cloudflare-worker/README.md`).
+
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.
 - [x] Add explicit platform abstraction definitions within `src/platforms/`.

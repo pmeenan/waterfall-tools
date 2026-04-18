@@ -1405,6 +1405,69 @@ function resetWaterfallUI() {
     }
 }
 
+/**
+ * Fetch a user-supplied URL with escalating fallbacks for CORS-blocked origins.
+ *
+ * Attempt order:
+ *   1. Direct fetch with credentials (so sites behind a cookie-based paywall work).
+ *   2. Anonymous direct fetch (no credentials).
+ *   3. Relative `/fetch?url=<target>` — the waterfall-tools CORS proxy worker
+ *      co-deployed on this origin, if any.
+ *   4. If (3) returned 403 or 404 (signalling no proxy is deployed here) AND
+ *      this viewer isn't already on https://waterfall-tools.com, fall back to
+ *      the public proxy at https://waterfall-tools.com/fetch.
+ *
+ * The 403/404 gate on step 4 is deliberate: it lets privately-hosted viewers
+ * run their own proxy (potentially inside a firewall) without silently leaking
+ * URLs to the public instance. Any other status from the local proxy is
+ * treated as a real failure and not retried.
+ *
+ * Returns a Response on the first successful attempt. Throws if every
+ * strategy fails, with an error message describing the last failure.
+ */
+const PUBLIC_PROXY_ORIGIN = 'https://waterfall-tools.com';
+
+async function fetchRemote(targetUrl) {
+    // 1. Direct fetch, crossorigin with credentials.
+    try {
+        const r = await fetch(targetUrl, { mode: 'cors', credentials: 'include' });
+        if (r.ok) return r;
+    } catch (_e) { /* CORS or network error — try anonymous next */ }
+
+    // 2. Anonymous direct fetch.
+    try {
+        const r = await fetch(targetUrl, { mode: 'cors', credentials: 'omit' });
+        if (r.ok) return r;
+    } catch (_e) { /* fall through to the proxy path */ }
+
+    // 3. Relative /fetch on the current origin.
+    const proxyPath = `/fetch?url=${encodeURIComponent(targetUrl)}`;
+    let relativeStatus = null;
+    let relativeError = null;
+    try {
+        const r = await fetch(proxyPath, { mode: 'cors', credentials: 'omit' });
+        if (r.ok) return r;
+        relativeStatus = r.status;
+    } catch (e) {
+        relativeError = e;
+    }
+
+    // 4. Public-instance proxy, only when the local /fetch explicitly signals
+    //    "no proxy here" (403/404) and we aren't already on the public origin.
+    const onPublicInstance = (typeof window !== 'undefined') &&
+        window.location && window.location.origin === PUBLIC_PROXY_ORIGIN;
+    if (!onPublicInstance && (relativeStatus === 403 || relativeStatus === 404)) {
+        const publicProxyUrl = `${PUBLIC_PROXY_ORIGIN}/fetch?url=${encodeURIComponent(targetUrl)}`;
+        const r = await fetch(publicProxyUrl, { mode: 'cors', credentials: 'omit' });
+        if (r.ok) return r;
+        throw new Error(`Public proxy returned HTTP ${r.status}`);
+    }
+
+    if (relativeStatus !== null) throw new Error(`Proxy returned HTTP ${relativeStatus}`);
+    if (relativeError) throw relativeError;
+    throw new Error(`Unable to fetch ${targetUrl}`);
+}
+
 async function resetViewerState() {
     resetWaterfallUI();
     
@@ -1644,8 +1707,7 @@ async function initViewer() {
                 try {
                     await resetViewerState();
                     showLoading(`Downloading: ${urlVal}`);
-                    const response = await fetch(urlVal);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const response = await fetchRemote(urlVal);
                     
                     showLoading("Processing Network Data...");
                     const buffer = await response.arrayBuffer();
@@ -2028,17 +2090,16 @@ async function initViewer() {
         try {
             await resetViewerState();
             showLoading(`Downloading: ${srcUrl}`);
-            const response = await fetch(srcUrl);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
+            const response = await fetchRemote(srcUrl);
+
             let keylogBuffer = null;
             if (keylogUrl) {
                 showLoading(`Downloading keylog: ${keylogUrl}`);
-                const keylogResponse = await fetch(keylogUrl);
-                if (keylogResponse.ok) {
+                try {
+                    const keylogResponse = await fetchRemote(keylogUrl);
                     keylogBuffer = await keylogResponse.arrayBuffer();
-                } else {
-                    console.warn(`Failed to fetch keylog: HTTP ${keylogResponse.status}`);
+                } catch (e) {
+                    console.warn(`Failed to fetch keylog: ${e.message}`);
                 }
             }
             

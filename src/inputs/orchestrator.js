@@ -94,6 +94,40 @@ function concatUint8Arrays(arrays) {
     return result;
 }
 
+/**
+ * Distinctive wptagent member filenames. A valid wptagent bundle's first
+ * 64KB is expected to contain at least one of these substrings (they appear
+ * inside the zip's local file headers). Keep in sync with the list in
+ * cloudflare-worker/worker.js.
+ */
+const WPTAGENT_FILENAME_TOKENS = [
+    'testinfo.json',
+    'testinfo.ini',
+    'video_1/ms_',
+    'video_1_cached/ms_',
+    '_devtools_requests.json',
+    '_netlog_requests.json',
+    '_page_data.json',
+    '_visual_progress.json',
+    '_timed_events.json',
+    '_script_timing.json',
+    '_trace.json.gz',
+    '_timeline_cpu.json',
+    '_long_tasks.json',
+    '_interactive.json',
+    'lighthouse.json.gz',
+    '_bodies.zip',
+];
+
+function looksLikeWptagentZip(buf) {
+    const decoder = new TextDecoder('utf-8', { fatal: false });
+    const text = decoder.decode(buf.subarray(0, Math.min(buf.length, 65536)));
+    for (const token of WPTAGENT_FILENAME_TOKENS) {
+        if (text.includes(token)) return true;
+    }
+    return false;
+}
+
 function finishSniffing(text, resolve) {
     const minText = text.replace(/\s/g, '');
 
@@ -180,10 +214,14 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
         });
     }
 
-    // Check for ZIP magic bytes (PK\x03\x04)
+    // Check for ZIP magic bytes (PK\x03\x04). Require at least one
+    // distinctive wptagent member filename in the first 64KB so we don't
+    // claim arbitrary zips as wptagent archives. The central directory lives
+    // at the end of the archive, but each member is preceded by a local file
+    // header containing its filename — that's what we scan for here.
     if (textBuf.length >= 4) {
         const magic = readUint32BE(textBuf, 0);
-        if (magic === 0x504b0304) {
+        if (magic === 0x504b0304 && looksLikeWptagentZip(textBuf)) {
             return { format: 'wptagent', isGz: false };
         }
     }
