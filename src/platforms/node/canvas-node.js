@@ -5,7 +5,7 @@
  */
 import { createCanvas as napiCreateCanvas } from '@napi-rs/canvas';
 
-export class NodeCanvas {
+export class NativeCanvas {
     constructor(width, height) {
         this.width = width;
         this.height = height;

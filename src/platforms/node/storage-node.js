@@ -9,7 +9,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 
-export class NodeStorage {
+export class NativeStorage {
     constructor(hash) {
         this.hash = hash;
         this.filePath = path.join(os.tmpdir(), `waterfall_opfs_${hash}`);

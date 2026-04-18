@@ -40,6 +40,13 @@ async function runRollup(entryName, aliasMap, outDir, externalDeps, stubName, is
     const bundle = await rollup({
         input: resolve(__dirname, `../src/${entryName}`),
         external: externalDeps,
+        onwarn(warning, warn) {
+            // Ignore brotli circular dependency
+            if (warning.code === 'CIRCULAR_DEPENDENCY' && warning.message.includes('node_modules/brotli/')) {
+                return;
+            }
+            warn(warning);
+        },
         plugins: [
             alias({ entries: aliasMap }),
             nodeResolve({ preferBuiltins: true, browser: isBrowser }),

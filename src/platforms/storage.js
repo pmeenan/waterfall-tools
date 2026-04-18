@@ -6,14 +6,14 @@
 import * as Impl from 'platform-storage-impl';
 
 export async function createStorage(hash) {
-    const StorageClass = Impl.NodeStorage || Impl.BrowserStorage;
+    const StorageClass = Impl.NativeStorage;
     const storage = new StorageClass(hash);
     await storage.init();
     return storage;
 }
 
 export async function cleanupOrphans() {
-    if (Impl.BrowserStorage) {
-        await Impl.BrowserStorage.cleanupOrphans();
+    if (Impl.NativeStorage.cleanupOrphans) {
+        await Impl.NativeStorage.cleanupOrphans();
     }
 }

@@ -5,7 +5,7 @@
  */
 // File: src/platforms/browser/storage-browser.js
 
-export class BrowserStorage {
+export class NativeStorage {
     constructor(hash) {
         this.hash = hash;
         this.dirHandle = null;

@@ -6,7 +6,7 @@
 import * as Impl from 'platform-canvas-impl';
 
 export async function createCanvas(width, height) {
-    const CanvasClass = Impl.NodeCanvas || Impl.BrowserCanvas;
+    const CanvasClass = Impl.NativeCanvas;
     const canvasWrapper = new CanvasClass(width, height);
     return canvasWrapper.getCanvas();
 }
