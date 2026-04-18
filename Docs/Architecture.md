@@ -1,130 +1,135 @@
 # Waterfall Tools Architecture
 
 ## Overview
-The Waterfall Tools library is a highly performant, modular, client-side Vanilla JavaScript library for generating, viewing, and analyzing network waterfalls and filmstrips. It takes inspiration from WebPageTest, with an emphasis on performance, zero-bloat, and extensibility.
 
-## Core Principles
-- **Intermediary Data Format**: Everything standardizes to an Extended HAR (HTTP Archive) format.
-- **Pluggability**: Input processors, output generators, and embeddable viewers are isolated and selectable.
-- **Client-Rendered**: Canvas-based rendering with Vanilla JS for optimal performance.
-- **Environment Agnostic**: Supports both Browser and Node.js environments where applicable.
+Waterfall Tools is a high-performance, modular Vanilla JavaScript library for generating, viewing, and analyzing network waterfalls and filmstrips. It takes its visual conventions from WebPageTest and prioritizes zero bloat, extensibility, and raw rendering speed.
 
-## High-Level Architecture
+## Core principles
+
+- **One intermediate format.** Every input is normalized to an Extended HAR (HTTP Archive) payload before it touches renderers or output modules.
+- **Pluggable.** Input parsers, output generators, and embed targets are isolated modules — consumers only pay for what they use, and bundlers can tree-shake the rest.
+- **Client-rendered.** Canvas-based rendering in Vanilla JS. No framework, no DOM-per-request.
+- **Isomorphic.** The core runs the same code path in the browser and Node.js. Environment-specific shims are dynamically imported.
+
+## High-level architecture
 
 ```mermaid
 graph TD
-    %% Inputs
-    subgraph Inputs ["Input Processors (inputs/)"]
-        HARv1[HAR format]
-        ChromeTrace[Chrome Trace, CDP & Perfetto]
-        WPT[WPT Format & Netlog]
-        Custom[Custom JSON]
-        Tcpdump[PCAP / PCAPNG Captures]
+    subgraph Inputs ["Input processors (src/inputs/)"]
+        HAR[HAR 1.2]
+        ChromeTrace[Chrome Trace / CDP / Perfetto]
+        WPT[WPT JSON / wptagent / Netlog]
+        Tcpdump[PCAP / PCAPNG captures]
     end
 
-    %% Orchestrator
-    subgraph Core ["Core Orchestration (core/)"]
-        Orchestrator[Input Orchestrator]
-        HAR_Ext[(Extended HAR Data Intermediary)]
-        Conductor[Main Library Conductor API]
+    subgraph Core ["Core orchestration (src/core/)"]
+        Orchestrator[Format sniffing orchestrator]
+        HAR_Ext[(Extended HAR intermediate)]
+        Conductor[WaterfallTools class]
     end
 
-    %% Outputs & Viewers
-    subgraph Processors ["Output Processors (outputs/)"]
-        ImageGen[Image Generator]
-        ThumbGen[Thumbnail Generator]
-        JSONGen[Simplified JSON]
+    subgraph Outputs ["Output processors (src/outputs/)"]
+        ImageGen[Image generator]
+        ThumbGen[Thumbnail generator]
+        JSONGen[simple-json]
     end
 
-    subgraph Renderer ["Rendering Engine (renderer/)"]
-        Canvas[Canvas Engine]
-        Interactions[Interaction Hooks <br/> Hover/Click/Zoom/Filter]
+    subgraph Renderer ["Rendering engine (src/renderer/)"]
+        Canvas[Canvas engine]
+        Interactions[Interaction hooks<br/>hover / click / zoom / filter]
     end
 
-    subgraph Embed ["Embeddable Viewers (embed/)"]
-        DirectEmbed[renderTo API Embedding]
-        Iframe[Iframe / Query Params]
-        External[External Viewers <br/> Perfetto / DevTools / NetLog Viewer]
+    subgraph Embed ["Embeddable viewers (src/embed/)"]
+        DirectEmbed[renderTo API]
+        Iframe[Iframe + query params]
+        External[Embedded Perfetto / NetLog viewer]
     end
 
-    %% Connections
-    HARv1 --> Orchestrator
+    HAR --> Orchestrator
     ChromeTrace --> Orchestrator
     WPT --> Orchestrator
-    Custom --> Orchestrator
-    
+    Tcpdump --> Orchestrator
+
     Orchestrator --> HAR_Ext
     HAR_Ext --> Conductor
-    
+
     Conductor --> ImageGen
     Conductor --> ThumbGen
     Conductor --> JSONGen
-    
+
     Conductor --> Canvas
     Canvas --> Interactions
-    
+
     Conductor --> DirectEmbed
     Conductor --> Iframe
     Conductor --> External
 ```
 
-## Directory Structure
+## Directory structure
 
 ```text
 /
-├── bin/                # CLI entry points and binary wrappers
-│   └── waterfall-tools.js # Main CLI executable pulling from Core
+├── bin/
+│   └── waterfall-tools.js            # Unified CLI
 ├── src/
-│   ├── inputs/             # Self-contained modules for processing specific input formats
-│   │   ├── cli/            # Standalone CLI tools testing & generating Extended HARs
-│   │   ├── utilities/      # Internal parsing pipelines & decoupled bin protocol helpers
-│   │   │   └── tcpdump/    # Deep packet inspection modular helpers (TLS, QUIC, TCP/UDP)
-│   │   ├── har.js          # Standard HAR passthrough
-│   │   ├── chrome-trace.js
-│   │   ├── perfetto.js     # Perfetto protobuf binary parser
-│   │   ├── wpt-json.js     # WebPageTest pipeline
-│   │   ├── netlog.js       # Raw Chrome proxy tracker
-│   │   ├── cdp.js          # Chrome DevTools network protocols
-│   │   ├── tcpdump.js      # Processes PCAP/PCAPNG packets
-│   │   └── orchestrator.js # API for converting chosen input to intermediary HAR
-│   ├── outputs/            # Modules for generating various output formats
-│   │   ├── image.js        # Waterfall image generation
-│   │   ├── thumbnail.js    # Thumbnail generation
-│   │   └── simple-json.js  # Simplified request data
-│   ├── renderer/           # Waterfall canvas rendering logic
-│   │   ├── canvas.js       # Core rendering loop
-│   │   ├── layout.js       # Positioning and geometry calculations
-│   │   └── interaction.js  # Hooks for hover, click, zoom, filtering
-│   ├── embed/              # Website embedding support
-│   │   ├── iframe-embed.js # Iframe query param handling
-│   │   └── external/       # Wrappers for Perfetto, Chrome DevTools
-│   ├── core/               # Shared logic, schemas, and main library conductor
-│   │   ├── har-types.js    # Extended HAR conventions
-│   │   └── conductor.js    # Main API interface
-│   ├── viewer/             # Self-contained, full-featured standalone frontend UI
-│   │   ├── index.html      # Main presentation container
-│   │   ├── viewer.js       # App controller handling loading, layout routing, drag-and-drop, history API, interactions (tooltips), and generating dynamic Request Detail Tabs
-│   │   ├── history.js      # IndexedDB wrapper securely managing waterfall history states tracking user URLs
-│   │   └── public/         # Self-hosted static dependencies (sw.js, favicons) copied natively via Vite
-│   │       └── netlog-viewer/ # Standalone compiled Chrome NetLog viewer HTML bundle
-│   ├── platforms/          # Environment-specific implementations (e.g., File I/O vs Fetch)
-│   │   ├── browser/
-│   │   └── node/
-│   └── filmstrip/          # (Future) Filmstrip and screenshot processing
-├── vite.config.js          # Library build configuration
-├── vite.demo.config.js     # Standalone viewer frontend configuration
-├── Sample/                 # Sample files and reference implementations
-│   ├── Data/               # Sample input files grouped by format (e.g., HAR/source1)
-│   └── Implementations/    # Sample python parsing implementations by format
+│   ├── inputs/                        # Input format processors
+│   │   ├── cli/                       # Per-format CLI wrappers (Node-only)
+│   │   ├── utilities/                 # Internal parsers / binary protocol helpers
+│   │   │   └── tcpdump/               # Deep packet inspection (TLS, QUIC, TCP/UDP, HPACK, QPACK)
+│   │   ├── har.js                     # HAR passthrough
+│   │   ├── chrome-trace.js            # Chrome DevTools Trace → Extended HAR
+│   │   ├── perfetto.js                # Perfetto protobuf (pure-JS)
+│   │   ├── wpt-json.js                # WebPageTest JSON
+│   │   ├── wptagent.js                # wptagent ZIP archives
+│   │   ├── netlog.js                  # Chrome Netlog
+│   │   ├── cdp.js                     # Chrome DevTools Protocol events
+│   │   ├── tcpdump.js                 # PCAP / PCAPNG
+│   │   └── orchestrator.js            # Format sniffing + routing
+│   ├── outputs/
+│   │   ├── image.js                   # Waterfall image export
+│   │   ├── thumbnail.js               # Thumbnail export
+│   │   └── simple-json.js             # Flattened 1D request array
+│   ├── renderer/
+│   │   ├── canvas.js                  # Core render loop
+│   │   ├── layout.js                  # Row layout + geometry
+│   │   └── interaction.js             # Hover / click / zoom / filter hooks
+│   ├── embed/
+│   │   ├── iframe-embed.js            # Iframe query-param wiring
+│   │   └── external/                  # Perfetto / NetLog viewer wrappers
+│   ├── core/
+│   │   ├── waterfall-tools.js         # Main WaterfallTools class
+│   │   ├── har-converter.js           # HAR ↔ internal shape
+│   │   ├── har-types.js               # JSDoc type definitions
+│   │   └── decompress.js              # Content-encoding decoders
+│   ├── viewer/                        # Standalone full-page viewer
+│   │   ├── index.html
+│   │   ├── viewer.js                  # App controller (routing, drag-drop, history, request tabs)
+│   │   ├── history.js                 # IndexedDB-backed URL history
+│   │   └── public/
+│   │       └── netlog-viewer/         # Self-hosted Chrome NetLog viewer bundle
+│   ├── platforms/
+│   │   ├── browser/                   # Browser-only shims (fetch, File)
+│   │   └── node/                      # Node-only shims (fs, streams)
+│   └── filmstrip/                     # (Future) screenshot / filmstrip processing
+├── vite.config.js                     # Library build
+├── vite.demo.config.js                # Demo viewer build
+├── cloudflare-worker/                 # Optional CORS fetch proxy (single-file)
+├── Sample/
+│   ├── Data/                          # Sample inputs grouped by format
+│   └── Implementations/               # Reference parsers (e.g. Python)
+└── Docs/
 ```
 
-## CLI Modes and Testing
-Each input format processor acts as an independent module that includes a **stand-alone CLI mode**. The CLI takes a single input file format and generates an output file in the intermediary Extended HAR format. This standalone mode doubles as the primary testing vector: automated tests parse known sample data and assert that the CLI-generated outputs strictly match known-good Extended HAR outputs (after an initial baseline is captured).
+## CLI modes and testing
 
-## Intermediary Data Format (Extended HAR)
-The library uses the standard HAR 1.2 format as a base. Any application-specific data extracted from non-HAR formats (such as Chrome Traces or WPT data) will be stored in fields prefixed with an underscore (`_`), per the HAR specification allowance for custom fields. 
+Every input format processor ships with a standalone CLI wrapper under `src/inputs/cli/[format].js` that ingests one file and emits normalized Extended HAR JSON. The unified CLI at `bin/waterfall-tools.js` wraps the same pipeline with format auto-detection and automatic keylog discovery.
 
-Example:
+Tests (vitest) parse sample inputs and assert strict equality against committed golden Extended HAR fixtures. Large-object comparisons are routed through `JSON.parse(JSON.stringify(...))` before assertion to avoid `undefined`-vs-missing hangs; dynamically-generated fields (like fallback `startedDateTime` values derived from `Date.now()`) are scrubbed from both sides before comparison.
+
+## Extended HAR
+
+Standard HAR 1.2 as the baseline. Anything that doesn't fit the 1.2 schema — custom data from Chrome Traces, WPT payloads, PCAP decryption — lives in fields prefixed with an underscore, per HAR's own extension convention.
+
 ```json
 {
   "log": {
@@ -137,8 +142,8 @@ Example:
       {
         "startedDateTime": "2023-10-01T12:00:00.000Z",
         "time": 50,
-        "request": { ... },
-        "response": { ... },
+        "request": { },
+        "response": { },
         "_initiator": "script.js",
         "_renderBlocking": true,
         "_connectionReused": false
@@ -148,35 +153,74 @@ Example:
 }
 ```
 
-### Tcpdump Bandwidth & Chunk Timing
-When processing PCAP captures, the tcpdump processor estimates the maximum download bandwidth by running a 100ms sliding window over all server-to-client packets in the capture. This value (in Kbps) is stored as `_bwDown` on the page object, enabling the canvas renderer to calculate per-chunk download durations for granular waterfall visualization. Individual response data chunks from HTTP/1, HTTP/2 DATA frames, and HTTP/3 DATA frames are mapped to `_chunks` arrays with absolute millisecond timestamps and byte counts. HTTP/2 stream priority is parsed from HEADERS frames (when the PRIORITY flag is set) and standalone PRIORITY frames, mapping the weight to Chrome-compatible priority strings (Highest/High/Medium/Low/Lowest). HTTP/3 priority is extracted from the `priority` request header using RFC 9218 Extensible Priorities urgency values. Request overhead (`_bytesOut`) is estimated from serialized request headers, and uncompressed response sizes (`_objectSizeUncompressed`) are tracked when content-encoding decompression produces a different size than the wire bytes.
+The full set of custom fields is documented in [Extended-HAR-Schema.md](Extended-HAR-Schema.md).
 
-### Multi-File Archives & OPFS Integration
-When processing complex multi-asset packages natively encapsulating several files uniquely (e.g., `wptagent` ZIP archives chaining JSON traces, netlogs, and screenshots), parsers MUST mitigate memory bloat forcefully. The architecture seamlessly utilizes the Web **Origin Private File System (OPFS)** natively paired dynamically with the `Web Locks API`. This bridges native unzipped file assets precisely through `data._opfsStorage` and `data._zipFiles` boundaries inherently, granting the main library unified mechanisms (`getPageResource()`) to securely map isolated Blob URLs natively to images or raw string chunks efficiently dynamically on-demand, without permanently unpacking and exhausting available RAM natively.
+### Tcpdump bandwidth & chunk timing
 
-#### Nested Response Bodies (`_bodies.zip`)
-WPTAgent ZIP archives contain nested `[run]_bodies.zip` (and `[run]_Cached_bodies.zip`) archives holding individual response body files. Each request in `devtools_requests.json` references its body via the `body_file` field (e.g., `001-<id>-body.txt`). During processing, the wptagent parser extracts these nested zips into temporary storage, reads each referenced body file, base64-encodes the content, and stores it on the HAR entry's `response.content.text` with `encoding: 'base64'`. The temporary storage is destroyed immediately after extraction to minimize memory usage.
+When processing PCAP captures, the tcpdump processor runs a 100 ms sliding window over server-to-client packets to estimate peak download bandwidth. The value (Kbps) is stored as `_bwDown` on the page and lets the canvas renderer compute per-chunk download durations for granular visualization.
 
-#### Chunked HTML Body Inspection
-For HTML responses with both `_chunks` (with timestamps) and a base64-encoded body, the standalone viewer's request inspector renders the response body as a per-chunk hex-viewer-style table instead of one monolithic block. The body is decoded once into a `Uint8Array` and sliced by `inflated` byte counts (or wire `bytes` when `inflated` is absent), with `TextDecoder` stream-mode handling UTF-8 sequences split across chunk boundaries. Each row shows the chunk's waterfall-relative arrival time, request-relative offset, and inflated/wire byte counts in a narrow left column, alongside the syntax-highlighted HTML slice that arrived in that delivery in a wide right column. This makes it trivial to correlate "what arrived when" against the canvas waterfall timeline.
+Response data chunks from HTTP/1 body segments, HTTP/2 DATA frames, and HTTP/3 DATA frames are captured into `_chunks` arrays with absolute millisecond timestamps and byte counts (plus an optional `inflated` field when content-encoding is in use — see below).
 
-## Progress Reporting & Event Loop Yielding
-All input parsers support an optional `options.onProgress(phase, percent)` callback for real-time processing feedback. The `loadBuffer()` method automatically injects `totalBytes` into options so parsers can scale progress proportionally to bytes consumed. The tcpdump parser reports the most granular progress across 5 distinct phases (reading packets, TLS decryption, protocol decoding, UDP decoding, waterfall building) and inserts `setTimeout(0)` yield points between phases and periodically within long synchronous loops to prevent browser "script too long" dialogs. Other stream-based parsers yield naturally at each `await reader.read()` chunk boundary. The standalone viewer displays a CSS-animated progress bar during processing, driven by this callback.
+Stream priority is extracted per protocol:
+- **HTTP/2** — from HEADERS frames when the PRIORITY flag is set, and from standalone PRIORITY frames. Weights map to Chrome-compatible names (Highest / High / Medium / Low / Lowest).
+- **HTTP/3** — from the `priority` request header using the RFC 9218 Extensible Priorities urgency value.
 
-## Rendering Engine
-The renderer uses the native HTML5 `<canvas>` API rather than the DOM (e.g., creating hundreds of `<div>` tags) to ensure that rendering thousands of requests doesn't cause browser layout trashing. The canvas engine is completely autonomous, instantiated against a parent container div where it utilizes native `ResizeObserver` instances to self-recalculate structural geometric bounds responsive to viewport changes perfectly. Interaction is handled by maintaining a spatial index of drawn elements and mapping mouse coordinates to data entries. Application logic overrides can be supplied via robust hook events system injected into the render core. It natively supports specialized rendering modes (e.g., **Connection View** for multiplexing visualization, or **Thumbnail View** for dense overviews) configurable via standard render option primitives. Since HAR files can natively contain multiple pages (such as First View and Repeat View runs from WebPageTest), the rendering engine assumes callers actively filter the global pool of request entries to specifically match only the single active page ID before passing them to the rendering loop natively.
+Request overhead (`_bytesOut`) is estimated from the serialized request line and headers. Uncompressed response size (`_objectSizeUncompressed`) is tracked when decompression produces a different byte count than the wire bytes.
 
-## Embeddable Components
-The architecture natively accommodates integration directly securely into web apps. The `WaterfallTools.renderTo(containerElement, options)` API handles deep integrations organically, superseding any separate `div-embed.js` boilerplate. IFrame configurations rely on structured message passing or parsed query parameters for headless integration with data resources. 
+### Multi-file archives & OPFS integration
 
-## Build and Bundling
-The project uses Vite (backed by Rolldown/Rollup) to package the library into modular ES Modules (ESM). The configuration must strictly support tree-shaking, preserving cross-platform aliasing (`scripts/build.js`) replacing runtime environment branches (like canvas wrappers) with statically resolvable targets securely.
+Complex multi-asset packages (wptagent ZIPs chain JSON traces, netlogs, and screenshots) would blow out RAM if fully unpacked. The pipeline uses the Web **Origin Private File System (OPFS)** paired with the **Web Locks API** to stage assets on disk. `data._opfsStorage` and `data._zipFiles` track what's available; the library exposes `getPageResource()` so consumers can pull individual Blob URLs or buffers on demand without holding the full decompressed archive in memory.
 
-### Strict Artifact Generation
-To maximize load performance and caching efficiency across integrations natively, the library explicitly avoids excessive fragmentation (dozens of micro-chunks) by lifting decoupled streaming parsers (`@streamparser/json`) to static imports globally. As a baseline, the bundler generates exactly three primary payload artifacts:
-1. `waterfall-tools.es.js` - The core application logic, HTML5 canvas renderer, and standard JSON streaming processors.
-2. `tcpdump-[hash].js` - The dynamically loaded chunk isolated specifically for TCPDump, PCAP, SSL decryption, QUIC, and standard deep-packet inspection tooling natively.
-3. `decompress-[hash].js` - The dynamically loaded chunk exclusively isolating WebAssembly decompression fallbacks like `brotli-dec-wasm` protecting core payloads accurately.
+#### Response bodies from nested `_bodies.zip`
 
-## Responsive UI Boundaries & Pinch Geometry
-Mobile configurations securely trigger layout breakpoints bypassing explicit device definitions using structural flex bindings inherently ensuring 3-across grids neatly wrap appropriately across scaling devices gracefully. Touch listeners (`touchstart`, `touchmove`) attached explicitly within `WaterfallCanvas` decode multi-point geometry calculating `startTime` and `endTime` transformations intrinsically seamlessly scaling absolute grids organically horizontally while skipping standard `dpr` scaling recalculations explicitly.
+wptagent archives wrap response bodies inside nested `[run]_bodies.zip` and `[run]_Cached_bodies.zip`. Each request in `devtools_requests.json` references its body by `body_file` (e.g. `001-<id>-body.txt`). During processing the wptagent parser extracts these nested zips into temporary OPFS storage, reads each referenced body, base64-encodes the raw bytes, and stores the result on the HAR entry's `response.content.text` with `encoding: 'base64'`. The temp storage is destroyed immediately after extraction.
+
+#### Per-chunk `inflated` byte counts
+
+For content-encoded (gzip / br / zstd) responses, each `_chunks[i]` may carry an `inflated` field representing the decoded bytes that particular wire chunk contributed. The sum across a response equals `_objectSizeUncompressed`. Parsers only emit this field when the source gives genuine per-chunk attribution (Chrome Netlog / DevTools Trace / CDP / wptagent provide it directly; tcpdump computes it via streaming decompression). Consumers that find `inflated` missing should treat it as equal to `bytes`.
+
+#### Chunked HTML body inspection
+
+For HTML responses with both `_chunks` (with timestamps) and a base64-encoded body, the standalone viewer's request inspector renders the body as a per-chunk table rather than a single block. The base64 is decoded once into a `Uint8Array` and sliced by `inflated` byte counts (falling back to wire `bytes` when absent). `TextDecoder` in stream mode handles UTF-8 sequences that split across chunk boundaries. Each row shows the chunk's waterfall-relative arrival time, request-relative offset, and inflated/wire byte counts on the left, with the syntax-highlighted HTML slice that arrived in that delivery on the right — making it trivial to correlate "what arrived when" against the canvas timeline.
+
+## Progress reporting & event-loop yielding
+
+Every input parser accepts an optional `options.onProgress(phase, percent)` callback. `loadBuffer()` automatically injects `totalBytes` so parsers can scale progress against bytes consumed.
+
+The tcpdump parser reports five distinct phases (reading packets, TLS decryption, protocol decoding, UDP decoding, waterfall building) and inserts `setTimeout(0)` yield points between phases and at intervals inside long synchronous loops to keep the main thread from hitting the browser's "script too long" guard. Other stream-based parsers yield naturally at each `await reader.read()` chunk boundary.
+
+The standalone viewer displays a CSS-animated progress bar driven by this callback.
+
+## Rendering engine
+
+The renderer uses the HTML5 `<canvas>` API rather than per-request DOM nodes — rendering thousands of requests doesn't trigger layout reflow. The canvas is instantiated against a parent container and uses a `ResizeObserver` to recalculate geometry as the viewport changes.
+
+Interaction is handled by maintaining a spatial index of drawn elements and mapping pointer coordinates back to data entries. Application logic plugs in via callback hooks (`onHover`, `onClick`) rather than inheritance.
+
+The renderer supports specialized modes configurable via standard options:
+- **Connection View** — groups entries by connection to visualize multiplexing.
+- **Thumbnail View** — dense overview with optional truncation (`thumbMaxReqs`).
+
+Since HAR files can contain multiple pages (e.g. WebPageTest First View + Repeat View), callers are expected to filter global request entries to the active page ID before passing them to the render loop.
+
+## Embeddable components
+
+`WaterfallTools.renderTo(containerElement, options)` is the supported embedding entry point; it replaces the earlier `div-embed.js` boilerplate. For iframe integrations, the standalone viewer reads query parameters (`src`, `keylog`, `page`, `tab`, `options`) and also exposes `window.WaterfallViewer.loadData(buffer)` and `window.WaterfallViewer.updateOptions(opts)` on its global for programmatic control from the parent frame.
+
+## Build & bundling
+
+The build uses Vite backed by **Rollup**. It outputs pure ESM (no UMD). Cross-platform aliasing lives in `scripts/build.js` and replaces runtime environment branches (canvas wrappers, `fs`/`zlib` imports) with statically resolvable targets at bundle time.
+
+### Artifact layout
+
+To balance caching efficiency against bundle size, the build deliberately avoids micro-chunk fragmentation by hoisting streaming parsers (`@streamparser/json`) into static imports. It produces three primary payloads:
+
+1. `waterfall-[hash].js` — core application logic, canvas renderer, JSON stream processors, and all always-loaded input parsers.
+2. `tcpdump-[hash].js` — dynamically loaded chunk with the PCAP pipeline, TLS/QUIC decryption, and deep packet inspection.
+3. `decompress-[hash].js` — dynamically loaded chunk with the pure-JS Brotli (`brotli`) and zstd (`fzstd`) fallbacks used by tcpdump when native `DecompressionStream` isn't available for those encodings.
+
+A 41-byte `waterfall-tools.es.js` proxy stub re-exports from the hashed core payload, so integrators link against the stable name while the underlying hashed artifacts enjoy 1-year max-age CDN caching. Every static artifact also gets a `.br` sibling (Brotli level 11) for zero-compute edge serving.
+
+## Responsive UI & pinch gestures
+
+The viewer uses structural flex layouts for responsive breakpoints instead of hard-coded device definitions — grids wrap cleanly as the viewport scales. Touch handlers (`touchstart`, `touchmove`) inside `WaterfallCanvas` decode multi-point geometry and translate pinch gestures directly into `startTime` / `endTime` updates, re-rendering at the new temporal bounds without triggering a full DPR-scaled recalculation.
