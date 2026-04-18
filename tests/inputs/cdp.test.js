@@ -42,11 +42,14 @@ describe('Chrome DevTools Protocol (CDP) Input Processor', () => {
         await tool.loadFile(inputPath, { debug: true, format: 'cdp' });
         const result = tool.getHar({ debug: true });
 
+        const REGENERATE_FIXTURES = process.env.REGENERATE_FIXTURES === 'true';
+
         // Auto-generate golden reference file if absent
-        if (!fs.existsSync(refPath)) {
+        if (!fs.existsSync(refPath) || REGENERATE_FIXTURES) {
             console.log("Generating golden fixture for cdp-google.har.json...");
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
+            if (REGENERATE_FIXTURES) return;
         }
 
         const normalizedResult = JSON.parse(JSON.stringify(result));
@@ -71,10 +74,13 @@ describe('Chrome DevTools Protocol (CDP) Input Processor', () => {
         await tool.loadFile(inputPath, { debug: true, format: 'cdp' });
         const result = tool.getHar({ debug: true });
 
-        if (!fs.existsSync(refPath)) {
+        const REGENERATE_FIXTURES = process.env.REGENERATE_FIXTURES === 'true';
+
+        if (!fs.existsSync(refPath) || REGENERATE_FIXTURES) {
             console.log("Generating golden fixture for cdp-cnn.har.json...");
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
+            if (REGENERATE_FIXTURES) return;
         }
 
         const normalizedResult = JSON.parse(JSON.stringify(result));

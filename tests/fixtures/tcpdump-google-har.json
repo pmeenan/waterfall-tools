@@ -82,7 +82,8 @@
         "_chunks": [
           {
             "ts": 1774566229106.035,
-            "bytes": 55479
+            "bytes": 55479,
+            "inflated": 185125
           }
         ],
         "_priority": null,
@@ -172,7 +173,8 @@
         "_chunks": [
           {
             "ts": 1774566229290.131,
-            "bytes": 1330
+            "bytes": 1330,
+            "inflated": 2922
           }
         ],
         "_priority": null,
@@ -255,7 +257,8 @@
         "_chunks": [
           {
             "ts": 1774566229314.613,
-            "bytes": 365017
+            "bytes": 365017,
+            "inflated": 1028346
           }
         ],
         "_priority": null,
@@ -1141,43 +1144,53 @@
         "_chunks": [
           {
             "ts": 1774566229536.657,
-            "bytes": 8192
+            "bytes": 8192,
+            "inflated": 16384
           },
           {
             "ts": 1774566229540.376,
-            "bytes": 8192
+            "bytes": 8192,
+            "inflated": 3524
           },
           {
             "ts": 1774566229554.761,
-            "bytes": 8192
+            "bytes": 8192,
+            "inflated": 22278
           },
           {
             "ts": 1774566229559.116,
-            "bytes": 8192
+            "bytes": 8192,
+            "inflated": 39734
           },
           {
             "ts": 1774566229562.877,
-            "bytes": 8192
+            "bytes": 8192,
+            "inflated": 29000
           },
           {
             "ts": 1774566229567.885,
-            "bytes": 8192
+            "bytes": 8192,
+            "inflated": 3768
           },
           {
             "ts": 1774566229571.325,
-            "bytes": 8192
+            "bytes": 8192,
+            "inflated": 43822
           },
           {
             "ts": 1774566229574.193,
-            "bytes": 8192
+            "bytes": 8192,
+            "inflated": 5330
           },
           {
             "ts": 1774566229577.676,
-            "bytes": 8192
+            "bytes": 8192,
+            "inflated": 39795
           },
           {
             "ts": 1774566229580.248,
-            "bytes": 7508
+            "bytes": 7508,
+            "inflated": 19625
           }
         ],
         "_priority": "Low",
@@ -1270,7 +1283,8 @@
         "_chunks": [
           {
             "ts": 1774566229616.3162,
-            "bytes": 112
+            "bytes": 112,
+            "inflated": 102
           }
         ],
         "_priority": null,
@@ -1469,7 +1483,8 @@
         "_chunks": [
           {
             "ts": 1774566229650.2012,
-            "bytes": 1582
+            "bytes": 1582,
+            "inflated": 5610
           }
         ],
         "_priority": "Lowest",
@@ -1771,7 +1786,8 @@
         "_chunks": [
           {
             "ts": 1774566230043.8599,
-            "bytes": 40818
+            "bytes": 40818,
+            "inflated": 121661
           }
         ],
         "_priority": null,
@@ -1854,7 +1870,8 @@
         "_chunks": [
           {
             "ts": 1774566230048.4941,
-            "bytes": 1359
+            "bytes": 1359,
+            "inflated": 12323
           }
         ],
         "_priority": null,
@@ -2006,7 +2023,8 @@
         "_chunks": [
           {
             "ts": 1774566230217.157,
-            "bytes": 1899
+            "bytes": 1899,
+            "inflated": 2879
           }
         ],
         "_priority": null,
@@ -2089,7 +2107,8 @@
         "_chunks": [
           {
             "ts": 1774566230250.9712,
-            "bytes": 2159
+            "bytes": 2159,
+            "inflated": 5006
           }
         ],
         "_priority": null,
@@ -2318,7 +2337,8 @@
         "_chunks": [
           {
             "ts": 1774566230291.631,
-            "bytes": 112
+            "bytes": 112,
+            "inflated": 102
           }
         ],
         "_priority": null,
@@ -2401,7 +2421,8 @@
         "_chunks": [
           {
             "ts": 1774566230324.1091,
-            "bytes": 358
+            "bytes": 358,
+            "inflated": 783
           }
         ],
         "_priority": null,
@@ -2484,7 +2505,8 @@
         "_chunks": [
           {
             "ts": 1774566230345.132,
-            "bytes": 75680
+            "bytes": 75680,
+            "inflated": 241344
           }
         ],
         "_priority": null,
@@ -2567,7 +2589,8 @@
         "_chunks": [
           {
             "ts": 1774566230353.334,
-            "bytes": 54992
+            "bytes": 54992,
+            "inflated": 190233
           }
         ],
         "_priority": null,
@@ -2827,7 +2850,8 @@
         "_chunks": [
           {
             "ts": 1774566230530.926,
-            "bytes": 1345
+            "bytes": 1345,
+            "inflated": 1322
           }
         ],
         "_priority": "High",
@@ -3070,7 +3094,8 @@
         "_chunks": [
           {
             "ts": 1774566230527.3098,
-            "bytes": 47572
+            "bytes": 47572,
+            "inflated": 175424
           }
         ],
         "_priority": "Low",
@@ -4414,7 +4439,8 @@
         "_chunks": [
           {
             "ts": 1774566232540.584,
-            "bytes": 8464
+            "bytes": 8464,
+            "inflated": 13242
           }
         ],
         "_priority": null,
@@ -4529,7 +4555,8 @@
         "_chunks": [
           {
             "ts": 1774566234048.136,
-            "bytes": 8464
+            "bytes": 8464,
+            "inflated": 13242
           }
         ],
         "_priority": null,
