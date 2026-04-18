@@ -1428,15 +1428,15 @@ function resetWaterfallUI() {
 const PUBLIC_PROXY_ORIGIN = 'https://waterfall-tools.com';
 
 async function fetchRemote(targetUrl) {
-    // 1. Direct fetch, crossorigin with credentials.
-    try {
-        const r = await fetch(targetUrl, { mode: 'cors', credentials: 'include' });
-        if (r.ok) return r;
-    } catch (_e) { /* CORS or network error — try anonymous next */ }
-
-    // 2. Anonymous direct fetch.
+    // 1. Anonymous direct fetch.
     try {
         const r = await fetch(targetUrl, { mode: 'cors', credentials: 'omit' });
+        if (r.ok) return r;
+    } catch (_e) { /* CORS or network error — try credentialed next */ }
+
+    // 2. Direct fetch, crossorigin with credentials.
+    try {
+        const r = await fetch(targetUrl, { mode: 'cors', credentials: 'include' });
         if (r.ok) return r;
     } catch (_e) { /* fall through to the proxy path */ }
 
@@ -1654,6 +1654,32 @@ window.WaterfallViewer = {
     }
 };
 
+function transformWptUrl(url) {
+    if (!url) return url;
+    const originRe = /^https?:\/\/[^\/]+/;
+    const resultRe = /\/result\/(\d{6}_[^/]+)/;
+    const phpRe = /\/results\.php\?.*test=(\d{6}_[^&]+)/;
+
+    let testId = null;
+    let match = url.match(resultRe);
+    if (match) {
+        testId = match[1];
+    } else {
+        match = url.match(phpRe);
+        if (match) {
+            testId = match[1];
+        }
+    }
+
+    if (testId) {
+        const originMatch = url.match(originRe);
+        if (originMatch) {
+            return `${originMatch[0]}/export.php?bodies=1&test=${testId}`;
+        }
+    }
+    return url;
+}
+
 async function initViewer() {
     const urlOptions = getOptionsFromUrl();
     const params = new URLSearchParams(window.location.search);
@@ -1699,15 +1725,16 @@ async function initViewer() {
         const handleUrlLoad = async () => {
             const urlVal = urlInput.value.trim();
             if (urlVal) {
-                console.log("Attempting to load URL payload natively:", urlVal);
+                const transformedVal = transformWptUrl(urlVal);
+                console.log("Attempting to load URL payload natively:", transformedVal);
                 const newUrl = new URL(window.location.href);
                 newUrl.searchParams.set('src', urlVal);
                 if (typeof history !== 'undefined') history.pushState(history.state, '', newUrl.toString());
                 
                 try {
                     await resetViewerState();
-                    showLoading(`Downloading: ${urlVal}`);
-                    const response = await fetchRemote(urlVal);
+                    showLoading(`Downloading: ${transformedVal}`);
+                    const response = await fetchRemote(transformedVal);
                     
                     showLoading("Processing Network Data...");
                     const buffer = await response.arrayBuffer();
@@ -2087,10 +2114,11 @@ async function initViewer() {
     const keylogUrl = params.get('keylog');
 
     if (srcUrl) {
+        const transformedSrcUrl = transformWptUrl(srcUrl);
         try {
             await resetViewerState();
-            showLoading(`Downloading: ${srcUrl}`);
-            const response = await fetchRemote(srcUrl);
+            showLoading(`Downloading: ${transformedSrcUrl}`);
+            const response = await fetchRemote(transformedSrcUrl);
 
             let keylogBuffer = null;
             if (keylogUrl) {

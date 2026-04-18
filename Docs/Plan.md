@@ -103,6 +103,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] If a `src` is provided, display a loading UI to provide feedback while fetching data, transitioning directly into the waterfall view once processed.
 - [x] If no `src` is provided, display a UI similar to the canvas demo allowing users to load a file manually via an input button or drag/drop.
 - [x] Integrate a URL entry bar on the main landing page to automatically load remote traces and update URL parameters for sharing.
+- [x] Detect WebPageTest test URLs pasted into the URL entry bar and automatically transform them to fetch the HAR payloads via export.php.
 - [x] Architect the UI starting with a simple canvas rendering of the waterfall, keeping the structure flexible enough for future feature expansions.
 - [x] Map all supported Waterfall renderer options to individual query parameters so they can be explicitly configured via URL.
 - [x] Ensure the HTML page operates correctly both as a completely stand-alone viewer (served over HTTP or loaded from a local `file://` URI) and when embedded inside an iframe.
