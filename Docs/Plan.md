@@ -178,6 +178,12 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Keep the legacy `_browser_main_thread` / `_mainThreadEvents` block-based rendering as a fallback when slices are absent.
 - [x] Add vitest coverage in `tests/inputs/wptagent.test.js` for category folding, slice-count parity across types, and per-slice-value bounds.
 
+## Phase 8h: wptagent CPU / Bandwidth / JS-Execution Feeds
+**Goal:** Restore the three remaining WebPageTest overlay bands (CPU utilization, bandwidth graph, per-request JS execution) for wptagent zip imports.
+- [x] Fix `[run][_Cached]_progress.csv` → `page._utilization` attachment: match pages by `_run`/`_cached` (the existing string-concat on `page_${run}_${cached}` missed the `_1` suffix minted by `processWPTView`, so CPU and BW arrays never reached the renderer).
+- [x] Parse `[run][_Cached]_script_timing.json[.gz]` in `src/inputs/wptagent.js`. Flatten the allowlisted event pairs (`EvaluateScript`, `v8.compile`, `FunctionCall`, `GCEvent`, `TimerFire`, `EventDispatch`, `TimerInstall`, `TimerRemove`, `XHRLoad`, `XHRReadyStateChange`, `MinorGC`, `MajorGC`, `FireAnimationFrame`, `ThreadState::completeSweep`, `Heap::collectGarbage`, `ThreadState::performIdleLazySweep`) from the `main_thread` subtree into `entry._js_timing = [[start_ms, end_ms], ...]`. Attach by `_full_url` equality, first-match-wins (matches the `$used` de-dup at `Sample/Implementations/webpagetest/www/waterfall.inc#L2004-L2011`).
+- [x] Regression coverage in `tests/inputs/wptagent.test.js` for utilization-per-page population and js_timing attachment on the primary document.
+
 ## Phase 9: Environment Adapters & Image Generation
 **Goal:** Allow creating static images and ensure robust server-side context scaling.
 - [x] Add explicit platform abstraction definitions within `src/platforms/`.

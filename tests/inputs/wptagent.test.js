@@ -89,6 +89,57 @@ describe('WPTagent ZIP Input Processor', () => {
         }
     }, 30000);
 
+    it('Should attach progress.csv utilization to each run/cached page', async () => {
+        const inputPath = path.resolve(__dirname, '../../Sample/Data/wptagent/roadtrip-wptagent.zip');
+
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'wptagent' });
+        const result = tool.getHar({ debug: true });
+
+        // The roadtrip zip has 3 runs × first/cached = 6 pages; every page must have
+        // its own CPU and bandwidth series formatted for the renderer.
+        for (const page of result.log.pages) {
+            expect(page._utilization, `page ${page.id} missing _utilization`).toBeTruthy();
+            expect(Array.isArray(page._utilization.cpu)).toBe(true);
+            expect(page._utilization.cpu.length).toBeGreaterThan(0);
+            expect(Array.isArray(page._utilization.bw)).toBe(true);
+            expect(page._utilization.bw.length).toBeGreaterThan(0);
+            // Renderer reads bwMax to scale the graph — the legacy `.max` property is
+            // preserved for Node consumers but the Browser/Worker path needs bwMax.
+            expect(page._utilization.bwMax).toBeGreaterThan(0);
+        }
+    }, 30000);
+
+    it('Should attach script_timing.json JS execution ranges to matching entries', async () => {
+        const inputPath = path.resolve(__dirname, '../../Sample/Data/wptagent/roadtrip-wptagent.zip');
+
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { debug: true, format: 'wptagent' });
+        const result = tool.getHar({ debug: true });
+
+        const jsEntries = result.log.entries.filter(
+            e => Array.isArray(e._js_timing) && e._js_timing.length > 0
+        );
+        expect(jsEntries.length).toBeGreaterThan(0);
+
+        // Every entry's js_timing should be a list of [start_ms, end_ms] ordered pairs.
+        for (const entry of jsEntries) {
+            for (const pair of entry._js_timing) {
+                expect(Array.isArray(pair)).toBe(true);
+                expect(pair.length).toBe(2);
+                expect(Number.isFinite(pair[0])).toBe(true);
+                expect(Number.isFinite(pair[1])).toBe(true);
+                expect(pair[1]).toBeGreaterThanOrEqual(pair[0]);
+            }
+        }
+
+        // The top-level document usually accumulates EvaluateScript/FunctionCall spans.
+        const doc = result.log.entries.find(
+            e => e._run === 1 && e._cached === 0 && e._full_url === 'https://roadtrip.meenan.us/'
+        );
+        expect(doc?._js_timing?.length).toBeGreaterThan(0);
+    }, 30000);
+
     it('Should include body metadata (_body_file, _body_hash) on entries', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/wptagent/roadtrip-wptagent.zip');
 

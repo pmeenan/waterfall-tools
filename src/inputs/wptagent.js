@@ -90,6 +90,66 @@ async function parseWptagentTimelineCpu(stream, isGz) {
     }
 }
 
+// Script-timing event names the renderer cares about. Mirrors `$script_events` in
+// Sample/Implementations/webpagetest/www/waterfall.inc#L1976-L1993 — each matching
+// [start_ms, end_ms] pair becomes a JS-execution overlay on the request's row.
+const SCRIPT_TIMING_EVENTS = [
+    'EvaluateScript',
+    'v8.compile',
+    'FunctionCall',
+    'GCEvent',
+    'TimerFire',
+    'EventDispatch',
+    'TimerInstall',
+    'TimerRemove',
+    'XHRLoad',
+    'XHRReadyStateChange',
+    'MinorGC',
+    'MajorGC',
+    'FireAnimationFrame',
+    'ThreadState::completeSweep',
+    'Heap::collectGarbage',
+    'ThreadState::performIdleLazySweep'
+];
+
+async function parseWptagentScriptTiming(stream, isGz) {
+    if (isGz && typeof DecompressionStream !== 'undefined') {
+        stream = stream.pipeThrough(new DecompressionStream('gzip'));
+    }
+    const pipeline = stream.pipeThrough(new TextDecoderStream());
+    const reader = pipeline.getReader();
+    let text = '';
+    while (true) {
+        const { done, value } = await reader.read();
+        if (value) text += value;
+        if (done) break;
+    }
+    let raw;
+    try { raw = JSON.parse(text); } catch (_) { return null; }
+    if (!raw || typeof raw !== 'object') return null;
+    const mainKey = raw.main_thread;
+    const mainThread = mainKey && raw[mainKey];
+    if (!mainThread || typeof mainThread !== 'object') return null;
+
+    // Flatten the allowlisted events for each URL into a single [[start, end], ...] list.
+    const perUrl = {};
+    for (const [url, events] of Object.entries(mainThread)) {
+        if (!events || typeof events !== 'object') continue;
+        const flat = [];
+        for (const ev of SCRIPT_TIMING_EVENTS) {
+            const pairs = events[ev];
+            if (!Array.isArray(pairs)) continue;
+            for (const pair of pairs) {
+                if (Array.isArray(pair) && pair.length >= 2 && Number.isFinite(pair[0]) && Number.isFinite(pair[1])) {
+                    flat.push([pair[0], pair[1]]);
+                }
+            }
+        }
+        if (flat.length) perUrl[url] = flat;
+    }
+    return perUrl;
+}
+
 async function parseWptagentProgressCsv(stream, isGz) {
     if (isGz && typeof DecompressionStream !== 'undefined') {
         stream = stream.pipeThrough(new DecompressionStream('gzip'));
@@ -314,22 +374,50 @@ export async function processWptagentZip(input, options = {}) {
         }
     }
 
-    // Parse any progress.csv matching run identifiers for utilization mapping
+    // Parse any progress.csv matching run identifiers for utilization mapping.
+    // Match pages by `_run`/`_cached` — processWPTView appends a `_1` suffix to the id
+    // (`page_${run}_${cached}_1`) so string-concatenating the id misses every page.
     const progressRegex = /^(\d+)(_Cached)?_progress\.csv(\.gz)?$/;
     for (const file of fileList) {
         const match = file.match(progressRegex);
-        if (match) {
-            const runStr = match[1];
-            const cachedNum = match[2] ? 1 : 0;
-            const stream = await zip.getFileStream(file);
-            if (stream) {
-                const rawUtil = await parseWptagentProgressCsv(stream, file.endsWith('.gz'));
-                const pageId = `page_${runStr}_${cachedNum}`;
-                const targetPage = outputHar.log.pages.find(p => p.id === pageId);
-                if (targetPage) {
-                    targetPage._utilization = formatWptUtilization(rawUtil, outputHar.log._bwDown || 0);
-                }
+        if (!match) continue;
+        const runNum = parseInt(match[1], 10);
+        const cachedNum = match[2] ? 1 : 0;
+        const stream = await zip.getFileStream(file);
+        if (!stream) continue;
+        const rawUtil = await parseWptagentProgressCsv(stream, file.endsWith('.gz'));
+        const formatted = formatWptUtilization(rawUtil, outputHar.log._bwDown || 0);
+        for (const page of outputHar.log.pages) {
+            if (page._run === runNum && page._cached === cachedNum) {
+                page._utilization = formatted;
             }
+        }
+    }
+
+    // Parse any script_timing.json for per-request JS execution overlays.
+    // `main_thread` is a thread id (e.g. "4496:1") whose subtree keys are URLs; the PHP
+    // reference at waterfall.inc#L1974-L2024 attaches the first matching URL only (via
+    // `$used` de-dup), so we do the same to avoid painting a script's events on every
+    // cached copy of its URL.
+    const scriptTimingRegex = /^(\d+)(_Cached)?_script_timing\.json(\.gz)?$/;
+    for (const file of fileList) {
+        const match = file.match(scriptTimingRegex);
+        if (!match) continue;
+        const runNum = parseInt(match[1], 10);
+        const cachedNum = match[2] ? 1 : 0;
+        const stream = await zip.getFileStream(file);
+        if (!stream) continue;
+        const perUrl = await parseWptagentScriptTiming(stream, file.endsWith('.gz'));
+        if (!perUrl) continue;
+        const used = new Set();
+        for (const entry of outputHar.log.entries) {
+            if (entry._run !== runNum || entry._cached !== cachedNum) continue;
+            const url = entry._full_url || entry.request?.url;
+            if (!url || used.has(url)) continue;
+            const pairs = perUrl[url];
+            if (!pairs) continue;
+            entry._js_timing = pairs;
+            used.add(url);
         }
     }
 
