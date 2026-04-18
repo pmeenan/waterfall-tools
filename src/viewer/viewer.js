@@ -4,6 +4,7 @@
  * See the LICENSE file for details.
  */
 import { WaterfallTools, identifyFormatFromBuffer, Layout } from 'waterfall-tools';
+import { saveToHistory } from './history.js';
 
 const ui = {
     loading: document.getElementById('loading'),
@@ -1741,6 +1742,28 @@ async function initViewer() {
                     
                     const processOpts = Object.assign({}, getOptionsFromUrl(), { historyMode: 'replace' });
                     await processData(buffer, processOpts);
+                    
+                    try {
+                        let type = waterfallTool ? waterfallTool._sourceFormat : 'unknown';
+                        let testUrl = '';
+                        let numPages = 0;
+                        if (waterfallTool && waterfallTool.data && waterfallTool.data.pages) {
+                            const pageKeys = Object.keys(waterfallTool.data.pages);
+                            numPages = pageKeys.length;
+                            if (numPages > 0) {
+                                const firstPage = waterfallTool.data.pages[pageKeys[0]];
+                                testUrl = firstPage._URL || '';
+                                if (!testUrl && firstPage.requests) {
+                                    const reqKeys = Object.keys(firstPage.requests);
+                                    if (reqKeys.length > 0) {
+                                        testUrl = firstPage.requests[reqKeys[0]].url;
+                                    }
+                                }
+                                if (!testUrl) testUrl = firstPage.url || firstPage.id || '';
+                            }
+                        }
+                        saveToHistory({ url: urlVal, type, title: '', testUrl, numPages }).catch(e => console.warn('Failed to save to history:', e));
+                    } catch(e) {}
                 } catch(e) {
                     console.error("URL Load Error:", e);
                     showError(`Failed fetching remote file: ${e.message}`);
@@ -2136,6 +2159,28 @@ async function initViewer() {
             
             const processOpts = Object.assign({}, urlOptions, { historyMode: 'replace' });
             await processData(buffer, processOpts, keylogBuffer);
+
+            try {
+                let type = waterfallTool ? waterfallTool._sourceFormat : 'unknown';
+                let testUrl = '';
+                let numPages = 0;
+                if (waterfallTool && waterfallTool.data && waterfallTool.data.pages) {
+                    const pageKeys = Object.keys(waterfallTool.data.pages);
+                    numPages = pageKeys.length;
+                    if (numPages > 0) {
+                        const firstPage = waterfallTool.data.pages[pageKeys[0]];
+                        testUrl = firstPage._URL || '';
+                        if (!testUrl && firstPage.requests) {
+                            const reqKeys = Object.keys(firstPage.requests);
+                            if (reqKeys.length > 0) {
+                                testUrl = firstPage.requests[reqKeys[0]].url;
+                            }
+                        }
+                        if (!testUrl) testUrl = firstPage.url || firstPage.id || '';
+                    }
+                }
+                saveToHistory({ url: srcUrl, type, title: '', testUrl, numPages }).catch(e => console.warn('Failed to save to history:', e));
+            } catch(e) {}
         } catch(e) {
             console.error(e);
             showError(`Failed fetching remote file: ${e.message}`);

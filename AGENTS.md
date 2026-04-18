@@ -136,7 +136,9 @@ When working on this codebase, you must adhere to the following strict architect
     - When translating logic to HTML5 `<canvas>`, `fillRect(x, y, w, h)` utilizes raw deltas (`w = x2 - x1`). A delta of identically snapped coordinates mapped to `x2 = x1 + 1` mathematically computes to `1px`, wiping the span from visibility over top-level layers. 
     - Always strictly append `+ 1` to HTML5 `fillRect` width logic translated from PHP boundaries (`width = (x2 - x1) + 1`) to ensure critical 2px-minimum visibility for identical-timestamp events natively (e.g., `_domContentLoadedEventStart` identical to `_domContentLoadedEventEnd`).
 
-25. **Renderer Edge Cases & UI Behaviors:**
+    - **History Tracking**: The standalone viewer inherently tracks URL-based test loads automatically into an IndexedDB store (`WaterfallHistoryDB`), saving the source URL, detection format, title, and initial/recent timestamps using logic stored inside `src/viewer/history.js`. Extensions mapping to this history MUST retrieve metadata purely using `saveToHistory` hooks instead of polluting cookies or local storage directly.
+
+26. **Renderer Edge Cases & UI Behaviors:**
     - **Label Layering:** Metric labels mapped geometrically against the timeline grid must forcefully paint an opaque background layout exactly matching the respective underlying row stripe (`#ffffff` or `#f0f0f0`). This strictly sits *behind* the font text to prevent vertical time grids bleeding through typography natively.
     - **Cross-Domain Contexts:** Request URL labels evaluate their `_documentURL` iteratively against the base document URL (inherited from `rawEntries[0]`). Mismatched origins natively format text into blue (`#0000ff`) indicating secure iframe execution environments mimicking WPT.
     - **Render Blocking Indicators:** When `_renderBlocking` validates to exactly `blocking`, legacy WPT injects `render-block-icon.png`. Zero-asset web rendering securely recreates this natively using standard DOM canvas shapes (deploying a perfectly aligned 14px orange `#ff9900` circle holding a 1.5px white stroked geometric `X`).

@@ -104,6 +104,7 @@ graph TD
 │   ├── viewer/             # Self-contained, full-featured standalone frontend UI
 │   │   ├── index.html      # Main presentation container
 │   │   ├── viewer.js       # App controller handling loading, layout routing, drag-and-drop, history API, interactions (tooltips), and generating dynamic Request Detail Tabs
+│   │   ├── history.js      # IndexedDB wrapper securely managing waterfall history states tracking user URLs
 │   │   └── public/         # Self-hosted static dependencies (sw.js, favicons) copied natively via Vite
 │   │       └── netlog-viewer/ # Standalone compiled Chrome NetLog viewer HTML bundle
 │   ├── platforms/          # Environment-specific implementations (e.g., File I/O vs Fetch)
