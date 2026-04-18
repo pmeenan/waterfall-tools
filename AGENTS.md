@@ -1,384 +1,248 @@
-# Waterfall Tools: AI Agent Guidance & Context
-
-Welcome. You are working on the **Waterfall Tools** library, a powerful, robust, and client-side solution for displaying detailed network request waterfalls akin to WebPageTest.
-
-## 🎯 Directives for AI Agents
-
-When working on this codebase, you must adhere to the following strict architectural principles and workflow:
-
-1. **Mandatory Project Context & Workflow:**
-   - **Initial Step:** At the beginning of any task, you must read `Docs/Architecture.md` to understand the project architecture and `Docs/Plan.md` for the project implementation plan.
-   - **Closing Step:** At the end of each conversation, you must update `README.md`, `Docs/Plan.md`, and `Docs/Architecture.md` with any respective changes. Furthermore, update `AGENTS.md` with any information that would benefit future agents either as a result of the current conversation or as discovered while working on the current conversation (it is the long-term memory for the project).
-
-2. **Zero Bloat & Peak Performance:**
-   - **No Heavy Frameworks:** This library must remain exceptionally fast, lightweight, and distributable. Prefer **Vanilla JavaScript** when it makes sense. Feel free to use external libraries as necessary if they significantly improve the architecture or functionality. Do not introduce React, Vue, Svelte, or Angular under any circumstances within the core lib space.
-   - **DOM Performance:** Avoid generating thousands of DOM elements (e.g., specific divs for every network request). Network waterfalls frequently exceed 1,000+ requests globally. Rendering must leverage raw native `<canvas>` operations optimizing for seamless 60fps scrolling latency buffers.
-
-3. **The Intermediary Format (Extended HAR):**
-   - Feature rendering cannot tightly couple against raw unique inputs (eg. directly rendering an external WebPageTest object without conversions).
-   - Every input format **MUST** map entirely to the standard **Extended HAR format** payload pipeline immediately prior to engaging renderer states or internal processor hooks.
-   - The generated HAR **MUST** include a `creator` object within `log` identifying `waterfall-tools` as the generating tool.
-   - When broadening properties beyond the standard HAR `1.2` specification schema logic, always strictly prefix keys with an underscore `_` (e.g., `_priority`, `_renderBlockingConstraints`, `_initiator`). 
-
-4. **Pluggable & Declarative Architecture:**
-   - Component classes defining input modules (`src/inputs/`), output modules (`src/outputs/`), embed viewers (`src/embed/`), and drawing renderers (`src/renderer/`) are decoupled entities deliberately separated inherently.
-   - The primary orchestrator object operates uniquely by transporting verified Extended HAR data uniformly across specific decoupled systems cleanly without implicit mutation states.
-   - Modules must export structurally permitting granular bundler operations like Webpack, Vite or Rollup safely tree-shaking specific elements entirely out of arbitrary compilation phases natively. (A consumer integrating browser-only HAR generation shouldn't package unused Node libraries).
-
-5. **Environment Nuances & File Modularity:**
-   - Code residing fundamentally inside `src/core/` and the root interface level of `src/inputs/` strictly stays conditionally isomorphic (e.g., `src/inputs/tcpdump.js`). Ensure runtime viability targeting concurrently Node.js and Browser JS endpoints safely.
-   - Separate CLI Wrappers exclusively into `src/inputs/cli/` (e.g., `src/inputs/cli/tcpdump.js`) so that generic bundlers evaluating APIs won't accidentally traverse `process.stdout` hooks indiscriminately.
-   - Segment format-specific logic gracefully. Standalone decoders natively reside in `src/inputs/utilities/[format]/` avoiding monopolizing top-level directories natively.
-   - Interaction demanding Web APIs like (`fetch()`, `HTMLCanvasElement`, browser `window`) isolate explicitly into segmented folders encompassing respectively `src/platforms/browser/`, `src/renderer/`, or `src/embed/`. Node native tools (`fs` integration pipelines) deploy cleanly only into `src/platforms/node/`.
-
-6. **Future-Proofing Hardware Considerations:**
-   - Ensure the structure accommodates adopting powerful native WASM instances gracefully isolated internally exclusively for computationally heavy future requirements, for example massive Chrome Trace unzipping / reduction iterations or binary frame unpacking processes. Image compilation explicitly respects standardized Canvas APIs first natively across operations naturally.
-
-7. **CLI Modes & Testing Validation:**
-   - Each input format MUST feature a stand-alone CLI mode wrapper capable of ingesting an input file and exporting the normalized intermediary Extended HAR serialization. This wrapper should be built as an individual standalone CLI script (e.g., `src/inputs/cli-[format].js`).
-   - Write comprehensive tests asserting that parsing sample logic matches established "known-good" HAR output targets (generated during initial implementations) perfectly.
-   - For alternative formats originating from the same tests as HAR files (e.g. Netlogs), explicitly include validation pipelines (like Node.js `scripts/`) ensuring the parsed requests map reliably back to their matching baseline WebPageTest HAR representations. Leverage file prefix naming conventions for robust automated matching (e.g. `www.google.com-netlog.json.gz` against `www.google.com.har.gz`).
-
-8. **Sample Assets Organization:**
-   - Store all sample files for respective data formats cleanly partitioned within the `Sample/Data/` root (e.g., `Sample/Data/HAR/sourceA`, `Sample/Data/ChromeTrace/site1`).
-   - If writing or utilizing reference parsing implementations (like exploratory Python scripts decoding specific unmapped formats), place them explicitly in `Sample/Implementations/` mapped by format folders inherently.
-   - **Wptagent Testing:** Note that `Sample/Data/wptagent/roadtrip-wptagent.zip` defines a comprehensive reference payload explicitly testing all currently collectable file types natively alongside multiplexed first & repeat view iterations securely.
-
-9. **Target Environments (Evergreen Browsers & Node):**
-   - The minimal baseline for Javascript execution and Web API usage are the **latest stable versions of Chrome, Firefox, Safari, and Node.js**. 
-   - You may freely use the newest ES syntax and native platform capabilities (e.g. modern `<canvas>` APIs, generic `fetch()`, latest `Intl` formats) without needing to transpile or polyfill for backward legacy compatibility.
-
-10. **Fault Tolerance & Streaming Execution:**
-   - The input processors should be strictly tolerant of malformed or truncated input files, degrading gracefully rather than hard-crashing.
-   - Processing massively large payloads MUST leverage stream-based architectures (prefer true streaming parsers like `stream-json` specifically) rather than lazily loading massive uncompressed strings entirely into V8 heap memory (`JSON.parse()`).
-   - **Crucially:** Input processors dealing with extremely bloated inputs (e.g. Chrome Traces or WebPageTest JSON files) SHOULD utilize primitive Transform streams before the JSON Assembler to aggressively discard massive extraneous fields (like `generated-html` or `almanac`) natively at the token level safely preventing V8 memory exhaustion.
-   - Input files can frequently be supplied in gzip format organically. Input wrappers must automatically detect compressions by sniffing file magic byte headers (e.g., `1f 8b` for gzip) over blindly trusting `.gz` extensions, unzipping pipes natively on-the-fly (`zlib.createGunzip()`).
-
-11. **Implementation Notes & Current Conventions:**
-    - **Extended HAR Standard:** The complete schema definition of custom properties (e.g., `_load_ms`, `_ttfb_ms`, `_bytesIn`) derived from WebPageTest is documented definitively in `Docs/Extended-HAR-Schema.md`.
-    - **Type Definitions (JSDoc):** Though the project explicitly isolates to Vanilla JavaScript, zero-compilation type safety modeling is rigorously structured via JSDoc annotations. Always reference `src/core/har-types.js` when mutating payload definitions to preserve mapping without invoking TypeScript compilers.
-    - **Rollup & Hashing Framework:** The core library API compiles exclusively inside pure **Rollup** passes cleanly bypassing complex Rolldown internal shims, yielding strictly three artifacts (`waterfall-[hash].js`, `tcpdump-[hash].js`, `decompress-[hash].js`). 
-    - **Stub Payload Mapping:** Embedders can dynamically link explicitly to a 41-byte `waterfall-tools.es.js` proxy file natively generated alongside the target which intrinsically imports the `waterfall-[hash].js` payload seamlessly enabling optimal 1-year max-age caching environments offline.
-    - **Brotli Static Compression Iterations:** All static artifacts within the browser/frontend path immediately compress recursively into identical `.br` counterparts using `zlib` explicitly dialed to natively run maximum generic Brotli compression (level 11) for superior pre-compressed file serving off zero-computation Edge CDNs inherently.
-    - **Zero UMD:** UMD targets are deliberately abandoned natively reflecting the strictly-ESM browser baseline.
-
-12. **Testing & Golden Fixtures:**
-    - Comparing massive object payloads (such as thousands of network requests parsed from Traces) with `assert.deepStrictEqual` can hang `node:test` execution indefinitely if there are `undefined` property mismatches. Always sanitize results via `JSON.parse(JSON.stringify(result))` before asserting against disk-saved JSON fixtures.
-    - Always scrub dynamically generated keys (e.g., fallback `startedDateTime` values using `Date.now()`) from both the parsed object and the reference golden fixture prior to running deep comparisons.
-
-13. **Streaming Nuances (Web Streams & Async Iterators):**
-    - The core library natively utilizes **Web Streams API** (`ReadableStream`, `DecompressionStream`, `TextDecoderStream`) across all standard inputs preventing any requirement for Node native pipelines.
-    - JSON processing seamlessly leverages `@streamparser/json` matching native iterable pipelines natively natively cleanly dropping legacy `stream-json` bottlenecks.
-    - **Piped Stream Destruction**: Native web streams do not natively auto-close connected file handles in Node bridging layers organically; `finally` blocks must manually invoke `.destroy()` on generated `fs.ReadStream` instances immediately upon `getReader().read()` completions.
-
-14. **Parallel Fallback Architecture & O(n) Mitigations:**
-    - Fallback strategies natively parsing alternative execution paths (e.g. Chrome trace `devtools.timeline` elements substituting explicitly to form arrays matching missing `netlog` configurations) must continuously buffer `id` constraints carefully.
-    - When bridging buffered entities across multiple distinct event paths against massive baseline arrays (15,000+ entries linearly), always aggressively index payloads utilizing explicit `Map` structures preventing catastrophic O(N^2) memory loop stalls internally.
-
-15. **Isomorphic Binary Streams (PCAP/PCAPNG):**
-    - Raw binary ingestion pipelines (e.g. `PcapParser`) MUST operate strictly on native `Uint8Array` slicing and `DataView` abstractions rather than Node.js specific `Buffer` classes. This guarantees zero-copy native browser parsing against massive payloads without triggering Node polyfill imports.
-    - **Note on PCAPNG Requirements:** The initial parser framework supports sniffing PCAPNG magics and extracting `Enhanced Packet Blocks` (EPB). However, timestamp precision explicitly assumes microsecond intervals. Proper timestamp mapping requires tracking `Interface Description Block` (IDB) options, which should be finalized when actual `.pcapng` capture files are included for complete test coverage.
-    - The raw `PcapParser` natively handles decoding `Ethernet`, `IPv4`, `IPv6`, `TCP`, and `UDP` directly alongside the container unwrapping to prevent deep loop regressions across independent processor domains.
-
-16. **Offline QUIC & HTTP/3 Decoding:**
-    - Because `waterfall-tools` reassembles QUIC streams offline from `.cap.gz` captures, the `decodeQuic` logic fully unwraps `1-RTT` AEAD payloads and gracefully tracks all `RFC-9000` frame types without breaking on non-stream frames natively.
-    - QUIC Header Protection natively utilizes `AES-ECB` directly; however, WebCrypto organically rejects native ECB mapping organically globally. Consequently, `quic-crypto.js` maps a 16-byte raw `AES-CBC` initialization exclusively employing a fully zeroed IV perfectly mirroring identical single-block ECB states matching WebCrypto constraints smoothly.
-    - When unpacking HTTP/3 fragments mapping to proper Request streams natively, the `QpackDecoder` strictly maintains a stateful tracking mechanism parsing the relative bounds of encoder dynamic table instructions linearly. This guarantees the highest reconstruction fidelity without employing massive client memory leaks safely.
-
-17. **TCPDump HAR Assembler:**
-    - The `tcpdump.js` processor natively flattens the multidimensional array of reconstructed flows (TCP connections with HTTP/1 & 2 objects, UDP blocks with HTTP/3, explicit DoH unlinked pipelines) mapping chronologically aligned structures tightly against resolved DNS tables. It guarantees standard Extended HAR payload generations directly matching downstream CLI endpoints.
-
-18. **Orchestrator & API Conventions:**
-    - The library handles automatic format detection via `src/inputs/orchestrator.js` utilizing file peeking and magic-byte/token sniffing natively so the caller does not need to define input formats strictly.
-    - All format processors accept `input` generic signatures (`processXNode(input, options)`) uniformly supporting either file paths or raw `Readable` streams gracefully.
-    - The main `Conductor` artifact represents the central class and exposes `processFile` and `processStream` methods bridging inputs systematically.
-    - The root unified CLI resides at `bin/waterfall-tools.js` wrapping the `Conductor` logic securely for global terminal access across formats natively while automatically discovering matching `keylog` inputs implicitly.
-    - **API Documentation**: Whenever you modify APIs (such as `waterfall-tools.js` methods or rendering parameters like `renderTo()` default options), you MUST comprehensively document these modifications structurally inside the `README.md` and explicitly note them within this `AGENTS.md` context log ensuring future AI Agents seamlessly identify the exposed signatures.
-
-19. **Output Processors (Headless):**
-    - The `simple-json` output processor (`src/outputs/simple-json.js`) provides a strictly 1D array mapping of `ExtendedHAR` request entries. It collapses deep `request` and `response` object trees into simple top-level properties (e.g. `url`, `method`, `status`, `ttfb_ms`) natively suitable for generic JavaScript iterators.
-
-20. **Zero Polyfill Browser Architecture:**
-    - The core input parsers are strictly entirely isomorphic mapping exclusively across the exact Web APIs shipped comprehensively natively natively (`window.crypto.subtle`, `DecompressionStream`, `Uint8Array`, `TextDecoderStream`).
-    - Standard Node modules (`fs`, `zlib`, `crypto`) are securely dynamically imported matching isolated backend targets effectively avoiding breaking native browser rollup configurations intrinsically inherently.
-    - The frontend integration natively converts standard Browser `File` objects securely matching `Blob.stream()` cleanly immediately skipping any heavy Vite polyfill requirements previously needed natively.
-
-21. **Wptagent Formatting & OPFS Storage Contexts:**
-    - The new `wptagent` standard explicitly wraps massive traces (Netlogs, CDPs) alongside standard network requests securely packaged inside ZIP containers.
-    - Parsers MUST rigorously digest Zips utilizing the isolated `BrowserStorage` wrapper mapping universally to `Origin Private File System` (OPFS) and native `Web Locks API` bounds ensuring single-tab garbage collection prevents orphaned lock cascades naturally without utilizing Shared Workers.
-    - Currently, only the standard `testinfo.json` (or `testinfo.json.gz`) and `[run]_devtools_requests.json.gz` network elements unbox intrinsically. The unified `output.log._zipFiles` dynamically stores the extracted array payload denoting all untouched internal zip paths natively (e.g. `1_trace.json.gz`, `1_bodies.zip`).
-    - **Resource Abstraction (`getPageResource`)**: The core class explicitly provides an isomorphic `waterfallTool.getPageResource(pageId, resourceType)` abstraction exposing stored OPFS buffers seamlessly natively. This guarantees extraction returns `{url, mimeType}` isolated blobs natively rendering directly into browser image tags immediately without manual UI parsing burdens, while safely generating standard Node.js UInt8Array formats (`{buffer}`) implicitly backend. `getPageResource` natively supports nested `netlog` queries mapped securely to `*_netlog.json.gz` or explicitly `*_netlog.txt.gz` artifacts securely.
-    - **Critical Metadata Linkage**: For `getPageResource()` mappings to operate internally, WPT Parsers MUST securely append `_run` (run index integer) and `_cached` (1 for repeat view, 0 for first view) explicitly mapped to the core Extended HAR `page` object. (Failing to assign these properties prevents downstream layout abstractions from successfully seeking `2_Cached_screen.jpg` mappings dynamically).
-    - **Chunk Arrays vs Objects:** Legacy WPT JSON natively outputs `chunks` as an object map (`{ ts: bytes }`), whereas WptAgent generated archives (`devtools_requests.json.gz`) inherently serialize `chunks` as direct arrays (`[{ ts, bytes }]`). Resolvers interacting natively across both boundaries must tolerate and homogenize both structures intelligently protecting against `Object.keys()` parsing errors failing array indices as `NaN`.
-    - **Lighthouse HTML Extraction**: `getPageResource()` generically extracts natively gzipped `.html.gz` payloads (like Lighthouse audits embedded in WPT ZIP archives) unzipped using native generic `DecompressionStream('gzip')` pipes natively returning functional uncompressed Blob representations safely rendering in standard iframe elements locally.
-    - **Dynamic Tile Rendering**: When parsing layouts exposing Screenshots visually inside a grid (like `viewer.js`), developers MUST ensure DOM wrappers leverage flexible constraints (like `flex-wrap: wrap` and `width: fit-content`) natively protecting standard tiles from stretching their responsive grid widths aggressively attempting to fill `span 2` auto-fill layouts inappropriately.
-
-22. **Renderer Timestamp Mapping:**
-    - The Extended HAR standard explicitly leverages absolute ISO strings for `startedDateTime`. However, internal renderer states (like `canvas.js` drawing timelines) must strictly normalize all entry timings to **relative millisecond offsets** calculated off the earliest absolute `startedDateTime` in the entire collection. Failing to normalize to a zero-point relative index will cause `requestAnimationFrame` canvas loops calculating timestamp grids to iterate trillions of times, instantly crashing the browser tab.
-    - **Crucially:** When synthesizing Chrome Traces utilizing `devtools.timeline` elements as a fallback (due to missing `netlog` configurations), standard `.ts` representations frequently encode absolute `CLOCK_MONOTONIC` system uptimes (e.g. `89,356,270,953` ms). Parsers MUST correctly extract the absolute minimum baseline `requestTime` globally and subtract it strictly from all bounds gracefully ensuring relative zero-indexing.
-
-22. **Canvas Rendering Rules (WPT Parity):**
-    - High DPI displays require `window.devicePixelRatio` multiplication against `canvas.width`/`height` and a scaled context (`ctx.scale(dpr, dpr)`) internally so logic coordinates remain absolute CSS logical measurements natively.
-    - Vertical timeline grids draw **underneath** request bar blocks, but **over** the alternating row-background highlighted bands natively.
-    - Global Page Metric lines (like Start Render, LCP) explicitly draw **over** the time grid but **behind** the network request block layouts inherently.
-    - `TTFB` represents the underlying gradient base of a request layer when detailed download properties are present, mapping fully to `downloadEnd` time lengths, whereas specific downloaded `Chunks` overlay the TTFB base opaquely natively reflecting byte progression streams carefully.
-    - Connection initiation phases (`Wait`, `DNS`, `Connect`, `SSL`) strictly leverage solid WPT standardized colors rather than scaling the `baseColor` derived from content types seamlessly preventing confusion across the timeline natively.
-    - Row backgrounds explicitly highlight redirects (HTTP 300-399, excluding 304) with an opaque warning yellow and highlight errors (HTTP >= 400, or 0) with an opaque error red natively matching WPT visibility parameters (painted at 100% opacity prior to rendering request blocks).
-    - **Legend Rendering**: The visual legend aligns with WPT. Connection phases (Wait, DNS, Connect, SSL) draw as solid thick uniform bars. MIME content types (HTML, JS, Image, etc.) draw as split 20px wide bars displaying their lightened TTFB color (`scaleRgb(color, 0.65)`) on the left half and their primary download color on the right.
-23. **Code Documentation & Analysis (Train-of-Thought):**
-    - Ensure all source code logic, especially dense mathematical and coordinate-bound mapping segments (like Canvas rendering or input byte-parsing), is extremely well commented.
-    - Write robust "train-of-thought" inline documentation that explicitly explains *why* a calculation operates in a specific boundary order, rather than just what the syntax does.
-    - Extensive comments serve as a critical analytical breadcrumb trail for future AI Agents to efficiently follow complex execution scopes without executing brute-force reverse engineering.
-    - The build pipeline natively utilizes Vite/Rollup tools out-of-the-box which aggressively minify and automatically strip source comments dynamically before final generation; thus, heavily prioritizing inline clarity yields zero bloat impacts in production outputs.
-
-24. **HTML5 Canvas vs PHP GD Geometry (Bounds & Inclusivity):**
-    - The legacy WebPageTest PHP renderer uses GD functions (like `imagefilledrectangle`) explicitly treating geometric coordinates as **inclusive**. For example, drawing a rectangle from `x1 = 10` to `x2 = 10` logically targets the pixel itself, but legacy loop incrementing often forces `x2 = x1 + 1` executing a `2px` footprint intrinsically. 
-    - When translating logic to HTML5 `<canvas>`, `fillRect(x, y, w, h)` utilizes raw deltas (`w = x2 - x1`). A delta of identically snapped coordinates mapped to `x2 = x1 + 1` mathematically computes to `1px`, wiping the span from visibility over top-level layers. 
-    - Always strictly append `+ 1` to HTML5 `fillRect` width logic translated from PHP boundaries (`width = (x2 - x1) + 1`) to ensure critical 2px-minimum visibility for identical-timestamp events natively (e.g., `_domContentLoadedEventStart` identical to `_domContentLoadedEventEnd`).
-
-    - **History Tracking**: The standalone viewer inherently tracks URL-based test loads automatically into an IndexedDB store (`WaterfallHistoryDB`), saving the source URL, detection format, title, and initial/recent timestamps using logic stored inside `src/viewer/history.js`. Extensions mapping to this history MUST retrieve metadata purely using `saveToHistory` hooks instead of polluting cookies or local storage directly.
-
-26. **Renderer Edge Cases & UI Behaviors:**
-    - **Label Layering:** Metric labels mapped geometrically against the timeline grid must forcefully paint an opaque background layout exactly matching the respective underlying row stripe (`#ffffff` or `#f0f0f0`). This strictly sits *behind* the font text to prevent vertical time grids bleeding through typography natively.
-    - **Cross-Domain Contexts:** Request URL labels evaluate their `_documentURL` iteratively against the base document URL (inherited from `rawEntries[0]`). Mismatched origins natively format text into blue (`#0000ff`) indicating secure iframe execution environments mimicking WPT.
-    - **Render Blocking Indicators:** When `_renderBlocking` validates to exactly `blocking`, legacy WPT injects `render-block-icon.png`. Zero-asset web rendering securely recreates this natively using standard DOM canvas shapes (deploying a perfectly aligned 14px orange `#ff9900` circle holding a 1.5px white stroked geometric `X`).
-    - **State Resetting:** When processing completely new files dynamically (e.g. dragging a new file over an existing active viewer), you MUST fully reset the DOM state inherently. This includes strictly removing dynamic `.req-tab` configurations, revoking old `activeBlobUrls` blobs to evade OOM crashes, clearing iframe `.src` representations (like Lighthouse/Trace wrappers) and destroying OPFS caching instances intrinsically via `waterfallTool.destroy()` natively before creating a new `WaterfallTools` core.
-
-26. **Diagnostic Logging (Debug Flags):**
-    - All API entry points (`Conductor`, CLI wrappers, Viewers) and inner input/output processors MUST implement and respect an `options.debug` boolean flag uniformly to preserve zero-bloat high-performance pathways in production default states.
-    - When `options.debug === true`, parsers MUST selectively output key operational telemetry via `console.log` and `console.error` (e.g. streaming chunks processed, routing completions, protocol deviations) establishing a robust breadcrumb trace specifically assisting local debugging iterations elegantly across node and browser contexts securely. All tests executing natively implicitly set `{ debug: true }`.
-
-27. **Canvas Responsiveness:**
-    - The viewer implementations (e.g. `src/demo/canvas/viewer.js`) must preserve the core `ExtendedHAR` state globally upon parsing completion. This ensures debounced `window.addEventListener('resize')` closures can recalculate Layout bounds (`Layout.calculateRows`) securely, pushing non-destructive structural updates cleanly into existing Canvas Renderers continuously matching active viewport dimensions natively.
-
-28. **Multi-Page HAR Rendering:**
-    - Standard HAR files, particularly those generated from WebPageTest JSON processors, natively encapsulate multiple independent testing runs (e.g. `First View`, `Repeat View`) as strictly discrete `pages` within the same `log` payload.
-    - Renderers MUST rigorously filter global `log.entries` arrays precisely matching the desired active `pageObj.id` string before executing visual layout mappings. Failing to filter cross-page entries natively collapses disjointed execution timelines (separated by hundreds of seconds) onto single overlapping scales instantly destroying local time grid bounds.
-
-29. **Format Sniffing Resiliency:**
-    - When automatically detecting input formats (like WebPageTest JSON), avoid relying on keys that could appear arbitrarily deep within the JSON payload. For instance, WebPageTest traces might not immediately expose `"runs"` or `"median"` in the initial buffer window; sniffing logic in `orchestrator.js` must safely evaluate a broader union of indicator keys (e.g., `"testRuns"`, `"average"`) to successfully identify valid format structures without reading massive files entirely into memory up front.
-    - **DecompressionStream Bounds:** When sniffing gzipped files, the `DecompressionStream` bounded buffer chunks must be sufficiently large. For formats like Netlog, dictionaries (like `"logEventTypes"`) frequently do not appear until around byte 4500. Sniffing bounds must reliably process at least the first 64KB (`65536` bytes) to prevent false-negative `"unknown"` identification results.
-    - **Dual-File Handling:** Frontend viewer implementations (like `src/demo/canvas/viewer.js`) organically support dual-file drops (e.g., a `.pcap` simultaneously with a `.key_log`). Processing must explicitly run the standard `identifyFormatFromBuffer` mechanism across all dropped files internally mapping correctly rather than relying exclusively on simple string/name-matching fallbacks. Keylogs uniquely identify via `CLIENT_RANDOM` or `CLIENT_TRAFFIC_SECRET_0` strings within buffers.
-
-30. **Mutable Array Reference Safety:**
-    - Parsing routines mapping nested arrays across independently iterated models (e.g., copying HTTP/2 stream `chunks` down to specific Chrome `netlog` request arrays) MUST explicitly clone object arrays natively (`JSON.parse(JSON.stringify(stream.chunks))`). If shared by-reference arrays traverse globally scoped mutation steps (like `postProcessEvents` decrementing `chunk.ts` by relative trace `start_time`), overlapping array references will execute subtraction logic destructively across multiple identical paths corrupting the temporal payload irreversibly natively.
-
-31. **HTTP/3 & QPACK Nuances**: The `QpackDecoder` natively supports decoding `Indexed Field Line`, `Literal Field Line`, etc., strictly abiding by RFC 9204 prefix bounds rather than HPACK constants. For offline 0-RTT/1-RTT QUIC HTTP/3 streams extracted from `.pcap` flows, Request Headers are frequently missing if the first client packets fail decryption or are contained in undecrypted 0-RTT ranges. In these cases, we map the Server's HTTP Response streams to instantiate the `ExtendedHAR` entry anyway, bypassing standard dual-header-presence validation. QPACK string values utilizing Huffman encodings (H bit = 1) evaluate natively using a zero-dependency dynamically constructed Huffman tree based on RFC 7541, falling back to primitive UTF-8 seamlessly upon failure preventing parser stalls.
-
-32. **QUIC vs STUN Multiplexing**: Port 443 frequently carries non-QUIC UDP traffic (specifically WebRTC STUN/TURN). Standard QUIC Short Headers explicitly enforce the `Fixed Bit (0x40)` constraint. Parsers handling raw UDP payloads (`quic-decoder.js`) strictly drop Datagrams when `(firstByte & 0x40) === 0`, gracefully ignoring STUN bursts seamlessly preventing noisy MAC parsing failures across fallback loops. Early Connection ID mappings (`scidLen`/`dcidLen`) accurately mutate dynamically tracking directionality uniformly reflecting transient server identities explicitly inherited from active Initial phases.
-
-33. **TLS Interleaving & HPACK Decoding**: When reconstructing TCP/TLS streams (e.g., `TlsDecoder`), client and server `contiguousChunks` MUST be interleaved chronologically before execution. Feeding all client chunks before server chunks guarantees `ServerHello` random values are missed stalling symmetric key derivations instantly. HTTP/2 HPACK header decompression is handled by a custom zero-dependency `HpackDecoder` class (`src/inputs/utilities/tcpdump/hpack-decoder.js`) implementing RFC 7541 entirely with browser-native APIs (`Uint8Array`, `DataView`). It shares the same Huffman tree infrastructure as `QpackDecoder`. The decoder exposes a simple synchronous `decode(uint8Array)` method returning `[{name, value}]` arrays, maintaining stateful dynamic table context across calls per connection direction.
-
-34. **Solid Download Chunks Fallback**: When drawing the waterfalls and max bandwidth is not available (`maxBw === 0`), individual `chunks` cannot accurately map their duration on the timeline. Rather than drawing hundreds of 1px slivers exactly at their timestamp, the render natively falls back to drawing a solid download block spanning from the end of TTFB (the timestamp of the first chunk) to the end of the request.
-
-35. **Hygiene & Temporary Assets**: During active development workflows or parsing investigations, AI agents will frequently create throw-away diagnostic scripts (like `test-dns.js` or `parse-tracer.js`), generated sample outputs (like `out.json`), or massive `.har` test outputs scattered in the root directory. **Agents MUST meticulously track and clean up** (delete) all standalone testing hooks, debugging `.log` files, and generic CLI scratch files prior to concluding their development sequence globally to prevent polluting the repository tree.
-
-36. **Document-Wide Drag Interactions:** When implementing drag-and-drop file targets across the entire `document.body` while child elements (like `<canvas>`) exist, native `dragleave` events will fire continuously as hover states cross child boundaries. To prevent UI overlays from rapidly flickering open and closed, utilize a `dragCounter` variable incremented on `dragenter` and decremented on `dragleave`. Only hide the overlay when `dragCounter === 0`.
-
-37. **Chrome Trace Timing Offsets**: Native Chrome Netlogs log `time` natively in system MILLISECONDS, whereas Chrome DevTools Traces log `trace_event.ts` strictly in MICROSECONDS (`89,445,124,782`). Because `normalizeNetlogToHAR` assumes internally standardized arrays already map entirely to MILLISECONDS, mapping DevTools Traces correctly requires aggressive mathematical scaling. Explicitly divide ALL microsecond bounds by `1000.0` inside `chrome-trace.js` instantly before creating the HAR generation natively preventing 80+ billion metric bounds cascading into `Date()` instances triggering `RangeError: Invalid time value` failures across renderers natively. Ensure missing Timeline `requestTime` objects strictly bypass synthesis gracefully preventing `NaN` timeline corruptions natively.
-
-38. **Chrome Trace Netlog Pointer Aliasing**: Chrome trace dumps do not guarantee unique string `id` attributes for `netlog` network requests. Instead they utilize `id2.local` which natively represents a C++ memory pointer. Because C++ reallocates identical pointer addresses strictly asynchronously, a single massive trace frequently maps dozens of disjoint `URL_REQUEST_START_JOB` lifecycles sequentially sharing the identical `"0x1a5"` identifier. Parsers exclusively utilizing `id2` (or even native Python Netlog implementations assuming uniqueness) WILL irreversibly corrupt timestamp properties by infinitely merging consecutive lifecycle metrics over each other. 
-    - **Fix Implementation**: Parsers MUST intercept `URL_REQUEST_START_JOB` (or `REQUEST_ALIVE`) `ph="b"` boundaries natively and actively multiplex incoming pointer addresses (assigning each "begin" boundary to a brand new sequentially unique `log` identifier internally). Subsequent chunks tracking the shared `id2.local` correctly execute against the active multiplexed mapping.
-
-39. **Monotonic to Real Epoch Conversion**: Chrome traces natively use `CLOCK_MONOTONIC` (system uptime) for all timestamps (`ts`). The `normalizeNetlogToHAR` function requires a real UNIX epoch to generate valid `startedDateTime` ISO strings. Parsers MUST extract real wall-clock time from the first HTTP `date:` response header encountered during streaming to compute a monotonic-to-epoch offset. Crucially, when applying `req.start` offsets to the baseline to create individual `Date` objects, never pass seconds directly to `new Date(seconds)` as it expects milliseconds natively causing dramatic 1000x scale disparities resulting in rendering engine Infinite Loops/OOMs. Always compute: `new Date(baseEpochMs + req.startMs)`.
-
-40. **Test Framework (Vitest):**
-    - All tests MUST use **vitest** (`import { describe, it, expect } from 'vitest'`), NOT `node:test` or `node:assert`. The project uses vitest as its test runner (`npm test` runs `vitest`).
-    - Use `describe`/`it` for test structure and `expect()` for assertions (e.g., `expect(x).toBe(y)`, `expect(x).toEqual(y)`, `expect(x).toBeTruthy()`, `expect(fn).rejects.toThrow()`).
-    - Test files follow the `*.test.js` naming convention under `tests/inputs/` and `tests/outputs/`.
-
-41. **CDP (Chrome DevTools Protocol) Timing Nuances:**
-    - CDP Network events (`Network.requestWillBeSent`, `Network.responseReceived`) log natively in system seconds (`timestamp`), but the underlying DevTools layout operates strictly in milliseconds. Parsers MUST calculate the relative differences (e.g. `timestamp - first_timestamp`) and explicitly multiply by `1000.0`.
-    - Furthermore, `response.timing` objects (like `dnsStart`, `connectStart`) natively log relative millisecond offsets against `requestTime`. Parsers MUST aggressively compute and map these relative bounds to the absolute Request `startTime` explicitly; otherwise, critical visual phases (DNS, TCP, TLS) will completely fail to appear in standard Waterfall exports.
-    - Because CDP intercepts do not natively guarantee a `responseReceived` phase for aborted or manually blocked requests, parsers must actively scrub unbounded requests (where `endTime` remains undefined) and explicitly fault them out (`errorCode = 12999`) preventing infinite loading state ghost bars natively.
-
-42. **Universal Absolute Timing & Parallel Waterfall Phases:**
-    - Standard HAR implementations fundamentally calculate execution bounds by purely chaining timing durations sequentially (`time_start` + `blocked` + `dns` + `connect` + `send` + `wait`). This natively destroys parallel network metrics (such as a predictive DNS lookup occurring _during_ a request queue block) forcing extreme layout drift pushing HTTP streams massively out of synchronization.
-    - To reflect actual hardware parallelism natively mapped by tools like WebPageTest, the `ExtendedHAR` normalizers (`har-converter.js`, `wpt-json.js`, `cdp.js`, `netlog.js`) inherently encapsulate discrete WPT geometric constraints directly via aliased mappings (`_dns_start`, `_load_start`, `_ttfb_end`, `_download_start`). 
-    - The rendering engine (`layout.js`) rigorously attempts to bypass conventional arithmetic `timings` arrays exclusively utilizing universal absolute epochs (`hasAbsoluteTimings`) against these `_*` constraints natively, guaranteeing mathematically identical visualizations aligning fully to legacy reference frames across all modern ingestion pipelines safely.
-
-43. **Data Parsing Robustness (WPT JSON Polymorphism):**
-    - WebPageTest JSON utilization structures (like CPU or Bandwidth) can manifest differently depending on the export version. Sometimes they bundle generically as arrays (`[ {dataDict}, maxVal, avgVal ]`) and sometimes as strictly keyed dictionaries (`{ data: {dataDict}, max: maxVal, count: avgVal }`).
-    - Data parsing normalizers MUST strictly accommodate both polymorphic structures universally and rigorously map them into consistent array outputs (`[time, scaledPct]`) specifically scaling internal values securely using their embedded maximum limits before submitting to the downstream renderer.
-    - Preserving mathematical limits naturally inside normalizer arrays (i.e., `arr.max = maxVal`) enables layout frontends to dynamically cast highly accurate formatted labels (scaling dynamic suffixes logically like Mbps natively via `mbps.toFixed(1)`) safely referencing unmodified bounds intrinsically.
-
-44. **Canvas Engine Execution Guards (Path Poisoning):**
-    - Natively rendering lines within the `CanvasRenderingContext2D` utilizes strict mathematical paths (`moveTo`, `lineTo`, `stroke`). 
-    - If **any** dynamically mapped coordinate sequence evaluates to `NaN` or `Infinity` structurally within a `.beginPath()` bounding sequence, the entire resulting path is irreversibly poisoned natively completely stripping it from drawing to the screen. Always strictly guard layout geometry inherently using `isFinite(x) && isFinite(y)` logic within iterative arrays completely dodging mathematical anomalies without throwing explicit hard-errors blocking background processes entirely.
-
-45. **Independent UI Control Interdependencies:**
-    - Component layouts occasionally bundle multiple features conceptually spanning physical canvas layers together identically (for example, combining CPU Line algorithms inside Bandwidth Chart Frames). Ensure boolean conditional toggles strictly evaluate distinctly internally preventing hierarchical dependencies from unexpectedly swallowing orthogonal configuration branches unconditionally.
-
-46. **Context Mutation Independence:**
-    - **Canvas fillStyle Context**: Always explicitly set `ctx.fillStyle` or `ctx.strokeStyle` using the computed styling *immediately before* invoking HTML5 canvas geometry methods like `fillRect` or `stroke`. Neglecting to set the style assigns the previously lingering color state on the context (often the default `#000000` or `#ffffff`), effectively rendering data layers completely invisible or rendering incorrectly without raising console errors.
-
-47. **Stair-Stepped Utilization Graphs:** When drawing utilization graphs (like CPU and Bandwidth) in the waterfall canvas renderer, the values represent the utilization over the *previous* time window, rather than an instantaneous measurement. Therefore, these graphs must be drawn using a stair-stepped line generation logic (drawing to the new value at the previous time stamp, and then drawing a horizontal line to the new time stamp) to accurately reflect the original reporting window natively preventing skewed diagonal interpolations.
-
-48. **QUIC / HTTP/3 Netlog Multiplexing**: Unlike HTTP/2 connections which cleanly map against `processStreamJobEvent` dependencies, Chrome Netlogs log multiplexed QUIC bindings natively inside `processUrlRequestEvent` (acting directly on the `URL_REQUEST` source). Thus, identifying QUIC multiplexing requires explicitly trapping `HTTP_STREAM_REQUEST_BOUND_TO_QUIC_SESSION` and mapping the incoming `source_dependency` directly to `quic_session`. Relying purely on the `quicSession.stream` matching logic fails natively since Chromium leaves the corresponding `stream_id` formally undefined inside `URL_REQUEST` dictionaries.
-
-49. **Connection View Formatting**: When rendering in Connection View mode (`options.connectionView === true`), the canvas MUST suppress non-essential visual elements on individual requests (such as wait times / TTFB backgrounds, JS execution chunk highlighting, and individual per-request timing labels). This ensures a clean, multiplexed visualization focusing entirely on the concurrent network streams without visual clutter.
-
-50. **Bandwidth Utilization Normalization**: Unlike CPU measurement averages, Bandwidth usage parsing frequently encounters instant capacity spikes (measuring bytes read off a buffer instantaneously) that drastically exceed physical wire limits (e.g. processing a large chunk at once). Rather than graphing extreme instantaneous bucket peaks, the parsing engines MUST normalize bandwidth bounds by tracking a `rolling deficit` (redistributing overflow capacity forward into subsequent time buckets). The renderer draws this stabilized capacity utilizing a WPT-standard dark green, stair-stepped timeline natively.
-
-51. **API Exposure - Default Render Options**: External integrators interact with `WaterfallTools.getDefaultOptions()` which natively returns a structured boolean configuration state: `{ connectionView, thumbnailView, thumbMaxReqs, showCpu, showBw, showMainthread, showLongtasks, showMissing, showLabels, showChunks, showJsTiming, showWait, showLegend }` alongside dynamic filters like `reqFilter` and `startTime`. When `thumbnailView` is active, `thumbMaxReqs` (default 100) dictates truncation inserting a visual torn-edge natively; setting this to `0` specifically disables this maximum limit unconditionally. Any modifications to rendering capabilities must synchronously update this exported dictionary mapping guaranteeing API continuity.
-
-52. **UI & API Embedding Paradigms**: The core embedding mechanism dynamically utilizes the `WaterfallTools.renderTo(canvasElement, options)` API heavily superseding legacy `div-embed` bootstrapping logic natively. To support interactions seamlessly, this API supports callback hooks (`options.onHover(req)`, `options.onClick(req)`) checking spatial layout indexes internally rather than building separate heavy DOM interaction APIs natively. Additionally, the project features a fully integrated Stand-alone Viewer UI (`src/viewer/index.html`) operating via standard `?src=` query parameters internally capable of exposing global `load()` mechanisms to parent `iframe` wrappers dynamically natively, alongside native Perfetto and Chrome NetLog Viewer nested iframe components supporting isolated trace/log inspections.
-
-53. **History API & Viewer Navigation**: The standalone viewer natively implements standard browser `History API` tracking (`history.pushState` and `popstate`) for seamlessly navigating between its multi-page thumbnail `tileView` and specific canvas overlays natively. When the user navigates fully backward to the initial empty viewer state (landing page), the viewer hides the dynamic visualization containers and restores the drop-zone AND MUST fully clear the underlying `waterfallTool` context instance via `resetViewerState()`. This guarantees previous memory-heavy contexts are properly destructed preventing OOM crashes when subsequently loading new massive parses. Furthermore, when parsing WPT JSON inputs, core painting metrics (like `LargestContentfulPaint` or `firstContentfulPaint`) may not universally exist functionally on root structures. Parsers must explicitly inspect nested `chromeUserTiming` arrays tracking them independently to prevent renderer properties defaulting strictly to `-1`.
-
-54. **Viewer Tabs Drag-and-Drop & Overflow Scrolling**: The Stand-alone Viewer UI now supports full HTML5 structural drag-and-drop dragging interactions seamlessly mapping onto standard CSS tab architectures naturally. When a custom configuration spawns multiple overflowing external tabs natively (like Netlog or Trace wrappers), the flex boundary auto-collapses and actively maps hidden `left` and `right` pagination `.tab-scroll-btn` indicators securely recalculating dimensions implicitly via `MutationObserver` and resize loops exactly reflecting visible boundaries safely.
-
-55. **Viewer Landing Page Updates**: The Stand-alone Viewer integrates a highly professional landing page directly inside `src/viewer/index.html`. Whenever the core supported file formats change or new significant integration capabilities are added, the standalone viewer landing page HTML and descriptive text MUST be explicitly updated. Future agents MUST ensure the marketing copy, feature explanations, and file formats list accurately reflect the latest library capabilities.
-    - **URL Navigation Flow**: The native landing page securely embeds a URL entry bar natively allowing users to fetch remote payloads organically. Submitting valid strings structurally pushes `?src=<URL>` payloads sequentially into `window.location.search` immediately triggering the standalone viewer to fetch the configured remote trace cleanly maintaining shareable History states. Furthermore, the viewer automatically detects specific WebPageTest GUI result URLs (e.g. `/result/YYMMDD_.../` or `/results.php?test=YYMMDD_...`) and automatically transforms them into the appropriate `export.php?bodies=1&test=...` endpoint before fetching, simplifying the workflow for pasting links.
-
-    - **Timing Export Prioritization**: When mapping standard HAR outputs during `WaterfallTools.getHar()` processing, ensure that the array chronologically sorts strictly using parsed upstream `_load_start` bindings (derived directly from WPT inputs) or derived delay alignments rather than simply using `time_start`. It is critical to only populate generalized `entry._load_start` fallback limits using `entry._load_start === undefined` guards to preserve lossless high-fidelity metrics obtained by specific parser inputs.
-
-56. **NetLog Viewer Embedding**: Because the legacy Chrome NetLog Viewer natively enforces block-scoped (`const`) abstractions across its utility classes (`LogUtil`), developers CANNOT globally bind its properties into embedded iframe environments without triggering Cross-Origin Security policies or Reference Errors natively.
-    - WPT explicitly embeds a **self-hosted, uncompressed build** (`src/viewer/public/netlog-viewer/index.html`) loaded natively onto the same Vite origin bypassing CORS flawlessly.
-    - When programmatically injecting WPT `_netlog.txt.gz` payloads, the `loadNetlog(buffer)` function natively unwraps the zip via isomorphic `DecompressionStream('gzip')`.
-    - It then deliberately monkey-patches the globally bound `window.ImportView.getInstance().onLoadLogFile()` natively trapping the core `FileReader` completion pipeline. This perfectly executes asynchronous log injections safely shifting `location.hash = '#events'` exactly when rendering terminates preventing massive empty UI flashes.
-
-57. **Expand/Collapse UI Standard**: Whenever implementing vertically expanding or collapsible components across the UI (like Summary sections or deep Custom Metric tiles), you MUST strictly utilize inline vector SVG chevron indicators rather than unicode emojis or raw text characters.
-    - The standard open/expanded state MUST bind to an Up Chevron: `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>`.
-    - The standard closed/collapsed state MUST bind to a Down Chevron: `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`.
-    - Modifying the native `<polyline>` using `.setAttribute('points', ...)` ensures ultra-responsive vector path transitions that scale perfectly across all DPI environments without font-bound layout shifting.
-
-58. **Native Perfetto Decoding & Integration**: The library natively decodes binary Perfetto Protobuf traces (`.perfetto` / `.pftrace` / `.gz`) in 100% Vanilla JavaScript without `traceconv` SQLite shells or heavy WASM dependencies.
-    - It implements a pure TransformStream TLV varint parser mapping binary variables securely.
-    - It strictly seals `interned_data` (Name, Category, and Event IIDs) using `trusted_packet_sequence_id` namespacing naturally mirroring C++ sequence scoping precisely resolving infinite ID collision bleed. 
-    - **Monotonic Sequence Offsets**: The decoder tracks `timestamp_delta_us` and `timestamp_absolute_us` incrementally per sequence. Critically, to support `devtools.netlog` array synthesis smoothly inside legacy parsers, traces exhibiting monotonic clock overrides within explicitly nested JSON payloads (e.g., `args.params.source_start_time`) completely bypass delta constraints forcing active parsing branches seamlessly back to unified monotonic epoch boundaries.
-    - Internal fallbacks dynamically detect modern Chromium structural shifts natively correcting dictionaries wrapped in contexts like `V8.SnapshotDecompress` and layout loops like `preLCP` back into standard `devtools.timeline` representations without breaking network pipelines natively.
-    - **Original Buffer Bypass**: When loading `.perfetto` traces into the standalone viewer UI (`src/viewer/viewer.js`), `waterfallTool.getPageResource(pageId, 'trace')` explicitly bypasses internal JSON extraction loops securely returning the original binary Uint8Array intact natively routing the raw protobuf structure directly into the embedded `https://ui.perfetto.dev` iframe safely preserving rendering integrity.
-    - **Timing Mapping & Double Value Extraction**: When parsing complex DevTools Timeline traces (e.g., `ResourceReceiveResponse` events inside Perfetto traces), timestamps for detailed connection phases (like `requestTime`, `dnsStart`, `connectStart`) heavily utilize the `double_value` field (`field 5, wire 1`) in `DebugAnnotation` messages natively mapped to 64-bit IEEE-754 floats. Failing to correctly extract these via a `DataView(buffer, offset, 8).getFloat64(0, true)` will silently result in `null` timings, causing subsequent NetLog integrations to render these granular phases as `0` or `-1`.
-    - **Header Array Normalization**: The `har-converter.js` output architecture natively extracts request and response headers exclusively from the arrays built by downstream parsers (like `netlog.js`). However, `devtools.timeline` elements natively serialize `headers` purely as standard objects. Parsers bridging `chrome-trace.js` into `netlog.js` MUST proactively detect and normalize these maps into strictly formatted arrays of strings (`["Header-Name: Header-Value"]`) immediately mapping them to `req.response_headers` protecting standard Extended HAR output definitions from silently mapping these to `[object Object]` natively.
-    - **Netlog Request Inclusion Resilience**: When multiplexing `netlog` outputs against `devtools.timeline` dictionaries, earlier mappings rigidly discarded unfinalized `netlog` events lacking completed bounds or headers. To ensure `timeline` fallback synthesis successfully attaches parsed NetLog states organically across identical URLs, parsers strictly bypass requiring `req.end` and `req.request_headers` naturally preventing missing arrays mapping into UI traces.
-
-### Perfetto Timeline Clock Normalization 
-- When synthesizing Chrome Netlog strings inherently embedded within Perfetto traces, ensure `data.time` strings (usually capturing massive OS Uptime values directly from Blink payloads) are unconditionally overridden via `trace_event.ts` bounds. Omitting this overwrite causes netlog array intersections to subtract `-4465` microseconds blindly against `10,000,000,000` ticks natively, shattering bounds by 118+ days natively.
-
-59. **Prefetch Limits & Monotonic Normalization**:
-    - For recent Chrome traces resolving natively out of Disk Cache or recent stream Prefetches, the `ResourceFinish` event actively records the cached completion offset (tracing when it was hydrated to disk). This timestamp physically precedes the `requestTime` DOM execution fired by `ResourceSendRequest` within identical scopes seamlessly.
-    - Consequently, raw trace `.json` emissions routinely create instances where `req.end < req.start`, producing natively negative layout ranges.
-    - **Fix Implementation**: The library strictly prevents inverted waterfall painting artifacts natively structurally clamping metrics chronologically: `if (req.end < req.start) req.end = req.start;`. Modifiers MUST place this Monotonic Limit exclusively within the central `normalizeNetlogToHAR` function seamlessly protecting both natively evaluated `buildNetlogRequests` objects and manually synthesized fallback strings inherently bridging Chrome Traces.- When computing the trace `base_time_microseconds` natively using `timeline_requests`, realize that `tl.timing.requestTime` strictly exposes natively in **Seconds** (unlike `tl.requestTime` in ms). Calculating bounds rigorously mandates multiplying `requestTime` dynamically by `1,000,000.0` ensuring microsecond-scaling comparisons natively protect baseline offsets from falling arbitrarily back into integer 0 constraints organically.
-
-60. **Response Body Handling & Viewer Display**:
-    - The netlog parser (`src/inputs/netlog.js`) collects base64-encoded response body chunks from `URL_REQUEST_JOB_FILTERED_BYTES_READ` events (via `params.bytes`) into `this.bodies[requestId]`. These are joined into `request.encoded_body` during `postProcessEvents()`, then stored as `response.content.text` with `encoding: 'base64'` in `normalizeNetlogToHAR`.
-    - Standard HAR files also include `response.content.text` natively (plain text or base64 encoded).
-    - **WPTAgent Bodies**: The wptagent processor (`src/inputs/wptagent.js`) extracts response bodies from nested `[run]_bodies.zip` (and `[run]_Cached_bodies.zip`) archives within the outer wptagent ZIP. Each request in `devtools_requests.json` references its body via the `body_file` field (e.g., `001-<id>-body.txt`). The processor opens the nested zip into temporary storage via `ZipReader`, reads each referenced body file, base64-encodes the raw bytes, and stores the result as `response.content.text` with `encoding: 'base64'` on the HAR entry. Temporary body storage is destroyed immediately after extraction.
-    - The `buildWaterfallDataFromHar` function (`src/core/har-converter.js`) transfers `response.content.text` → `request.body` and `response.content.encoding` → `request.bodyEncoding` into the internal waterfall data structure. The `getHar()` method in `waterfall-tools.js` round-trips these back to `response.content.text`/`encoding` in the HAR output.
-    - The viewer (`src/viewer/viewer.js`) renders bodies based on MIME type:
-      - **Text content** (`text/*`, `json`, `javascript`, `xml`, `css`, `svg`): Base64 is decoded to UTF-8 string, then rendered with syntax-highlighted `<pre>` blocks. A copy button is provided.
-      - **Images** (`image/*`): Rendered as actual `<img>` elements using `data:` URIs from the base64 body.
-      - **Other binary** (fonts, protobuf, etc.): Displays approximate byte size.
-      - **Fallback**: When no embedded body exists but the URL is available for images, the URL is used directly.
-    - The `body` field is explicitly excluded from the Raw Details JSON serialization to prevent massive output in the inspector panel.
-    - **Content-Encoding Decompression**: The isomorphic utility `src/core/decompress.js` provides `decompressBody(data, encoding)` which decompresses `Uint8Array` payloads according to their `Content-Encoding` header value. Supported encodings: `gzip`, `x-gzip`, `deflate` (via native `DecompressionStream`), `br` (Brotli — native `DecompressionStream('brotli')` with pure-JS `brotli/decompress` fallback), and `zstd` (native `DecompressionStream('zstd')` with pure-JS `fzstd` fallback). Native support is probed via constructor-only checks (cached per algorithm); fallback imports are dynamic (`import()`) so bundlers code-split the ~69KB Brotli dictionary and ~8KB fzstd library automatically. The tcpdump processor (`src/inputs/tcpdump.js`) uses `decompressBody` in `extractAndStoreBody()` to decode all content-encoded response bodies before base64-encoding them into the HAR output. Unrecognised encodings pass through as raw wire bytes.
-
-61. **Tcpdump Bandwidth Estimation & Chunk Timing:**
-    - The tcpdump processor (`src/inputs/tcpdump.js`) estimates maximum download bandwidth using a 100ms sliding window over all server-to-client packets in the pcap. This is stored as `_bwDown` (in Kbps) on the page object, enabling the canvas renderer to calculate per-chunk download durations for granular visualization instead of solid download bars.
-    - Individual response data chunks from HTTP/1 body segments, HTTP/2 DATA frames, and HTTP/3 DATA frames are mapped into `_chunks` arrays with `{ ts: absoluteMs, bytes: byteCount, inflated? }` matching the format expected by the canvas renderer. `inflated` is populated for content-encoded responses — see note 72 for details on per-chunk uncompressed size tracking.
-    - The `calculateMaxBandwidth()` function identifies server endpoints by cross-referencing packet source IP:port against known TCP and UDP connections, then tracks peak throughput across a sliding 100ms window to avoid burst noise.
-
-62. **Tcpdump Priority Extraction:**
-    - HTTP/2 priority is decoded in `http2-decoder.js` from both HEADERS frames (when the PRIORITY flag 0x20 is set) and standalone PRIORITY frames (type 2). The 5-byte priority payload is parsed into `{ exclusive, dependency, weight, priority }` where weight maps to Chrome-compatible priority strings using the same thresholds as `netlog.js` (weight >= 256 → Highest, >= 220 → High, >= 183 → Medium, >= 147 → Low, else Lowest).
-    - HTTP/3 priority is extracted from the `priority` request header (RFC 9218 Extensible Priorities) by parsing the `u=N` urgency value: u=0-1 → Highest, u=2 → High, u=3 → Medium, u=4-5 → Low, u=6-7 → Lowest.
-
-63. **Tcpdump Bytes Out & Uncompressed Size:**
-    - Request overhead (`_bytesOut`) is estimated from the serialized request line and headers. This approximation covers the HTTP/1.1 request line format and individual header sizes.
-    - Uncompressed response size (`_objectSizeUncompressed`) is tracked in `extractAndStoreBody()` when content-encoding decompression produces a different byte count than the wire-encoded body. This enables the viewer to display both compressed (bytes_in) and uncompressed sizes in the request detail panel.
-
-64. **Asynchronous Progress Reporting & Event Loop Yielding:**
-    - All input parsers accept an optional `options.onProgress(phase, percent)` callback, enabling callers to display real-time processing progress (e.g., progress bars in the viewer). The `phase` string describes the current operation; `percent` is 0-100.
-    - **Tcpdump** reports the most granular progress across 5 phases: Reading packets (0-25%), Decrypting TLS (25-50%), Decoding protocols (50-60%), Decoding UDP (60-85%), Building waterfall (85-100%). The percent within each phase scales proportionally to connections/bytes processed.
-    - Other parsers (HAR, WPT JSON, Chrome Trace, Netlog, CDP) report stream-reading progress proportional to `bytesRead / totalBytes`. The `totalBytes` value is automatically injected by `loadBuffer()`.
-    - **Event Loop Yielding:** The tcpdump parser inserts `setTimeout(0)` yield points between major processing phases and periodically within long synchronous loops (e.g., every 5 TLS connections, every 10 TCP protocol decodings). This prevents browser "script is taking too long" dialogs by giving the browser's rendering pipeline a chance to repaint between heavy synchronous operations. Other parsers yield naturally at each `await reader.read()` chunk boundary.
-    - The helper `yieldToEventLoop()` (`const yieldToEventLoop = () => new Promise(r => setTimeout(r, 0))`) is defined at module scope in `tcpdump.js` and used at all phase transitions and within long loops.
-    - **Uint8Array Base64 Encoding:** Both `tcpdump.js` and `wptagent.js` encode response bodies to base64 using chunked `String.fromCharCode.apply(null, subarray)` with 8KB slices joined once, replacing the prior character-by-character loop which was O(n²) due to string concatenation.
-    - The standalone viewer (`src/viewer/viewer.js`) displays a CSS-animated progress bar (`#progress-container` / `#progress-bar`) that appears during file processing, updated via the `onProgress` callback passed through `loadBuffer`. The `updateProgress(phase, percent)` function controls the bar width and phase label text.
-
-65. **HTTP/1 Header Scan Safety:**
-    - The `Http1Parser._readHeaders()` method in `http1-decoder.js` searches for the `\r\n\r\n` header boundary across an incrementally-growing buffer. The search is O(n) — each new chunk is appended once, and only the overlap region (last 3 bytes of prior data + new bytes) is scanned for the delimiter.
-    - A 256KB cap (`MAX_HEADER_SCAN`) causes the method to bail out and return `null` if no header boundary is found within that limit. This prevents catastrophic hangs when encrypted or binary data is falsely sniffed as HTTP/1.1 by the protocol sniffer (e.g., first 4 bytes of an encrypted client flow randomly matching `GET `, `POST`, or `HTTP`). Without this cap, the prior O(n²) concat-and-rescan pattern would process gigabytes of redundant byte operations on large non-HTTP connections.
-
-66. **HTTP/1 Zero-Length Chunk Safety:**
-    - The `Http1Parser.parse()` and `_readLengthBody()` methods skip zero-length chunks at the top of their loops. TLS decryption can produce empty records (alerts, ChangeCipherSpec, close_notify) and TCP reconstruction may emit empty segments from ACK-only packets. Without this guard, `_consume(0)` is a no-op (its `while (needed > 0)` loop never executes), causing `BODY_EOF`, `BODY_CHUNKED`, and `BODY_LENGTH` states to retry the same `chunkIdx` forever in an infinite loop.
-
-67. **QUIC Decryption Early-Bail on Non-QUIC UDP Traffic:**
-    - Captures from real websites (e.g., CNN) routinely contain thousands of UDP connections on port 443 — most being STUN/TURN/WebRTC traffic, not QUIC. The UDP sniffer's check (`firstByte & 0x40`) matches 75% of random byte values, causing `decodeQuic` to be called on non-QUIC connections.
-    - Without mitigation, each non-QUIC connection brute-forces 21 candidate CID lengths × all key pairs × 2 directions × WebCrypto AEAD operations per packet. With thousands of connections, this causes multi-minute hangs or "script taking too long" dialogs.
-    - **Fix:** The QUIC decoder tracks `consecutiveFailures` — packets that fail AEAD decryption in sequence without any success. After `MAX_CONSECUTIVE_FAILURES` (5 packets), the decoder bails out of the entire connection. The counter only increments when `forwardKeys === null` (no keys have ever been established for this connection), so legitimate connections with sporadic packet loss or key rotation are not affected.
-
-68. **Dependency Licensing**:
-    - All introduced dependencies MUST use an unencumbered license like MIT, BSD, Apache 2, ISC or MPL. 
-    - Any dependency that uses any flavor of the GPL (General Public License) is expressly prohibited.
-
-69. **Unified Build Orchestration & Viewer Decoupling**:
-    - Production boundaries between Node.js API components, Browser API components, and the Standalone Viewer are strictly severed at build-time dynamically via `scripts/build.js` natively bridging Vite iterations transparently.
-    - Instead of bundling API utilities identically into `viewer.js`, the Standalone Viewer utilizes an HTML5 `<script type="importmap">` physically routing `import ... from 'waterfall-tools'` dynamically to the decoupled local `waterfall-tools.es.js` artifact securely generated into `/dist/browser/waterfall-tools/`.
-    - Local Hot Module Replacement (HMR) seamlessly overrides this map using `vite.dev.config.js` (`npm run dev:viewer`) dynamically aliasing the `waterfall-tools` bare specifier strictly to the root `/src/core/waterfall-tools.js` logic avoiding compilation resets beautifully seamlessly!
-
-70. **Internal Dependency Injection (Options Propagation):**
-    - The core library avoids referencing specific platform APIs (like Node's `zlib` or Browser Polyfills) internally inside stream parsing loops natively. Instead, the root `orchestrator.js` organically injects dependencies utilizing `options.deps` (like `options.deps.decompressBody` or `options.deps.sniffMimeType`).
-    - When building isolated CLI test harnesses (e.g., `src/inputs/cli/tcpdump.js`), developers MUST ensure they explicitly instantiate and populate `options.deps` reflecting identical orchestrator mappings natively preventing `TypeError` exceptions deep within the library.
-    - Internally, when executing deeply nested asynchronous extractions (like chunking HTTP chunks inside `extractAndStoreBody`), parsers MUST recursively pass down the `options` object securely ensuring downstream bounds maintain access to injected dependencies inherently avoiding `ReferenceError` crashes.
-
-72. **Per-Chunk Uncompressed Sizes (`_chunks[].inflated`):**
-    - Each entry in `_chunks` may carry an optional `inflated` field representing the decoded (post content-encoding) byte count contributed by that wire chunk. Sum of `inflated` across all chunks equals the total decoded body size (`_objectSizeUncompressed`), enabling downstream consumers to slice the base64-decoded `response.content.text` by delivery time to visualize *when* each piece of the decoded payload arrived.
-    - **Core principle:** Missing data is better than wrong data. `inflated` is only populated when the underlying source can provide genuine per-chunk attribution — never via proportional/approximate distribution. Consumers that find `inflated` absent should treat it as unknown rather than inferring it.
-    - **Source behavior:**
-      - `netlog` / `chrome-trace`: populated directly from `URL_REQUEST_JOB_FILTERED_BYTES_READ` events — Chrome sets the `inflated` value on the most recently recorded wire chunk as filtered bytes are emitted from the decompressor.
-      - `wpt-json` / `wptagent`: pre-computed by Chrome DevTools Protocol upstream; flows through unchanged via the generic `_`-prefix property mapping in `processWPTView`.
-      - `cdp`: extracted from `Network.dataReceived` events where `params.dataLength` differs from `params.encodedDataLength`. Only emitted when the two differ (uncompressed chunks omit the field).
-      - `tcpdump`: computed via streaming decompression in `extractAndStoreBody()`. Each wire chunk is written individually to a streaming decoder and the exact number of decompressed bytes emitted in response to that write is recorded as that chunk's `inflated`. This mirrors real decoder behaviour — many wire chunks produce 0 bytes of output while the decoder buffers internally, then a subsequent chunk triggers a burst. If streaming isn't available for the encoding (pure-JS brotli fallback path, which has no streaming API), `inflated` is omitted entirely for that request.
-    - **Streaming decompression helper** (`src/core/decompress.js#decompressBodyPerChunk`): the shared utility input processors can use for per-chunk decompression. Dispatches to:
-      - `DecompressionStream` (gzip/deflate — always native; brotli/zstd when natively supported). Uses a parallel read-drain pattern where a background loop accumulates output bytes into a counter; after each `await writer.write(chunk)` we yield once via `await new Promise(r => setTimeout(r, 0))` so pending microtasks (reader.read() resolutions) drain before we sample the counter delta.
-      - `fzstd.Decompress` for zstd when native `DecompressionStream('zstd')` is unavailable. `fzstd`'s `ondata` callback fires synchronously from inside each `push(chunk, isLast)` call, so per-chunk attribution is exact without any event-loop yield dance.
-      - Pure-JS `brotli` package (one-shot only, no streaming API). Returns `null` from `decompressBodyPerChunk` in this case so the caller can fall back to one-shot `decompressBody` for the body bytes but skip `inflated` reporting.
-      - Must be wired into `options.deps.decompressBodyPerChunk` by both the orchestrator (`src/inputs/orchestrator.js`) and the standalone CLI (`src/inputs/cli/tcpdump.js`) — parsers that skip this wiring silently lose `inflated` reporting.
-    - Only set for compressed responses. For uncompressed responses the field is omitted — consumers should treat an absent `inflated` as equal to `bytes`.
-    - Preserved by reference through `har-converter.js` (`_chunks: entry._chunks || []`) and `waterfall-tools.js` `getHar()` (generic `_`-prefix property copy loop at line 540-544), so the field round-trips cleanly through HAR export and re-import.
-
-73. **Connection & Queue Layout Gaps (Preconnect Rendering):**
-    - Network preconnect objects often trigger TCP connections and DNS lookups far earlier than when browser dispatch naturally issues the HTTP request (resulting in massive temporal gaps).
-    - Under WebPageTest visualization standards, HTTP requests strictly retain ownership over these distant connection phases.
-    - To accurately render these gaps, `src/renderer/layout.js` rigidly maps exact boundaries independently (`sslEnd`, `connectEnd`) and categorically rejects fallback interpolation bounds that artificially merge `sslEnd` directly into `ttfbStart`.
-    - Native graphical Queueing layers (`row.colors.wait`) must strictly end immediately upon the absolute earliest boundary of any actively running network phase. This elegantly bounds queue styling independently to temporal Queue phases, eliminating spanning bounds mistakenly rendering massively long queue indicators blindly stretching across uninstrumented `tcpdump` preconnect gaps natively.
-
-74. **Chunked HTML Response Body Viewer:**
-    - For HTML responses (MIME type contains `html`) that have both `_chunks` with timestamps and a base64-encoded body, the standalone viewer's request inspector (`src/viewer/viewer.js#buildChunkedHtmlBody`) renders the response body as a hex-viewer-style two-column table — one row per delivered wire chunk — instead of a single monolithic `<pre>` block.
-    - **Slicing rule:** the body is sliced by `inflated` byte counts when present (compressed responses), falling back to wire `bytes` when `inflated` is absent (uncompressed). Per AGENTS note 72, an absent `inflated` is treated as equal to `bytes`. If cumulative slice sizes don't match the decoded body length exactly (parser undercounts or trailing decoder flush), the leftover is absorbed into the final chunk so no body content is dropped, and overflow is clamped from the tail.
-    - **UTF-8 boundary safety:** body slicing operates on the raw `Uint8Array` (decoded once via `atob`), and each slice is decoded with `TextDecoder('utf-8').decode(slice, { stream: true })` for non-final chunks so multi-byte sequences split across chunk boundaries reassemble correctly.
-    - **Time labels:** each row shows `[absTime] ms ([±deltaTime] ms)`. `absTime` is the chunk's absolute position on the waterfall axis (same coordinate the canvas uses). `deltaTime` is the inter-arrival gap — for the first chunk it's `chunk.ts − request.time_start` (TTFB / wait time), for subsequent chunks it's `chunk.ts − previous_chunk.ts`. Both values live entirely in the canvas's coordinate space — no conversion through real epoch ms is required, just consistent normalisation via `toWaterfallMs` (see below).
-    - **Coordinate normalisation:** `toWaterfallMs(ts)` mirrors `canvas.js#L883` but uses the page anchor (not the magic `> 1e12` constant) for the epoch-vs-relative discriminator. Anything `>= waterfallZero` is treated as absolute epoch ms and gets the anchor subtracted; anything below it is already-relative and passes through. `waterfallZero` is resolved the same way `layout.js#L159-L176` does — prefer `pageData.startedDateTime` epoch ms, fall back to scanning the page's entries for the earliest `time_start`. The fixed `> 1e12` threshold breaks for parsers that produce small but legitimate epoch baselines (the historical netlog `1970-07-15` bug — see note 75).
-    - **Size labels:** when `inflated !== bytes` (compressed response with per-chunk attribution), both are shown as `<inflated> · <wire> wire`. When equal or only one is present, only the relevant value is shown. `humanizeBytes` is used so massive bursts stay readable (e.g. `870.05 KB · 16 KB wire` for a gzipped HTML chunk where the decoder flushed a large internal buffer).
-    - **Layout invariants:** rows have `min-height: 56px` so the two-line label always fits even when the body slice is empty (e.g. early compressed chunks where `inflated === 0`). Rows alternate `#ffffff` / `#f6f7f9` shading with thin `#e6e6e6` separators. The body cell uses `flex: 1 1 auto; min-width: 0` so the inner `<pre>` shrinks/wraps correctly inside the flex container. The body cell has **no per-chunk vertical scroll** (`max-height: none; overflow: visible`) — each chunk uses whatever vertical space its content needs and the request tab's outer scroll handles overall navigation. This avoids fighting dozens of nested scrollbars when reading a long chunked HTML document.
-    - **Fallback safety:** `buildChunkedHtmlBody` returns `null` (and the caller falls back to the standard single-block view) when the body can't be base64-decoded, when chunks lack timestamps, or when the chunks array is empty. Non-HTML MIME types skip this path entirely and continue to use the existing `<pre>` rendering.
-
-75. **Netlog `timeTickOffset` Page Anchor:**
-    - Pure netlog dumps (`.json` / `.json.gz`, not chrome traces) record monotonic event timestamps in the `events` stream (Chrome's tick clock — milliseconds since process start). The wall-clock anchor for tick `0` is captured in `constants.timeTickOffset` as an integer string of milliseconds since the UNIX epoch.
-    - Adding any monotonic `event.time` value to `timeTickOffset` yields a real UNIX epoch ms timestamp. The netlog parser captures this in `Netlog#setConstants` (`src/inputs/netlog.js`) and stores it as `this.timeTickOffset`, then returns it from `postProcessEvents()` so `processNetlogFileNode` can resolve `pageStartEpochMs = timeTickOffset + start_time` (where `start_time` is the earliest tick value across requests, before the per-event normalisation that subtracts it).
-    - **Historical bug:** `normalizeNetlogToHAR` previously took `run_start_epoch` and computed `new Date(run_start_epoch * 1000)`, treating the monotonic tick value as if it were UNIX epoch *seconds*. For traces with a few hours of process uptime (e.g. `start_time ≈ 16,879,307`), this produced page `startedDateTime = 1970-07-15T08:41:47Z` — entries got pseudo-epochs around 1.7e10 instead of 1.7e12, which silently broke any downstream consumer that used the magic `> 1e12` epoch heuristic (canvas.js, the chunked body viewer, etc.).
-    - **Fix:** the function is now `normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, page_start_epoch_ms)` and consumes a real wall-clock epoch ms anchor directly. The netlog driver computes it from `timeTickOffset + start_time`; chrome-trace.js (which reuses the function via its synthesised netlog pipeline) passes its own pre-resolved `final_start_time` (already in ms after the HTTP `date:`-header offset hack at lines 313-324) directly without the `/ 1000.0` divisor it used to need.
-    - **Fixture impact:** regenerating the netlog golden fixtures (`tests/fixtures/netlog-google.har.json`, `netlog-amazon1.har.json`) only touched `startedDateTime` strings — every relative `_*` timing field was unchanged, confirming the fix is purely an anchor correction. Chrome-trace fixtures are unaffected because that test scrubs `startedDateTime` before snapshot comparison.
-    - **What still bulk-copies:** `normalizeNetlogToHAR` continues to copy every `req.X` field onto `entry._X` via the `for (const key of Object.keys(req))` loop near line 1268, so `_start`, `_first_byte`, `_end`, `_dns_start`, etc. flow through automatically — the fix is anchor-only, not field-population. Per-request `_dns_start`/`_connect_start`/`_ssl_start` are intentionally only populated when those phases happen on this entry's URL_REQUEST (e.g. the redirect entry); reused-connection entries leave them undefined and the renderer pulls connection-level timings from `data.tcp_connections` / `data.quic_connections` via `connection_id` instead.
-\n- The Viewer Options UI in `src/viewer/` now supports complex non-boolean controls (like `startTime`, `endTime`, `reqFilter`) mapped generically to the canvas renderer's options object natively syncing via the URL parameters.
-
-26. **Responsive Layouts & Split Labels Render Engine:**
-    - The `WaterfallCanvas` natively exposes `options.labelsCanvas` and `options.overlapLabels` parameters enabling headless DOM-split layouts structurally isolating URL labels from the primary data rendering bounds securely.
-    - Pinch-to-zoom gestures apply intrinsic bounds checking mapping deltas implicitly onto `options.startTime` and `options.endTime` natively via bound `updateOptions(newOptions)` API routines. Layout logic avoids regenerating the full layout via `renderTo` when bounding offsets internally cleanly.
-
-76. **Cloudflare Worker CORS Fetch Proxy (`cloudflare-worker/`)**:
-    - A single-file Cloudflare Worker (`cloudflare-worker/worker.js`) provides a CORS-friendly fetch fallback for URL-based imports, used by the viewer when a direct `fetch()` fails due to missing CORS headers on the remote origin.
-    - **Scope Gate**: The Worker **only** handles requests to the `/fetch` pathname. Any other path MUST be passed through unmodified (`return fetch(request)`), so the Worker can safely share a hostname with unrelated content.
-    - **Input Contract**: `GET /fetch?url=<URL-encoded absolute http(s) URL>`. The caller supplies the target via the `url` query param.
-    - **Response Contract**: On success, streams the upstream response body byte-for-byte with `Access-Control-Allow-Origin: *` attached so anonymous-mode `fetch()` works. Also exposes `X-Waterfall-Tools-Format` containing the sniffed format name for diagnostics.
-    - **Format Sniffing (Abuse Mitigation)**: The Worker reads the first 64 KB of the upstream body and runs the same detection logic as `src/inputs/orchestrator.js#identifyFormatFromBuffer`. Only responses matching a known waterfall-tools format (`har`, `wpt`, `netlog`, `cdp`, `chrome-trace`, `perfetto`, `wptagent`, `tcpdump`, `keylog`) are allowed through; anything else returns `415 unsupported_format`. This prevents the Worker from being used as a generic open proxy for arbitrary content.
-    - **CRITICAL CONTRACT**: When a new input format is added to `src/inputs/orchestrator.js`, the `identifyFormatFromBuffer` function inside `cloudflare-worker/worker.js` **MUST be updated in lockstep**. Otherwise the new format will be silently rejected by the proxy. The two copies exist because the Worker is intentionally self-contained (single JS file, zero bindings, pasteable into the Cloudflare dashboard) — it does not import from the main `src/` tree at build time.
-    - **Stream Architecture (Zero-Copy Passthrough)**: The Worker reads only the first 64 KB off the upstream `ReadableStreamDefaultReader`, buffers those chunks for sniffing, then constructs a new `ReadableStream` that re-emits the buffered chunks one-at-a-time (preserving backpressure) before forwarding remaining `reader.read()` output unchanged. Bytes are never reassembled into a single large buffer and no content transformation occurs — `Content-Encoding` is passed through verbatim.
-    - **Non-Anonymizing Proxy**: Upstream fetches include `X-Forwarded-For` (appended to any existing chain), `X-Real-IP`, `Forwarded` (RFC 7239 quoted for IPv6), and a custom `Via: 1.1 waterfall-tools-proxy` header. This removes the hide-behind-a-proxy value for abusers while still working for legitimate viewer imports.
-    - **SSRF Guard**: Before issuing the upstream fetch the Worker rejects non-http(s) schemes and blocks obvious private hostnames via `isPrivateHost` — loopback, RFC 1918, link-local (169.254/16 and IPv6 fe80::/10), CGNAT (100.64/10), ULA (fc00::/7), `localhost`/`.local`/`.internal` labels, and IPv4-mapped-IPv6 forms (`::ffff:127.0.0.1`). This is best-effort hostname filtering; it does **not** resolve DNS, so a public-looking hostname pointing at a private address still technically bypasses it. Document this caveat if deploying alongside private services.
-    - **Failure-Based Rate Limiting**: Any failed proxied request (upstream error, non-2xx status, unsupported format, SSRF rejection, malformed URL) increments an **in-memory** per-IP counter (`failureCounters`, a module-scope `Map<string, {count, firstFailureMs}>`). Once the counter reaches `RATE_LIMIT_MAX_FAILURES` (default 10) within `RATE_LIMIT_WINDOW_SECONDS` (default 600), further requests from that IP receive `429 rate_limited` until the window rolls over (lazy eviction on the next read of that IP). Successful fetches do not count and do not reset the counter — they're simply not incremented. Counters are per-isolate; Cloudflare keeps isolates warm and clients normally land on the same isolate inside the same colo across repeat requests, so per-isolate accounting is sufficient for the threat model (a single malicious page hammering the proxy). Deliberately not using KV / D1 / Durable Object / `caches.default` keeps the Worker a zero-binding, paste-to-deploy single file.
-    - **Fail-Closed Tracking Cap**: The map is capped at `RATE_LIMIT_MAP_CAP` (default 10 000). When at cap, the Worker **refuses to evict any entry that is still inside its active window** — doing so would let an attacker flood the Worker with unique source IPs to silently roll a real offender off the FIFO tail and bypass the rate limit. Instead, while the map is full of still-active entries, `isRateLimited` returns `true` for **all** callers, causing every `/fetch` request (including from IPs with no prior record) to be rejected with `429 rate_limited` until the oldest entry ages out of its window. Once the oldest entry expires, the next `recordFailure` call evicts it and re-opens the tracking budget. This deliberately chooses availability-for-the-honest-path over availability-for-everyone-including-abusers, and ensures the rate limiter cannot fail-open by overflow.
-    - **Client IP Extraction**: `getClientIp` prefers Cloudflare's `CF-Connecting-IP` header (present on every production request) and falls back to the left-most `X-Forwarded-For` entry (for `wrangler dev` local testing).
-    - **HEAD Requests Rejected**: `HEAD` requests on `/fetch` are refused because there's no body to sniff — allowing them unsniffed would turn the Worker into a free reachability probe for arbitrary hosts.
-    - **Deployment**: No KV, D1, Durable Object, or Rate Limiting bindings are required. Deploy via `wrangler deploy cloudflare-worker/worker.js` (a `wrangler.toml` is provided) or by pasting the file into the Cloudflare dashboard "Module Worker" editor.
+# Waterfall Tools: AI Agent Guidance
+
+Client-side, high-performance network waterfall library (WebPageTest-style).
+
+## Workflow (mandatory)
+
+- **Start:** read `Docs/Architecture.md` and `Docs/Plan.md`.
+- **End:** update `README.md`, `Docs/Plan.md`, `Docs/Architecture.md`, and `AGENTS.md` (this file is long-term project memory).
+- **Hygiene:** delete any throw-away diagnostic scripts, `.log` files, and scratch outputs from the repo root before concluding.
+- **API changes** to public signatures (`WaterfallTools` methods, `renderTo()` options) MUST be reflected in `README.md` and noted here.
+
+## Core architecture
+
+- Vanilla JS only in library core. No React/Vue/Svelte/Angular. External libs allowed if they improve the architecture.
+- Use `<canvas>` for waterfalls — no per-request DOM elements (1000+ requests are common).
+- Every input format maps to **Extended HAR** before rendering or output. HAR `log.creator` must identify `waterfall-tools`. Custom fields prefix with `_` (e.g. `_priority`, `_load_ms`, `_ttfb_ms`, `_bytesIn`). Schema: `Docs/Extended-HAR-Schema.md`. Types: JSDoc in `src/core/har-types.js`.
+- Pluggable, decoupled modules. Orchestrator transports verified HAR across renderers/outputs without implicit mutation. Tree-shakeable exports.
+- Target: latest stable Chrome, Firefox, Safari, Node. No polyfills or transpilation. UMD abandoned — ESM only.
+- Licenses: MIT / BSD / Apache-2 / ISC / MPL only. **No GPL** in any form.
+
+## File layout / isomorphism
+
+- `src/core/` and top-level `src/inputs/*.js` — strictly isomorphic (Node + browser).
+- `src/inputs/cli/[format].js` — CLI wrappers (Node-only, keeps bundlers away from `process.*`).
+- `src/inputs/utilities/[format]/` — format-specific decoders.
+- `src/platforms/browser/`, `src/renderer/`, `src/embed/` — Web APIs only.
+- `src/platforms/node/` — Node APIs only (`fs`, `zlib`, `crypto` dynamic-imported from isomorphic code).
+- Structure must allow dropping in WASM for heavy future work (trace decompress, frame unpacking).
+
+## Build
+
+- Rollup, not Rolldown. Outputs: `waterfall-[hash].js`, `tcpdump-[hash].js`, `decompress-[hash].js`, plus a 41-byte `waterfall-tools.es.js` stub that imports the hashed payload (enables 1-year max-age caching).
+- Static artifacts have Brotli `.br` counterparts, level 11.
+- Orchestration: `scripts/build.js`.
+- Viewer uses `<script type="importmap">` pointing `waterfall-tools` → `dist/browser/waterfall-tools/waterfall-tools.es.js`. `vite.dev.config.js` aliases the bare specifier to `src/core/waterfall-tools.js` for HMR (`npm run dev:viewer`).
+
+## Testing
+
+- **vitest only** (`import { describe, it, expect } from 'vitest'`). Not `node:test`/`assert`. Files: `tests/**/*.test.js`.
+- Before `deepStrictEqual`-style asserts on large objects, sanitize via `JSON.parse(JSON.stringify(result))` — `undefined` mismatches hang the runner.
+- Scrub dynamically generated keys (e.g. `startedDateTime` from `Date.now()` fallbacks) from both sides before comparing.
+- Tests implicitly set `{ debug: true }`.
+- For formats with parallel sources (e.g. netlog vs HAR from the same test), match samples by filename prefix convention (e.g. `www.google.com-netlog.json.gz` ↔ `www.google.com.har.gz`).
+
+## Sample assets
+
+- `Sample/Data/[format]/[source]/` — format-segmented inputs.
+- `Sample/Implementations/[format]/` — exploratory/reference parsers (e.g. Python).
+- `Sample/Data/wptagent/roadtrip-wptagent.zip` — canonical reference: all collectable types, first+repeat view.
+
+## Orchestrator & public API
+
+- `src/inputs/orchestrator.js` auto-detects format by magic bytes / token sniffing. Callers don't pass format.
+- Every parser signature: `processXNode(input, options)` accepting either file path or `Readable`.
+- `Conductor` class exposes `processFile` and `processStream`.
+- Unified CLI: `bin/waterfall-tools.js`. Auto-discovers matching `keylog` files.
+- All entry points honour `options.debug` → structured `console.log`/`error` telemetry. Default off for zero production cost.
+- `options.onProgress(phase, percent)` — every parser supports it. Tcpdump reports fine-grained phases; other parsers report `bytesRead/totalBytes`. `totalBytes` injected by `loadBuffer()`.
+- **Dependency injection:** orchestrator passes `options.deps` (`decompressBody`, `decompressBodyPerChunk`, `sniffMimeType`). CLI harnesses (`src/inputs/cli/tcpdump.js`) must populate these. Recursively pass `options` through nested async extraction calls.
+
+## Fault tolerance & streaming
+
+- Parsers degrade gracefully on truncated/malformed input.
+- Use **Web Streams API** (`ReadableStream`, `DecompressionStream`, `TextDecoderStream`). JSON via `@streamparser/json`. Never `JSON.parse` large payloads.
+- Transform streams to drop massive fields (`generated-html`, `almanac`) at token level before the JSON assembler — prevents V8 OOM.
+- Detect gzip by magic bytes (`1f 8b`), not `.gz` extension.
+- In Node bridges, manually `.destroy()` `fs.ReadStream` instances in `finally` after `getReader().read()` — Web streams don't auto-close file handles.
+- When bridging events across arrays with 15K+ entries, index by `Map` (avoid O(n²)).
+- Clone chunk arrays (`JSON.parse(JSON.stringify(...))`) before mutations that subtract relative offsets — by-reference sharing across parser paths corrupts timestamps irreversibly.
+- Format sniff bounds: at least 64KB (`logEventTypes` in netlog appears ~byte 4500). WPT JSON: check `testRuns`, `average` etc. — not just `runs`/`median`.
+- Dual-file drops (viewer): run `identifyFormatFromBuffer` on every dropped file, not name matching. Keylogs contain `CLIENT_RANDOM` or `CLIENT_TRAFFIC_SECRET_0`.
+
+## Timestamp / clock normalization
+
+The canvas renderer expects **relative millisecond offsets** from the earliest `startedDateTime` in the collection. Mis-normalized absolute epochs (seconds vs ms, or monotonic uptime) cause `requestAnimationFrame` loops to iterate trillions of times and crash the tab. Per-parser rules:
+
+- **Chrome Trace:** `trace_event.ts` is **microseconds**; divide by 1000 before HAR generation. Extract real epoch from the first HTTP `date:` response header (CLOCK_MONOTONIC otherwise). Compute entry dates as `new Date(baseEpochMs + req.startMs)`, never `new Date(seconds)`. Missing `requestTime` → bypass synthesis, don't emit NaN. Clamp `req.end = max(req.end, req.start)` to handle cached/prefetched responses where `ResourceFinish` precedes `requestTime`. When using `timeline_requests` for base, `tl.timing.requestTime` is **seconds** (vs `tl.requestTime` in ms) — multiply by 1e6 for µs comparisons.
+- **CDP:** `timestamp` is seconds — `(ts - first_ts) * 1000`. `response.timing.{dnsStart,connectStart,...}` are ms offsets relative to `requestTime` — add to absolute start time. Aborted/blocked requests with no `endTime` → scrub with `errorCode = 12999`.
+- **Netlog:** monotonic event ticks in ms. `constants.timeTickOffset` is epoch ms string for tick 0. Parser stores `this.timeTickOffset` and returns from `postProcessEvents()`. `processNetlogFileNode` resolves `pageStartEpochMs = timeTickOffset + earliest_tick` and passes it to `normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, page_start_epoch_ms)` as a real epoch ms anchor (historical bug: treating ticks as seconds produced `1970-07-15` dates that silently broke `> 1e12` heuristics downstream).
+- **Chrome Trace via netlog pipe:** passes its own pre-resolved epoch ms baseline directly — no divisor needed.
+- `normalizeNetlogToHAR` bulk-copies `req.X` onto `entry._X`. Per-request `_dns_start` / `_connect_start` / `_ssl_start` only populate for entries where those phases happened on this request's URL_REQUEST (redirects). Reused-connection entries pull connection-level timings from `data.tcp_connections` / `data.quic_connections` via `connection_id`.
+
+## Parser-specific rules
+
+### Chrome Trace
+- `id2.local` is a C++ pointer — reused across disjoint request lifecycles. **Must** intercept `URL_REQUEST_START_JOB` / `REQUEST_ALIVE` `ph="b"` boundaries and mint a new internal id per "begin"; subsequent events on the shared `id2.local` map to the active multiplexed id.
+- Headers in `devtools.timeline` are serialized as objects — normalize to `["Name: Value"]` string arrays when bridging into `netlog.js`.
+- Don't require `req.end` / `req.request_headers` to be present when attaching netlog state across identical URLs.
+
+### WPT JSON
+- Multiple pages per `log` (First View, Repeat View). Renderers must filter `log.entries` by active `pageObj.id` before layout.
+- WPT parsers must set `_run` (int) and `_cached` (0/1) on each `page` so `getPageResource()` can locate `*_Cached_screen.jpg` etc.
+- `chunks` is polymorphic: legacy WPT → `{ts: bytes}` object map; wptagent → `[{ts, bytes}]` array. Normalize both.
+- CPU / bandwidth data is polymorphic: array `[dict, max, avg]` or object `{data, max, count}`. Map to `[time, scaledPct]` and preserve `arr.max`.
+- LCP / FCP may live only in nested `chromeUserTiming` arrays — inspect there before defaulting to -1.
+
+### Wptagent (ZIP)
+- Digest via `BrowserStorage` → OPFS + Web Locks (no SharedWorkers). Don't leak OPFS locks across reloads.
+- Only `testinfo.json[.gz]` and `[run]_devtools_requests.json.gz` are unboxed on parse. Other entries are listed in `output.log._zipFiles` for on-demand extraction.
+- Response bodies: each request references `body_file` (`001-<id>-body.txt`) inside `[run]_bodies.zip` (and `[run]_Cached_bodies.zip` for repeat). Extract to temp storage via `ZipReader`, base64-encode, set `response.content.{text,encoding:'base64'}`. Destroy temp storage immediately after extraction.
+
+### Netlog
+- QUIC multiplexing: trap `HTTP_STREAM_REQUEST_BOUND_TO_QUIC_SESSION` and map `source_dependency` to `quic_session`. `quicSession.stream` matching fails — Chromium leaves `stream_id` undefined on `URL_REQUEST`.
+- Response bodies: collect base64 chunks from `URL_REQUEST_JOB_FILTERED_BYTES_READ` → `request.encoded_body`; emit `response.content.text` with `encoding:'base64'`.
+
+### CDP
+- Aborted requests with no `responseReceived` → fault out with `errorCode = 12999` so renderer doesn't draw ghost bars.
+
+### Tcpdump
+- Binary pipeline on `Uint8Array` + `DataView` only. No Node `Buffer`.
+- **PCAPNG:** sniffs magics, extracts Enhanced Packet Blocks. Timestamp precision assumes µs; full Interface Description Block tracking pending real `.pcapng` fixtures.
+- Raw parser decodes Ethernet / IPv4 / IPv6 / TCP / UDP.
+- **QUIC:** unwraps 1-RTT AEAD, tracks all RFC-9000 frame types. Header protection via `AES-CBC` with zero IV (WebCrypto rejects raw ECB). Port 443 carries STUN/TURN: drop datagrams when `(firstByte & 0x40) === 0`. After `MAX_CONSECUTIVE_FAILURES = 5` AEAD failures (while `forwardKeys === null`), bail out of the connection — prevents brute-force CID-length loops on non-QUIC UDP floods.
+- **QPACK** (`src/inputs/utilities/tcpdump/qpack-decoder.js`): RFC 9204 prefixes (not HPACK constants). Stateful encoder-dynamic-table instructions per direction. Shares Huffman tree with HPACK. HTTP/3 request headers often missing from 0-RTT; still emit HAR entry from server response.
+- **HPACK** (`src/inputs/utilities/tcpdump/hpack-decoder.js`): custom zero-dep RFC 7541 impl, `decode(Uint8Array) → [{name,value}]`, stateful per direction.
+- **TLS/TCP reconstruction:** interleave client + server `contiguousChunks` chronologically (order matters for `ServerHello` random / key derivation).
+- **HTTP/1 parser:** header search has 256KB `MAX_HEADER_SCAN` cap — returns `null` on overrun, prevents O(n²) rescans when encrypted flows are mis-sniffed as HTTP/1. Skip zero-length chunks at top of `parse()` and `_readLengthBody()` — TLS empty records (alerts, CCS, close_notify) otherwise infinite-loop.
+- **Priority:** HTTP/2 from HEADERS flag 0x20 or standalone PRIORITY frames; `weight ≥ 256/220/183/147` → Highest/High/Medium/Low/Lowest (matches `netlog.js`). HTTP/3 from `priority` header `u=N`: 0-1 Highest, 2 High, 3 Medium, 4-5 Low, 6-7 Lowest.
+- **Bandwidth:** 100ms sliding window over server→client packets → `_bwDown` Kbps on page.
+- **Chunks:** populate `_chunks: [{ts, bytes, inflated?}]` from HTTP/1 body segments, H/2 DATA, H/3 DATA frames.
+- **Bytes out:** estimate from request line + header sizes.
+- **Uncompressed size:** track `_objectSizeUncompressed` in `extractAndStoreBody()` when decompression output differs from wire.
+- **Event-loop yielding:** `yieldToEventLoop = () => new Promise(r => setTimeout(r, 0))` at module scope. Yield at phase transitions and every 5 TLS connections / 10 TCP decodings. Prevents "script taking too long" dialogs.
+- **Base64 encoding:** chunk to 8KB slices with `String.fromCharCode.apply(null, subarray)`, join once. Per-char concat is O(n²).
+
+## Content decompression (`src/core/decompress.js`)
+
+- `decompressBody(data, encoding)` handles `gzip`, `x-gzip`, `deflate`, `br`, `zstd`. Native `DecompressionStream` when available (constructor-probe cached per algorithm); fallbacks: `brotli/decompress` (pure JS, dict is ~69KB) and `fzstd` (~8KB). Dynamic imports so bundlers code-split.
+- Unknown encodings pass through as raw wire bytes.
+- Orchestrator and tcpdump CLI both wire `options.deps.decompressBody` and `options.deps.decompressBodyPerChunk`.
+
+## Per-chunk `inflated`
+
+`_chunks[].inflated` = decoded bytes contributed by that wire chunk. Sum == `_objectSizeUncompressed`. Lets consumers slice the base64 body by delivery time.
+
+- **Principle:** missing is better than wrong. Never distribute proportionally. Omit `inflated` when genuine per-chunk attribution isn't available. Absent → consumers treat as equal to `bytes`.
+- **Per source:**
+  - `netlog` / `chrome-trace`: set directly from `URL_REQUEST_JOB_FILTERED_BYTES_READ` (Chrome attaches inflated to most recent wire chunk as filtered bytes emit).
+  - `wpt-json` / `wptagent`: pre-computed upstream via CDP; flows through the generic `_`-prefix mapping.
+  - `cdp`: from `Network.dataReceived` where `dataLength !== encodedDataLength`. Omitted when equal.
+  - `tcpdump`: streaming decompression via `decompressBodyPerChunk`. Each wire chunk written individually; output byte delta recorded. Many chunks emit 0 bytes (decoder buffers) then one bursts — that's correct. When streaming isn't available (brotli pure-JS fallback), returns `null` → caller still decompresses via `decompressBody` one-shot for body bytes but omits `inflated`.
+- **Streaming helper internals:** `DecompressionStream` path uses parallel read-drain: background reader loop accumulates into a counter; after each `writer.write(chunk)`, one `await new Promise(r => setTimeout(r, 0))` lets pending microtasks drain before sampling the counter delta. `fzstd` path uses synchronous `ondata` inside each `push(chunk, isLast)` — no yield needed.
+- Preserved through `har-converter.js` (`_chunks: entry._chunks || []`) and `waterfall-tools.js#getHar()` generic `_`-prefix property copy.
+
+## Renderer (`src/renderer/`)
+
+- Canvas. `window.devicePixelRatio`: `canvas.width *= dpr`, `ctx.scale(dpr, dpr)`. Logical coordinates stay CSS px.
+- **Layer order:** row-background bands → time grid → request blocks → metric lines (Start Render, LCP) → chunks overlay → labels.
+- **PHP→HTML5 rect boundaries:** GD was inclusive (`x1..x2` covers `x2-x1+1` px). `fillRect(x,y,w,h)` uses raw delta. Always `width = (x2 - x1) + 1` for 2px-minimum visibility on same-timestamp events (`_domContentLoadedEventStart` == `...End`).
+- **Path poisoning:** any `NaN`/`Infinity` inside a `beginPath` block drops the whole path silently. Guard every coordinate with `isFinite(x) && isFinite(y)`.
+- **Fill style:** set `ctx.fillStyle` / `strokeStyle` **immediately before** each `fillRect` / `stroke`. Lingering state silently renders black/white.
+- **Row backgrounds:** redirects (300-399 except 304) → opaque yellow. Errors (≥400 or 0) → opaque red. 100% opacity before request blocks.
+- **TTFB gradient:** request row base fills from start to `downloadEnd`. `_chunks` overlay the TTFB base opaquely with byte progression.
+- **Connection phases** (Wait, DNS, Connect, SSL) use fixed WPT colors, not content-type `baseColor`.
+- **Solid download fallback:** when `maxBw === 0`, draw one solid block from TTFB end → request end (avoids hundreds of 1px slivers).
+- **Cross-origin:** compare entry URL origin to base document URL (`rawEntries[0]._documentURL`). Mismatch → label text in blue `#0000ff`.
+- **Render blocking:** `_renderBlocking === 'blocking'` → 14px `#ff9900` circle, 1.5px white-stroke X. Drawn from canvas primitives (no PNG asset).
+- **Label layering:** metric labels paint opaque background (`#ffffff` or `#f0f0f0` matching row stripe) behind text to prevent grid bleed.
+- **Legend:** connection phases = solid uniform bars. MIME types = 20px split bars, left half `scaleRgb(color, 0.65)` TTFB tint, right half primary download color.
+- **Utilization graphs (CPU, BW):** stair-stepped. Value = window-aggregated, not instantaneous — draw horizontal to new-ts-at-old-value, then vertical to new value. Diagonal interpolation is wrong.
+- **Bandwidth normalization:** rolling deficit carries instantaneous overflow forward into subsequent buckets (dark green, WPT standard).
+- **Connection View** (`options.connectionView`): suppress per-request TTFB backgrounds, JS-execution highlights, per-request timing labels.
+- **Thumbnail view** (`options.thumbnailView`, `options.thumbMaxReqs`): truncates at 100 by default with torn-edge; 0 disables truncation.
+- **Absolute timings path:** when entries carry `_dns_start`, `_load_start`, `_ttfb_end`, `_download_start`, `layout.js` bypasses conventional arithmetic `timings[]` chaining via `hasAbsoluteTimings` — preserves parallel phases (e.g. DNS during queue block).
+- **Queue band:** `row.colors.wait` must end at the earliest absolute start of any active network phase — prevents wait bars spanning uninstrumented preconnect gaps.
+- **Connection phase bounds:** map `sslEnd`/`connectEnd` independently; never interpolate `sslEnd → ttfbStart` as a fallback.
+- **Multi-page filter:** filter `log.entries` by `pageObj.id` before layout.
+- **Callbacks:** `options.onHover(req)`, `options.onClick(req)`.
+- **Resize:** viewers persist parsed `ExtendedHAR` globally, debounce `window.resize`, recompute via `Layout.calculateRows` non-destructively.
+- `options.labelsCanvas` + `options.overlapLabels` split labels from data into a separate canvas. Pinch-to-zoom updates `options.startTime`/`endTime` via `updateOptions()` — don't regenerate full layout.
+- `WaterfallTools.getDefaultOptions()` returns canonical boolean/filter dict: `{ connectionView, thumbnailView, thumbMaxReqs, showCpu, showBw, showMainthread, showLongtasks, showMissing, showLabels, showChunks, showJsTiming, showWait, showLegend, reqFilter, startTime, endTime }`. Keep in sync when adding controls.
+
+## Viewer (`src/viewer/`)
+
+- Landing page + URL entry bar at `index.html`. `?src=<url>` triggers remote fetch. Auto-transforms WPT GUI URLs (`/result/.../`, `/results.php?test=...`) → `export.php?bodies=1&test=...`.
+- Whenever supported formats or capabilities change, update the landing page copy and feature list.
+- **History (IndexedDB `WaterfallHistoryDB`):** tracks URL-based test loads via `src/viewer/history.js#saveToHistory`. No cookies / localStorage.
+- **Browser History API:** `pushState` / `popstate` for tile-view ↔ canvas navigation. Full back to empty state → `resetViewerState()` clears drop zone AND calls `waterfallTool.destroy()` (prevents OOM on next load).
+- **Reset on new file drop:** remove `.req-tab` entries, revoke `activeBlobUrls`, clear iframe `.src` (Lighthouse/Trace), call `waterfallTool.destroy()`.
+- **Drag overlay:** `dragCounter` incremented on `dragenter`, decremented on `dragleave`. Only hide when `dragCounter === 0` — avoids flicker over child `<canvas>`.
+- **Expand/collapse:** inline SVG chevrons only, no emoji/text glyphs.
+  - Open (up): `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>`
+  - Closed (down): swap `points="6 9 12 15 18 9"`. Mutate via `.setAttribute('points', ...)`.
+- **Tabs:** drag-and-drop reorder; overflow scrollbars via `MutationObserver` + resize loops.
+- **Progress bar:** `#progress-container` / `#progress-bar` driven by `onProgress(phase, percent)` → `updateProgress()`.
+- **Body rendering by MIME:**
+  - text (`text/*`, json, javascript, xml, css, svg) → decode base64 → UTF-8 → syntax-highlighted `<pre>` with copy button.
+  - image → `<img>` with `data:` URI.
+  - other binary → byte-size estimate.
+  - fallback: URL for images when body absent.
+  - `body` field excluded from Raw Details JSON.
+- **Chunked HTML body viewer** (`buildChunkedHtmlBody`): for HTML MIME with `_chunks[].ts` and base64 body, renders a hex-viewer-style two-col table, one row per wire chunk.
+  - Slice by `inflated` when present; fall back to `bytes`. Leftover from undercounts absorbed into final chunk; overflow clamped from tail.
+  - UTF-8 boundary safe via `TextDecoder('utf-8').decode(slice, { stream: true })` on raw `Uint8Array` slices.
+  - Time label: `[absTime] ms ([±deltaTime] ms)`. First chunk delta = `ts - time_start` (TTFB). Subsequent = inter-arrival. All normalized via `toWaterfallMs(ts)` — mirrors `canvas.js#L883` but uses the page anchor (`pageData.startedDateTime` epoch, else earliest `time_start` across entries) as the epoch-vs-relative discriminator. **Don't** use the `> 1e12` magic constant (breaks for small-epoch parsers — see historical netlog 1970-07-15 bug).
+  - Size label: `<inflated> · <wire> wire` when different; one value when equal.
+  - Row `min-height: 56px`. Alternating `#fff`/`#f6f7f9` with `#e6e6e6` separators. Body cell `flex: 1 1 auto; min-width: 0; max-height: none; overflow: visible` — no per-chunk scroll, outer tab handles it.
+  - Returns `null` on decode failure / empty chunks / missing timestamps → caller falls back to `<pre>`.
+- **HAR export sort:** `getHar()` sorts by `_load_start` when available, not `time_start`. Only populate fallback `entry._load_start` when `entry._load_start === undefined` — preserve parser-provided values.
+
+## Embedded viewers
+
+### NetLog viewer
+- Self-hosted uncompressed build at `src/viewer/public/netlog-viewer/index.html` (served same-origin to bypass CORS — the legacy Chrome build uses `const`-scoped utilities unreachable across origins).
+- Inject logs: `DecompressionStream('gzip')` on `_netlog.txt.gz`, monkey-patch `window.ImportView.getInstance().onLoadLogFile()` to intercept `FileReader` completion, set `location.hash = '#events'` on terminate to skip empty-UI flash.
+
+### Perfetto (`src/inputs/utilities/perfetto/`)
+- Pure JS TLV varint protobuf decoder (no `traceconv`, no WASM, no SQLite).
+- `interned_data` (Name/Category/Event IIDs) scoped by `trusted_packet_sequence_id` — mirrors C++ sequence namespacing, prevents ID collision bleed.
+- Per-sequence monotonic offsets: track `timestamp_delta_us` and `timestamp_absolute_us`. For netlog arrays embedded as nested JSON (`args.params.source_start_time`), bypass delta state and re-anchor to the monotonic base.
+- Modern Chromium wraps dictionaries in `V8.SnapshotDecompress` / `preLCP`-like contexts — detect and correct back to `devtools.timeline` shape.
+- **Original buffer bypass:** `waterfallTool.getPageResource(pageId, 'trace')` returns the raw `Uint8Array` for `.perfetto` inputs, routed straight into the `https://ui.perfetto.dev` iframe.
+- **Double_value extraction:** detailed timings (`requestTime`, `dnsStart`, `connectStart`) live in `DebugAnnotation.double_value` (field 5, wire 1). Decode with `new DataView(buf, off, 8).getFloat64(0, true)`. Missing → silent `null` / `0` / `-1` downstream.
+- **Netlog events in Perfetto traces:** override `data.time` strings (OS uptime values) with `trace_event.ts` bounds. Missing override → subtracting ~`-4465` µs against ~`10^10` ticks shatters bounds by ~118 days.
+- Headers from `devtools.timeline` are objects — normalize to `["Name: Value"]` string arrays before mapping into `netlog.js`.
+- Don't require `req.end` or `req.request_headers` when attaching netlog state to timeline synthesis.
+
+## getPageResource / OPFS
+
+- `waterfallTool.getPageResource(pageId, resourceType)` — browser returns `{url, mimeType}` blob; Node returns `{buffer}`.
+- Supports nested netlog queries → `*_netlog.json.gz` or `*_netlog.txt.gz`.
+- **Requires** `_run` and `_cached` on the HAR page object — without them, `2_Cached_screen.jpg` lookups fail.
+- Lighthouse `.html.gz` extracted via `DecompressionStream('gzip')` for iframe rendering.
+- Tile grids: use `flex-wrap: wrap; width: fit-content` — `span 2` auto-fill stretches tiles incorrectly otherwise.
+
+## Outputs (`src/outputs/`)
+
+- `simple-json`: 1D array, flattens `request`/`response` into top-level props (`url`, `method`, `status`, `ttfb_ms`).
+
+## Cloudflare Worker (`cloudflare-worker/worker.js`)
+
+Single-file, zero-binding Worker providing CORS-safe fetch proxy for viewer URL imports.
+
+- **Scope:** only `/fetch`. All other paths → `fetch(request)` passthrough.
+- **Contract:** `GET /fetch?url=<encoded http(s) URL>`. Streams upstream body byte-for-byte with `Access-Control-Allow-Origin: *`. Diagnostic `X-Waterfall-Tools-Format` header. No `HEAD` (can't sniff without body).
+- **Format sniff:** reads first 64KB, runs `identifyFormatFromBuffer` — MUST mirror `src/inputs/orchestrator.js`. **When a new input format is added to the orchestrator, `cloudflare-worker/worker.js` MUST be updated in lockstep** (Worker is intentionally self-contained for paste-to-dashboard deploys — no build-time imports). Unknown formats → `415 unsupported_format`.
+- **Stream architecture:** reads first 64KB into buffered chunks for sniffing, then constructs a new `ReadableStream` that re-emits the buffered chunks (preserving backpressure) before forwarding `reader.read()` output unchanged. No reassembly. No transformation. `Content-Encoding` passed through.
+- **Non-anonymizing:** appends `X-Forwarded-For`, `X-Real-IP`, RFC-7239 `Forwarded` (quoted for IPv6), `Via: 1.1 waterfall-tools-proxy`.
+- **SSRF guard:** `isPrivateHost` blocks loopback, RFC 1918, link-local (169.254/16, fe80::/10), CGNAT (100.64/10), ULA (fc00::/7), `localhost` / `.local` / `.internal`, IPv4-mapped-IPv6 (`::ffff:127.0.0.1`). Hostname-based only — doesn't resolve DNS. Note limitation when deploying alongside private services.
+- **Rate limit:** in-memory per-IP `Map<string, {count, firstFailureMs}>` at module scope. `RATE_LIMIT_MAX_FAILURES = 10` within `RATE_LIMIT_WINDOW_SECONDS = 600`. Increments only on failed requests (upstream error, non-2xx, unsupported format, SSRF reject, malformed URL). Successes don't count or reset. Per-isolate — sufficient for the threat model (Cloudflare keeps isolates warm, same colo = same isolate for repeat requests).
+- **Fail-closed cap:** `RATE_LIMIT_MAP_CAP = 10000`. When full of still-active-window entries, **refuses to evict** and returns `429` for all callers until the oldest ages out. Deliberately chooses honest-path availability over overflow-abuse availability. Ensures rate limiter cannot fail-open.
+- **Client IP:** prefer `CF-Connecting-IP`, fallback to leftmost `X-Forwarded-For` (for `wrangler dev`).
+- **Deploy:** `wrangler deploy cloudflare-worker/worker.js` (wrangler.toml provided) or paste into dashboard "Module Worker" editor. No KV / D1 / DO / Rate Limiting bindings.
+
+## Code commentary
+
+- Dense mathematical / coordinate-mapping logic (canvas rendering, binary parsing) must carry train-of-thought inline comments explaining *why* bounds fire in a specific order. Rollup/Vite strips comments in production — no bloat cost.
+- Don't explain what readable code already shows. Only explain why.
