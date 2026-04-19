@@ -125,25 +125,101 @@ function getDevtoolsPath() {
     return val ? val : null;
 }
 
-function loadDevtools() {
+function sniffTraceFormat(buffer) {
+    const view = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+    if (view.length >= 3 && view[0] === 0x1f && view[1] === 0x8b && view[2] === 0x08) return 'gzip';
+    // Skip BOM + whitespace to find the first JSON token
+    let i = 0;
+    if (view.length >= 3 && view[0] === 0xef && view[1] === 0xbb && view[2] === 0xbf) i = 3;
+    while (i < view.length && (view[i] === 0x20 || view[i] === 0x09 || view[i] === 0x0a || view[i] === 0x0d)) i++;
+    if (i < view.length && (view[i] === 0x7b /* { */ || view[i] === 0x5b /* [ */)) return 'json';
+    return 'binary';
+}
+
+function loadDevtools(traceBuffer) {
     const path = getDevtoolsPath();
     if (!path || !ui.devtoolsFrame) return;
 
     ui.devtoolsOverlay.style.display = 'flex';
     ui.devtoolsOverlayContent.innerText = 'Loading DevTools...';
 
-    const target = path + 'index.html';
-    if (ui.devtoolsFrame.src === 'about:blank' || !ui.devtoolsFrame.src || !ui.devtoolsFrame.src.endsWith(target.replace(/^\.\//, ''))) {
+    // DevTools honors ?panel=<id> on its entry page as the default tab — "timeline"
+    // selects the Performance panel and causes it to instantiate (registering itself
+    // on self.UI.panels.timeline) before the user has to click anything.
+    const target = path + 'index.html?panel=timeline';
+    const needsReload = ui.devtoolsFrame.src === 'about:blank'
+        || !ui.devtoolsFrame.src
+        || !ui.devtoolsFrame.src.includes(path.replace(/^\.\//, ''));
+
+    let alreadyReady = false;
+    if (needsReload) {
         ui.devtoolsFrame.src = target;
+    } else {
+        // iframe already points at devtools; panel is live — just re-use it
+        alreadyReady = true;
     }
 
-    const onLoad = () => {
-        // Give the frontend a moment to initialize before hiding the overlay
-        setTimeout(() => {
+    const format = traceBuffer ? sniffTraceFormat(traceBuffer) : null;
+    if (traceBuffer && format === 'binary') {
+        // Perfetto protobuf — DevTools Performance panel expects Chrome-trace JSON.
+        // Transcoding path to be added in a follow-up; for now signal that the
+        // Perfetto tab is the right place to inspect this buffer.
+        ui.devtoolsOverlayContent.innerText =
+            'This trace is in Perfetto binary format — use the Perfetto tab to view it in DevTools-style UI.';
+        return;
+    }
+
+    const waitForPanelAndLoad = () => {
+        const cw = ui.devtoolsFrame.contentWindow;
+        if (!cw) {
             ui.devtoolsOverlay.style.display = 'none';
-        }, 300);
+            return;
+        }
+
+        // Poll for the Performance panel instance to register itself. The panel's
+        // constructor does `self.UI.panels.timeline = this` right after the lazy
+        // module import triggered by the ?panel=timeline default-tab selection.
+        const deadline = Date.now() + 15000;
+        const tick = () => {
+            const panel = cw.UI && cw.UI.panels && cw.UI.panels.timeline;
+            if (panel && typeof panel.loadFromFile === 'function') {
+                if (traceBuffer) {
+                    ui.devtoolsOverlayContent.innerText = 'Loading trace into DevTools...';
+                    try {
+                        // File.type ending in "gzip" triggers DevTools' internal
+                        // DecompressionStream path; plain JSON files use the default.
+                        const mime = format === 'gzip' ? 'application/gzip' : 'application/json';
+                        const name = format === 'gzip' ? 'trace.json.gz' : 'trace.json';
+                        const file = new cw.File([traceBuffer], name, { type: mime });
+                        Promise.resolve(panel.loadFromFile(file))
+                            .catch((err) => console.warn('[viewer.js] DevTools loadFromFile failed:', err))
+                            .finally(() => {
+                                ui.devtoolsOverlay.style.display = 'none';
+                            });
+                    } catch (e) {
+                        console.warn('[viewer.js] Failed to hand trace to DevTools:', e);
+                        ui.devtoolsOverlay.style.display = 'none';
+                    }
+                } else {
+                    ui.devtoolsOverlay.style.display = 'none';
+                }
+                return;
+            }
+            if (Date.now() > deadline) {
+                console.warn('[viewer.js] Timed out waiting for DevTools Performance panel');
+                ui.devtoolsOverlay.style.display = 'none';
+                return;
+            }
+            setTimeout(tick, 100);
+        };
+        tick();
     };
-    ui.devtoolsFrame.addEventListener('load', onLoad, { once: true });
+
+    if (alreadyReady) {
+        waitForPanelAndLoad();
+    } else {
+        ui.devtoolsFrame.addEventListener('load', waitForPanelAndLoad, { once: true });
+    }
 }
 
 function loadNetlog(netlogBuffer) {
@@ -1308,12 +1384,12 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
                 loadTracePerfetto(traceResource.buffer);
             };
 
-            // DevTools tab is gated on the same resource availability — we reuse the trace
-            // buffer in a later phase when load-into-DevTools is implemented.
+            // DevTools tab is gated on the same resource availability — when the tab is
+            // activated we hand the trace buffer to the Performance panel's loadFromFile().
             if (ui.tabDevtools && getDevtoolsPath()) {
                 ui.tabDevtools.classList.remove('hidden');
                 pendingTabLoads.devtools = () => {
-                    loadDevtools();
+                    loadDevtools(traceResource.buffer);
                 };
             }
         }

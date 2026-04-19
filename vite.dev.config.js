@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { readFileSync } from 'fs';
-import { patchNodeWorkerThreadsImport } from './scripts/patch-devtools.js';
+import { patchDevtoolsBundle } from './scripts/patch-devtools.js';
 
 // Read the installed Chrome DevTools frontend version so the dev server can route
 // /devtools-<version>/ at the same versioned path that production uses. Matching
@@ -32,7 +32,7 @@ const devtoolsServePlugin = {
         let buf = readFileSync(filePath);
         const ext = filePath.split('.').pop().toLowerCase();
         if (ext === 'js' || ext === 'mjs') {
-          const patched = patchNodeWorkerThreadsImport(buf.toString('utf-8'));
+          const patched = patchDevtoolsBundle(buf.toString('utf-8'));
           buf = Buffer.from(patched, 'utf-8');
         }
         const ctype = {

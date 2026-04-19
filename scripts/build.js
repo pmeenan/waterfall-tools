@@ -25,7 +25,7 @@ const browserAlias = {
     'platform-storage-impl': resolve(__dirname, '../src/platforms/browser/storage-browser.js')
 };
 
-import { patchNodeWorkerThreadsImport } from './patch-devtools.js';
+import { patchDevtoolsBundle } from './patch-devtools.js';
 
 const externalDepsCore = [
   'fs', 'path', 'os', 'child_process', 'crypto', 'stream', 'zlib', 'util', 'url', 'https', 'http',
@@ -112,16 +112,14 @@ async function runBuilds() {
     // Strip the package.json so the directory is a clean static asset bundle
     await fs.rm(resolve(devtoolsDest, 'package.json'), { force: true });
 
-    // Patch the bundle for browser hosting:
-    //  1. `import * as X from "node:worker_threads"` leaks through from the DevTools worker-host
-    //     abstraction and fails both CSP (node: scheme not in script-src) and module resolution.
-    //     Rewrite it to an inert stub so the static import resolves; the surrounding wrapper
-    //     class is never constructed in the browser code path.
-    //  2. The baked-in <meta http-equiv="Content-Security-Policy"> is scoped to the in-Chromium
-    //     DevTools frontend. When we self-host it, its `script-src 'self' https://chrome-devtools-frontend.appspot.com`
-    //     is actually fine for loading our own chunks — but the policy is the thing that *reports*
-    //     the node: import violation. Patching the import above removes the violation at its source,
-    //     so we can leave the CSP alone.
+    // Patch the bundle for browser hosting. See scripts/patch-devtools.js for the full
+    // rationale; in short:
+    //  1. `import*as X from"node:worker_threads"` leaks through from the DevTools worker-host
+    //     abstraction → CSP violation + module-resolution failure. Rewrite to an inert stub.
+    //  2. Parent-relative Images paths (`../../Images/*`, `../../../Images/*`) escape the
+    //     versioned subdir when resolved against the chunk's import.meta.url → assets 404
+    //     at the document root. Flatten the prefix to `./` since the prebuilt bundle
+    //     co-locates every asset.
     async function patchDevtoolsJs(dir) {
         const entries = await fs.readdir(dir, { withFileTypes: true });
         for (const entry of entries) {
@@ -130,7 +128,7 @@ async function runBuilds() {
                 await patchDevtoolsJs(fullPath);
             } else if (entry.isFile() && entry.name.endsWith('.js')) {
                 const raw = await fs.readFile(fullPath, 'utf-8');
-                const patched = patchNodeWorkerThreadsImport(raw);
+                const patched = patchDevtoolsBundle(raw);
                 if (patched !== raw) await fs.writeFile(fullPath, patched);
             }
         }
