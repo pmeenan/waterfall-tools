@@ -408,7 +408,11 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 const peekReader = peekWebStream.pipeThrough(new TextDecoderStream()).getReader();
                 let prefix = '';
                 try {
-                    while (prefix.length < 30) {
+                    // Scan up to 64KB (matches orchestrator's sniff window). DevTools-saved
+                    // traces put `{"metadata":{...}}` before `traceEvents`, so a 30-char
+                    // peek would miss the wrapper and we'd stream `$.*` instead of
+                    // `$.traceEvents.*`, extracting nothing.
+                    while (prefix.length < 65536) {
                         const { done, value } = await peekReader.read();
                         if (done) break;
                         prefix += value;
@@ -417,7 +421,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
                     try { peekReader.cancel(); } catch (e) {}
                     peekFsStream.destroy();
                 }
-                hasTraceEventsWrapper = prefix.replace(/\s/g, '').startsWith('{"traceEvents":');
+                hasTraceEventsWrapper = prefix.replace(/\s/g, '').includes('"traceEvents":[');
             }
 
             const { Readable } = await import(/* @vite-ignore */ 'node:stream');
@@ -664,6 +668,13 @@ export async function processChromeTraceFileNode(input, options = {}) {
                             if (data.statusCode) req.status = data.statusCode;
                             if (data.mimeType) req.mimeType = data.mimeType;
                             if (data.protocol) req.protocol = data.protocol;
+                            // Stash `responseTime` + event ts for the no-netlog epoch bridge
+                            // below. Applied only when the trace has zero netlog coverage —
+                            // otherwise the authoritative HTTP `date:` header wins.
+                            if (req.responseMonotonicMs === undefined && typeof data.responseTime === 'number' && typeof trace_event.ts === 'number') {
+                                req.responseEpochMs = data.responseTime;
+                                req.responseMonotonicMs = trace_event.ts / 1000.0;
+                            }
                             
                             if (data.headers) {
                                 req.response_headers = [];
@@ -713,6 +724,24 @@ export async function processChromeTraceFileNode(input, options = {}) {
         onProgress('Processing events...', 80);
         if (options.debug) console.log(`[chrome-trace.js] Finished reading stream stream.`);
 
+        // No netlog in the trace (DevTools Performance panel captures). Bridge
+        // CLOCK_MONOTONIC → epoch using the first `ResourceReceiveResponse`'s
+        // `responseTime` (ms epoch) paired with its monotonic `ts`. Without
+        // this the downstream `final_start_time` fallback is `Date.now()`,
+        // which shifts every entry's absolute timings to the current wall
+        // clock (wrong day, harmless) and — more importantly — leaves
+        // `_connectTimeMs` etc. anchored to today instead of the capture.
+        // Traces WITH netlog keep using the HTTP `date:` response header
+        // (netlog.dateHeaderEpoch is authoritative in that case).
+        if (netlog_event_count === 0 && !netlog.dateHeaderEpoch) {
+            for (const tl of Object.values(timeline_requests)) {
+                if (typeof tl.responseEpochMs === 'number' && typeof tl.responseMonotonicMs === 'number') {
+                    netlog.dateHeaderEpoch = { epochMs: tl.responseEpochMs, monotonicMs: tl.responseMonotonicMs };
+                    break;
+                }
+            }
+        }
+
         const results = netlog.postProcessEvents();
         let requests = results ? (results.requests || []) : [];
         let unlinked_sockets = results ? (results.unlinked_sockets || []) : [];
@@ -745,12 +774,41 @@ export async function processChromeTraceFileNode(input, options = {}) {
             }
         }
 
+        // Every candidate below must be a finite number — `netlog.start_time` is
+        // `null` when the trace has no netlog events (DevTools Performance panel
+        // captures), and `null < anything` coerces to `0 < anything`, which would
+        // silently poison base_time_microseconds to `null` and make every entry's
+        // `_start` equal to its raw CLOCK_MONOTONIC timestamp.
+        //
+        // Noise URLs (chrome://tracing buffer polls, wptagent bootstrap, browser
+        // extensions) are filtered out of the HAR downstream, but they still
+        // appear in `timeline_requests`. If one fires before the first real
+        // navigation — the chrome://tracing DevTools panel polls its own buffer
+        // every few seconds — it would otherwise pull the page anchor backwards
+        // and push every real request forward by that delta on the waterfall.
+        // Only real network requests anchor the page start. Two classes of
+        // timeline_requests would otherwise pull it backwards and push every
+        // real request to the right on the waterfall:
+        //   1. Noise URLs — chrome://tracing (DevTools panel buffer polls), the
+        //      wptagent bootstrap probe, and chrome-extension:// traffic all
+        //      get filtered out of the HAR downstream but remain in the
+        //      timeline_requests map.
+        //   2. Entries without a URL — blink.resource prefetch probes and
+        //      stray ResourceReceiveResponse fragments whose ResourceSendRequest
+        //      never fired. These also fail the synthesis gate below, so
+        //      letting them influence the anchor anchors the page on something
+        //      that isn't in the HAR.
+        const baseTimeIsNoise = (u) => typeof u === 'string' && (
+            u.startsWith('http://127.0.0.1:8888') || u.startsWith('chrome://tracing') || u.startsWith('chrome-extension://')
+        );
+        const baseTimeEligible = (tl) => typeof tl.url === 'string' && tl.url.length > 0 && !baseTimeIsNoise(tl.url);
         let base_time_microseconds = Number.MAX_VALUE;
-        if (start_time !== null && start_time < base_time_microseconds) base_time_microseconds = start_time;
-        if (results && results.start_time !== undefined && results.start_time < base_time_microseconds) base_time_microseconds = results.start_time;
+        if (typeof start_time === 'number' && start_time < base_time_microseconds) base_time_microseconds = start_time;
+        if (results && typeof results.start_time === 'number' && results.start_time < base_time_microseconds) base_time_microseconds = results.start_time;
         for (const tl of Object.values(timeline_requests)) {
-            if (tl.requestTime !== undefined && (tl.requestTime * 1000.0) < base_time_microseconds) base_time_microseconds = tl.requestTime * 1000.0;
-            if (tl.timing && tl.timing.requestTime && (tl.timing.requestTime * 1000000.0) < base_time_microseconds) base_time_microseconds = tl.timing.requestTime * 1000000.0;
+            if (!baseTimeEligible(tl)) continue;
+            if (typeof tl.requestTime === 'number' && (tl.requestTime * 1000.0) < base_time_microseconds) base_time_microseconds = tl.requestTime * 1000.0;
+            if (tl.timing && typeof tl.timing.requestTime === 'number' && (tl.timing.requestTime * 1000000.0) < base_time_microseconds) base_time_microseconds = tl.timing.requestTime * 1000000.0;
         }
         if (base_time_microseconds === Number.MAX_VALUE) base_time_microseconds = 0;
 

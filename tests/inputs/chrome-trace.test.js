@@ -87,6 +87,40 @@ describe('Chrome Trace Input Processing', () => {
         const detected = await identifyFormatFromBuffer(buf);
         expect(detected.format).toBe('chrome-trace');
         expect(detected.hasTraceEventsWrapper).toBe(true);
+
+        // Auto-detect through loadBuffer (viewer path). Timeline-only synthesis
+        // applies because the trace has no `cat:netlog` events. The DevTools
+        // timeline supplies a wall-clock anchor via `ResourceReceiveResponse.
+        // args.data.responseTime` (ms epoch), paired with `trace_event.ts`
+        // (monotonic µs) — without that bridge every entry lands ~210_000
+        // seconds past the page anchor.
+        const tool = new WaterfallTools();
+        await tool.loadBuffer(buf, { debug: true });
+        const har = tool.getHar();
+        expect(har.log.entries.length).toBeGreaterThan(0);
+        const pageStart = Date.parse(har.log.pages[0].startedDateTime);
+        for (const entry of har.log.entries) {
+            const offsetMs = Date.parse(entry.startedDateTime) - pageStart;
+            // Every entry should land within 10 minutes of the page start. A
+            // broken monotonic-to-epoch bridge shifts entries by CLOCK_MONOTONIC
+            // uptime (days).
+            expect(offsetMs).toBeGreaterThan(-1000);
+            expect(offsetMs).toBeLessThan(600_000);
+        }
+        // `_*` absolute timings are consumed by layout.js via `hasAbsoluteTimings`.
+        // They must be relative ms offsets from the page anchor — when the
+        // monotonic→epoch bridge is broken (or `base_time_microseconds` is
+        // poisoned by a `null` netlog `start_time`), `_start` carries raw
+        // CLOCK_MONOTONIC uptime (~212_000 seconds) and every request lands
+        // far off-screen.
+        for (const entry of har.log.entries) {
+            for (const k of ['_start', '_end', '_first_byte', '_dns_start', '_connect_start', '_ssl_start']) {
+                if (typeof entry[k] === 'number') {
+                    expect(entry[k], `${entry.request.url}: ${k}=${entry[k]}`).toBeLessThan(600_000);
+                    expect(entry[k], `${entry.request.url}: ${k}=${entry[k]}`).toBeGreaterThan(-1000);
+                }
+            }
+        }
     });
 
 });
