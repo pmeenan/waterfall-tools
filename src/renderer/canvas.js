@@ -1376,8 +1376,12 @@ export class WaterfallCanvas {
                     chartYOffset += blockHeight;
                 }
 
+                // See layout.js: `Array.isArray(page._longTasks)` means the data source
+                // instrumented long-task detection — we render the band even when empty
+                // so "no blocking tasks" shows as fully green, distinct from data sources
+                // that lack long-task support (no band rendered at all).
                 const longTasks = page._longTasks || [];
-                if (this.options.showLongtasks && (longTasks.length > 0 || mtEvents.length > 0)) {
+                if (this.options.showLongtasks && (Array.isArray(page._longTasks) || mtEvents.length > 0)) {
                     const blockHeight = this.options.thumbnailView ? 4 : 18;
                     const ltTitle = !this.options.thumbnailView ? 'Long Tasks' : null;
                     drawChartFrame(ltTitle, chartYOffset, blockHeight, null, null, null, false, false); // showBands = false, showGrid = false

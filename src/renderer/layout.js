@@ -421,8 +421,14 @@ export class Layout {
         const mtEvents = p._browser_main_thread || p._mainThreadEvents || [];
         const mtSlices = p._mainThreadSlices && p._mainThreadSlices.slices && p._mainThreadSlices.slice_usecs ? p._mainThreadSlices : null;
         const hasMainthread = options.showMainthread && (mtSlices || mtEvents.length > 0);
-        const longTasks = p._longTasks || [];
-        const hasLongTasks = options.showLongtasks && (longTasks.length > 0 || mtEvents.length > 0);
+        // `_longTasks` presence = the parser instrumented long-task detection.
+        // A parser that can't produce long-task data omits the field entirely;
+        // a parser that can but saw none sets it to `[]`. In the empty case we
+        // still want the band to render (fully green = no blocking), which is
+        // why we check `Array.isArray`, not `.length > 0`. The legacy
+        // `_mainThreadEvents` path (pre-slices) gates on mtEvents because
+        // that's its only source signal.
+        const hasLongTasks = options.showLongtasks && (Array.isArray(p._longTasks) || mtEvents.length > 0);
 
         if (hasCpu || hasBw) additionalHeight += (options.thumbnailView ? 16 : 50);
         if (hasMainthread) additionalHeight += (options.thumbnailView ? 16 : 50);

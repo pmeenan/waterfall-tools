@@ -43,7 +43,7 @@ function isGzip(buffer) {
  * event whose effective start is before it is dropped (matches trace_parser's `s >= start_time`
  * guard).
  */
-function buildMainThreadActivity(rawEvents, baseUs, startUs, metaMainThreads, subframePids) {
+function buildMainThreadActivity(rawEvents, baseUs, startUs, metaMainThreads, subframePids, toplevelTasks) {
     if (!rawEvents.length) {
         return { cpu: null, scripts: null, longTasks: [] };
     }
@@ -290,6 +290,41 @@ function buildMainThreadActivity(rawEvents, baseUs, startUs, metaMainThreads, su
 
     for (const evt of timelineEvents) walk(evt, null, {});
 
+    // Merge `toplevel` RunTask durations into long tasks. Only the subset that ran on
+    // one of the main-thread candidates counts — we ignore ThreadPool_RunTask work on
+    // worker threads, because "Long Tasks" in WPT waterfall semantics is specifically
+    // main-thread blocking time. This has to run after the timelineEvents walk so
+    // `pushLongTask` can coalesce with whatever the devtools-stack path emitted.
+    //
+    // Candidate set is intentionally generous (every thread the streaming pass flagged
+    // as a main-thread candidate) — narrowing to the single picked `bestThread` runs
+    // below. Until that pick happens we take every candidate's long tasks, then filter
+    // at the end.
+    if (Array.isArray(toplevelTasks) && toplevelTasks.length) {
+        toplevelTasks.sort((a, b) => a.ts - b.ts);
+        for (const t of toplevelTasks) {
+            const thread = `${t.pid}:${t.tid}`;
+            if (!mainThreadCandidates.has(thread)) continue;
+            const relStart = t.ts - baseUs;
+            const relEnd = relStart + t.dur;
+            if (relEnd <= 0) continue;
+            pushLongTask(Math.floor(Math.max(0, relStart) / 1000), Math.ceil(relEnd / 1000));
+        }
+        // pushLongTask assumed monotonic input; after merging two sources we need a
+        // final sort + re-coalesce to keep the array clean.
+        longTasks.sort((a, b) => a[0] - b[0]);
+        const merged = [];
+        for (const lt of longTasks) {
+            if (merged.length && lt[0] <= merged[merged.length - 1][1]) {
+                if (lt[1] > merged[merged.length - 1][1]) merged[merged.length - 1][1] = lt[1];
+            } else {
+                merged.push(lt);
+            }
+        }
+        longTasks.length = 0;
+        longTasks.push(...merged);
+    }
+
     // Convert float fractions to integer µs (drop the `total` tracker along the way).
     for (const thread of Object.keys(slices)) {
         delete slices[thread].total;
@@ -396,6 +431,25 @@ export async function processChromeTraceFileNode(input, options = {}) {
 
         const netlog = new Netlog();
         const timeline_requests = {};
+        // Tracks whether a `cat: netlog` event was ever seen. When false, the trace has no
+        // netlog coverage and we have to synthesize every request from devtools.timeline alone
+        // (with stricter quality gates). When true, netlog is the source of truth and
+        // timeline serves only to enrich netlog entries with priority / initiator / render
+        // blocking / JS timing overlays — timeline-only synthesis is reserved for the rare
+        // case where a request appears in devtools but not in netlog at all.
+        let netlog_event_count = 0;
+
+        // `toplevel` RunTask captures. Trace events in the `toplevel` / `ipc,toplevel`
+        // categories wrap the synchronous work on a message-loop tick; their duration IS
+        // the task's wall-clock duration. Modern Chrome traces captured through the
+        // DevTools Performance panel (as opposed to wptagent) rarely have any
+        // `devtools.timeline` events that are themselves ≥ 50 ms — the work lives in
+        // short nested child events under a long `ThreadControllerImpl::RunTask`. So for
+        // long-task detection we collect tasks from `toplevel` separately and pick the
+        // subset that ran on a main-thread candidate after the stack replay has chosen
+        // the primary `main_thread`. Slice aggregation still ignores `toplevel` because
+        // nesting it with `devtools.timeline` children would double-count CPU.
+        const toplevel_tasks = [];
 
         // Raw `devtools.timeline` / `blink.resource` events captured for the WriteCPUSlices +
         // WriteScriptTimings port. Stored minimally (only the fields the stack-replay and JS
@@ -435,7 +489,28 @@ export async function processChromeTraceFileNode(input, options = {}) {
 
                 // 1. Process Netlog
                 if (cat === 'netlog' || cat.includes('netlog')) {
+                    netlog_event_count++;
                     netlog.addTraceEvent(trace_event);
+                    return;
+                }
+
+                // 1b. Capture `toplevel` RunTask durations for long-task detection. We
+                //     only record `ph: 'X'` (complete w/ dur) events ≥ 50 ms — anything
+                //     shorter isn't a long task, and B/E pairs in `toplevel` are rare in
+                //     practice (Chrome emits the whole task as a single X event).
+                //
+                //     Filtering here (in the streaming callback) instead of in the
+                //     post-pass lets us drop the hundreds of thousands of short
+                //     RunTasks before they ever enter memory.
+                if (cat === 'toplevel' || cat === 'ipc,toplevel') {
+                    if (ph === 'X' && typeof trace_event.dur === 'number' && trace_event.dur >= 50000) {
+                        toplevel_tasks.push({
+                            ts: trace_event.ts,
+                            dur: trace_event.dur,
+                            pid: trace_event.pid,
+                            tid: trace_event.tid
+                        });
+                    }
                     return;
                 }
 
@@ -534,22 +609,31 @@ export async function processChromeTraceFileNode(input, options = {}) {
                     }
 
                     let request_id = null;
+                    let has_real_request_id = false;
                     if (trace_event.args && trace_event.args.data && trace_event.args.data.requestId) {
                         request_id = trace_event.args.data.requestId;
+                        has_real_request_id = true;
                     } else if (trace_event.args && trace_event.args.url) {
+                        // URL-only fallback. `blink.resource` fires prefetch/preload candidate
+                        // events that never produce an actual network fetch (URL is present
+                        // but no `requestId`). We keep them for URL-matching during netlog
+                        // augmentation, but they are disqualified from timeline-only synthesis
+                        // because there's no proof a real HTTP transaction ever started.
                         request_id = trace_event.args.url;
                     }
-                    
+
                     if (request_id) {
                         if (!timeline_requests[request_id]) timeline_requests[request_id] = { bytesIn: 0 };
                         const req = timeline_requests[request_id];
-                        
+                        if (has_real_request_id) req.has_real_id = true;
+
                         if (trace_event.args && trace_event.args.url) req.url = trace_event.args.url;
                         
                         const data = trace_event.args && trace_event.args.data ? trace_event.args.data : null;
                         
                         if (name === 'ResourceSendRequest' && data) {
                             req.requestTime = trace_event.ts / 1000.0;
+                            req.was_sent = true;
                             if (data.priority) {
                                 req.priority = data.priority;
                                 if (PRIORITY_MAP[req.priority]) req.priority = PRIORITY_MAP[req.priority];
@@ -574,6 +658,9 @@ export async function processChromeTraceFileNode(input, options = {}) {
                                 }
                             }
                         } else if (name === 'ResourceReceiveResponse' && data) {
+                            req.had_response = true;
+                            if (data.fromCache) req.from_cache = true;
+                            if (data.fromServiceWorker) req.from_service_worker = true;
                             if (data.statusCode) req.status = data.statusCode;
                             if (data.mimeType) req.mimeType = data.mimeType;
                             if (data.protocol) req.protocol = data.protocol;
@@ -688,6 +775,45 @@ export async function processChromeTraceFileNode(input, options = {}) {
             }
         }
 
+        // --------------------------------------------------------------------
+        // Step 1: filter netlog-derived requests to those that actually went
+        //         to the network. Chrome's URL_REQUEST lifecycle creates an
+        //         entry for every *candidate* fetch — cache hits, prefetch
+        //         probes, service worker intercepts, cancelled preloads, and
+        //         transient redirect placeholders. None of those produce
+        //         meaningful waterfall rows; we want only requests with
+        //         proof of a real HTTP transaction.
+        //
+        //         "Proof" = a `start` timestamp (HTTP_TRANSACTION_SEND_REQUEST
+        //         fired) AND at least one of: response headers were parsed,
+        //         first-byte landed, bytes_in > 0, or `end` was recorded by
+        //         URL_REQUEST_JOB_BYTES_READ. Anything short of that indicates
+        //         the request never materialized over the wire.
+        //
+        //         Wptagent bootstrap traffic (http://127.0.0.1:8888/) and the
+        //         DevTools UI's own fetches (chrome://tracing/…) are filtered
+        //         out because they belong to the recording harness, not the
+        //         page under test.
+        // --------------------------------------------------------------------
+        function isNoiseUrl(u) {
+            if (typeof u !== 'string') return false;
+            if (u.startsWith('http://127.0.0.1:8888')) return true;
+            if (u.startsWith('chrome://tracing')) return true;
+            if (u.startsWith('chrome-extension://')) return true;
+            return false;
+        }
+        function netlogRequestHasNetworkActivity(r) {
+            if (r.start === undefined) return false;
+            if (r.response_headers && r.response_headers.length > 0) return true;
+            if (r.first_byte !== undefined) return true;
+            if (r.end !== undefined && r.end > r.start) return true;
+            if (r.bytes_in !== undefined && r.bytes_in > 0) return true;
+            return false;
+        }
+        const preFilterCount = requests.length;
+        requests = requests.filter(r => !isNoiseUrl(r.url) && netlogRequestHasNetworkActivity(r));
+        if (options.debug) console.log(`[chrome-trace.js] Filtered ${preFilterCount - requests.length} incomplete netlog requests (kept ${requests.length}).`);
+
         // Create a quick lookup for timeline requests by URL
         const timeline_by_url = new Map();
         for (const tl_req of Object.values(timeline_requests)) {
@@ -695,11 +821,20 @@ export async function processChromeTraceFileNode(input, options = {}) {
             if (tl_req.overwrittenURL) timeline_by_url.set(tl_req.overwrittenURL, tl_req);
         }
 
-        // Augment netlog requests with timeline data and mark as matched
+        // Step 2: augment netlog requests with timeline data and mark matched
+        // timeline entries so they don't get re-synthesized below. Matching
+        // is by URL — the timeline `requestId` and the netlog `URL_REQUEST`
+        // source id live in different ID spaces (devtools_requestId is
+        // frame-local, netlog id is a C++ pointer), so URL is the only
+        // reliable join key. This is fine for waterfall-level enrichment:
+        // timeline only supplies priority / renderBlocking / initiator /
+        // resourceType metadata we'd otherwise lack.
+        const netlogUrlsPresent = new Set();
         for (const req of requests) {
             if (!req.url) continue;
+            netlogUrlsPresent.add(req.url);
             const matched_timeline_req = timeline_by_url.get(req.url);
-            
+
             if (matched_timeline_req) {
                 matched_timeline_req._matched = true;
                 if (matched_timeline_req.priority && !req.priority) req.priority = matched_timeline_req.priority;
@@ -709,7 +844,13 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 if (req.type === undefined && matched_timeline_req.resourceType) req.type = matched_timeline_req.resourceType;
                 if ((!req.bytesIn || req.bytesIn === 0) && matched_timeline_req.bytesIn) req.bytesIn = matched_timeline_req.bytesIn;
                 if (!req.mimeType && matched_timeline_req.mimeType) req.mimeType = matched_timeline_req.mimeType;
-                
+                // If netlog couldn't parse a status line out of stored response_headers
+                // (e.g. H2 / QUIC pseudo-headers were stripped, or netlog truncation),
+                // inherit the statusCode the timeline observed on ResourceReceiveResponse.
+                if ((req.status === undefined || req.status === 0) && matched_timeline_req.status) {
+                    req.status = matched_timeline_req.status;
+                }
+
                 if ((!req.request_headers || req.request_headers.length === 0) && matched_timeline_req.request_headers && matched_timeline_req.request_headers.length > 0) {
                     req.request_headers = matched_timeline_req.request_headers;
                 }
@@ -732,11 +873,45 @@ export async function processChromeTraceFileNode(input, options = {}) {
             }
         }
 
-        // Synthesize any devtools requests that missed matched netlog mapping paths cleanly
+        // Step 3: synthesize requests from devtools.timeline only.
+        //
+        // Two code paths land here:
+        //   (a) netlog is present but some requests appear in devtools without
+        //       a corresponding URL_REQUEST (iframe / subframe / worker traffic
+        //       the netlog filter missed). We still want those, but only if
+        //       the timeline proves a full send+receive cycle.
+        //   (b) netlog is absent entirely (the user captured with the DevTools
+        //       Performance panel or wptagent-without-netlog profile). Then
+        //       this is the *only* source of request data, and the quality
+        //       bar is the same: we refuse to emit a request unless it was
+        //       actually sent and either got a response or had a proper
+        //       network timing block.
+        //
+        // Quality gates shared by both paths:
+        //   - Request had a real `requestId` (not just a URL lifted from a
+        //     blink.resource prefetch probe event).
+        //   - ResourceSendRequest fired (`was_sent`).
+        //   - URL exists and isn't recording-harness / DevTools noise.
+        //   - EITHER ResourceReceiveResponse fired AND status > 0, OR
+        //     `tl_req.timing` was populated (full connect/send/wait breakdown)
+        //     — this indicates the request reached the transport layer.
+        //   - Not already represented by a netlog request with the same URL.
+        let synthesized = 0;
         for (const [reqId, tl_req] of Object.entries(timeline_requests)) {
-            if (tl_req._matched) continue; // Already merged into a netlog request
-            if (tl_req.requestTime === undefined) continue; // Prevent NaN propagation
-            
+            if (tl_req._matched) continue;
+            if (!tl_req.has_real_id) continue;
+            if (!tl_req.was_sent) continue;
+            if (tl_req.requestTime === undefined) continue;
+            if (!tl_req.url || isNoiseUrl(tl_req.url)) continue;
+            if (netlogUrlsPresent.has(tl_req.url)) continue;
+            // Cache hits and service-worker-intercepted responses aren't network
+            // requests — they never left the tab. Including them would double-count
+            // resources that any netlog pass would (correctly) omit.
+            if (tl_req.from_cache || tl_req.from_service_worker) continue;
+            const hasStatus = typeof tl_req.status === 'number' && tl_req.status > 0;
+            const hasTiming = tl_req.timing && tl_req.timing.requestTime;
+            if (!(hasTiming || (tl_req.had_response && hasStatus))) continue;
+
             const r = {
                 _id: reqId,
                 netlog_id: reqId,
@@ -754,16 +929,16 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 request_headers: tl_req.request_headers || [],
                 response_headers: tl_req.response_headers || []
             };
-            
+
             // Expected bounds track strictly microsecond ranges relative to base arrays naturally.
             r.start = (tl_req.requestTime * 1000.0) - base_time_microseconds;
             r.end = ((tl_req.finishTime || tl_req.requestTime) * 1000.0) - base_time_microseconds;
             r.first_byte = r.end;
-            
+
             if (tl_req.timing) {
                 const rt = (tl_req.timing.requestTime * 1000000.0) - base_time_microseconds;
                 r.start = rt;
-                
+
                 if (tl_req.timing.receiveHeadersEnd > 0) r.first_byte = rt + (tl_req.timing.receiveHeadersEnd * 1000.0);
                 if (tl_req.timing.dnsStart >= 0) r.dns_start = rt + (tl_req.timing.dnsStart * 1000.0);
                 if (tl_req.timing.dnsEnd >= 0) r.dns_end = rt + (tl_req.timing.dnsEnd * 1000.0);
@@ -772,11 +947,12 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 if (tl_req.timing.sslStart >= 0) r.ssl_start = rt + (tl_req.timing.sslStart * 1000.0);
                 if (tl_req.timing.sslEnd >= 0) r.ssl_end = rt + (tl_req.timing.sslEnd * 1000.0);
             }
-            
+
             requests.push(r);
+            synthesized++;
         }
-        
-        if (options.debug) console.log(`[chrome-trace.js] Successfully normalized Netlog data. Synthesized ${requests.length} requests.`);
+
+        if (options.debug) console.log(`[chrome-trace.js] Netlog requests: ${preFilterCount}→${requests.length - synthesized}; timeline-synthesized: ${synthesized}; netlog events seen: ${netlog_event_count}.`);
 
         // Scale ALL internal times from MICROSECONDS to MILLISECONDS since HAR mappings require ms natively.
         const scaleTimes = ['dns_start', 'dns_end', 'connect_start', 'connect_end', 'ssl_start', 'ssl_end', 'start', 'created', 'first_byte', 'end'];
@@ -835,14 +1011,22 @@ export async function processChromeTraceFileNode(input, options = {}) {
                 base_time_microseconds,
                 startUs,
                 metaMainThreads,
-                subframe_pids
+                subframe_pids,
+                toplevel_tasks
             );
             if (mt.cpu) {
                 const folded = foldCpuSlices(mt.cpu);
                 if (folded) page._mainThreadSlices = folded;
             }
-            if (mt.longTasks && mt.longTasks.length) {
-                page._longTasks = mt.longTasks;
+            // Always attach `_longTasks` — even when empty — so the renderer can
+            // distinguish "data source supports long-task detection but there
+            // were none" (render the band as a fully-green interactive bar)
+            // from "data source doesn't instrument long tasks at all" (omit the
+            // band entirely). `mt.cpu` is the signal that the stack replay ran
+            // successfully; we only attach when that path produced something,
+            // otherwise there's no real evidence we'd have *seen* a long task.
+            if (mt.cpu) {
+                page._longTasks = Array.isArray(mt.longTasks) ? mt.longTasks : [];
             }
             if (mt.scripts) {
                 // Walk script timings, flatten allowlisted event names per URL, attach to
