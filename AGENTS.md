@@ -222,6 +222,15 @@ The canvas renderer expects **relative millisecond offsets** from the earliest `
 - Self-hosted uncompressed build at `src/viewer/public/netlog-viewer/index.html` (served same-origin to bypass CORS — the legacy Chrome build uses `const`-scoped utilities unreachable across origins).
 - Inject logs: `DecompressionStream('gzip')` on `_netlog.txt.gz`, monkey-patch `window.ImportView.getInstance().onLoadLogFile()` to intercept `FileReader` completion, set `location.hash = '#events'` on terminate to skip empty-UI flash.
 
+### Chrome DevTools frontend
+- Shipped via the **`@chrome-devtools/index`** npm package (MIT, prebuilt, maintained by `iam-medvedev`). The upstream Google `chrome-devtools-frontend` package is source-only (needs `vpython3`/`gn`/`ninja`) and is deliberately not used.
+- **Keep it fresh** — bump the dependency on every project work session: `npm install --save @chrome-devtools/index@latest`. Commit `package.json` + `package-lock.json` with the version bump.
+- Version flows through automatically: `scripts/build.js` reads `node_modules/@chrome-devtools/index/package.json` at build time, copies the bundle to `dist/browser/devtools-<version>/`, and injects `<meta name="waterfall-devtools-path" content="./devtools-<version>/">` into `dist/browser/index.html`. Never hard-code the version anywhere — the build plumbing derives it in one place.
+- `vite.dev.config.js` does the same thing for dev (`npm run dev:viewer`): reads the same `package.json`, serves `/devtools-<version>/*` from `node_modules/@chrome-devtools/index/` via middleware, and `transformIndexHtml` populates the meta tag. Source HTML carries an empty `content=""` placeholder that both paths overwrite.
+- The 79 MB DevTools bundle is **excluded from Brotli pre-compression** (`compressDirectory` skips any `dist/browser/devtools-*` dir). Pre-compressing already-optimized third-party assets at level 11 would dominate the build.
+- Viewer (`src/viewer/viewer.js`): `getDevtoolsPath()` reads the meta tag; `loadDevtools()` sets `iframe.src = path + 'index.html'`. The **DevTools tab is gated on the same `getPageResource(pageId, 'trace')` availability signal that enables the Perfetto tab** (if a page has a trace, both tabs are offered). The Perfetto tab was renamed from "Trace".
+- Data load-in is not yet wired — this phase only embeds the UI. When implemented, route the trace buffer through `postMessage` to the DevTools frontend (Performance panel import) similar to the Perfetto `perfetto:{buffer,title}` message flow.
+
 ### Perfetto (`src/inputs/utilities/perfetto/`)
 - Pure JS TLV varint protobuf decoder (no `traceconv`, no WASM, no SQLite).
 - `interned_data` (Name/Category/Event IIDs) scoped by `trusted_packet_sequence_id` — mirrors C++ sequence namespacing, prevents ID collision bleed.

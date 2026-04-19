@@ -25,6 +25,8 @@ const browserAlias = {
     'platform-storage-impl': resolve(__dirname, '../src/platforms/browser/storage-browser.js')
 };
 
+import { patchNodeWorkerThreadsImport } from './patch-devtools.js';
+
 const externalDepsCore = [
   'fs', 'path', 'os', 'child_process', 'crypto', 'stream', 'zlib', 'util', 'url', 'https', 'http',
   'node:fs', 'node:path', 'node:stream', 'node:os', 'node:child_process', 'node:crypto', 'node:fs/promises',
@@ -97,19 +99,68 @@ async function runBuilds() {
     console.log('\n[3/3] Building Core API (Browser Target)...');
     const browserFileName = await runRollup('core/waterfall-tools.js', browserAlias, 'dist/browser/waterfall-tools', externalDepsCore, 'waterfall-tools.es.js', true);
 
+    // Copy the prebuilt Chrome DevTools frontend into a versioned subdirectory so the viewer
+    // can embed it via an iframe. Versioned path lets aggressive CDN caching coexist with updates.
+    const devtoolsPkgPath = resolve(__dirname, '../node_modules/@chrome-devtools/index/package.json');
+    const devtoolsPkg = JSON.parse(await fs.readFile(devtoolsPkgPath, 'utf-8'));
+    const devtoolsVersion = devtoolsPkg.version;
+    const devtoolsDirName = `devtools-${devtoolsVersion}`;
+    const devtoolsSrc = resolve(__dirname, '../node_modules/@chrome-devtools/index');
+    const devtoolsDest = resolve(__dirname, `../dist/browser/${devtoolsDirName}`);
+    console.log(`Copying @chrome-devtools/index@${devtoolsVersion} -> dist/browser/${devtoolsDirName}/ ...`);
+    await fs.cp(devtoolsSrc, devtoolsDest, { recursive: true });
+    // Strip the package.json so the directory is a clean static asset bundle
+    await fs.rm(resolve(devtoolsDest, 'package.json'), { force: true });
+
+    // Patch the bundle for browser hosting:
+    //  1. `import * as X from "node:worker_threads"` leaks through from the DevTools worker-host
+    //     abstraction and fails both CSP (node: scheme not in script-src) and module resolution.
+    //     Rewrite it to an inert stub so the static import resolves; the surrounding wrapper
+    //     class is never constructed in the browser code path.
+    //  2. The baked-in <meta http-equiv="Content-Security-Policy"> is scoped to the in-Chromium
+    //     DevTools frontend. When we self-host it, its `script-src 'self' https://chrome-devtools-frontend.appspot.com`
+    //     is actually fine for loading our own chunks — but the policy is the thing that *reports*
+    //     the node: import violation. Patching the import above removes the violation at its source,
+    //     so we can leave the CSP alone.
+    async function patchDevtoolsJs(dir) {
+        const entries = await fs.readdir(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const fullPath = resolve(dir, entry.name);
+            if (entry.isDirectory()) {
+                await patchDevtoolsJs(fullPath);
+            } else if (entry.isFile() && entry.name.endsWith('.js')) {
+                const raw = await fs.readFile(fullPath, 'utf-8');
+                const patched = patchNodeWorkerThreadsImport(raw);
+                if (patched !== raw) await fs.writeFile(fullPath, patched);
+            }
+        }
+    }
+    await patchDevtoolsJs(devtoolsDest);
+
     if (browserFileName) {
         const indexPath = resolve(__dirname, '../dist/browser/index.html');
         let indexHtml = await fs.readFile(indexPath, 'utf-8');
-        
+
         // Rewrite importmap to direct hash
         indexHtml = indexHtml.replace('./waterfall-tools/waterfall-tools.es.js', `./waterfall-tools/${browserFileName}`);
-        
+
         // Inject modulepreload after the main JS payload
         indexHtml = indexHtml.replace(
             /(<script type="module".*?src="[^"]+"><\/script>)/,
             `$1\n  <link rel="modulepreload" href="./waterfall-tools/${browserFileName}">`
         );
-        
+
+        // Inject the devtools path so the viewer can locate the versioned bundle at runtime
+        const devtoolsMeta = `<meta name="waterfall-devtools-path" content="./${devtoolsDirName}/">`;
+        if (indexHtml.includes('name="waterfall-devtools-path"')) {
+            indexHtml = indexHtml.replace(
+                /<meta name="waterfall-devtools-path"[^>]*>/,
+                devtoolsMeta
+            );
+        } else {
+            indexHtml = indexHtml.replace('</head>', `  ${devtoolsMeta}\n</head>`);
+        }
+
         await fs.writeFile(indexPath, indexHtml);
     }
 
@@ -120,6 +171,9 @@ async function runBuilds() {
         for (const entry of entries) {
             const fullPath = resolve(dir, entry.name);
             if (entry.isDirectory()) {
+                // The Chrome DevTools bundle is ~79 MB of already-optimized third-party code.
+                // Compressing every file at Brotli-11 would dominate build time; skip it.
+                if (entry.name.startsWith('devtools-')) continue;
                 await compressDirectory(fullPath);
             } else if (entry.isFile() && /\.(js|css|html|svg)$/.test(entry.name)) {
                 const data = await fs.readFile(fullPath);

@@ -28,6 +28,11 @@ const ui = {
     tabLighthouse: document.getElementById('tab-lighthouse'),
     lighthouseView: document.getElementById('lighthouse-view'),
     lighthouseFrame: document.getElementById('lighthouse-frame'),
+    tabDevtools: document.getElementById('tab-devtools'),
+    devtoolsView: document.getElementById('devtools-view'),
+    devtoolsFrame: document.getElementById('devtools-frame'),
+    devtoolsOverlay: document.getElementById('devtools-overlay'),
+    devtoolsOverlayContent: document.getElementById('devtools-overlay-content'),
     tabTrace: document.getElementById('tab-trace'),
     traceView: document.getElementById('trace-view'),
     traceFrame: document.getElementById('trace-frame'),
@@ -110,6 +115,35 @@ function loadTracePerfetto(traceBuffer) {
         }
     };
     ui.traceFrame.addEventListener('load', onLoad, { once: true });
+}
+
+function getDevtoolsPath() {
+    // The build script (prod) and vite.dev.config.js (dev) both populate this meta tag
+    // with the relative URL of the versioned devtools bundle, e.g. "./devtools-1.20260412.0/".
+    const meta = document.querySelector('meta[name="waterfall-devtools-path"]');
+    const val = meta && meta.getAttribute('content');
+    return val ? val : null;
+}
+
+function loadDevtools() {
+    const path = getDevtoolsPath();
+    if (!path || !ui.devtoolsFrame) return;
+
+    ui.devtoolsOverlay.style.display = 'flex';
+    ui.devtoolsOverlayContent.innerText = 'Loading DevTools...';
+
+    const target = path + 'index.html';
+    if (ui.devtoolsFrame.src === 'about:blank' || !ui.devtoolsFrame.src || !ui.devtoolsFrame.src.endsWith(target.replace(/^\.\//, ''))) {
+        ui.devtoolsFrame.src = target;
+    }
+
+    const onLoad = () => {
+        // Give the frontend a moment to initialize before hiding the overlay
+        setTimeout(() => {
+            ui.devtoolsOverlay.style.display = 'none';
+        }, 300);
+    };
+    ui.devtoolsFrame.addEventListener('load', onLoad, { once: true });
 }
 
 function loadNetlog(netlogBuffer) {
@@ -1248,6 +1282,8 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     if (ui.lighthouseFrame) ui.lighthouseFrame.src = 'about:blank';
     if (ui.tabTrace) ui.tabTrace.classList.add('hidden');
     if (ui.traceFrame) ui.traceFrame.src = 'about:blank';
+    if (ui.tabDevtools) ui.tabDevtools.classList.add('hidden');
+    if (ui.devtoolsFrame) ui.devtoolsFrame.src = 'about:blank';
     if (ui.tabNetlog) ui.tabNetlog.classList.add('hidden');
     if (ui.netlogFrame) ui.netlogFrame.src = 'about:blank';
 
@@ -1271,6 +1307,15 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
             pendingTabLoads.trace = () => {
                 loadTracePerfetto(traceResource.buffer);
             };
+
+            // DevTools tab is gated on the same resource availability — we reuse the trace
+            // buffer in a later phase when load-into-DevTools is implemented.
+            if (ui.tabDevtools && getDevtoolsPath()) {
+                ui.tabDevtools.classList.remove('hidden');
+                pendingTabLoads.devtools = () => {
+                    loadDevtools();
+                };
+            }
         }
     } catch (e) {
         console.warn(`[viewer.js] Failed to fetch trace data for ${pageId}:`, e);
@@ -1414,6 +1459,7 @@ function resetWaterfallUI() {
     if (typeof ui !== 'undefined') {
         if (ui.lighthouseFrame) ui.lighthouseFrame.src = 'about:blank';
         if (ui.traceFrame) ui.traceFrame.src = 'about:blank';
+        if (ui.devtoolsFrame) ui.devtoolsFrame.src = 'about:blank';
         if (ui.netlogFrame) ui.netlogFrame.src = 'about:blank';
     }
     
@@ -2004,6 +2050,12 @@ async function initViewer() {
                 if (pendingTabLoads.trace) {
                     pendingTabLoads.trace();
                     delete pendingTabLoads.trace;
+                }
+            } else if (tabId === 'devtools') {
+                if (ui.devtoolsView) ui.devtoolsView.classList.add('active');
+                if (pendingTabLoads.devtools) {
+                    pendingTabLoads.devtools();
+                    delete pendingTabLoads.devtools;
                 }
             } else if (tabId === 'netlog') {
                 if (ui.netlogView) ui.netlogView.classList.add('active');

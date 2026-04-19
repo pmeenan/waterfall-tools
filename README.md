@@ -156,7 +156,7 @@ The library ships with a pre-built standalone viewer — deployable as a static 
 
 Loading a HAR with multiple runs (e.g. WebPageTest First View + Repeat View) presents an interactive **Thumbnail Grid** showing each run's paint metrics, load times, and request counts before drilling into a specific trace.
 
-The viewer integrates tab-switching to self-hosted copies of the **Perfetto Trace Viewer** and the legacy **Chrome NetLog Viewer** for deep inspection of DevTools metrics, timelines, and raw socket-level network events.
+The viewer integrates tab-switching to self-hosted copies of the **Perfetto Trace Viewer**, the **Chrome DevTools** frontend, and the legacy **Chrome NetLog Viewer** for deep inspection of DevTools metrics, timelines, and raw socket-level network events. The DevTools frontend is pulled in from the `@chrome-devtools/index` npm package at build time and copied under `dist/browser/devtools-<version>/` so it's served versioned alongside the viewer.
 
 When inspecting an HTML response that has per-chunk timing and inflated byte counts (available from `tcpdump`, `netlog`, `chrome-trace`, `cdp`, and `wptagent`), the request inspector renders the **Response Body** as a hex-viewer-style table — one row per delivered wire chunk, with arrival timestamps and sizes in the left column and the syntax-highlighted HTML slice that arrived in that delivery on the right. This makes it easy to correlate "what arrived when" against the canvas waterfall.
 
@@ -169,7 +169,7 @@ The viewer tracks its state via the browser History API, so the URL updates as y
 - `src=<url>` — remote file to fetch and load.
 - `keylog=<url>` — TLS keylog to pair with `src` for raw packet captures.
 - `page=<index>` — open a specific multi-page run (aliases `pageId`); skips the thumbnail grid.
-- `tab=<name>` — jump to a tab: `summary`, `waterfall`, `trace`, `lighthouse`, `netlog`, or `RequestN` (e.g. `Request10`).
+- `tab=<name>` — jump to a tab: `summary`, `waterfall`, `trace` (Perfetto), `devtools`, `lighthouse`, `netlog`, or `RequestN` (e.g. `Request10`).
 - `options=<csv>` — override defaults in `key:val` pairs (e.g. `options=showCpu:false,showBw:false`).
 
 ```

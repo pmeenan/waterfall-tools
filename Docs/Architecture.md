@@ -107,6 +107,9 @@ graph TD
 │   │   ├── history.js                 # IndexedDB-backed URL history
 │   │   └── public/
 │   │       └── netlog-viewer/         # Self-hosted Chrome NetLog viewer bundle
+│   │                                  # (Chrome DevTools bundle is copied from
+│   │                                  #  node_modules/@chrome-devtools/index into
+│   │                                  #  dist/browser/devtools-<version>/ at build time)
 │   ├── platforms/
 │   │   ├── browser/                   # Browser-only shims (fetch, File)
 │   │   └── node/                      # Node-only shims (fs, streams)
@@ -211,6 +214,16 @@ Since HAR files can contain multiple pages (e.g. WebPageTest First View + Repeat
 ## Embeddable components
 
 `WaterfallTools.renderTo(containerElement, options)` is the supported embedding entry point; it replaces the earlier `div-embed.js` boilerplate. For iframe integrations, the standalone viewer reads query parameters (`src`, `keylog`, `page`, `tab`, `options`) and also exposes `window.WaterfallViewer.loadData(buffer)` and `window.WaterfallViewer.updateOptions(opts)` on its global for programmatic control from the parent frame.
+
+### Third-party iframe viewers
+
+The viewer hosts three external UIs in iframes alongside the canvas waterfall:
+
+- **NetLog** — self-hosted Chrome NetLog viewer at `src/viewer/public/netlog-viewer/index.html`. Shown when a test has a netlog resource attached.
+- **Perfetto** — `https://ui.perfetto.dev` via `postMessage`. Shown when a test has a Chrome trace resource attached. (Renamed from "Trace" for clarity alongside DevTools.)
+- **DevTools** — the prebuilt Chrome DevTools UI. The `@chrome-devtools/index` npm package is copied into `dist/browser/devtools-<version>/` at build time (or served from `node_modules/@chrome-devtools/index/` via a vite middleware in dev). A `<meta name="waterfall-devtools-path">` tag injected by the build tells the viewer where the versioned bundle lives — so the version never has to be hard-coded in source. Shown on the same trace-resource gate as the Perfetto tab. Data routing into the DevTools Performance panel is a future phase — this infrastructure only embeds the UI.
+
+The DevTools dependency is kept current on every project work session (`npm install --save @chrome-devtools/index@latest`). Both the production build and the dev server read `node_modules/@chrome-devtools/index/package.json` to derive the versioned URL automatically.
 
 ## Build & bundling
 

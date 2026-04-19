@@ -490,7 +490,7 @@ body, html {
     z-index: 2;
 }
 
-#trace-overlay, #netlog-overlay {
+#trace-overlay, #netlog-overlay, #devtools-overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(255,255,255,0.9);
@@ -500,7 +500,7 @@ body, html {
     z-index: 10;
 }
 
-#trace-overlay-content, #netlog-overlay-content {
+#trace-overlay-content, #netlog-overlay-content, #devtools-overlay-content {
     font-size: 1.5rem;
     color: var(--text-color);
     font-family: var(--font-stack);
