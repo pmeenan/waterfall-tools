@@ -17,7 +17,9 @@
   },
   "scripts": {
     "test": "vitest",
-    "build": "node scripts/build.js",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "build": "npm run lint && node scripts/build.js",
     "dev:demo": "vite --config vite.demo.config.js",
     "build:demo": "vite build --config vite.demo.config.js",
     "dev:viewer": "vite --config vite.dev.config.js"
@@ -35,10 +37,13 @@
   },
   "homepage": "https://github.com/pmeenan/waterfall-tools#readme",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
+    "eslint": "^10.2.1",
+    "globals": "^17.5.0",
     "rollup": "^4.60.1",
     "sharp": "^0.34.5",
     "vite": "^8.0.3",

@@ -217,6 +217,15 @@ Tests are vitest suites that assert parsed outputs against golden Extended HAR f
 npm test
 ```
 
+### Lint
+
+ESLint (flat config, `eslint.config.js`) is run automatically as the first step of `npm run build` — warnings fail the build (`--max-warnings 0`). Only first-party code under `src/`, `tests/`, `scripts/`, `bin/`, and `cloudflare-worker/` is linted; dependencies and vendored third-party bundles are excluded.
+
+```bash
+npm run lint       # report lint issues
+npm run lint:fix   # auto-fix what is safe to auto-fix
+```
+
 ### Build
 
 ```bash
