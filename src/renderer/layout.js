@@ -4,8 +4,6 @@
  * See the LICENSE file for details.
  */
 // src/renderer/layout.js
-const FONT_HEIGHT = 12;
-
 export class Layout {
     static getMimeColor(mime, url = null) {
         if (!mime) return [196, 196, 196]; // other
@@ -90,7 +88,7 @@ export class Layout {
             
             const half = Math.floor((maxLength - 3) / 2);
             return combined.substring(0, half) + '...' + combined.substring(combined.length - half);
-        } catch(e) {
+        } catch {
             if (fullUrl.length <= maxLength) return fullUrl;
             const half = Math.floor((maxLength - 3) / 2);
             return fullUrl.substring(0, half) + '...' + fullUrl.substring(fullUrl.length - half);
@@ -98,18 +96,18 @@ export class Layout {
     }
 
     static calculateRows(entries, canvasWidth = 1012, options = {}) {
-        let absoluteMaxTime = 0;
+        let absoluteMaxTime;
         const rowHeight = options.thumbnailView ? 4 : 18;
 
         if (!entries || entries.length === 0) {
             return { rows: [], dimensions: { canvasWidth, canvasHeight: 0, maxTime: 0, labelsWidth: 0, widthPerMs: 0 }};
         }
-        let rawEntries = entries;
+        const rawEntries = entries;
         entries = Array.from(rawEntries);
         // Map original index backwards to securely map hover payloads
         entries.forEach((e, i) => e._originalIndex = i);
 
-        let allowedIndices = new Set();
+        const allowedIndices = new Set();
         if (options.reqFilter !== undefined && options.reqFilter !== null) {
             const filterStr = String(options.reqFilter).trim();
             if (filterStr !== '') {
@@ -196,10 +194,10 @@ export class Layout {
             let timeTotal = 0;
             
             // Allow Absolute timing mapping bypassing standard sequential HAR chaining universally
-            let hasAbsoluteTimings = entry._load_start !== undefined || entry._start !== undefined || entry._dns_start !== undefined || entry._ttfb_start !== undefined;
+            const hasAbsoluteTimings = entry._load_start !== undefined || entry._start !== undefined || entry._dns_start !== undefined || entry._ttfb_start !== undefined;
             
             let baseEpoch = entry.time_start;
-            let startOrigin = entry._load_start !== undefined ? entry._load_start : (entry._start !== undefined ? entry._start : undefined);
+            const startOrigin = entry._load_start !== undefined ? entry._load_start : (entry._start !== undefined ? entry._start : undefined);
             
             if (entry._created !== undefined) {
                 baseEpoch = entry.time_start - entry._created;
@@ -265,8 +263,7 @@ export class Layout {
                 if (entry.timings && entry.timings.ssl > 0) sslEnd = sslStart + entry.timings.ssl;
                 
                 requestStart = entry._requestTimeMs > 0 ? entry._requestTimeMs : sslEnd + (entry.timings ? Math.max(0, entry.timings.send || 0) : 0);
-                
-                ttfb = requestStart;
+
                 if (entry.first_data_time > 0) {
                     ttfb = entry.first_data_time;
                 } else {
@@ -336,7 +333,7 @@ export class Layout {
         const dataWidth = canvasWidth - labelsWidth - 5;
         const widthPerMs = maxTime > 0 ? (dataWidth / maxTime) : 0;
         
-        let yOffset = (options.showLegend && !options.thumbnailView) ? 35 : 0;
+        const yOffset = (options.showLegend && !options.thumbnailView) ? 35 : 0;
 
         // Finalize rows with their geometric positions (y values)
         if (options.connectionView) {
@@ -344,7 +341,7 @@ export class Layout {
             const connRowMap = new Map();
             processedRows.forEach((row) => {
                 let rIdx = currentRowIdx;
-                let units = row.isTornEdge ? 4 : 1;
+                const units = row.isTornEdge ? 4 : 1;
                 // Treat requests without connection_id as isolated rows natively
                 if (entries[row.index] && entries[row.index].connection_id && !row.isTornEdge) {
                     const cid = entries[row.index].connection_id.toString();
@@ -368,8 +365,8 @@ export class Layout {
             options._totalRows = currentRowIdx;
         } else {
             let currentRowIdx = 0;
-            processedRows.forEach((row, index) => {
-                let units = row.isTornEdge ? 4 : 1;
+            processedRows.forEach((row) => {
+                const units = row.isTornEdge ? 4 : 1;
                 row.y1 = currentRowIdx * rowHeight + rowHeight + yOffset;
                 row.y2 = row.y1 + (rowHeight * units) - 1;
                 row.maxMs = maxTime;
@@ -379,7 +376,7 @@ export class Layout {
             options._totalRows = currentRowIdx;
         }
 
-        let pageEvents = {};
+        const pageEvents = {};
         let maxBw = 0;
         if (options.page) {
             const p = options.page;

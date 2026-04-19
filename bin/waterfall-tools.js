@@ -22,7 +22,7 @@ async function main() {
         process.exit(1);
     }
     
-    let inputFile = args[0];
+    const inputFile = args[0];
     let outputFile = null;
     let keyLogPath = null;
     const options = { debug: false };

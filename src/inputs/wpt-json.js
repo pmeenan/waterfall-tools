@@ -105,7 +105,7 @@ function processWPTView(viewData, runStr, cachedNum, har) {
                     
                     if (dataDict) {
                         const arr = [];
-                        let rawPts = Object.entries(dataDict).map(([k, v]) => ({ ts: parseFloat(k), val: parseFloat(v) }));
+                        const rawPts = Object.entries(dataDict).map(([k, v]) => ({ ts: parseFloat(k), val: parseFloat(v) }));
                         rawPts.sort((a, b) => a.ts - b.ts);
                         
                         if (uKey === 'bw') {
@@ -121,7 +121,7 @@ function processWPTView(viewData, runStr, cachedNum, har) {
                             if (wireBps > 0) {
                                 for (let i = rawPts.length - 1; i >= 0; i--) {
                                     if (rawPts[i].val > limit) {
-                                        let excess = rawPts[i].val - limit;
+                                        const excess = rawPts[i].val - limit;
                                         rawPts[i].val = limit;
                                         if (i > 0) {
                                             rawPts[i-1].val += excess;
@@ -305,13 +305,9 @@ export async function processWPTFileNode(input, options = {}) {
             const fs = await import(/* @vite-ignore */ 'node:fs');
             
             const header = new Uint8Array(2);
-            try {
-                const fd = fs.openSync(input, 'r');
-                fs.readSync(fd, header, 0, 2, 0);
-                fs.closeSync(fd);
-            } catch (e) {
-                throw e;
-            }
+            const fd = fs.openSync(input, 'r');
+            fs.readSync(fd, header, 0, 2, 0);
+            fs.closeSync(fd);
             isGz = isGzip(header);
             
             const { Readable } = await import(/* @vite-ignore */ 'node:stream');
@@ -346,7 +342,7 @@ export async function processWPTFileNode(input, options = {}) {
         'videoFrames'
     ]);
 
-    parser.onValue = ({ value, key, parent, stack }) => {
+    parser.onValue = ({ value, key, parent: _parent, stack }) => {
         if (bloatNames.has(key)) return undefined; // Strips heavy blobs entirely during AST population cleanly
 
         if (key === 'bwDown') {
@@ -362,7 +358,7 @@ export async function processWPTFileNode(input, options = {}) {
         // Intercept completed views accurately preventing parent AST accumulation correctly natively
         if ((key === 'firstView' || key === 'repeatView') && value && value.requests) {
             let runStr = '1';
-            let cachedNum = key === 'repeatView' ? 1 : 0;
+            const cachedNum = key === 'repeatView' ? 1 : 0;
             
             // stack: [ { key: "data", ... }, { key: "runs", ... }, { key: "1", ... } ]
             if (stack.length >= 3) {
@@ -402,11 +398,9 @@ export async function processWPTFileNode(input, options = {}) {
     }
     onProgress('Building waterfall...', 90);
     if (options.debug) console.log("Finished WPT loop.");
-    
-    } catch (e) {
-        throw e;
+
     } finally {
-        if (reader) try { reader.releaseLock(); } catch (e) {}
+        if (reader) try { reader.releaseLock(); } catch {}
         if (keepAlive) globalThis.clearInterval(keepAlive);
         if (nodeFsStream) nodeFsStream.destroy();
     }
@@ -487,7 +481,7 @@ export function formatWptUtilization(rawUtilization, bwDown = 0) {
         
         if (dataDict) {
             const arr = [];
-            let rawPts = Object.entries(dataDict).map(([k, v]) => ({ ts: parseFloat(k), val: parseFloat(v) }));
+            const rawPts = Object.entries(dataDict).map(([k, v]) => ({ ts: parseFloat(k), val: parseFloat(v) }));
             rawPts.sort((a, b) => a.ts - b.ts);
             
             if (uKey === 'bw') {
@@ -503,7 +497,7 @@ export function formatWptUtilization(rawUtilization, bwDown = 0) {
                 if (wireBps > 0) {
                     for (let i = rawPts.length - 1; i >= 0; i--) {
                         if (rawPts[i].val > limit) {
-                            let excess = rawPts[i].val - limit;
+                            const excess = rawPts[i].val - limit;
                             rawPts[i].val = limit;
                             if (i > 0) {
                                 rawPts[i-1].val += excess;

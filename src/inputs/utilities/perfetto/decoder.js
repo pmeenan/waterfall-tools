@@ -172,10 +172,8 @@ export class PerfettoDecoder {
         this.emitCompleteEvents = options.emitCompleteEvents === true;
         
         // Emulated JSON payload stream
-        let controllerRef = null;
         this.stream = new TransformStream({
             start: (controller) => {
-                controllerRef = controller;
                 controller.enqueue('{"traceEvents":[');
             },
             transform: (chunk, controller) => {
@@ -435,7 +433,7 @@ export class PerfettoDecoder {
         }
     }
 
-    _parseTrackDescriptor(data, startOffset, len, seqNames) {
+    _parseTrackDescriptor(data, startOffset, len, _seqNames) {
         const endOffset = startOffset + len;
         let o = startOffset;
 
@@ -693,7 +691,7 @@ export class PerfettoDecoder {
             } else if (af === 9 && aw === 2) { // legacy_json_value
                 const sl = readVarint(data, o); o+=sl[1];
                 const jsonStr = this.decodeString(data, o, Number(sl[0])); o+=Number(sl[0]);
-                try { value = JSON.parse(jsonStr); } catch(e) { value = jsonStr; }
+                try { value = JSON.parse(jsonStr); } catch { value = jsonStr; }
             } else if (af === 8 && aw === 2) { // nested_value (recursive typed-value tree)
                 // Chrome's standard mechanism for structured timeline args (frame ids,
                 // pixel rects, dom node ids, etc. on PaintTimingVisualizer, LayoutShift,

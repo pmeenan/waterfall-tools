@@ -73,7 +73,7 @@ const DOH_ENDPOINT = 'https://cloudflare-dns.com/dns-query';
 // -----------------------------------------------------------------------------
 
 export default {
-    async fetch(request, env, ctx) {
+    async fetch(request, _env, _ctx) {
         const url = new URL(request.url);
 
         // Only /fetch is ours; everything else passes through.
@@ -846,7 +846,6 @@ function concatUint8(chunks, totalLen) {
     for (const c of chunks) {
         if (offset + c.byteLength > totalLen) {
             out.set(c.subarray(0, totalLen - offset), offset);
-            offset = totalLen;
             break;
         }
         out.set(c, offset);

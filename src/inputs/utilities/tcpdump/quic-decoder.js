@@ -6,14 +6,7 @@
 import { deriveTrafficKeys, generateHeaderProtectionMask, decryptQuicPayload } from './quic-crypto.js';
 import { QuicBuffer } from './quic-buffer.js';
 
-// Convert hex string to Uint8Array directly natively
-function hexToBytes(hex) {
-    let bytes = new Uint8Array(Math.ceil(hex.length / 2));
-    for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
-    return bytes;
-}
-
-export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
+export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
     let clientCidLength = 0;
     let serverCidLength = 0;
     // Track CID establishment per-direction since client and server CID lengths can differ.
@@ -23,9 +16,9 @@ export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
     const streams = [];
     const connQuicParams = { streams: new Map() };
 
-    let keyPairs = [];
+    const keyPairs = [];
     if (keyLog && keyLog.keys) {
-        for (const [key, value] of keyLog.keys.entries()) {
+        for (const value of keyLog.keys.values()) {
             const clientLabel = value['QUIC_CLIENT_TRAFFIC_SECRET_0'] ? 'QUIC_CLIENT_TRAFFIC_SECRET_0' : (value['CLIENT_TRAFFIC_SECRET_0'] ? 'CLIENT_TRAFFIC_SECRET_0' : null);
             const serverLabel = value['QUIC_SERVER_TRAFFIC_SECRET_0'] ? 'QUIC_SERVER_TRAFFIC_SECRET_0' : (value['SERVER_TRAFFIC_SECRET_0'] ? 'SERVER_TRAFFIC_SECRET_0' : null);
             const earlyLabel = value['QUIC_CLIENT_EARLY_TRAFFIC_SECRET'] ? 'QUIC_CLIENT_EARLY_TRAFFIC_SECRET' : (value['CLIENT_EARLY_TRAFFIC_SECRET'] ? 'CLIENT_EARLY_TRAFFIC_SECRET' : null);
@@ -40,7 +33,7 @@ export async function decodeQuic(chunks, clientPort, keyLog, options = {}) {
         }
     }
 
-    let derivedKeyPairs = [];
+    const derivedKeyPairs = [];
     for (const kp of keyPairs) {
         try {
             const earlyKeys = kp.earlySecretBytes ? await deriveTrafficKeys(kp.earlySecretBytes) : null;

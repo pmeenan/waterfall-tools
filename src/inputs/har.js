@@ -73,13 +73,9 @@ export async function processHARFileNode(input, options = {}) {
             const fs = await import(/* @vite-ignore */ 'node:fs');
             
             const header = new Uint8Array(2);
-            try {
-                const fd = fs.openSync(input, 'r');
-                fs.readSync(fd, header, 0, 2, 0);
-                fs.closeSync(fd);
-            } catch (e) {
-                throw e;
-            }
+            const fd = fs.openSync(input, 'r');
+            fs.readSync(fd, header, 0, 2, 0);
+            fs.closeSync(fd);
             isGz = isGzip(header);
             
             const { Readable } = await import(/* @vite-ignore */ 'node:stream');
@@ -124,10 +120,8 @@ export async function processHARFileNode(input, options = {}) {
 
     if (options.debug) console.log(`[har.js] Finished parsing HAR string structure. Returning extracted items.`);
 
-    } catch (e) {
-        throw e;
     } finally {
-        if (reader) try { reader.releaseLock(); } catch (e) {}
+        if (reader) try { reader.releaseLock(); } catch {}
         if (keepAlive) globalThis.clearInterval(keepAlive);
         if (nodeFsStream) nodeFsStream.destroy();
     }

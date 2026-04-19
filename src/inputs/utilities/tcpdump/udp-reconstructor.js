@@ -56,8 +56,8 @@ export class UdpReconstructor {
         const ipB = packet.ip.dstIP;
         const portB = packet.transport.dstPort;
 
-        let connectionKey = '';
-        
+        let connectionKey;
+
         // Canonical key ordering based on IP:port.
         if (ipA < ipB || (ipA === ipB && portA < portB)) {
             connectionKey = `${ipA}:${portA}-${ipB}:${portB}`;

@@ -223,7 +223,7 @@ function preventDefaults(e) {
 
 let dragCounter = 0;
 
-document.body.addEventListener('dragenter', (e) => {
+document.body.addEventListener('dragenter', () => {
     dragCounter++;
     if (dragCounter === 1) {
         dropZone.classList.remove('hidden');
@@ -231,7 +231,7 @@ document.body.addEventListener('dragenter', (e) => {
     }
 });
 
-document.body.addEventListener('dragleave', (e) => {
+document.body.addEventListener('dragleave', () => {
     dragCounter--;
     if (dragCounter === 0) {
         dropZone.classList.remove('drag-active');

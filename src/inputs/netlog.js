@@ -72,7 +72,7 @@ export class Netlog {
         try {
             this.hydrateEvent(event);
             this.processEvent(event);
-        } catch (e) {
+        } catch {
             // Silently ignore individual event processing errors
         }
     }
@@ -131,7 +131,7 @@ export class Netlog {
                     
                     this.addEvent(event);
                 }
-            } catch (e) {
+            } catch {
                 // Silently ignore tracing mapping errors
             }
         }
@@ -156,7 +156,7 @@ export class Netlog {
         if (event.params && typeof event.params === 'object') {
             const params = event.params;
             if (params.cert_status !== undefined && consts.certStatusFlag) {
-                let certStatus = [];
+                const certStatus = [];
                 for (const [flagStr, name] of Object.entries(consts.certStatusFlag)) {
                     const flag = parseInt(flagStr, 10);
                     if (params.cert_status & flag) certStatus.push(name);
@@ -182,7 +182,7 @@ export class Netlog {
                 params.priority = PRIORITY_MAP[params.priority];
             }
             if (params.load_flags !== undefined && consts.loadFlag) {
-                let loadFlags = [];
+                const loadFlags = [];
                 for (const [flagStr, name] of Object.entries(consts.loadFlag)) {
                     const flag = parseInt(flagStr, 10);
                     if (params.load_flags & flag) loadFlags.push(name);
@@ -680,7 +680,7 @@ export class Netlog {
                     // Collect base64 chunks directly
                     if (!this.bodies[requestId]) this.bodies[requestId] = [];
                     this.bodies[requestId].push(params.bytes);
-                } catch (e) {
+                } catch {
                     // Ignore decode errors
                 }
             }
@@ -722,7 +722,7 @@ export class Netlog {
     postProcessEvents() {
         if (this.netlog_requests !== null) return this.netlog_requests;
         let requests = [];
-        let knownHosts = new Set(['cache.pack.google.com', 'clients1.google.com', 'redirector.gvt1.com']);
+        const knownHosts = new Set(['cache.pack.google.com', 'clients1.google.com', 'redirector.gvt1.com']);
         let lastTime = 0;
 
         for (const [requestId, request] of Object.entries(this.netlog.url_request || {})) {
@@ -762,7 +762,7 @@ export class Netlog {
 
             if (request.url && !request.url.startsWith('http://127.0.0.1') && !request.url.startsWith('http://192.168.10.')) {
                 let requestHost;
-                try { requestHost = new URL(request.url).hostname; } catch (e) {}
+                try { requestHost = new URL(request.url).hostname; } catch {}
                 if (requestHost && !knownHosts.has(requestHost)) knownHosts.add(requestHost);
 
                 if (request.stream_id !== undefined && request.h2_session === undefined && request.url) {
@@ -863,10 +863,10 @@ export class Netlog {
             }
         }
 
-        let failedHosts = {};
-        for (const [streamJobId, streamJob] of Object.entries(this.netlog.stream_job || {})) {
+        const failedHosts = {};
+        for (const streamJob of Object.values(this.netlog.stream_job || {})) {
             if (streamJob.group !== undefined && streamJob.socket_start !== undefined && streamJob.socket === undefined) {
-                const match = streamJob.group.match(/^.*\/([^:]+)\:\d+$/);
+                const match = streamJob.group.match(/^.*\/([^:]+):\d+$/);
                 if (match) {
                     const groupHost = match[1];
                     if (!knownHosts.has(groupHost) && !failedHosts[groupHost]) {
@@ -877,9 +877,9 @@ export class Netlog {
                 }
             }
         }
-        for (const [url, timeObj] of Object.entries(this.netlog.urls || {})) {
+        for (const url of Object.keys(this.netlog.urls || {})) {
             let host;
-            try { host = new URL(url).hostname; } catch (e) {}
+            try { host = new URL(url).hostname; } catch {}
             if (host && failedHosts[host]) {
                 requests.push({
                     url: url,
@@ -925,7 +925,7 @@ export class Netlog {
                 }
             }
 
-            let dnsLookups = {};
+            const dnsLookups = {};
             for (const [dnsId, dns] of Object.entries(this.netlog.dns || {})) {
                 if (dns.host !== undefined && dns.start !== undefined && dns.end !== undefined && dns.end >= dns.start) {
                     let hostname = dns.host;
@@ -946,7 +946,7 @@ export class Netlog {
             for (const request of requests) {
                 if (request.connect_start !== undefined) {
                     let hostname;
-                    try { hostname = new URL(request.url).hostname; } catch (e) {}
+                    try { hostname = new URL(request.url).hostname; } catch {}
                     if (hostname && dnsLookups[hostname] && !dnsLookups[hostname].claimed) {
                         const dns = dnsLookups[hostname];
                         dns.claimed = true;
@@ -955,9 +955,9 @@ export class Netlog {
                         if (dns.times) {
                             let maxElapsed = -1;
                             for (const d of dns.times) {
-                                let localEnd = Math.min(d.end, request.connect_start);
+                                const localEnd = Math.min(d.end, request.connect_start);
                                 if (localEnd >= d.start) {
-                                    let localElapsed = localEnd - d.start;
+                                    const localElapsed = localEnd - d.start;
                                     if (localElapsed > maxElapsed) {
                                         maxElapsed = localElapsed;
                                         request.dns_start = d.start;
@@ -972,7 +972,7 @@ export class Netlog {
             
             for (const request of requests) {
                 let hostname;
-                try { hostname = new URL(request.url).hostname; } catch (e) {}
+                try { hostname = new URL(request.url).hostname; } catch {}
                 if (hostname && dnsLookups[hostname] && !dnsLookups[hostname].claimed) {
                     const dns = dnsLookups[hostname];
                     dns.claimed = true;
@@ -980,9 +980,9 @@ export class Netlog {
                     if (dns.times) {
                         let maxElapsed = -1;
                         for (const d of dns.times) {
-                            let localEnd = Math.min(d.end, request.start !== undefined ? request.start : Number.MAX_SAFE_INTEGER);
+                            const localEnd = Math.min(d.end, request.start !== undefined ? request.start : Number.MAX_SAFE_INTEGER);
                             if (localEnd >= d.start) {
-                                let localElapsed = localEnd - d.start;
+                                const localElapsed = localEnd - d.start;
                                 if (localElapsed > maxElapsed) {
                                     maxElapsed = localElapsed;
                                     request.dns_start = d.start;
@@ -996,7 +996,7 @@ export class Netlog {
             
             for (const request of requests) {
                 let hostname;
-                try { hostname = new URL(request.url).hostname; } catch (e) {}
+                try { hostname = new URL(request.url).hostname; } catch {}
                 if (hostname && this.netlog.dns_info[hostname]) {
                     request.dns_details = this.netlog.dns_info[hostname];
                 }
@@ -1052,24 +1052,19 @@ export class Netlog {
                         // Decode each chunk to bytes, concatenate, then re-encode to a single
                         // valid base64 string.
                         const chunks = this.bodies[request.netlog_id];
-                        let totalLen = 0;
-                        const decoded = chunks.map(c => {
-                            const bin = atob(c);
-                            totalLen += bin.length;
-                            return bin;
-                        });
+                        const decoded = chunks.map(c => atob(c));
                         let combined = '';
                         for (const part of decoded) combined += part;
                         request.encoded_body = btoa(combined);
-                    } catch (e) {}
+                    } catch {}
                 }
             }
         }
 
-        let unlinked_sockets = [];
+        const unlinked_sockets = [];
         for (const [socketId, socket] of Object.entries(this.netlog.socket || {})) {
             if (!socket.claimed) {
-                let copy = Object.assign({ _id: socketId }, socket);
+                const copy = Object.assign({ _id: socketId }, socket);
                 if (this.start_time !== null) {
                     if (copy.connect_start !== undefined) copy.connect_start -= this.start_time;
                     if (copy.connect_end !== undefined) copy.connect_end -= this.start_time;
@@ -1080,10 +1075,10 @@ export class Netlog {
             }
         }
 
-        let unlinked_dns = [];
+        const unlinked_dns = [];
         for (const [dnsId, dns] of Object.entries(this.netlog.dns || {})) {
             if (!dns.claimed && dns.host !== undefined && dns.start !== undefined) {
-                 let copy = Object.assign({ _id: dnsId }, dns);
+                 const copy = Object.assign({ _id: dnsId }, dns);
                  if (this.start_time !== null) {
                      copy.start -= this.start_time;
                      if (copy.end !== undefined) copy.end -= this.start_time;
@@ -1329,15 +1324,10 @@ export async function processNetlogFileNode(input, options = {}) {
             const fs = await import(/* @vite-ignore */ 'node:fs');
             
             const header = new Uint8Array(2);
-            let fd;
-            try {
-                fd = fs.openSync(input, 'r');
-                fs.readSync(fd, header, 0, 2, 0);
-                fs.closeSync(fd);
-            } catch (e) {
-                throw e;
-            }
-            
+            const fd = fs.openSync(input, 'r');
+            fs.readSync(fd, header, 0, 2, 0);
+            fs.closeSync(fd);
+
             isGz = header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b;
             
             const { Readable } = await import(/* @vite-ignore */ 'node:stream');
@@ -1397,7 +1387,7 @@ export async function processNetlogFileNode(input, options = {}) {
                 } else if (line.startsWith('"events": [')) {
                     started = true;
                 }
-            } catch (e) {
+            } catch {
                 // Silently skip malformed truncated lines as instructed
             }
         }
@@ -1434,10 +1424,8 @@ export async function processNetlogFileNode(input, options = {}) {
         // Use statically imported buildWaterfallDataFromHar
         return buildWaterfallDataFromHar(har.log, 'netlog');
 
-    } catch (e) {
-        throw e;
     } finally {
-        if (reader) try { reader.releaseLock(); } catch (e) {}
+        if (reader) try { reader.releaseLock(); } catch {}
         if (keepAlive) globalThis.clearInterval(keepAlive);
         if (nodeFsStream) nodeFsStream.destroy();
     }

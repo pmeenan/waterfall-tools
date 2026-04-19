@@ -3,11 +3,11 @@
  * Licensed under the Apache License, Version 2.0.
  * See the LICENSE file for details.
  */
-import { hkdfExpandLabel, hkdfExpand } from './tls-crypto.js';
+import { hkdfExpandLabel } from './tls-crypto.js';
 
 // Convert hex string to Uint8Array directly natively
 function hexToBytes(hex) {
-    let bytes = new Uint8Array(Math.ceil(hex.length / 2));
+    const bytes = new Uint8Array(Math.ceil(hex.length / 2));
     for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
     return bytes;
 }

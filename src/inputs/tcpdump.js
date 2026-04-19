@@ -38,14 +38,9 @@ export async function processTcpdumpNode(input, options = {}) {
             const fs = await import(/* @vite-ignore */ 'node:fs');
 
             const header = new Uint8Array(2);
-            let fd;
-            try {
-                fd = fs.openSync(input, 'r');
-                fs.readSync(fd, header, 0, 2, 0);
-                fs.closeSync(fd);
-            } catch (e) {
-                throw e;
-            }
+            const fd = fs.openSync(input, 'r');
+            fs.readSync(fd, header, 0, 2, 0);
+            fs.closeSync(fd);
 
             isGz = header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b;
 
@@ -170,10 +165,10 @@ export async function processTcpdumpNode(input, options = {}) {
                 const decoder = new TlsDecoder(keyLogMap);
 
                 const interleavedChunks = [];
-                for (let chunk of conn.clientFlow.contiguousChunks) {
+                for (const chunk of conn.clientFlow.contiguousChunks) {
                     interleavedChunks.push({ dir: 0, chunk: chunk });
                 }
-                for (let chunk of conn.serverFlow.contiguousChunks) {
+                for (const chunk of conn.serverFlow.contiguousChunks) {
                     interleavedChunks.push({ dir: 1, chunk: chunk });
                 }
                 interleavedChunks.sort((a, b) => a.chunk.time - b.chunk.time);
@@ -205,7 +200,7 @@ export async function processTcpdumpNode(input, options = {}) {
 
 
 
-        let dnsRegistry = new DnsRegistry();
+        const dnsRegistry = new DnsRegistry();
 
         for (let i = 0; i < tcpConnections.length; i++) {
             const conn = tcpConnections[i];
@@ -268,7 +263,7 @@ export async function processTcpdumpNode(input, options = {}) {
         console.error("Execution Error:", e);
         throw e;
     } finally {
-        if (reader) try { reader.releaseLock(); } catch (e) {}
+        if (reader) try { reader.releaseLock(); } catch {}
         if (keepAlive) globalThis.clearInterval(keepAlive);
         if (nodeFsStream) nodeFsStream.destroy();
     }
@@ -544,7 +539,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
     };
 
     const mapConnection = (conn, isUdp, getRequestsFunc) => {
-        let reqs = getRequestsFunc(conn);
+        const reqs = getRequestsFunc(conn);
         
         let connectTimeMs = -1;
         let connectEndTimeMs = -1;
@@ -593,7 +588,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
             
             let hostname = '';
             if (req.url) {
-                try { hostname = new URL(req.url).hostname; } catch(e) {}
+                try { hostname = new URL(req.url).hostname; } catch {}
             }
             
             let dnsId = null;
@@ -729,7 +724,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
 
     const extractHttp1 = (conn) => {
         if (conn.protocol !== 'http/1.1' || !conn.http) return null;
-        let reqs = [];
+        const reqs = [];
         for (let i = 0; i < conn.http.requests.length; i++) {
             let reqMsg = conn.http.requests[i];
             let resMsg = conn.http.responses[i] || {};
@@ -747,8 +742,8 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                 status = parseInt(parts[1]) || 200;
                 statusText = parts.slice(2).join(' ');
             }
-            let host = reqMsg.headers ? reqMsg.headers.find(h => h.name.toLowerCase() === 'host') : null;
-            let fullUrl = host ? `http://${host.value}${url}` : url;
+            const host = reqMsg.headers ? reqMsg.headers.find(h => h.name.toLowerCase() === 'host') : null;
+            const fullUrl = host ? `http://${host.value}${url}` : url;
             reqs.push({
                 time: reqMsg.time, method: method, url: fullUrl,
                 headers: reqMsg.headers || [], responseHeaders: resMsg.headers || [],
@@ -762,17 +757,17 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
     };
     
     const extractHttp2 = (conn) => {
-        let streams = conn.http2 ? conn.http2.streams : null;
+        const streams = conn.http2 ? conn.http2.streams : null;
         if (!streams) return null;
-        let reqs = [];
+        const reqs = [];
         for (const [id, stream] of streams.entries()) {
             if (!stream.headers || !stream.headers.client || stream.headers.client.length === 0) continue;
-            let method = stream.headers.client.find(h => h.name === ':method')?.value || 'GET';
-            let path = stream.headers.client.find(h => h.name === ':path')?.value || '/';
-            let auth = stream.headers.client.find(h => h.name === ':authority')?.value || resolveHostname(conn.serverIp);
-            let scheme = stream.headers.client.find(h => h.name === ':scheme')?.value || 'https';
-            let status = stream.headers.server ? (parseInt(stream.headers.server.find(h => h.name === ':status')?.value) || 200) : 200;
-            let reqTime = stream.headers.clientTime || 0;
+            const method = stream.headers.client.find(h => h.name === ':method')?.value || 'GET';
+            const path = stream.headers.client.find(h => h.name === ':path')?.value || '/';
+            const auth = stream.headers.client.find(h => h.name === ':authority')?.value || resolveHostname(conn.serverIp);
+            const scheme = stream.headers.client.find(h => h.name === ':scheme')?.value || 'https';
+            const status = stream.headers.server ? (parseInt(stream.headers.server.find(h => h.name === ':status')?.value) || 200) : 200;
+            const reqTime = stream.headers.clientTime || 0;
             reqs.push({
                 time: reqTime, method: method, url: `${scheme}://${auth}${path}`,
                 headers: stream.headers.client.filter(h => !h.name.startsWith(':')),
@@ -788,18 +783,18 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
     };
 
     const extractHttp3 = (conn) => {
-        let streams = conn.http3;
+        const streams = conn.http3;
         if (!streams) return null;
-        let reqs = [];
+        const reqs = [];
         for (const [id, stream] of streams.entries()) {
             if ((!stream.headers || stream.headers.length === 0) && (!stream.responses || stream.responses.length === 0)) continue;
-            let method = stream.headers?.find(h => h.name === ':method')?.value || 'GET';
-            let path = stream.headers?.find(h => h.name === ':path')?.value || '/';
-            let auth = stream.headers?.find(h => h.name === ':authority')?.value || resolveHostname(conn.serverIp);
-            let scheme = stream.headers?.find(h => h.name === ':scheme')?.value || 'https';
+            const method = stream.headers?.find(h => h.name === ':method')?.value || 'GET';
+            const path = stream.headers?.find(h => h.name === ':path')?.value || '/';
+            const auth = stream.headers?.find(h => h.name === ':authority')?.value || resolveHostname(conn.serverIp);
+            const scheme = stream.headers?.find(h => h.name === ':scheme')?.value || 'https';
             let status = 200;
             let resHeaders = [];
-            let dataBlocks = [];
+            const dataBlocks = [];
             if (stream.responses) {
                  for (const res of stream.responses) {
                       if (res.headers && res.headers.length > 0) {
@@ -812,7 +807,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                       }
                  }
             }
-            let reqTime = stream.firstClientTime || stream.time;
+            const reqTime = stream.firstClientTime || stream.time;
             reqs.push({
                 time: reqTime, method: method, url: `${scheme}://${auth}${path}`,
                 headers: stream.headers ? stream.headers.filter(h => !h.name.startsWith(':')) : [],

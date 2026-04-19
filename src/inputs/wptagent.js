@@ -192,7 +192,7 @@ export async function processWptagentZip(input, options = {}) {
                 if (testinfo.latency) outputHar.log._latency = testinfo.latency;
                 if (testinfo.plr) outputHar.log._plr = testinfo.plr;
                 outputHar.log._testinfo = testinfo;
-            } catch(e) {
+            } catch {
                 // Ignore silent JSON parse issues gracefully
             }
         }

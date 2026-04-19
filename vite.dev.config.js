@@ -52,7 +52,7 @@ const devtoolsServePlugin = {
         }[ext] || 'application/octet-stream';
         res.setHeader('Content-Type', ctype);
         res.end(buf);
-      } catch (e) {
+      } catch {
         next();
       }
     });

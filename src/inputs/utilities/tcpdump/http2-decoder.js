@@ -28,7 +28,7 @@ class Http2FrameReader {
         let cIdx = this.chunkIdx;
         let cOffset = this.offset;
         
-        let buf = new Uint8Array(bytesToRead);
+        const buf = new Uint8Array(bytesToRead);
         let bytesCopied = 0;
 
         while (needed > 0 && cIdx < this.chunks.length) {
@@ -73,8 +73,8 @@ class Http2FrameReader {
         return 0;
     }
 
-    readFrame(isClient = false) {
-        let time = this._peekTime();
+    readFrame(_isClient = false) {
+        const time = this._peekTime();
         
         const headerBuf = this._peek(9);
         if (!headerBuf) return null; // End of stream
@@ -210,7 +210,6 @@ export function decodeHttp2(clientChunks, serverChunks) {
                         if (priorityData && !stream.priority) {
                             stream.priority = priorityData;
                         }
-                        offset += 5;
                         headerBlockFragment = headerBlockFragment.subarray(5);
                     }
                 }

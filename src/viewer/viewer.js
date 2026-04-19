@@ -64,7 +64,7 @@ const ui = {
 
 let waterfallTool = null;
 let rendererCanvas = null;
-let activeBlobUrls = [];
+const activeBlobUrls = [];
 let pendingTabLoads = {};
 
 function loadTracePerfetto(traceBuffer) {
@@ -77,7 +77,12 @@ function loadTracePerfetto(traceBuffer) {
 
     const ORIGIN = 'https://ui.perfetto.dev';
     let loaded = false;
-    let pingInterval;
+
+    const pingInterval = setInterval(() => {
+        if (ui.traceFrame && ui.traceFrame.contentWindow) {
+            ui.traceFrame.contentWindow.postMessage('PING', ORIGIN);
+        }
+    }, 500);
 
     const onMessage = (e) => {
         if (e.origin !== ORIGIN) return;
@@ -92,7 +97,7 @@ function loadTracePerfetto(traceBuffer) {
                         title: 'WaterfallTools Trace'
                     }
                 }, ORIGIN);
-                
+
                 setTimeout(() => {
                     ui.traceOverlay.style.display = 'none';
                     window.removeEventListener('message', onMessage);
@@ -100,14 +105,8 @@ function loadTracePerfetto(traceBuffer) {
             }
         }
     };
-    
-    window.addEventListener('message', onMessage);
 
-    pingInterval = setInterval(() => {
-        if (ui.traceFrame && ui.traceFrame.contentWindow) {
-            ui.traceFrame.contentWindow.postMessage('PING', ORIGIN);
-        }
-    }, 500);
+    window.addEventListener('message', onMessage);
 
     const onLoad = () => {
         if (ui.traceFrame && ui.traceFrame.contentWindow && !loaded) {
@@ -502,7 +501,7 @@ function buildChunkedHtmlBody(request, waterfallZero) {
         const binStr = atob(request.body);
         bytes = new Uint8Array(binStr.length);
         for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
-    } catch (e) {
+    } catch {
         return null;
     }
     if (bytes.length === 0) return null;
@@ -631,7 +630,7 @@ function highlightSyntax(code, lang) {
     if (code === undefined || code === null) return '';
     let html = String(code).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     if (lang === 'json') {
-        html = html.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        html = html.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, function (match) {
             let cls = 'hl-number';
             if (/^"/.test(match)) {
                 if (/:$/.test(match)) {
@@ -647,12 +646,12 @@ function highlightSyntax(code, lang) {
             return '<span class="' + cls + '">' + match + '</span>';
         });
     } else if (lang === 'html') {
-        html = html.replace(/(&lt;\/?[a-zA-Z0-9\-:]+)(.*?)(&gt;)/g, function(match, p1, p2, p3) {
-            let attrs = p2.replace(/([a-zA-Z0-9\-]+)(=)(&quot;.*?&quot;|&#39;.*?&#39;|".*?"|'.*?')/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>');
+        html = html.replace(/(&lt;\/?[a-zA-Z0-9:-]+)(.*?)(&gt;)/g, function(match, p1, p2, p3) {
+            const attrs = p2.replace(/([a-zA-Z0-9-]+)(=)(&quot;.*?&quot;|&#39;.*?&#39;|".*?"|'.*?')/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>');
             return '<span class="hl-tag">' + p1 + '</span>' + attrs + '<span class="hl-tag">' + p3 + '</span>';
         });
     } else if (lang === 'css') {
-        html = html.replace(/([a-zA-Z0-9\-]+)(\s*:)([^;]+)(;)/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>$4');
+        html = html.replace(/([a-zA-Z0-9-]+)(\s*:)([^;]+)(;)/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>$4');
     } else if (lang === 'js') {
         html = html.replace(/\b(const|let|var|function|return|if|else|for|while|class|import|export|true|false|null)\b/g, '<span class="hl-keyword">$1</span>');
         html = html.replace(/('[^']*'|"[^"]*"|`[^`]*`)/g, '<span class="hl-string">$1</span>');
@@ -765,15 +764,15 @@ function renderSummary(pageData) {
             let customHtml = '<div class="custom-metrics-grid">';
             
             for (const key of customKeys) {
-                let val = '';
+                let val;
                 if (Array.isArray(pageData._custom)) {
                     val = pageData['_' + key];
                 } else {
                     val = pageData._custom[key];
                 }
-                
+
                 if (val !== undefined && val !== null) {
-                    let formatted = '';
+                    let formatted;
                     let lang = 'text';
 
                     if (typeof val === 'object') {
@@ -783,7 +782,7 @@ function renderSummary(pageData) {
                         let parsedObj = null;
                         try {
                             parsedObj = JSON.parse(val);
-                        } catch (e) {}
+                        } catch {}
 
                         if (parsedObj !== null && typeof parsedObj === 'object') {
                             formatted = JSON.stringify(parsedObj, null, 2);
@@ -987,7 +986,6 @@ async function renderTiles(pushHistory = true) {
 
         // Wait to process microtask explicitly to allow DOM bounds to calc smoothly
         setTimeout(async () => {
-             const tData = waterfallTool.getPage(pageId, { includeRequests: true });
              await waterfallTool.renderTo(thumbContainer, opts);
         }, 0);
 
@@ -1007,7 +1005,7 @@ function renderRequestTab(request, reqNum) {
         history.pushState({ view: 'waterfall', pageId: rendererCanvas.options.pageId, tabId: tabId }, '');
     }
 
-    let existingTab = document.querySelector(`.viewer-tab[data-tab-id="${tabId}"]`);
+    const existingTab = document.querySelector(`.viewer-tab[data-tab-id="${tabId}"]`);
     if (existingTab) {
         if (!existingTab.classList.contains('active')) existingTab.click();
         return;
@@ -1018,7 +1016,7 @@ function renderRequestTab(request, reqNum) {
     tab.dataset.tabId = tabId;
     tab.draggable = true;
     
-    let mime = request._contentType || request.mimeType || '';
+    const mime = request._contentType || request.mimeType || '';
     const urlStr = request.url || request._URL || '';
     const colors = Layout.getRequestColors(mime, urlStr);
     
@@ -1061,7 +1059,7 @@ function renderRequestTab(request, reqNum) {
         const u = new URL(urlStr);
         parsedUrl = u.toString();
         host = u.host;
-    } catch (e) {
+    } catch {
         // Leave as is if invalid URL
     }
 
@@ -1071,7 +1069,7 @@ function renderRequestTab(request, reqNum) {
     const toggleIconSvgCollapsed = `<svg class="acc-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
     
     const createSectionHeader = (title, collapsed, copyId) => {
-        let copyBtn = copyId ? `
+        const copyBtn = copyId ? `
             <button class="copy-btn" data-copy-target="${copyId}" title="Copy" onclick="event.stopPropagation();">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy
             </button>` : '';
@@ -1094,7 +1092,7 @@ function renderRequestTab(request, reqNum) {
         `;
     };
 
-    let detailsHtml = `
+    const detailsHtml = `
         <div class="req-section">
             ${createSectionHeader('Details', false, false)}
             <div class="req-section-body">
@@ -1138,7 +1136,7 @@ function renderRequestTab(request, reqNum) {
         return hHtml;
     };
 
-    let reqHeadersHtml = `
+    const reqHeadersHtml = `
         <div class="req-section">
             ${createSectionHeader('Request Headers', false, 'reqHeaders')}
             <div class="req-section-body">
@@ -1147,7 +1145,7 @@ function renderRequestTab(request, reqNum) {
         </div>
     `;
 
-    let resHeadersHtml = `
+    const resHeadersHtml = `
         <div class="req-section">
             ${createSectionHeader('Response Headers', false, 'resHeaders')}
             <div class="req-section-body">
@@ -1156,13 +1154,13 @@ function renderRequestTab(request, reqNum) {
         </div>
     `;
 
-    let rawJson = '';
+    let rawJson;
     try {
         const rawReq = {};
-        for(let key in request) {
+        for(const key in request) {
             if(key !== 'body') rawReq[key] = request[key];
         }
-        
+
         const cache = new Set();
         const safeString = JSON.stringify(rawReq, (key, value) => {
             if (typeof value === 'object' && value !== null) {
@@ -1171,13 +1169,13 @@ function renderRequestTab(request, reqNum) {
             }
             return value;
         }, 2);
-        
+
         rawJson = highlightSyntax(safeString, 'json');
-    } catch (e) {
+    } catch {
         rawJson = highlightSyntax('{\n  "error": "Could not serialize raw details"\n}', 'json');
     }
 
-    let rawDetailsHtml = `
+    const rawDetailsHtml = `
         <div class="req-section collapsed">
             ${createSectionHeader('Raw Details', true, false)}
             <div class="req-section-body">
@@ -1214,7 +1212,7 @@ function renderRequestTab(request, reqNum) {
             if (isBase64) {
                 try {
                     bodyText = new TextDecoder().decode(Uint8Array.from(atob(request.body), c => c.charCodeAt(0)));
-                } catch (e) {
+                } catch {
                     bodyText = '[Could not decode response body]';
                 }
             } else {
@@ -1317,7 +1315,7 @@ function renderRequestTab(request, reqNum) {
 
     // Bind copy events natively immediately after injection!
     contentPane.querySelectorAll('.copy-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
             const targetId = btn.dataset.copyTarget;
             const textToCopy = clipboardPayloads[targetId];
             if (textToCopy) {
@@ -1388,7 +1386,7 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
                 const urlObj = new URL(pageUrl);
                 document.title = `Waterfall Viewer - ${urlObj.hostname}`;
                 ui.viewerTitle.textContent = `Waterfall`;
-            } catch (err) {
+            } catch {
                 document.title = `Waterfall Viewer - ${pageUrl}`;
                 ui.viewerTitle.textContent = `Waterfall`;
             }
@@ -1540,7 +1538,7 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     // Check for explicit tab auto-loading without flashing
     const params = new URLSearchParams(window.location.search);
     if (!rendererCanvas._tabHandled && params.has('tab')) {
-        let requestedTab = params.get('tab');
+        const requestedTab = params.get('tab');
         rendererCanvas._tabHandled = true; // only do this once
         
         let tabToClick = null;
@@ -1552,7 +1550,7 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
                 reqs = Array.isArray(pData.requests) ? pData.requests : Object.values(pData.requests);
             }
             const reqIdx = reqs.findIndex((r, i) => {
-                return (r && (r._request_id == matchId || r._id == matchId || r.id == matchId)) || ((i + 1).toString() === matchId);
+                return (r && (String(r._request_id) === matchId || String(r._id) === matchId || String(r.id) === matchId)) || ((i + 1).toString() === matchId);
             });
             
             if (reqIdx !== -1) {
@@ -1805,7 +1803,7 @@ function updateUrlWithCurrentState() {
                 
                 // Generate non-default options list
                 const defaultOpts = WaterfallTools.getDefaultOptions();
-                let optionOverrides = [];
+                const optionOverrides = [];
                 for (const key of Object.keys(defaultOpts)) {
                     if (key === 'pageId') continue;
                     if (currentOpts[key] !== undefined && currentOpts[key] !== defaultOpts[key]) {
@@ -1880,7 +1878,7 @@ window.WaterfallViewer = {
 
 function transformWptUrl(url) {
     if (!url) return url;
-    const originRe = /^https?:\/\/[^\/]+/;
+    const originRe = /^https?:\/\/[^/]+/;
     const resultRe = /\/result\/(\d{6}_[^/]+)/;
     const phpRe = /\/results\.php\?.*test=(\d{6}_[^&]+)/;
 
@@ -1967,7 +1965,7 @@ async function initViewer() {
                     await processData(buffer, processOpts);
                     
                     try {
-                        let type = waterfallTool ? waterfallTool._sourceFormat : 'unknown';
+                        const type = waterfallTool ? waterfallTool._sourceFormat : 'unknown';
                         let testUrl = '';
                         let numPages = 0;
                         if (waterfallTool && waterfallTool.data && waterfallTool.data.pages) {
@@ -1986,7 +1984,7 @@ async function initViewer() {
                             }
                         }
                         saveToHistory({ url: urlVal, type, title: '', testUrl, numPages }).catch(e => console.warn('Failed to save to history:', e));
-                    } catch(e) {}
+                    } catch {}
                 } catch(e) {
                     console.error("URL Load Error:", e);
                     showError(`Failed fetching remote file: ${e.message}`);
@@ -2397,7 +2395,7 @@ async function initViewer() {
             await processData(buffer, processOpts, keylogBuffer);
 
             try {
-                let type = waterfallTool ? waterfallTool._sourceFormat : 'unknown';
+                const type = waterfallTool ? waterfallTool._sourceFormat : 'unknown';
                 let testUrl = '';
                 let numPages = 0;
                 if (waterfallTool && waterfallTool.data && waterfallTool.data.pages) {
@@ -2416,7 +2414,7 @@ async function initViewer() {
                     }
                 }
                 saveToHistory({ url: srcUrl, type, title: '', testUrl, numPages }).catch(e => console.warn('Failed to save to history:', e));
-            } catch(e) {}
+            } catch {}
         } catch(e) {
             console.error(e);
             showError(`Failed fetching remote file: ${e.message}`);

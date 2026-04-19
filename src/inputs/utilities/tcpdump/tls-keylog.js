@@ -9,7 +9,7 @@ export class TlsKeyLog {
     }
 
     _hexToBytes(hex) {
-        let bytes = new Uint8Array(Math.ceil(hex.length / 2));
+        const bytes = new Uint8Array(Math.ceil(hex.length / 2));
         for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
         return bytes;
     }

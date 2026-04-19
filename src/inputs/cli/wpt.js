@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0.
  * See the LICENSE file for details.
  */
-import { normalizeWPT, processWPTFileNode } from '../wpt-json.js';
+import { processWPTFileNode } from '../wpt-json.js';
 import fs from 'node:fs';
 import path from 'node:path';
 

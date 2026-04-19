@@ -18,8 +18,8 @@ export function decodeDns(rawBuffer) {
     const flags = view.getUint16(offset, false); offset += 2;
     const qdcount = view.getUint16(offset, false); offset += 2;
     const ancount = view.getUint16(offset, false); offset += 2;
-    const nscount = view.getUint16(offset, false); offset += 2;
-    const arcount = view.getUint16(offset, false); offset += 2;
+    // Skip nscount and arcount; offset bookkeeping only
+    offset += 4;
 
     const isResponse = (flags & 0x8000) !== 0;
 
@@ -34,7 +34,7 @@ export function decodeDns(rawBuffer) {
 
     function readName() {
         let p = offset;
-        let labels = [];
+        const labels = [];
         let jumped = false;
         let jumps = 0;
 
@@ -114,7 +114,7 @@ export function decodeDns(rawBuffer) {
 
             result.answers.push({ name, type, "class": qclass, ttl, address });
         }
-    } catch (e) {
+    } catch {
         // Truncated or malformed packet
     }
 

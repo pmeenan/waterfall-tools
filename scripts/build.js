@@ -33,11 +33,6 @@ const externalDepsCore = [
   '@napi-rs/canvas'
 ];
 
-const externalDepsTcp = [
-  'fs', 'path', 'os', 'child_process', 'crypto', 'stream', 'zlib', 'util', 'url', 'https', 'http',
-  'node:fs', 'node:path', 'node:stream', 'node:os', 'node:child_process', 'node:crypto', 'node:fs/promises'
-];
-
 async function runRollup(entryName, aliasMap, outDir, externalDeps, stubName, isBrowser) {
     const bundle = await rollup({
         input: resolve(__dirname, `../src/${entryName}`),
@@ -190,7 +185,7 @@ async function runBuilds() {
         let sharp;
         try {
             sharp = (await import('sharp')).default;
-        } catch (e) {
+        } catch {
             console.log('Skipping image optimization install Sharp with npm install -D sharp if needed');
             return;
         }

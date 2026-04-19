@@ -10,7 +10,6 @@ export function decodeHttp3(quicStreams) {
     // QPACK Requires two distinct dynamic tables (RFC 9204)
     const qpackClientDec = new QpackDecoder();
     const qpackServerDec = new QpackDecoder();
-    const requests = [];
 
     // Assembles contiguous stream fragments into a single buffer.
     // Returns { buffer, startOffset } where startOffset is the byte offset of the
@@ -22,7 +21,7 @@ export function decodeHttp3(quicStreams) {
         // This allows partial assembly of streams that began before the capture started.
         let offset = frags[0].offset;
         const startOffset = offset;
-        let blocks = [];
+        const blocks = [];
         for (const f of frags) {
             if (f.offset === offset) {
                 blocks.push(f.data);
@@ -39,20 +38,20 @@ export function decodeHttp3(quicStreams) {
             }
         }
         if (blocks.length === 0) return undefined;
-        let total = blocks.reduce((acc, b) => acc + b.length, 0);
-        let out = new Uint8Array(total);
+        const total = blocks.reduce((acc, b) => acc + b.length, 0);
+        const out = new Uint8Array(total);
         let p = 0;
-        for (let b of blocks) {
+        for (const b of blocks) {
             out.set(b, p); p += b.length;
         }
         return { buffer: out, startOffset };
     };
 
     const concatUint8Arrays = (arrays) => {
-        let total = arrays.reduce((acc, b) => acc + b.length, 0);
-        let out = new Uint8Array(total);
+        const total = arrays.reduce((acc, b) => acc + b.length, 0);
+        const out = new Uint8Array(total);
         let p = 0;
-        for (let b of arrays) {
+        for (const b of arrays) {
             out.set(b, p); p += b.length;
         }
         return out;
@@ -62,12 +61,12 @@ export function decodeHttp3(quicStreams) {
     for (const [id, fragments] of quicStreams.entries()) {
         if (fragments.length === 0) continue;
         
-        let clientFrags = fragments.filter(f => f.isClient).sort((a,b) => a.offset - b.offset);
-        let serverFrags = fragments.filter(f => !f.isClient).sort((a,b) => a.offset - b.offset);
+        const clientFrags = fragments.filter(f => f.isClient).sort((a,b) => a.offset - b.offset);
+        const serverFrags = fragments.filter(f => !f.isClient).sort((a,b) => a.offset - b.offset);
         
-        let sortedClient = fragments.filter(f => f.isClient).sort((a,b) => a.time - b.time);
-        let sortedServer = fragments.filter(f => !f.isClient).sort((a,b) => a.time - b.time);
-        let sortedAll = [...fragments].sort((a,b) => a.time - b.time);
+        const sortedClient = fragments.filter(f => f.isClient).sort((a,b) => a.time - b.time);
+        const sortedServer = fragments.filter(f => !f.isClient).sort((a,b) => a.time - b.time);
+        const sortedAll = [...fragments].sort((a,b) => a.time - b.time);
 
         const clientAssembly = assemble(clientFrags);
         const serverAssembly = assemble(serverFrags);
@@ -99,7 +98,7 @@ export function decodeHttp3(quicStreams) {
         const baseStartOffset = isClientInit ? stream.clientStartOffset : stream.serverStartOffset;
         if (!baseBuf) continue;
 
-        let isEncoder = false;
+        let isEncoder;
         let payloadBytes;
 
         if (baseStartOffset === 0) {
@@ -149,7 +148,7 @@ export function decodeHttp3(quicStreams) {
 
             const parseHttp3Frames = (baseBuf, isClientSide) => {
                 const qb = new QuicBuffer(baseBuf);
-                let currentRes = { headers: [], data: [] };
+                const currentRes = { headers: [], data: [] };
                 
                 while (qb.remaining > 0) {
                     const frameType = qb.readVarInt();

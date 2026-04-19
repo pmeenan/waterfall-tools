@@ -83,7 +83,7 @@ export class WaterfallCanvas {
             }
         });
 
-        this.canvas.addEventListener('mouseleave', (e) => {
+        this.canvas.addEventListener('mouseleave', () => {
             if (this.lastHoveredIndex !== null) {
                 this.lastHoveredIndex = null;
                 if (typeof this.options.onHover === 'function') {
@@ -277,11 +277,11 @@ export class WaterfallCanvas {
                     const minMs = Math.min(row.start || Number.MAX_SAFE_INTEGER, row.dnsStart || Number.MAX_SAFE_INTEGER, row.connectStart || Number.MAX_SAFE_INTEGER, row.sslStart || Number.MAX_SAFE_INTEGER, row.ttfbStart || Number.MAX_SAFE_INTEGER, row.downloadStart || Number.MAX_SAFE_INTEGER);
                     const maxMs = Math.max(row.end || 0, row.dnsEnd || 0, row.connectEnd || 0, row.sslEnd || 0, row.ttfbEnd || 0, row.downloadEnd || 0);
 
-                    let barStartX = xScaler(minMs - baseStartMs) - 3; // padding for thin rects mapping safely
-                    let barEndX = xScaler(maxMs - baseStartMs) + 3;
+                    const barStartX = xScaler(minMs - baseStartMs) - 3; // padding for thin rects mapping safely
+                    const barEndX = xScaler(maxMs - baseStartMs) + 3;
 
                     // Labels represent full origins in connection view; explicitly prevent interactive states there
-                    let isBarHit = (x >= barStartX && x <= barEndX);
+                    const isBarHit = (x >= barStartX && x <= barEndX);
 
                     if (isBarHit) {
                         hitRow = row;
@@ -302,18 +302,18 @@ export class WaterfallCanvas {
         if (pageData && pageData.requests) {
             this.rawEntries = Object.values(pageData.requests);
             const getSortEpoch = (req) => {
-                let hasAbsoluteTimings = req._load_start !== undefined || req._start !== undefined || req._dns_start !== undefined || req._ttfb_start !== undefined;
+                const hasAbsoluteTimings = req._load_start !== undefined || req._start !== undefined || req._dns_start !== undefined || req._ttfb_start !== undefined;
                 if (hasAbsoluteTimings) {
-                    let baseEpoch = 0; // Relative sorting
-                    let startOrigin = req._load_start !== undefined ? req._load_start : (req._start !== undefined ? req._start : undefined);
-                    let blockedEnd = baseEpoch + (startOrigin !== undefined ? startOrigin : (req._ttfb_start !== undefined ? req._ttfb_start : 0));
-                    let dnsStart = (req._dns_start !== undefined && req._dns_start >= 0) ? baseEpoch + req._dns_start : blockedEnd;
-                    let dnsEnd = (req._dns_end !== undefined && req._dns_end >= 0) ? baseEpoch + req._dns_end : dnsStart;
-                    let connectStart = (req._connect_start !== undefined && req._connect_start >= 0) ? baseEpoch + req._connect_start : dnsEnd;
-                    let connectEnd = (req._connect_end !== undefined && req._connect_end >= 0) ? baseEpoch + req._connect_end : connectStart;
-                    let sslStart = (req._ssl_start !== undefined && req._ssl_start >= 0) ? baseEpoch + req._ssl_start : connectEnd;
-                    let sslEnd = (req._ssl_end !== undefined && req._ssl_end >= 0) ? baseEpoch + req._ssl_end : sslStart;
-                    let requestStart = baseEpoch + (startOrigin !== undefined ? startOrigin : (req._ttfb_start !== undefined ? req._ttfb_start : (sslEnd - baseEpoch)));
+                    const baseEpoch = 0; // Relative sorting
+                    const startOrigin = req._load_start !== undefined ? req._load_start : (req._start !== undefined ? req._start : undefined);
+                    const blockedEnd = baseEpoch + (startOrigin !== undefined ? startOrigin : (req._ttfb_start !== undefined ? req._ttfb_start : 0));
+                    const dnsStart = (req._dns_start !== undefined && req._dns_start >= 0) ? baseEpoch + req._dns_start : blockedEnd;
+                    const dnsEnd = (req._dns_end !== undefined && req._dns_end >= 0) ? baseEpoch + req._dns_end : dnsStart;
+                    const connectStart = (req._connect_start !== undefined && req._connect_start >= 0) ? baseEpoch + req._connect_start : dnsEnd;
+                    const connectEnd = (req._connect_end !== undefined && req._connect_end >= 0) ? baseEpoch + req._connect_end : connectStart;
+                    const sslStart = (req._ssl_start !== undefined && req._ssl_start >= 0) ? baseEpoch + req._ssl_start : connectEnd;
+                    const sslEnd = (req._ssl_end !== undefined && req._ssl_end >= 0) ? baseEpoch + req._ssl_end : sslStart;
+                    const requestStart = baseEpoch + (startOrigin !== undefined ? startOrigin : (req._ttfb_start !== undefined ? req._ttfb_start : (sslEnd - baseEpoch)));
                     return Math.max(requestStart, connectEnd);
                 }
                 
@@ -466,7 +466,7 @@ export class WaterfallCanvas {
         if (interval >= 1000) places = 0;
         else if (interval >= 100) places = 1;
         
-        let val = ms / 1000.0;
+        const val = ms / 1000.0;
         
         if (places === 0) return Math.round(val).toString();
         else return val.toFixed(places);
@@ -709,7 +709,7 @@ export class WaterfallCanvas {
 
             // 5.8 Time Scale Labels (Rendered last so they draw on top of lines, with opaque backgrounds)
             if (!this.options.thumbnailView && dimensions.maxTime > 0 && intervalMs > 0) {
-                let bottomScaleY = dimensions.totalRows * rowHeight + rowHeight + topOffset;
+                const bottomScaleY = dimensions.totalRows * rowHeight + rowHeight + topOffset;
 
                 // Fill opaque white background specifically for the bottom time scale row
                 const fillX = Math.floor(dimensions.labelsWidth) + 1;
@@ -737,18 +737,17 @@ export class WaterfallCanvas {
             // 6. Draw Requests - Pass 1: State lines and TTFB Backgrounds
             this.ctx.textAlign = 'left';
 
-            rows.forEach((row, index) => {
+            rows.forEach((row) => {
                 if (row.isTornEdge) return;
-                
-                let sWait = xScaler(row.start - baseStartMs);
-                let sDns = xScaler(row.dnsStart - baseStartMs);
-                let sDnsEnd = xScaler(row.dnsEnd - baseStartMs);
-                let sConn = xScaler(row.connectStart - baseStartMs);
-                let sConnEnd = xScaler(row.connectEnd - baseStartMs);
-                let sSsl = xScaler(row.sslStart - baseStartMs);
-                let sSslEnd = xScaler(row.sslEnd - baseStartMs);
-                let sTtfb = xScaler(row.ttfbStart - baseStartMs);
-                let sTtfbEnd = xScaler(row.ttfbEnd - baseStartMs);
+
+                const sDns = xScaler(row.dnsStart - baseStartMs);
+                const sDnsEnd = xScaler(row.dnsEnd - baseStartMs);
+                const sConn = xScaler(row.connectStart - baseStartMs);
+                const sConnEnd = xScaler(row.connectEnd - baseStartMs);
+                const sSsl = xScaler(row.sslStart - baseStartMs);
+                const sSslEnd = xScaler(row.sslEnd - baseStartMs);
+                const sTtfb = xScaler(row.ttfbStart - baseStartMs);
+                const sTtfbEnd = xScaler(row.ttfbEnd - baseStartMs);
                 
                 let drawY1 = row.y1;
                 let drawY2 = row.y2;
@@ -767,11 +766,11 @@ export class WaterfallCanvas {
                 const barY2 = Math.max(barY1 + 1, drawY2);
                 
                 // State lines (queueing wait -> dns -> connect -> ssl)
-                let sQueueStart = xScaler(row.blockedStart - baseStartMs);
+                const sQueueStart = xScaler(row.blockedStart - baseStartMs);
                 // Queueing legitimately ends the exact instant any network phase actively begins.
-                let firstNetworkPhase = Math.min(row.dnsStart, row.connectStart, row.ttfbStart);
-                let actualQueueEnd = Math.min(row.blockedEnd, firstNetworkPhase);
-                let sActualQueueEnd = xScaler(Math.max(row.blockedStart, actualQueueEnd) - baseStartMs);
+                const firstNetworkPhase = Math.min(row.dnsStart, row.connectStart, row.ttfbStart);
+                const actualQueueEnd = Math.min(row.blockedEnd, firstNetworkPhase);
+                const sActualQueueEnd = xScaler(Math.max(row.blockedStart, actualQueueEnd) - baseStartMs);
                 
                 if (this.options.showWait !== false && !this.options.connectionView && sQueueStart < sActualQueueEnd) {
                     this.drawBar(sQueueStart, sActualQueueEnd, stateY1, stateY2, row.colors.wait, true);
@@ -793,7 +792,7 @@ export class WaterfallCanvas {
 
             // 6. Draw Requests - Pass 2: Downloads & Overlaps
             const solidDownloadsByRow = new Map();
-            rows.forEach((row, index) => {
+            rows.forEach((row) => {
                 if (row.isTornEdge) return;
                 const hasBandwidth = dimensions.maxBw && dimensions.maxBw > 0;
                 const hasChunks = row.chunks && row.chunks.length > 0;
@@ -804,8 +803,8 @@ export class WaterfallCanvas {
                     const rowKey = row.y1;
                     if (!solidDownloadsByRow.has(rowKey)) solidDownloadsByRow.set(rowKey, []);
                     
-                    let sDownload = xScaler(row.downloadStart - baseStartMs);
-                    let eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
+                    const sDownload = xScaler(row.downloadStart - baseStartMs);
+                    const eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
                     
                     if (sDownload < eDownload) {
                         solidDownloadsByRow.get(rowKey).push({ row, sDownload, eDownload, colors: row.colors.download });
@@ -853,10 +852,10 @@ export class WaterfallCanvas {
             }
 
             // 6. Draw Requests - Pass 3: Chunked Downloads + Labels + JS
-            rows.forEach((row, index) => {
+            rows.forEach((row) => {
                 if (row.isTornEdge) return;
-                let sWait = xScaler(row.start - baseStartMs);
-                let eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
+                const sWait = xScaler(row.start - baseStartMs);
+                const eDownload = xScaler(Math.max(row.end, row.downloadEnd) - baseStartMs);
                 
                 let drawY1 = row.y1;
                 let drawY2 = row.y2;
@@ -874,8 +873,8 @@ export class WaterfallCanvas {
                 const useChunks = hasChunks && (hasBandwidth || this.options.showChunks !== false);
                 
                 if (useChunks) {
-                    let minMs = row.downloadStart - baseStartMs;
-                    let maxBw = dimensions.maxBw || 0;
+                    const minMs = row.downloadStart - baseStartMs;
+                    const maxBw = dimensions.maxBw || 0;
                     
                     row.chunks.forEach(chunk => {
                         if (chunk.ts !== undefined) {
@@ -1060,11 +1059,11 @@ export class WaterfallCanvas {
                     
                     let bwTitle = null;
                     if (hasBw && !this.options.thumbnailView) {
-                        let maxBw = page._utilization.bwMax || (Array.isArray(page._utilization.bw) && page._utilization.bw.max) ? (page._utilization.bwMax || page._utilization.bw.max) : (page._bwDown || 0);
+                        const maxBw = page._utilization.bwMax || (Array.isArray(page._utilization.bw) && page._utilization.bw.max) ? (page._utilization.bwMax || page._utilization.bw.max) : (page._bwDown || 0);
 
                         if (maxBw > 0) {
                             if (maxBw >= 1000) {
-                                let mbps = maxBw / 1000;
+                                const mbps = maxBw / 1000;
                                 bwTitle = `BW (0 - ${mbps % 1 === 0 ? mbps : mbps.toFixed(1)} mbps)`;
                             } else {
                                 bwTitle = `BW (0 - ${maxBw} kbps)`;
@@ -1080,7 +1079,7 @@ export class WaterfallCanvas {
                     if (hasCpu) {
                         let rawCpu = page._utilization.cpu;
                         if (typeof rawCpu === 'string') {
-                            try { rawCpu = JSON.parse(rawCpu); } catch (e) { rawCpu = []; }
+                            try { rawCpu = JSON.parse(rawCpu); } catch { rawCpu = []; }
                         }
                         if (Array.isArray(rawCpu) && rawCpu.length > 0 && typeof rawCpu[0] === 'object' && !Array.isArray(rawCpu[0])) {
                             rawCpu = rawCpu[0];
@@ -1107,8 +1106,8 @@ export class WaterfallCanvas {
                         }
                         
                         cpuData.forEach(point => {
-                            let ts = point.time !== undefined ? point.time : (point.ts !== undefined ? point.ts : (Array.isArray(point) ? point[0] : null));
-                            let val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
+                            const ts = point.time !== undefined ? point.time : (point.ts !== undefined ? point.ts : (Array.isArray(point) ? point[0] : null));
+                            const val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
                             if (ts === null || val === null) return;
                             
                             let internalTs = ts;
@@ -1138,7 +1137,7 @@ export class WaterfallCanvas {
                     if (hasBw) {
                         let rawBw = page._utilization.bw;
                         if (typeof rawBw === 'string') {
-                            try { rawBw = JSON.parse(rawBw); } catch (e) { rawBw = []; }
+                            try { rawBw = JSON.parse(rawBw); } catch { rawBw = []; }
                         }
                         if (Array.isArray(rawBw) && rawBw.length > 0 && typeof rawBw[0] === 'object' && !Array.isArray(rawBw[0])) {
                             rawBw = rawBw[0];
@@ -1166,7 +1165,7 @@ export class WaterfallCanvas {
                         
                         bwData.forEach(point => {
                             let ts = point.time !== undefined ? point.time : (point.ts !== undefined ? point.ts : (Array.isArray(point) ? point[0] : null));
-                            let val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
+                            const val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
                             if (ts === null || val === null) return;
 
                             if (ts > 1000000000000000) ts = ts / 1000;
@@ -1380,7 +1379,6 @@ export class WaterfallCanvas {
                 // instrumented long-task detection — we render the band even when empty
                 // so "no blocking tasks" shows as fully green, distinct from data sources
                 // that lack long-task support (no band rendered at all).
-                const longTasks = page._longTasks || [];
                 if (this.options.showLongtasks && (Array.isArray(page._longTasks) || mtEvents.length > 0)) {
                     const blockHeight = this.options.thumbnailView ? 4 : 18;
                     const ltTitle = !this.options.thumbnailView ? 'Long Tasks' : null;
@@ -1390,7 +1388,7 @@ export class WaterfallCanvas {
                     if (page._firstContentfulPaint > 0) startEventTs = page._firstContentfulPaint;
                     else if (page._render > 0) startEventTs = page._render;
                     
-                    let startEventX = Math.floor(xScaler(startEventTs));
+                    const startEventX = Math.floor(xScaler(startEventTs));
                     
                     if (startEventX < dimensions.canvasWidth) {
                         // Draw Interactive Background (Green) from FCP onwards
@@ -1477,7 +1475,7 @@ export class WaterfallCanvas {
                 const fontSize = this.options.thumbnailView ? 4 : 11;
                 labelCtx.font = `${fontSize}px sans-serif`;
                 
-                let renderedConnectionRows = new Set();
+                const renderedConnectionRows = new Set();
                 let connectionDisplayIndex = 1;
                 
                 rows.forEach((row, index) => {
@@ -1533,7 +1531,7 @@ export class WaterfallCanvas {
                     const prefixWidth = labelCtx.measureText(prefix).width;
                     const maxUrlWidth = drawLabelsWidth - textX - prefixWidth - 6; // 6px padding from line
                     
-                    let currentUrlWidth = labelCtx.measureText(urlText).width;
+                    const currentUrlWidth = labelCtx.measureText(urlText).width;
                     if (currentUrlWidth > maxUrlWidth && urlText.length > 5 && maxUrlWidth > 10) {
                         const avgCharWidth = currentUrlWidth / urlText.length;
                         let targetLen = Math.floor(maxUrlWidth / avgCharWidth);

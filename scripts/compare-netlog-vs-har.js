@@ -14,7 +14,7 @@ async function compareNetlogsToHar(harPath, netlogPaths) {
     const wptEntries = wptHar?.log?.entries || [];
     wptEntries.forEach(e => {
         if (e.request && e.request.url) {
-            let u = e.request.url.split('#')[0];
+            const u = e.request.url.split('#')[0];
             wptUrls.add(u);
         }
     });
@@ -29,7 +29,7 @@ async function compareNetlogsToHar(harPath, netlogPaths) {
         const netlogEntries = netlogHar?.log?.entries || [];
         netlogEntries.forEach(e => {
             if (e.request && e.request.url) {
-                let u = e.request.url.split('#')[0];
+                const u = e.request.url.split('#')[0];
                 netlogUrls.add(u);
             }
         });
@@ -38,7 +38,7 @@ async function compareNetlogsToHar(harPath, netlogPaths) {
 
         // Check for missing URLs
         let missingCount = 0;
-        let missingUrls = [];
+        const missingUrls = [];
 
         // Note: WPT HAR might contain multiple runs, while Netlog is typically just one.
         // We evaluate what's in the WPT HAR but missing from the Netlog.
@@ -49,7 +49,7 @@ async function compareNetlogsToHar(harPath, netlogPaths) {
             }
         }
         
-        let overlapPercent = ((wptUrls.size - missingCount) / wptUrls.size * 100).toFixed(2);
+        const overlapPercent = ((wptUrls.size - missingCount) / wptUrls.size * 100).toFixed(2);
         console.log(`Overlap: ${wptUrls.size - missingCount} / ${wptUrls.size} URLs (${overlapPercent}%)`);
         
         if (missingCount > 0) {

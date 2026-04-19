@@ -249,7 +249,7 @@ function buildMainThreadActivity(rawEvents, baseUs, startUs, metaMainThreads, su
             const perUrl = scripts[thread][url] || (scripts[thread][url] = {});
             const perName = perUrl[name] || (perUrl[name] = []);
 
-            let localStack = stackUsed;
+            const localStack = stackUsed;
             const tu = localStack[thread];
             const priorPeriods = tu && tu[url] && tu[url][name];
             let covered = false;
@@ -385,13 +385,9 @@ export async function processChromeTraceFileNode(input, options = {}) {
             const fs = await import(/* @vite-ignore */ 'node:fs');
 
             const header = new Uint8Array(2);
-            try {
-                const fd = fs.openSync(input, 'r');
-                fs.readSync(fd, header, 0, 2, 0);
-                fs.closeSync(fd);
-            } catch (e) {
-                throw e;
-            }
+            const fd = fs.openSync(input, 'r');
+            fs.readSync(fd, header, 0, 2, 0);
+            fs.closeSync(fd);
 
             isGz = isGzip(header);
 
@@ -400,7 +396,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
             // detected during format sniffing. This path only fires from standalone CLI usage.
             if (options.hasTraceEventsWrapper === undefined) {
                 const { Readable } = await import(/* @vite-ignore */ 'node:stream');
-                let peekFsStream = fs.createReadStream(input);
+                const peekFsStream = fs.createReadStream(input);
                 let peekWebStream = Readable.toWeb(peekFsStream);
                 if (isGz) {
                     peekWebStream = peekWebStream.pipeThrough(new DecompressionStream('gzip'));
@@ -418,7 +414,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
                         prefix += value;
                     }
                 } finally {
-                    try { peekReader.cancel(); } catch (e) {}
+                    try { peekReader.cancel(); } catch {}
                     peekFsStream.destroy();
                 }
                 hasTraceEventsWrapper = prefix.replace(/\s/g, '').includes('"traceEvents":[');
@@ -468,16 +464,8 @@ export async function processChromeTraceFileNode(input, options = {}) {
 
         let start_time = null;
         let marked_start_time = null;
-        let pageTimings = { onLoad: -1, onContentLoad: -1, _startRender: -1 };
-        let custom_user_marks = {};
-
-        // Wall-clock epoch estimation: Chrome traces use CLOCK_MONOTONIC (system uptime)
-        // for all ts values. We need a real UNIX epoch for HAR startedDateTime generation.
-        // Strategy: extract the first HTTP "date:" response header from netlog events,
-        // pair it with the monotonic ts at which the response was received, and compute
-        // the offset (real_epoch_us - monotonic_ts_us). This offset converts any monotonic
-        // timestamp to real wall-clock time.
-        let monotonicToEpochOffsetUs = null; // microseconds: add to monotonic ts to get epoch
+        const pageTimings = { onLoad: -1, onContentLoad: -1, _startRender: -1 };
+        const custom_user_marks = {};
 
         const targetPaths = hasTraceEventsWrapper ? ['$.traceEvents.*'] : ['$.*'];
         const parser = new JSONParser({ paths: targetPaths, keepStack: false });
@@ -704,7 +692,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
                     }
                 }
                 
-            } catch (e) {
+            } catch {
                 // Ignore single event errors
             }
         };
@@ -744,8 +732,8 @@ export async function processChromeTraceFileNode(input, options = {}) {
 
         const results = netlog.postProcessEvents();
         let requests = results ? (results.requests || []) : [];
-        let unlinked_sockets = results ? (results.unlinked_sockets || []) : [];
-        let unlinked_dns = results ? (results.unlinked_dns || []) : [];
+        const unlinked_sockets = results ? (results.unlinked_sockets || []) : [];
+        const unlinked_dns = results ? (results.unlinked_dns || []) : [];
         
         // Correct massive divergence offsets where Perfetto maps timeline threads natively as Epoch but network threads as Monotonic Uptime natively.
         let timeline_epoch_offset_ms = 0;
@@ -759,7 +747,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
         }
         
         if (timeline_epoch_offset_ms !== 0) {
-            for (const [reqId, tl_req] of Object.entries(timeline_requests)) {
+            for (const tl_req of Object.values(timeline_requests)) {
                 // The base bounds (requestTime, finishTime) are already correctly zero-indexed.
                 // The inner `timing` block natively preserves the massive OS clock string in args.
                 // Thus, we subtract the massive diff to zero-index the inner timing array natively.
@@ -1126,10 +1114,8 @@ export async function processChromeTraceFileNode(input, options = {}) {
         // Use statically imported buildWaterfallDataFromHar
         return buildWaterfallDataFromHar(har.log, 'chrome-trace');
 
-    } catch (e) {
-        throw e;
     } finally {
-        if (reader) try { reader.releaseLock(); } catch (e) {}
+        if (reader) try { reader.releaseLock(); } catch {}
         if (keepAlive) globalThis.clearInterval(keepAlive);
         if (nodeFsStream) nodeFsStream.destroy();
     }

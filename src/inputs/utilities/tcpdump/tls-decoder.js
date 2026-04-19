@@ -24,7 +24,7 @@ function concatUint8Arrays(arrays) {
     const len = arrays.reduce((acc, a) => acc + a.length, 0);
     const result = new Uint8Array(len);
     let offset = 0;
-    for (let a of arrays) {
+    for (const a of arrays) {
         result.set(a, offset);
         offset += a.length;
     }
@@ -53,7 +53,7 @@ export class TlsDecoder {
 
     async push(direction, chunkBuffer, timestamp) {
         // Concatenate new data to any existing partial data in the buffer
-        let b = this.buffers[direction];
+        const b = this.buffers[direction];
         this.buffers[direction] = concatUint8Arrays([b, chunkBuffer instanceof Uint8Array ? chunkBuffer : new Uint8Array(chunkBuffer)]);
         
         await this._parseRecords(direction, timestamp);
@@ -119,8 +119,8 @@ export class TlsDecoder {
                 if (msg.length >= 34) {
                     this.serverRandom = msg.subarray(2, 34); 
                     
-                    let sessLen = msg[34];
-                    let cipherOffset = 34 + 1 + sessLen;
+                    const sessLen = msg[34];
+                    const cipherOffset = 34 + 1 + sessLen;
                     
                     if (cipherOffset + 2 <= msg.length) {
                         this.cipherSuiteId = (msg[cipherOffset] << 8) | msg[cipherOffset + 1];
@@ -139,13 +139,13 @@ export class TlsDecoder {
                     try {
                         await this._deriveTls13KeysForDirection(direction, this.keyLog.getSessionKeys(this.clientRandom));
                         this.cryptoState[direction].sequence = 0n;
-                    } catch (e) {}
+                    } catch {}
                 }
             }
         }
     }
 
-    async _deriveKeys(isApplicationPhase = false) {
+    async _deriveKeys(_isApplicationPhase = false) {
         if (!this.clientRandom || !this.cipherSuite || !this.keyLog) return;
         
         const keyMaterial = this.keyLog.getSessionKeys(this.clientRandom);
@@ -158,7 +158,7 @@ export class TlsDecoder {
             } else {
                 await this._deriveTls12Keys(keyMaterial);
             }
-        } catch (e) {
+        } catch {
             // WebCrypto unavailable
         }
     }
@@ -167,8 +167,8 @@ export class TlsDecoder {
         if (!keyMaterial) return;
         const phase = this.cryptoState[dir].phase || 'handshake';
         
-        let clientSecretStr = phase === 'application' ? 'CLIENT_TRAFFIC_SECRET_0' : 'CLIENT_HANDSHAKE_TRAFFIC_SECRET';
-        let serverSecretStr = phase === 'application' ? 'SERVER_TRAFFIC_SECRET_0' : 'SERVER_HANDSHAKE_TRAFFIC_SECRET';
+        const clientSecretStr = phase === 'application' ? 'CLIENT_TRAFFIC_SECRET_0' : 'CLIENT_HANDSHAKE_TRAFFIC_SECRET';
+        const serverSecretStr = phase === 'application' ? 'SERVER_TRAFFIC_SECRET_0' : 'SERVER_HANDSHAKE_TRAFFIC_SECRET';
 
         const secretStr = dir === 0 ? clientSecretStr : serverSecretStr;
         const secret = keyMaterial[secretStr];
@@ -204,8 +204,8 @@ export class TlsDecoder {
         this.cryptoState[0].key = keyBlock.subarray(offset, offset + encLen); offset += encLen;
         this.cryptoState[1].key = keyBlock.subarray(offset, offset + encLen); offset += encLen;
         this.cryptoState[0].iv = keyBlock.subarray(offset, offset + ivLen); offset += ivLen;
-        this.cryptoState[1].iv = keyBlock.subarray(offset, offset + ivLen); offset += ivLen;
-        
+        this.cryptoState[1].iv = keyBlock.subarray(offset, offset + ivLen);
+
         this.cryptoState[0].rawKey = null;
         this.cryptoState[1].rawKey = null;
     }
@@ -321,8 +321,8 @@ export class TlsDecoder {
                 }
             }
             state.sequence++;
-        } catch (e) {
-            state.sequence++; 
+        } catch {
+            state.sequence++;
         }
     }
 }

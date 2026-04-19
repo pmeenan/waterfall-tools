@@ -3,31 +3,6 @@
  * Licensed under the Apache License, Version 2.0.
  * See the LICENSE file for details.
  */
-const concatUint8Arrays = (arrays) => {
-    let totalLen = 0;
-    for (const arr of arrays) totalLen += arr.length;
-    const res = new Uint8Array(totalLen);
-    let offset = 0;
-    for (const arr of arrays) {
-        res.set(arr, offset);
-        offset += arr.length;
-    }
-    return res;
-};
-
-function indexOfSequence(buffer, seq) {
-    if (seq.length === 0) return 0;
-    outer: for (let i = 0; i <= buffer.length - seq.length; i++) {
-        for (let j = 0; j < seq.length; j++) {
-            if (buffer[i + j] !== seq[j]) continue outer;
-        }
-        return i;
-    }
-    return -1;
-}
-
-const CRLF2 = new Uint8Array([13, 10, 13, 10]);
-
 class Http1Parser {
     constructor(chunks) {
         this.chunks = chunks; // Array of { time, bytes }
@@ -122,8 +97,8 @@ class Http1Parser {
     }
 
     // Read exactly n bytes for Content-Length body. Group by chunks
-    _readLengthBody(len) {
-        let extractedChunks = [];
+    _readLengthBody(_len) {
+        const extractedChunks = [];
         while (this.bodyRemaining > 0 && this.chunkIdx < this.chunks.length) {
             const c = this.chunks[this.chunkIdx].bytes;
             const avail = c.length - this.offset;
@@ -155,7 +130,7 @@ class Http1Parser {
         const lines = text.split('\r\n');
         const firstLine = lines.shift() || "";
         
-        let headers = [];
+        const headers = [];
         let isChunked = false;
         let contentLength = -1;
 

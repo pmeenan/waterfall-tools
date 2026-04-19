@@ -19,7 +19,7 @@ describe('WebPageTest JSON Input Processor', () => {
 
         const tool = new WaterfallTools();
         await tool.loadFile(inputPath, { debug: true, format: 'wpt' });
-        let result = tool.getHar({ debug: true });
+        const result = tool.getHar({ debug: true });
 
         // Auto-generate golden reference file if absent
         if (!fs.existsSync(refPath)) {
@@ -49,7 +49,7 @@ describe('WebPageTest JSON Input Processor', () => {
 
         const tool = new WaterfallTools();
         await tool.loadFile(inputPath, { debug: true, format: 'wpt' });
-        let result = tool.getHar({ debug: true });
+        const result = tool.getHar({ debug: true });
 
         if (!fs.existsSync(refPath)) {
             console.log("Generating golden fixture for wpt-cnn.har.json...");

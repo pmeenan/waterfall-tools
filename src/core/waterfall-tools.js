@@ -236,9 +236,9 @@ export class WaterfallTools {
                 }
 
                 // Standard Wait / Receive Phase
-                let reqTimeStartMs = req.time_start;
-                let firstDataMs = req.first_data_time > 0 ? req.first_data_time : req.time_end;
-                let lastDataMs = req.time_end;
+                const reqTimeStartMs = req.time_start;
+                const firstDataMs = req.first_data_time > 0 ? req.first_data_time : req.time_end;
+                const lastDataMs = req.time_end;
 
                 req.timings.wait = Math.max(0, firstDataMs - reqTimeStartMs);
                 req.timings.receive = Math.max(0, lastDataMs - firstDataMs);
@@ -422,7 +422,7 @@ export class WaterfallTools {
      * Compiles standard Extended HAR 1.2 Format strictly derived from internal Relational mapping
      * @param {Object} options 
      */
-    getHar(options = {}) {
+    getHar(_options = {}) {
         const pagesOut = [];
         const entriesOut = [];
 
@@ -461,22 +461,22 @@ export class WaterfallTools {
             if (page.requests) {
                 const reqArray = Object.values(page.requests);
                 const getLoadStartMs = (req) => {
-                    let hasAbsoluteTimings = req._load_start !== undefined || req._dns_start !== undefined || req._ttfb_start !== undefined;
+                    const hasAbsoluteTimings = req._load_start !== undefined || req._dns_start !== undefined || req._ttfb_start !== undefined;
                     
                     if (hasAbsoluteTimings) {
-                        let baseEpoch = globalEarliestMs;
-                        let blockedEnd = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : 0));
+                        const baseEpoch = globalEarliestMs;
+                        const blockedEnd = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : 0));
                         
-                        let dnsStart = (req._dns_start !== undefined && req._dns_start >= 0) ? baseEpoch + req._dns_start : blockedEnd;
-                        let dnsEnd = (req._dns_end !== undefined && req._dns_end >= 0) ? baseEpoch + req._dns_end : dnsStart;
+                        const dnsStart = (req._dns_start !== undefined && req._dns_start >= 0) ? baseEpoch + req._dns_start : blockedEnd;
+                        const dnsEnd = (req._dns_end !== undefined && req._dns_end >= 0) ? baseEpoch + req._dns_end : dnsStart;
                         
-                        let connectStart = (req._connect_start !== undefined && req._connect_start >= 0) ? baseEpoch + req._connect_start : dnsEnd;
-                        let connectEnd = (req._connect_end !== undefined && req._connect_end >= 0) ? baseEpoch + req._connect_end : connectStart;
+                        const connectStart = (req._connect_start !== undefined && req._connect_start >= 0) ? baseEpoch + req._connect_start : dnsEnd;
+                        const connectEnd = (req._connect_end !== undefined && req._connect_end >= 0) ? baseEpoch + req._connect_end : connectStart;
                         
-                        let sslStart = (req._ssl_start !== undefined && req._ssl_start >= 0) ? baseEpoch + req._ssl_start : connectEnd;
-                        let sslEnd = (req._ssl_end !== undefined && req._ssl_end >= 0) ? baseEpoch + req._ssl_end : sslStart;
+                        const sslStart = (req._ssl_start !== undefined && req._ssl_start >= 0) ? baseEpoch + req._ssl_start : connectEnd;
+                        const sslEnd = (req._ssl_end !== undefined && req._ssl_end >= 0) ? baseEpoch + req._ssl_end : sslStart;
                         
-                        let requestStart = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : (sslEnd - baseEpoch)));
+                        const requestStart = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : (sslEnd - baseEpoch)));
 
                         return Math.max(requestStart, connectEnd);
                     }

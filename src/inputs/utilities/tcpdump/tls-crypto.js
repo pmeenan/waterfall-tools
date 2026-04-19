@@ -24,7 +24,7 @@ function concatUint8Arrays(arrays) {
     const len = arrays.reduce((acc, a) => acc + a.length, 0);
     const result = new Uint8Array(len);
     let offset = 0;
-    for (let a of arrays) {
+    for (const a of arrays) {
         result.set(a, offset);
         offset += a.length;
     }

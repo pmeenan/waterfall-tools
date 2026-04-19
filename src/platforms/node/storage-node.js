@@ -63,7 +63,7 @@ export class NativeStorage {
         }
         try {
             await fsp.unlink(this.filePath);
-        } catch (e) {}
+        } catch {}
     }
 
     static async cleanupOrphans() {}

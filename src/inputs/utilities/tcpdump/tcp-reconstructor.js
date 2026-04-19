@@ -28,7 +28,7 @@ export class TcpFlow {
 
         const payloadLength = payload ? payload.length : 0;
         
-        let frameRecord = {
+        const frameRecord = {
             time: packet.time,
             seq: seq,
             length: payloadLength,
@@ -215,16 +215,13 @@ export class TcpReconstructor {
         const ipB = packet.ip.dstIP;
         const portB = packet.transport.dstPort;
 
-        let connectionKey = '';
-        let isClient = false;
+        let connectionKey;
 
         // Ensure a deterministic string representation for the 4-tuple.
         if (ipA < ipB || (ipA === ipB && portA < portB)) {
             connectionKey = `${ipA}:${portA}-${ipB}:${portB}`;
-            isClient = true; // The sender is A
         } else {
             connectionKey = `${ipB}:${portB}-${ipA}:${portA}`;
-            isClient = false; // The sender is B
         }
 
         let connection = this.connections.get(connectionKey);

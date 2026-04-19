@@ -77,7 +77,7 @@ export class PcapParser {
                 offset += 16;
                 const packetData = this.buffer.subarray(offset, offset + inclLen);
                 
-                let tsUsec = this.nanoSecs ? Math.floor(tsUsecOrNsec / 1000) : tsUsecOrNsec;
+                const tsUsec = this.nanoSecs ? Math.floor(tsUsecOrNsec / 1000) : tsUsecOrNsec;
                 this._processPacketData(packetData, tsSec, tsUsec, origLen, this.linkType);
                 
                 offset += inclLen;
@@ -114,7 +114,7 @@ export class PcapParser {
                     const tsUsec = Number(tsBig % 1000000n);
 
                     // TODO: Map to actual Interface via IDB list (defaulting to Ethernet 1)
-                    let pcapngLinkType = this.interfaces[interfaceId] || 1; 
+                    const pcapngLinkType = this.interfaces[interfaceId] || 1; 
 
                     this._processPacketData(packetData, tsSec, tsUsec, origLen, pcapngLinkType);
                 } else if (blockType === 0x00000001) { // Interface Description Block (IDB)
@@ -136,9 +136,9 @@ export class PcapParser {
         if (buffer.length === 0) return;
         
         const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-        let pOffset = 0;
+        let pOffset;
 
-        let ethResult = {};
+        const ethResult = {};
 
         // Parse Hardware Link Layer
         if (linkType === 1) { // Ethernet II
@@ -264,7 +264,7 @@ export class PcapParser {
     }
 
     _ipv6(buf) {
-        let parts = [];
+        const parts = [];
         for (let i = 0; i < 16; i += 2) {
             parts.push(((buf[i] << 8) | buf[i+1]).toString(16));
         }

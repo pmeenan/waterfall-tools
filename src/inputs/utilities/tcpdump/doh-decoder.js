@@ -61,7 +61,7 @@ function processHttp1(httpData, dnsRegistry) {
             if (dnsMatch && dnsMatch[1]) {
                 try {
                     dnsQueryPayload = decodeBase64Url(dnsMatch[1]);
-                } catch(e) { /* malformed base64 ignore */ }
+                } catch { /* malformed base64 ignore */ }
             }
         } else if (req.firstLine.startsWith('POST ') && req.headers) {
             const reqCt = req.headers.find(h => h.name.toLowerCase() === 'content-type');
@@ -101,7 +101,7 @@ function processHttp1(httpData, dnsRegistry) {
 }
 
 function processHttp2(http2Data, dnsRegistry) {
-    for (const [streamId, stream] of http2Data.streams.entries()) {
+    for (const stream of http2Data.streams.values()) {
         const clientHeaders = stream.headers.client || [];
         const serverHeaders = stream.headers.server || [];
         
@@ -117,7 +117,7 @@ function processHttp2(http2Data, dnsRegistry) {
             if (dnsMatch && dnsMatch[1]) {
                 try {
                     dnsQueryPayload = decodeBase64Url(dnsMatch[1]);
-                } catch(e) {}
+                } catch {}
             }
         } else if (method === 'POST' && reqCt && reqCt.includes('application/dns-message')) {
             dnsQueryPayload = concatUint8Arrays(stream.data.client.map(c => c.bytes));

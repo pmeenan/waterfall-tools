@@ -75,7 +75,7 @@ export class NativeStorage {
                         if (lock) {
                             try {
                                 await dirHandle.removeEntry(name);
-                            } catch (e) {}
+                            } catch {}
                         }
                     });
                 }

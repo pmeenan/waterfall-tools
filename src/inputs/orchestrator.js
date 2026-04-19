@@ -31,7 +31,7 @@ export const parsers = {
             return await module.processTcpdumpNode(input, options);
         } catch (e) {
             console.warn('TCPDump parser not included or failed to dynamically load:', e);
-            throw new Error('TCPDump decoding support is missing or not packaged in this build.');
+            throw new Error('TCPDump decoding support is missing or not packaged in this build.', { cause: e });
         }
     },
     'wptagent': processWptagentZip
@@ -163,15 +163,10 @@ export async function identifyFormat(filePath, options = {}) {
 
     // Read up to 64KB for format sniffing using a Uint8Array (not Node Buffer)
     const sniffBuf = new Uint8Array(65536);
-    let fd, bytesRead;
-    try {
-        fd = fs.openSync(filePath, 'r');
-        // fs.readSync accepts Uint8Array natively in modern Node
-        bytesRead = fs.readSync(fd, sniffBuf, 0, 65536, 0);
-        fs.closeSync(fd);
-    } catch (e) {
-        throw e;
-    }
+    const fd = fs.openSync(filePath, 'r');
+    // fs.readSync accepts Uint8Array natively in modern Node
+    const bytesRead = fs.readSync(fd, sniffBuf, 0, 65536, 0);
+    fs.closeSync(fd);
 
     const buf = sniffBuf.subarray(0, bytesRead);
     const result = await identifyFormatFromBuffer(buf, options);
@@ -185,35 +180,33 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
 
     let textBuf = buf;
     if (isGz) {
-        textBuf = await new Promise(async (resolve) => {
-            try {
-                const ds = new DecompressionStream('gzip');
-                const writer = ds.writable.getWriter();
-                writer.write(buf.subarray(0, Math.min(buf.length, 65536))).catch(() => {});
-                writer.close().catch(() => {});
+        try {
+            const ds = new DecompressionStream('gzip');
+            const writer = ds.writable.getWriter();
+            writer.write(buf.subarray(0, Math.min(buf.length, 65536))).catch(() => {});
+            writer.close().catch(() => {});
 
-                const reader = ds.readable.getReader();
-                const chunks = [];
-                let totalLen = 0;
+            const reader = ds.readable.getReader();
+            const chunks = [];
+            let totalLen = 0;
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const chunk = new Uint8Array(value);
-                    chunks.push(chunk);
-                    totalLen += chunk.length;
-                    if (totalLen >= 65536) {
-                        try { await reader.cancel(); } catch (e) {}
-                        break;
-                    }
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = new Uint8Array(value);
+                chunks.push(chunk);
+                totalLen += chunk.length;
+                if (totalLen >= 65536) {
+                    try { await reader.cancel(); } catch {}
+                    break;
                 }
-                const sniffed = concatUint8Arrays(chunks);
-                resolve(sniffed.length > 0 ? sniffed : buf);
-            } catch (err) {
-                // Return gracefully if stream aborts randomly
-                resolve(buf);
             }
-        });
+            const sniffed = concatUint8Arrays(chunks);
+            textBuf = sniffed.length > 0 ? sniffed : buf;
+        } catch {
+            // Return gracefully if stream aborts randomly
+            textBuf = buf;
+        }
     }
 
     // Check for ZIP magic bytes (PK\x03\x04). Require at least one
@@ -241,9 +234,9 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
     if (textBuf.length >= 4 && textBuf[0] === 0x0a) {
         // Tag 0x0a is Field 1 (TracePacket), WireType 2 (length-delimited).
         // Let's decode the length varint.
-        let len = 0; let shift = 0; let o = 1; let valid = true;
+        let len = 0; let shift = 0; let o = 1;
         while(o < textBuf.length && o < 5) {
-            let b = textBuf[o++];
+            const b = textBuf[o++];
             len |= (b & 0x7f) << shift;
             shift += 7;
             if (!(b & 0x80)) break;

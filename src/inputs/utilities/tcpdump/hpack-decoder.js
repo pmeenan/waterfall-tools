@@ -228,7 +228,7 @@ function readString(buffer, offset) {
     if (isHuffman) {
         try {
             str = decodeHuffman(raw);
-        } catch (e) {
+        } catch {
             // Graceful fallback for malformed Huffman data
             str = new TextDecoder('utf-8', { fatal: false }).decode(raw);
         }

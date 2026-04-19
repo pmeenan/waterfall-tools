@@ -19,7 +19,7 @@ export function sniffMimeType(bodyText, encoding) {
         // Decode a small portion — 1024 base64 chars yields ~768 decoded bytes
         try {
             sample = atob(bodyText.substring(0, 1024));
-        } catch (e) {
+        } catch {
             return '';
         }
     } else {
@@ -88,7 +88,7 @@ export function sniffMimeType(bodyText, encoding) {
         return 'text/css';
     }
     // CSS selector patterns followed by property declarations — e.g. "body { margin: 0 }"
-    if (/^[a-z*#.:\[_][^{]*\{[^}]*[;:]/i.test(trimmed)) {
+    if (/^[a-z*#.:[_][^{]*\{[^}]*[;:]/i.test(trimmed)) {
         if (/\b(display|margin|padding|color|background|font-|border|width|height|position|overflow|text-align|flex|grid)\s*:/i.test(trimmed)) {
             return 'text/css';
         }
@@ -217,8 +217,8 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
             if (entry.timings && entry.timings.connect > 0 || (entry._connectTimeMs > 0 && entry._connectEndTimeMs > 0)) {
                 if (!connId) connId = `conn_${reqId}`;
                 
-                let connectStart = entry._connectTimeMs > 0 ? entry._connectTimeMs : timeMs + Math.max(0, entry.timings.dns);
-                let connectEnd = entry._connectEndTimeMs > 0 ? entry._connectEndTimeMs : connectStart + entry.timings.connect;
+                const connectStart = entry._connectTimeMs > 0 ? entry._connectTimeMs : timeMs + Math.max(0, entry.timings.dns);
+                const connectEnd = entry._connectEndTimeMs > 0 ? entry._connectEndTimeMs : connectStart + entry.timings.connect;
                 
                 let sslStart = null;
                 if (entry._sslStartTimeMs > 0) sslStart = entry._sslStartTimeMs;
@@ -226,13 +226,13 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
 
                 if (connectStart > 0 && connectStart < globalEarliestMs) globalEarliestMs = connectStart;
 
-                let isUdp = entry._protocol === 'QUIC' || entry._protocol === 'HTTP/3';
+                const isUdp = entry._protocol === 'QUIC' || entry._protocol === 'HTTP/3';
 
                 let serverPort = 80;
                 try {
                     const parsedUrl = new URL(entry.request.url);
                     serverPort = parsedUrl.port ? parseInt(parsedUrl.port) : (parsedUrl.protocol === 'https:' ? 443 : 80);
-                } catch(e) {}
+                } catch {}
 
                 if (!isUdp && !data.tcp_connections[connId]) {
                     data.tcp_connections[connId] = {
@@ -257,10 +257,10 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
                 }
             }
             
-            let firstDataTimeMs = entry._firstDataTimeMs > 0 ? entry._firstDataTimeMs : (timeMs + Math.max(0, entry.timings.blocked || 0) + Math.max(0, entry.timings.dns || 0) + Math.max(0, entry.timings.connect || 0) + Math.max(0, entry.timings.send || 0) + Math.max(0, entry.timings.wait || 0));
-            let lastDataTimeMs = entry._lastDataTimeMs > 0 ? entry._lastDataTimeMs : firstDataTimeMs + Math.max(0, entry.timings.receive || 0);
+            const firstDataTimeMs = entry._firstDataTimeMs > 0 ? entry._firstDataTimeMs : (timeMs + Math.max(0, entry.timings.blocked || 0) + Math.max(0, entry.timings.dns || 0) + Math.max(0, entry.timings.connect || 0) + Math.max(0, entry.timings.send || 0) + Math.max(0, entry.timings.wait || 0));
+            const lastDataTimeMs = entry._lastDataTimeMs > 0 ? entry._lastDataTimeMs : firstDataTimeMs + Math.max(0, entry.timings.receive || 0);
 
-            let bytesIn = entry._bytesIn !== undefined ? entry._bytesIn : (entry.response && entry.response.content ? entry.response.content.size : 0);
+            const bytesIn = entry._bytesIn !== undefined ? entry._bytesIn : (entry.response && entry.response.content ? entry.response.content.size : 0);
             
             data.pages[pageId].requests[reqId] = {
                 url: entry.request ? entry.request.url : '',

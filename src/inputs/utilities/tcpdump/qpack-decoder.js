@@ -133,7 +133,7 @@ for (let i = 0; i < ENCODE_TABLE.length; i++) {
 
 function decodeHuffman(buffer) {
     let node = huffRoot;
-    let decoded = [];
+    const decoded = [];
     for (let i = 0; i < buffer.length; i++) {
         const b = buffer[i];
         for (let bit = 7; bit >= 0; bit--) {
@@ -196,8 +196,8 @@ export class QpackDecoder {
         if (isHuffman) {
             try {
                 stringVal = decodeHuffman(stringBuffer);
-            } catch (e) {
-                // Graceful fallback for malformed decoding strings 
+            } catch {
+                // Graceful fallback for malformed decoding strings
                 const decoder = new TextDecoder('utf8');
                 stringVal = decoder.decode(stringBuffer);
             }

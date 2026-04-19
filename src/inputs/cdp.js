@@ -56,12 +56,12 @@ class DevToolsParser {
 
     extract_net_requests(raw_events) {
         let has_request_headers = false;
-        let net_requests = [];
-        let page_data = { endTime: 0 };
+        const net_requests = [];
+        const page_data = { endTime: 0 };
         let first_timestamp = null;
-        let raw_requests = {};
-        let extra_headers = {};
-        let id_map = {};
+        const raw_requests = {};
+        const extra_headers = {};
+        const id_map = {};
 
         // To match Python script exactly, events are processed in order
         for (const raw_event of raw_events) {
@@ -725,15 +725,10 @@ export async function processCDPFileNode(input, options = {}) {
             const fs = await import(/* @vite-ignore */ 'node:fs');
             
             const header = new Uint8Array(2);
-            let fd;
-            try {
-                fd = fs.openSync(input, 'r');
-                fs.readSync(fd, header, 0, 2, 0);
-                fs.closeSync(fd);
-            } catch (e) {
-                throw e;
-            }
-            
+            const fd = fs.openSync(input, 'r');
+            fs.readSync(fd, header, 0, 2, 0);
+            fs.closeSync(fd);
+
             isGz = header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b;
             
             const { Readable } = await import(/* @vite-ignore */ 'node:stream');
@@ -806,10 +801,8 @@ export async function processCDPFileNode(input, options = {}) {
         
         return relational;
 
-    } catch (e) {
-        throw e;
     } finally {
-        if (reader) try { reader.releaseLock(); } catch (e) {}
+        if (reader) try { reader.releaseLock(); } catch {}
         if (keepAlive) globalThis.clearInterval(keepAlive);
         if (nodeFsStream) nodeFsStream.destroy();
     }

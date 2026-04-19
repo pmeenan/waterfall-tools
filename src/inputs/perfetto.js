@@ -18,13 +18,9 @@ export async function processPerfettoFileNode(input, options = {}) {
     if (typeof input === 'string') {
         const fs = await import(/* @vite-ignore */ 'node:fs');
         const header = new Uint8Array(2);
-        try {
-            const fd = fs.openSync(input, 'r');
-            fs.readSync(fd, header, 0, 2, 0);
-            fs.closeSync(fd);
-        } catch (e) {
-            throw e;
-        }
+        const fd = fs.openSync(input, 'r');
+        fs.readSync(fd, header, 0, 2, 0);
+        fs.closeSync(fd);
 
         isGz = header.length >= 2 && header[0] === 0x1f && header[1] === 0x8b;
         
