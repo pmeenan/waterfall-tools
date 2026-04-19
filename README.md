@@ -14,11 +14,19 @@ Waterfall Tools is a fast, zero-bloat library for parsing, analyzing, and visual
 
 For the design, module layout, and conventions, see [Docs/Architecture.md](Docs/Architecture.md).
 
-## Installation (coming soon)
+## Installation
 
 ```bash
 npm install waterfall-tools
 ```
+
+To host the bundled viewer (see [Hosting the viewer](#hosting-the-viewer)) also install the Chrome DevTools frontend as a peer dependency:
+
+```bash
+npm install waterfall-tools @chrome-devtools/index
+```
+
+The DevTools bundle is ~80 MB of prebuilt third-party code kept out of the waterfall-tools tarball on purpose — CLI-only and library-only users don't download it. The peer dependency is declared optional, so `npm install waterfall-tools` alone completes without errors or warnings.
 
 ## API usage
 
@@ -150,6 +158,19 @@ await wt.renderTo(document.getElementById('waterfall-container'), options);
 
 `renderTo(container, options)` is the supported embedding API; it replaces the earlier `div-embed.js` bootstrap. Pass a container and your options (including interaction callbacks) and drop the waterfall into any page.
 
+## Hosting the viewer
+
+A one-shot command materializes the viewer into a directory of your choice (typically your project's static web root):
+
+```bash
+npm install waterfall-tools @chrome-devtools/index
+npx waterfall-tools install-viewer ./public/waterfall
+```
+
+This copies the viewer's static assets out of `node_modules/waterfall-tools/dist/browser/` into the target directory, then copies `node_modules/@chrome-devtools/index/` into `./public/waterfall/devtools-<version>/`, patches the DevTools bundle for browser hosting, and rewrites the viewer's `<meta name="waterfall-devtools-path">` to point at the versioned directory. Serve the target directory with any static file server.
+
+Re-running the command updates the viewer in place and removes any stale `devtools-<prev-version>/` directories left over from earlier installs.
+
 ## Standalone viewer
 
 The library ships with a pre-built standalone viewer — deployable as a static page, embeddable in an iframe, or usable as a full-page tool without writing your own UI.
@@ -255,4 +276,4 @@ Every pull request to `main` triggers `.github/workflows/ci.yml`, which installs
 
 ## License
 
-Apache 2.0. The dependency tree is deliberately free of GPL-licensed code.
+Apache 2.0 — full text in [LICENSE](LICENSE). The dependency tree is deliberately free of GPL-licensed code.

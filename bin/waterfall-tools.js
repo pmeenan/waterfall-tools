@@ -7,19 +7,31 @@
 
 /**
  * Waterfall Tools Root CLI Wrapper
- * Usage: waterfall-tools <input-file> [output-file] [--keylog <keylog-file>] [--debug]
+ * Usage:
+ *   waterfall-tools <input-file> [output-file] [--keylog <keylog-file>] [--debug]
+ *   waterfall-tools install-viewer <target-dir>
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { WaterfallTools } from '../src/core/waterfall-tools.js';
+import { WaterfallTools } from '../dist/node/waterfall-tools.es.js';
 
 async function main() {
     const args = process.argv.slice(2);
-    
+
     if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
-        console.error('Usage: waterfall-tools <input-file> [output-file] [--keylog <keylog-file>] [--debug]');
+        console.error(
+            'Usage:\n' +
+            '  waterfall-tools <input-file> [output-file] [--keylog <keylog-file>] [--debug]\n' +
+            '  waterfall-tools install-viewer <target-dir>'
+        );
         process.exit(1);
+    }
+
+    if (args[0] === 'install-viewer') {
+        const { runInstallViewer } = await import('./install-viewer.js');
+        await runInstallViewer(args.slice(1));
+        return;
     }
     
     const inputFile = args[0];
