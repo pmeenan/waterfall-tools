@@ -129,6 +129,8 @@ Every input format processor ships with a standalone CLI wrapper under `src/inpu
 
 Tests (vitest) parse sample inputs and assert strict equality against committed golden Extended HAR fixtures. Large-object comparisons are routed through `JSON.parse(JSON.stringify(...))` before assertion to avoid `undefined`-vs-missing hangs; dynamically-generated fields (like fallback `startedDateTime` values derived from `Date.now()`) are scrubbed from both sides before comparison.
 
+Pull requests targeting `main` trigger `.github/workflows/ci.yml`, which runs `npm ci`, `npm run lint`, and `npm run build` on Node 22. Lint is a hard gate (`--max-warnings 0`), and the production build must succeed — either failing blocks the merge.
+
 ## Extended HAR
 
 Standard HAR 1.2 as the baseline. Anything that doesn't fit the 1.2 schema — custom data from Chrome Traces, WPT payloads, PCAP decryption — lives in fields prefixed with an underscore, per HAR's own extension convention.

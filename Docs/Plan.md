@@ -222,3 +222,4 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Implement `src/outputs/image.js` to digest render data straight into raw image buffer sets / Base64 serialization outputs snapshotting views.
 - [x] Restructure and optimize Vite build pipeline statically generating exactly three decoupled bundle artifacts resolving fragment bounds inherently natively.
 - [x] Integrate Touch Events and native Responsive layout mappings structurally accommodating mobile targets logically.
+- [x] CI gate for pull requests: `.github/workflows/ci.yml` runs `npm ci`, `npm run lint`, and `npm run build` on Node 22 for every PR targeting `main`, so new lint warnings or build failures block the merge.

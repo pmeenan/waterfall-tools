@@ -249,6 +249,10 @@ npm run dev:demo     # dev server with HMR
 npm run build:demo   # bundled demo output under bin/demo/
 ```
 
+### Continuous integration
+
+Every pull request to `main` triggers `.github/workflows/ci.yml`, which installs dependencies with `npm ci` and then runs `npm run lint` and `npm run build` on Node 22. Lint warnings and build failures block the PR.
+
 ## License
 
 Apache 2.0. The dependency tree is deliberately free of GPL-licensed code.
