@@ -9,6 +9,112 @@
  * standard Chrome Trace format JSON payloads on the fly natively.
  */
 
+// DevTools' trace handlers dispatch on event.name only and then dereference nested
+// args paths without null-checking. Any event matching one of these names whose
+// payload doesn't carry the listed path crashes the entire trace import with
+// "Cannot read properties of undefined". The structured args usually live in
+// Chrome-specific TrackEvent proto extensions (field numbers ≥ 9000 on the
+// TrackEvent message itself, not in debug_annotations) — we don't decode those
+// because each one needs its proto schema. Drop the events instead so the rest
+// of the trace loads.
+const DEVTOOLS_REQUIRED_ARG_PATHS = [
+    // NetworkRequestsHandler — handler dereferences event.args.data.requestId on:
+    { name: 'ResourceSendRequest', path: ['data', 'requestId'] },
+    { name: 'ResourceWillSendRequest', path: ['data', 'requestId'] },
+    { name: 'ResourceReceiveResponse', path: ['data', 'requestId'] },
+    { name: 'ResourceReceivedData', path: ['data', 'requestId'] },
+    { name: 'ResourceFinish', path: ['data', 'requestId'] },
+    { name: 'ResourceMarkAsCached', path: ['data', 'requestId'] },
+    { name: 'ResourceChangePriority', path: ['data', 'requestId'] },
+    { name: 'PreloadRenderBlockingStatusChange', path: ['data', 'requestId'] },
+    // MetaHandler.ts — event.args.render_frame_host.frame_type. Decoded as a typed
+    // TrackEvent extension at field 1028 (see TRACK_EVENT_EXTENSION_SCHEMAS). Kept
+    // in this list as a safety net: if the extension was somehow absent, drop the
+    // event so DevTools doesn't crash dereferencing the missing field.
+    { name: 'RenderFrameHostImpl::DidCommitSameDocumentNavigation', path: ['render_frame_host', 'frame_type'] },
+    // MetaHandler / PageLoadMetricsHandler — event.args.context.performanceTimelineNavigationId
+    { name: 'SoftNavigationStart', path: ['context', 'performanceTimelineNavigationId'] },
+    // PageLoadMetricsHandler — event.args.args.total_blocking_time_ms (on InteractiveTime)
+    { name: 'InteractiveTime', path: ['args', 'total_blocking_time_ms'] },
+];
+const DEVTOOLS_FRAGILE_NAMES = new Set(DEVTOOLS_REQUIRED_ARG_PATHS.map(r => r.name));
+const DEVTOOLS_REQUIRED_ARG_PATH_BY_NAME = new Map(
+    DEVTOOLS_REQUIRED_ARG_PATHS.map(r => [r.name, r.path])
+);
+
+// ChromeTrackEvent proto-extension schemas (Chromium base/tracing/protos/chrome_track_event.proto).
+// Chrome attaches typed structured args to TrackEvent via proto extensions in the 1xxx
+// field-number range. These are NOT debug_annotations and don't go through the generic
+// debug-annotation path — they're top-level fields on TrackEvent that we'd skip blindly
+// without a schema. Hardcoding the schema lets us emit Chrome's expected shape (frame_type
+// as a string enum, nested process/site_instance/render_frame_host_id, etc.) so DevTools'
+// MetaHandler can populate finalDisplayUrlByNavigationId properly instead of crashing.
+//
+// Schema shape (per field): { name: '<output-key>', type: 'message'|'string'|'uint'|'int'|'bool'|'enum',
+//                              schema: <nested schema for messages>, enum: <number→string for enums> }
+// Field 99 (debug_annotations) on each message is intentionally omitted — it would require
+// the seqDebugNames context and isn't in DevTools' check path.
+const FRAME_TYPE_ENUM = { 0: 'UNSPECIFIED_FRAME_TYPE', 1: 'SUBFRAME', 2: 'PRIMARY_MAIN_FRAME', 3: 'PRERENDER_MAIN_FRAME', 4: 'FENCED_FRAME_ROOT' };
+const LIFECYCLE_STATE_ENUM = { 0: 'UNSPECIFIED', 1: 'SPECULATIVE', 2: 'PENDING_COMMIT', 3: 'PRERENDERING', 4: 'ACTIVE', 5: 'IN_BACK_FORWARD_CACHE', 6: 'RUNNING_UNLOAD_HANDLERS', 7: 'READY_TO_BE_DELETED' };
+const SITE_INSTANCE_PROCESS_ASSIGNMENT_ENUM = { 0: 'UNKNOWN', 1: 'REUSED_EXISTING_PROCESS', 2: 'USED_SPARE_PROCESS', 3: 'CREATED_NEW_PROCESS' };
+
+const SCHEMA_BROWSER_CONTEXT = {
+    2: { name: 'id', type: 'string' },
+};
+const SCHEMA_RENDER_PROCESS_HOST = {
+    1: { name: 'id', type: 'uint' },
+    2: { name: 'process_lock', type: 'string' },
+    3: { name: 'child_process_id', type: 'int' },
+    4: { name: 'browser_context', type: 'message', schema: SCHEMA_BROWSER_CONTEXT },
+};
+const SCHEMA_GLOBAL_RFH_ID = {
+    1: { name: 'routing_id', type: 'int' },
+    2: { name: 'process_id', type: 'int' },
+};
+const SCHEMA_SITE_INSTANCE_GROUP = {
+    1: { name: 'site_instance_group_id', type: 'int' },
+    2: { name: 'active_frame_count', type: 'int' },
+    3: { name: 'process', type: 'message', schema: SCHEMA_RENDER_PROCESS_HOST },
+};
+const SCHEMA_SITE_INSTANCE = {
+    1: { name: 'site_instance_id', type: 'int' },
+    2: { name: 'browsing_instance_id', type: 'int' },
+    3: { name: 'is_default', type: 'bool' },
+    4: { name: 'has_process', type: 'bool' },
+    5: { name: 'related_active_contents_count', type: 'int' },
+    6: { name: 'active_rfh_count', type: 'int' },
+    7: { name: 'site_instance_group', type: 'message', schema: SCHEMA_SITE_INSTANCE_GROUP },
+    8: { name: 'process_assignment', type: 'enum', enum: SITE_INSTANCE_PROCESS_ASSIGNMENT_ENUM },
+};
+const SCHEMA_BROWSING_CONTEXT_STATE = {
+    1: { name: 'browsing_instance_id', type: 'int' },
+    3: { name: 'coop_related_group_token', type: 'string' },
+};
+// RenderFrameHost is recursive (parent / outer_document / embedder fields). Defined as
+// a `let` placeholder so child schemas can reference it before its full body is built.
+const SCHEMA_RENDER_FRAME_HOST = {
+    1: { name: 'process', type: 'message', schema: SCHEMA_RENDER_PROCESS_HOST },
+    2: { name: 'render_frame_host_id', type: 'message', schema: SCHEMA_GLOBAL_RFH_ID },
+    3: { name: 'lifecycle_state', type: 'enum', enum: LIFECYCLE_STATE_ENUM },
+    4: { name: 'origin', type: 'string' },
+    5: { name: 'url', type: 'string' },
+    6: { name: 'frame_tree_node_id', type: 'uint' },
+    7: { name: 'site_instance', type: 'message', schema: SCHEMA_SITE_INSTANCE },
+    // 8/9/10 are recursive RenderFrameHost — wired below after the schema object exists.
+    11: { name: 'browsing_context_state', type: 'message', schema: SCHEMA_BROWSING_CONTEXT_STATE },
+    12: { name: 'frame_type', type: 'enum', enum: FRAME_TYPE_ENUM },
+};
+SCHEMA_RENDER_FRAME_HOST[8]  = { name: 'parent', type: 'message', schema: SCHEMA_RENDER_FRAME_HOST };
+SCHEMA_RENDER_FRAME_HOST[9]  = { name: 'outer_document', type: 'message', schema: SCHEMA_RENDER_FRAME_HOST };
+SCHEMA_RENDER_FRAME_HOST[10] = { name: 'embedder', type: 'message', schema: SCHEMA_RENDER_FRAME_HOST };
+
+// TrackEvent extension field number → { name: <args-key>, schema: <RenderFrameHost-style schema> }
+// Chromium reserves 1xxx for chrome extensions; we only map the ones DevTools actually reads.
+// Add more here as new "Cannot read properties of undefined" crashes surface.
+const TRACK_EVENT_EXTENSION_SCHEMAS = {
+    1028: { name: 'render_frame_host', schema: SCHEMA_RENDER_FRAME_HOST },
+};
+
 // A fast BigInt Varint decoder reading continuously from a Uint8Array.
 // Returns an array [value (BigInt), bytesRead (Number)] or null if buffer ends prematurely.
 function readVarint(buf, offset) {
@@ -37,10 +143,33 @@ export class PerfettoDecoder {
         this.debugNames = new Map();
         this.tracks = new Map(); // uuid -> {pid, tid, name}
         this.seqTimestamps = new Map();
-        
+        // Per-sequence default track_uuid from TracePacketDefaults.track_event_defaults.
+        // TrackEvents typically omit track_uuid and inherit this default — without it,
+        // every event collapses to pid:0/tid:0 and downstream B/E pairing in Chrome
+        // trace consumers (DevTools' TimelineModel) implodes since unrelated threads
+        // pile onto the same stack.
+        this.seqDefaultTracks = new Map();
+        // Per-track B-event stacks. Perfetto's TYPE_SLICE_END events deliberately
+        // omit name/categories (redundant with the matching B), but Chrome trace
+        // JSON consumers like DevTools' RendererHandler.makeCompleteEvent reject
+        // any E whose name/cat doesn't match the popped B verbatim — logging
+        // "Begin/End events mismatch" hundreds of times. We push on B, pop on E,
+        // and propagate name+cat onto E events that arrived empty.
+        this.trackStacks = new Map();
+
         this.leftover = null;
         this.firstEvent = true;
         this.debug = options.debug;
+        // emitCompleteEvents: buffer Begins per-track and emit a single Complete (X)
+        // event per matched pair on End. Required for DevTools' Performance panel —
+        // its RendererHandler.makeCompleteEvent uses ONE global B/E stack across all
+        // threads, so any cross-thread B/E pair that overlaps in ts order produces a
+        // mismatch (DevTools dies with "Cannot read properties of null reading
+        // requestId" when the resulting tree is malformed). X events bypass that
+        // stack entirely and carry their own dur. Default off — the existing
+        // chrome-trace.js consumer relies on the B/E parent-child stack semantics
+        // for slice CPU aggregation, so we only opt-in for the DevTools path.
+        this.emitCompleteEvents = options.emitCompleteEvents === true;
         
         // Emulated JSON payload stream
         let controllerRef = null;
@@ -151,6 +280,7 @@ export class PerfettoDecoder {
                     this.categories.set(seqId, new Map());
                     this.debugNames.set(seqId, new Map());
                     this.seqTimestamps.set(seqId, 0);
+                    this.seqDefaultTracks.delete(seqId);
                 }
             } else if (fR === 13 && wR === 0) { // sequence_flags
                 const flR = readVarint(data, peekO);
@@ -159,6 +289,7 @@ export class PerfettoDecoder {
                     this.categories.set(seqId, new Map());
                     this.debugNames.set(seqId, new Map());
                     this.seqTimestamps.set(seqId, 0);
+                    this.seqDefaultTracks.delete(seqId);
                 }
             } else if (fR === 8 && wR === 0) { // timestamp
                 const tR = readVarint(data, peekO);
@@ -195,6 +326,11 @@ export class PerfettoDecoder {
                 peekO += tdLenR[1];
                 this._parseTrackDescriptor(data, peekO, Number(tdLenR[0]), seqNames);
                 peekO += Number(tdLenR[0]);
+            } else if (fR === 59 && wR === 2) { // trace_packet_defaults
+                const dLenR = readVarint(data, peekO);
+                peekO += dLenR[1];
+                this._parseTracePacketDefaults(data, peekO, Number(dLenR[0]), seqId);
+                peekO += Number(dLenR[0]);
             } else {
                 peekO += this._skip(data, peekO, wR);
             }
@@ -267,20 +403,54 @@ export class PerfettoDecoder {
         }
     }
     
-    _parseTrackDescriptor(data, startOffset, len, seqNames) {
+    // TracePacket field 59 → TracePacketDefaults. The only field we care about is
+    // track_event_defaults.track_uuid (field 11 inside field 11), which sets the
+    // implicit track that every TrackEvent on this sequence inherits when it omits
+    // its own track_uuid — Chromium emits it on the first packet after each
+    // incremental_state_cleared boundary.
+    _parseTracePacketDefaults(data, startOffset, len, seqId) {
         const endOffset = startOffset + len;
         let o = startOffset;
-        
-        let uuid = 0n;
-        let pid = 0;
-        let tid = 0;
-        let trackName = '';
-        
         while (o < endOffset) {
             const vR = readVarint(data, o); o += vR[1];
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
-            
+            if (field === 11 && wire === 2) { // track_event_defaults
+                const tedLenR = readVarint(data, o); o += tedLenR[1];
+                const tedEnd = o + Number(tedLenR[0]);
+                while (o < tedEnd) {
+                    const tV = readVarint(data, o); o += tV[1];
+                    const tw = Number(tV[0] & 7n);
+                    const tf = Number(tV[0] >> 3n);
+                    if (tf === 11 && tw === 0) { // track_uuid
+                        const uV = readVarint(data, o); o += uV[1];
+                        this.seqDefaultTracks.set(seqId, uV[0]);
+                    } else {
+                        o += this._skip(data, o, tw);
+                    }
+                }
+            } else {
+                o += this._skip(data, o, wire);
+            }
+        }
+    }
+
+    _parseTrackDescriptor(data, startOffset, len, seqNames) {
+        const endOffset = startOffset + len;
+        let o = startOffset;
+
+        let uuid = 0n;
+        let pid = 0;
+        let tid = 0;
+        let trackName = '';
+        let hasThread = false;     // descriptor explicitly named a thread (pid+tid)
+        let parentUuid = 0n;       // for async/named tracks that delegate pid resolution upward
+
+        while (o < endOffset) {
+            const vR = readVarint(data, o); o += vR[1];
+            const wire = Number(vR[0] & 7n);
+            const field = Number(vR[0] >> 3n);
+
             if (field === 1 && wire === 0) { // uuid
                 const uV = readVarint(data, o);
                 uuid = uV[0];
@@ -306,6 +476,7 @@ export class PerfettoDecoder {
             } else if (field === 4 && wire === 2) { // thread (pid/tid)
                 const tLen = readVarint(data, o); o += tLen[1];
                 const tEnd = o + Number(tLen[0]);
+                hasThread = true;
                 while (o < tEnd) {
                     const eV = readVarint(data, o); o += eV[1];
                     const ef = Number(eV[0] >> 3n);
@@ -321,12 +492,39 @@ export class PerfettoDecoder {
                         o += this._skip(data, o, Number(eV[0] & 7n));
                     }
                 }
+            } else if (field === 5 && wire === 0) { // parent_uuid
+                const pV = readVarint(data, o);
+                parentUuid = pV[0];
+                o += pV[1];
             } else {
                 o += this._skip(data, o, wire);
             }
         }
-        
-        this.tracks.set(uuid, { pid, tid, name: trackName });
+
+        this.tracks.set(uuid, { pid, tid, name: trackName, hasThread, parentUuid });
+    }
+
+    // Async / named tracks usually carry only parent_uuid; pid lives on the
+    // ancestor process descriptor. Walk up until we find a hasThread or a
+    // pid-bearing track. Returns { pid, tid, hasThread }.
+    _resolveTrack(uuid) {
+        let cursor = this.tracks.get(uuid);
+        let pid = cursor ? cursor.pid : 0;
+        let tid = cursor ? cursor.tid : 0;
+        let hasThread = !!(cursor && cursor.hasThread);
+        let guard = 16;
+        while (cursor && !hasThread && cursor.parentUuid && guard-- > 0) {
+            cursor = this.tracks.get(cursor.parentUuid);
+            if (!cursor) break;
+            if (!pid && cursor.pid) pid = cursor.pid;
+            if (cursor.hasThread) {
+                pid = cursor.pid;
+                tid = cursor.tid;
+                hasThread = true;
+                break;
+            }
+        }
+        return { pid, tid, hasThread };
     }
     
     _parseTrackEvent(data, startOffset, len, seqNames, seqDebugNames, seqId, packetTs) {
@@ -386,7 +584,13 @@ export class PerfettoDecoder {
                 const dLen = readVarint(data, o); o += dLen[1];
                 const dEnd = o + Number(dLen[0]);
                 const arg = this._parseDebugAnnotation(data, o, dEnd, seqDebugNames, seqNames);
-                if (arg.name) trackEvent.args[arg.name] = arg.value;
+                // Drop annotations with no parseable value. Perfetto producers
+                // sometimes emit just a name (e.g. `data`) with no typed value field —
+                // _parseDebugAnnotation returns value: null. Storing { data: null }
+                // poisons downstream consumers (Chrome JSON traces never carry
+                // args.data === null, and DevTools' NetworkRequestsHandler reads
+                // event.args.data.requestId without null-checking).
+                if (arg.name && arg.value !== null) trackEvent.args[arg.name] = arg.value;
                 o = dEnd;
             } else if (field === 6 && wire === 2) { // legacy_event
                 const lLen = readVarint(data, o); o += lLen[1];
@@ -410,11 +614,21 @@ export class PerfettoDecoder {
                         o += this._skip(data, o, lw);
                     }
                 }
+            } else if (wire === 2 && TRACK_EVENT_EXTENSION_SCHEMAS[field] !== undefined) {
+                // Chrome-specific TrackEvent proto extensions (field numbers ≥ 1000).
+                // Decode using the hardcoded schema and merge into args under the
+                // schema's named key — DevTools' MetaHandler reads args.render_frame_host
+                // etc. directly, so the args shape needs to mirror Chrome's JSON output.
+                const ext = TRACK_EVENT_EXTENSION_SCHEMAS[field];
+                const lR = readVarint(data, o); o += lR[1];
+                const innerEnd = o + Number(lR[0]);
+                trackEvent.args[ext.name] = this._parseSchemaMessage(data, o, innerEnd, ext.schema);
+                o = innerEnd;
             } else {
                 o += this._skip(data, o, wire);
             }
         }
-        
+
         let currentTs = this.seqTimestamps.get(seqId) || 0;
         
         if (absTs !== null) {
@@ -434,7 +648,14 @@ export class PerfettoDecoder {
         }
         
         trackEvent.ts = currentTs;
-        
+
+        // Inherit the sequence's default track when the event omits its own
+        // track_uuid (the common case — Chromium only sets it on the rare
+        // cross-thread event). Without this, every event collapses to pid:0/tid:0.
+        if (trackEvent.track_uuid === undefined && this.seqDefaultTracks.has(seqId)) {
+            trackEvent.track_uuid = this.seqDefaultTracks.get(seqId);
+        }
+
         return trackEvent;
     }
     
@@ -473,6 +694,16 @@ export class PerfettoDecoder {
                 const sl = readVarint(data, o); o+=sl[1];
                 const jsonStr = this.decodeString(data, o, Number(sl[0])); o+=Number(sl[0]);
                 try { value = JSON.parse(jsonStr); } catch(e) { value = jsonStr; }
+            } else if (af === 8 && aw === 2) { // nested_value (recursive typed-value tree)
+                // Chrome's standard mechanism for structured timeline args (frame ids,
+                // pixel rects, dom node ids, etc. on PaintTimingVisualizer, LayoutShift,
+                // EventTiming, NavStartToLargestContentfulPaint, ...). Distinct from
+                // dict_entries — uses a separate NestedValue message with a typed-union
+                // shape rather than recursive DebugAnnotation nesting.
+                const sl = readVarint(data, o); o+=sl[1];
+                const innerEnd = o + Number(sl[0]);
+                value = this._parseNestedValue(data, o, innerEnd);
+                o = innerEnd;
             } else if (af === 11 && aw === 2) { // dict_entries
                 if (!dict) dict = {};
                 const lenR = readVarint(data, o); o += lenR[1];
@@ -494,10 +725,128 @@ export class PerfettoDecoder {
         
         if (dict) value = dict;
         if (arr) value = arr;
-        
+
         return { name, value };
     }
-    
+
+    // Perfetto NestedValue (debug_annotation.proto). Recursive typed-union tree:
+    //   nested_type: UNSPECIFIED=0, DICT=1, ARRAY=2
+    //   DICT  → parallel `dict_keys` (string) and `dict_values` (NestedValue) repeated
+    //   ARRAY → repeated `array_values` (NestedValue)
+    //   else  → exactly one of int/double/bool/string set
+    _parseNestedValue(data, start, end) {
+        let o = start;
+        let nestedType = 0;
+        const dictKeys = [];
+        const dictValues = [];
+        const arrayValues = [];
+        let intVal, doubleVal, boolVal, stringVal;
+        let scalarSeen = false;
+
+        while (o < end) {
+            const vR = readVarint(data, o); o += vR[1];
+            const wire = Number(vR[0] & 7n);
+            const field = Number(vR[0] >> 3n);
+
+            if (field === 1 && wire === 0) {        // nested_type
+                const v = readVarint(data, o); o += v[1];
+                nestedType = Number(v[0]);
+            } else if (field === 2 && wire === 2) { // dict_keys (string)
+                const lR = readVarint(data, o); o += lR[1];
+                dictKeys.push(this.decodeString(data, o, Number(lR[0])));
+                o += Number(lR[0]);
+            } else if (field === 3 && wire === 2) { // dict_values (NestedValue)
+                const lR = readVarint(data, o); o += lR[1];
+                const innerEnd = o + Number(lR[0]);
+                dictValues.push(this._parseNestedValue(data, o, innerEnd));
+                o = innerEnd;
+            } else if (field === 4 && wire === 2) { // array_values (NestedValue)
+                const lR = readVarint(data, o); o += lR[1];
+                const innerEnd = o + Number(lR[0]);
+                arrayValues.push(this._parseNestedValue(data, o, innerEnd));
+                o = innerEnd;
+            } else if (field === 5 && wire === 0) { // int_value
+                const v = readVarint(data, o); o += v[1];
+                intVal = Number(BigInt.asIntN(64, v[0]));
+                scalarSeen = true;
+            } else if (field === 6 && wire === 1) { // double_value
+                const view = new DataView(data.buffer, data.byteOffset + o, 8);
+                doubleVal = view.getFloat64(0, true);
+                o += 8;
+                scalarSeen = true;
+            } else if (field === 7 && wire === 0) { // bool_value
+                const v = readVarint(data, o); o += v[1];
+                boolVal = v[0] !== 0n;
+                scalarSeen = true;
+            } else if (field === 8 && wire === 2) { // string_value
+                const lR = readVarint(data, o); o += lR[1];
+                stringVal = this.decodeString(data, o, Number(lR[0]));
+                o += Number(lR[0]);
+                scalarSeen = true;
+            } else {
+                o += this._skip(data, o, wire);
+            }
+        }
+
+        if (nestedType === 1 || (nestedType === 0 && dictKeys.length > 0)) {
+            const dict = {};
+            const n = Math.min(dictKeys.length, dictValues.length);
+            for (let i = 0; i < n; i++) dict[dictKeys[i]] = dictValues[i];
+            return dict;
+        }
+        if (nestedType === 2 || (nestedType === 0 && arrayValues.length > 0)) {
+            return arrayValues;
+        }
+        if (boolVal !== undefined) return boolVal;
+        if (stringVal !== undefined) return stringVal;
+        if (doubleVal !== undefined) return doubleVal;
+        if (intVal !== undefined) return intVal;
+        return scalarSeen ? null : null;
+    }
+
+    // Schema-driven proto message decoder for Chrome TrackEvent extensions.
+    // Walks the bytes [start, end) and emits a plain JS object whose keys come
+    // from the provided schema (Chromium chrome_track_event.proto field map).
+    // Unknown fields are skipped; mismatched wire types fall back to _skip.
+    _parseSchemaMessage(data, start, end, schema) {
+        const out = {};
+        let o = start;
+        while (o < end) {
+            const tR = readVarint(data, o); if (!tR) break;
+            o += tR[1];
+            const wire = Number(tR[0] & 7n);
+            const field = Number(tR[0] >> 3n);
+            const def = schema[field];
+            if (!def) { o += this._skip(data, o, wire); continue; }
+            if (def.type === 'message' && wire === 2) {
+                const lR = readVarint(data, o); o += lR[1];
+                const innerEnd = o + Number(lR[0]);
+                out[def.name] = this._parseSchemaMessage(data, o, innerEnd, def.schema);
+                o = innerEnd;
+            } else if (def.type === 'string' && wire === 2) {
+                const lR = readVarint(data, o); o += lR[1];
+                out[def.name] = this.decodeString(data, o, Number(lR[0]));
+                o += Number(lR[0]);
+            } else if (def.type === 'uint' && wire === 0) {
+                const v = readVarint(data, o); o += v[1];
+                out[def.name] = Number(v[0]);
+            } else if (def.type === 'int' && wire === 0) {
+                const v = readVarint(data, o); o += v[1];
+                out[def.name] = Number(BigInt.asIntN(64, v[0]));
+            } else if (def.type === 'bool' && wire === 0) {
+                const v = readVarint(data, o); o += v[1];
+                out[def.name] = v[0] !== 0n;
+            } else if (def.type === 'enum' && wire === 0) {
+                const v = readVarint(data, o); o += v[1];
+                const n = Number(v[0]);
+                out[def.name] = def.enum[n] !== undefined ? def.enum[n] : n;
+            } else {
+                o += this._skip(data, o, wire);
+            }
+        }
+        return out;
+    }
+
     _skip(data, offset, wire) {
         if (wire === 0) return readVarint(data, offset)[1];
         if (wire === 1) return 8;
@@ -528,45 +877,145 @@ export class PerfettoDecoder {
         
         let name = event.name || seqNames.get(event._name_iid) || '';
         
+        // Resolve (pid, tid). Real thread tracks emit their pid/tid directly; async
+        // and named tracks usually only carry parent_uuid, so we walk up to find
+        // an ancestor with a process or thread descriptor. For tracks that aren't
+        // explicitly threads we synthesize a unique tid from the track's uuid —
+        // otherwise every async track in a process collapses onto (pid, 0) and
+        // DevTools' per-(pid,tid) B/E stack pairs unrelated slices together. The
+        // 31-bit mask keeps the tid positive and well clear of real kernel TIDs
+        // (which are typically < 100k while uuids are 64-bit pointer-shaped).
         let pid = 0;
         let tid = 0;
-        if (event.track_uuid && this.tracks.has(event.track_uuid)) {
-            const tk = this.tracks.get(event.track_uuid);
-            pid = tk.pid;
-            tid = tk.tid;
+        if (event.track_uuid !== undefined && event.track_uuid !== 0n) {
+            const r = this._resolveTrack(event.track_uuid);
+            pid = r.pid;
+            tid = r.hasThread ? r.tid : Number(event.track_uuid & 0x7FFFFFFFn);
         }
-        
+
+        // Per-track stack handling. Two modes:
+        //   default — push {name, cat} on B, pop on E to copy name+cat onto E
+        //             events that arrived empty (Perfetto omits them on TYPE_SLICE_END).
+        //             Both B and E are emitted; consumer reconstructs nesting.
+        //   emitCompleteEvents — buffer the entire Begin (don't emit), and on the
+        //             matching E pop and emit a single X event with dur = E.ts - B.ts.
+        //             This is what DevTools needs (its single global B/E stack can't
+        //             handle cross-thread overlapping pairs).
+        let pendingComplete = null;  // begin metadata to combine with this E into an X
+        let suppressEmit = false;
+        if (event.track_uuid !== undefined) {
+            if (ph === 'B') {
+                let stack = this.trackStacks.get(event.track_uuid);
+                if (!stack) { stack = []; this.trackStacks.set(event.track_uuid, stack); }
+                if (this.emitCompleteEvents) {
+                    stack.push({
+                        name, cat, ts: event.ts, pid, tid,
+                        args: event.args,
+                        id: event.id, id2: event.id2, bind_id: event.bind_id,
+                    });
+                    suppressEmit = true;  // wait for matching E
+                } else {
+                    stack.push({ name, cat });
+                }
+            } else if (ph === 'E') {
+                const stack = this.trackStacks.get(event.track_uuid);
+                if (stack && stack.length > 0) {
+                    const top = stack.pop();
+                    if (this.emitCompleteEvents) {
+                        pendingComplete = top;
+                    } else {
+                        if (!name) name = top.name;
+                        if (!cat) cat = top.cat;
+                    }
+                } else if (this.emitCompleteEvents) {
+                    // Unbalanced E with no buffered B — drop. Emitting an orphan E
+                    // would just put DevTools back into mismatch territory.
+                    suppressEmit = true;
+                }
+            }
+        }
+
+        if (suppressEmit) return;
+
         // Workaround for Chromium Perfetto grouping/interning bleeding:
-        // Modern Chrome traces group network/render events into layout states (e.g. 'preFCP') 
-        // entirely dropping the 'devtools.timeline' category requirement, and wrap dictionary 
+        // Modern Chrome traces group network/render events into layout states (e.g. 'preFCP')
+        // entirely dropping the 'devtools.timeline' category requirement, and wrap dictionary
         // arguments with corrupted pointers (like 'V8.SnapshotDecompress').
         const timelineEvents = new Set(['ResourceSendRequest', 'ResourceReceiveResponse', 'ResourceReceivedData', 'ResourceFinish', 'EventDispatch', 'Layout', 'UpdateLayerTree', 'Paint', 'CompositeLayers', 'FunctionCall', 'EvaluateScript', 'v8.compile', 'ParseHTML']);
-        
-        if (timelineEvents.has(name)) {
-             if (!cat.includes('devtools.timeline')) {
-                 cat = cat ? cat + ',devtools.timeline' : 'devtools.timeline';
+
+        let outName = name;
+        let outCat = cat;
+        let outArgs = event.args;
+        if (pendingComplete) {
+            outName = pendingComplete.name;
+            outCat = pendingComplete.cat;
+            // Merge any non-empty args from this E onto the buffered B's args.
+            outArgs = pendingComplete.args || {};
+            if (event.args && Object.keys(event.args).length > 0) {
+                outArgs = { ...(pendingComplete.args || {}), ...event.args };
+            }
+        }
+
+        if (timelineEvents.has(outName)) {
+             if (!outCat.includes('devtools.timeline')) {
+                 outCat = outCat ? outCat + ',devtools.timeline' : 'devtools.timeline';
              }
-             if (event.args && !event.args.data) {
-                 const keys = Object.keys(event.args);
-                 if (keys.length === 1 && typeof event.args[keys[0]] === 'object' && !Array.isArray(event.args[keys[0]])) {
-                     event.args['data'] = event.args[keys[0]];
-                     delete event.args[keys[0]];
+             if (outArgs && !outArgs.data) {
+                 const keys = Object.keys(outArgs);
+                 // typeof null === 'object', so guard against mapping a null-valued
+                 // debug annotation to args.data — that yields { data: null } and
+                 // crashes DevTools' NetworkRequestsHandler when it does
+                 // event.args.data.requestId.
+                 if (keys.length === 1 && outArgs[keys[0]] !== null
+                     && typeof outArgs[keys[0]] === 'object'
+                     && !Array.isArray(outArgs[keys[0]])) {
+                     outArgs = { data: outArgs[keys[0]] };
                  }
              }
         }
-        
-        const jsonEvent = {
-            cat, name, ph, ts: event.ts, pid, tid, args: event.args
-        };
-        
-        if (event.id !== undefined) jsonEvent.id = event.id;
-        if (event.id2 !== undefined) jsonEvent.id2 = event.id2;
-        if (event.bind_id !== undefined) jsonEvent.bind_id = event.bind_id;
-        
+
+        // Defensive drop: DevTools handlers dispatch purely on event.name and
+        // dereference nested args paths without null-checking. Drop any matching
+        // event whose payload doesn't carry the required path — see the
+        // DEVTOOLS_REQUIRED_ARG_PATHS list at the top of this file.
+        if (DEVTOOLS_FRAGILE_NAMES.has(outName)) {
+            const required = DEVTOOLS_REQUIRED_ARG_PATH_BY_NAME.get(outName);
+            let cursor = outArgs;
+            for (const key of required) {
+                if (cursor === null || cursor === undefined || typeof cursor !== 'object') { cursor = undefined; break; }
+                cursor = cursor[key];
+            }
+            if (cursor === undefined || cursor === null) return;
+        }
+
+        let jsonEvent;
+        if (pendingComplete) {
+            jsonEvent = {
+                cat: outCat,
+                name: outName,
+                ph: 'X',
+                ts: pendingComplete.ts,
+                dur: Math.max(0, event.ts - pendingComplete.ts),
+                pid: pendingComplete.pid,
+                tid: pendingComplete.tid,
+                args: outArgs,
+            };
+            if (pendingComplete.id !== undefined) jsonEvent.id = pendingComplete.id;
+            if (pendingComplete.id2 !== undefined) jsonEvent.id2 = pendingComplete.id2;
+            if (pendingComplete.bind_id !== undefined) jsonEvent.bind_id = pendingComplete.bind_id;
+        } else {
+            jsonEvent = {
+                cat: outCat, name: outName, ph, ts: event.ts, pid, tid, args: outArgs,
+            };
+            if (event.id !== undefined) jsonEvent.id = event.id;
+            if (event.id2 !== undefined) jsonEvent.id2 = event.id2;
+            if (event.bind_id !== undefined) jsonEvent.bind_id = event.bind_id;
+        }
+
         if (jsonEvent.id === undefined && jsonEvent.id2 === undefined && event.track_uuid !== undefined) {
              jsonEvent.id2 = { local: "0x" + event.track_uuid.toString(16) };
         }
-        
+
         const prefix = this.firstEvent ? '' : ',\n';
         this.firstEvent = false;
         controller.enqueue(prefix + JSON.stringify(jsonEvent));

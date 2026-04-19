@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0.
  * See the LICENSE file for details.
  */
-import { WaterfallTools, identifyFormatFromBuffer, Layout } from 'waterfall-tools';
+import { WaterfallTools, identifyFormatFromBuffer, Layout, PerfettoDecoder } from 'waterfall-tools';
 import { saveToHistory, getAllHistory, updateHistoryInfo, clearAllHistory } from './history.js';
 
 const ui = {
@@ -125,18 +125,69 @@ function getDevtoolsPath() {
     return val ? val : null;
 }
 
-function sniffTraceFormat(buffer) {
+// Returns one of: 'json', 'gzipped-json', 'perfetto', 'gzipped-perfetto'.
+// Peeks inside gzip so a gzipped Perfetto protobuf doesn't get mistaken for
+// gzipped Chrome-trace JSON (DevTools' loadFromFile would silently fail with a
+// "malformed timeline data" error if we handed it the inflated bytes blind).
+async function sniffTraceContent(buffer) {
     const view = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
-    if (view.length >= 3 && view[0] === 0x1f && view[1] === 0x8b && view[2] === 0x08) return 'gzip';
-    // Skip BOM + whitespace to find the first JSON token
+    const isGz = view.length >= 3 && view[0] === 0x1f && view[1] === 0x8b && view[2] === 0x08;
+
+    let peek = view;
+    if (isGz) {
+        try {
+            const ds = new DecompressionStream('gzip');
+            const writer = ds.writable.getWriter();
+            const reader = ds.readable.getReader();
+            // Hand the whole buffer in but only consume the first decompressed chunk —
+            // DecompressionStream yields ~64KB chunks, more than enough to see the first
+            // token. Don't await write/close: write may block on backpressure until the
+            // reader drains, which we never do past chunk one.
+            writer.write(view).catch(() => {});
+            writer.close().catch(() => {});
+            const { value } = await reader.read();
+            try { await reader.cancel(); } catch {}
+            peek = value || new Uint8Array(0);
+        } catch {
+            peek = new Uint8Array(0);
+        }
+    }
+
     let i = 0;
-    if (view.length >= 3 && view[0] === 0xef && view[1] === 0xbb && view[2] === 0xbf) i = 3;
-    while (i < view.length && (view[i] === 0x20 || view[i] === 0x09 || view[i] === 0x0a || view[i] === 0x0d)) i++;
-    if (i < view.length && (view[i] === 0x7b /* { */ || view[i] === 0x5b /* [ */)) return 'json';
-    return 'binary';
+    if (peek.length >= 3 && peek[0] === 0xef && peek[1] === 0xbb && peek[2] === 0xbf) i = 3;
+    while (i < peek.length && (peek[i] === 0x20 || peek[i] === 0x09 || peek[i] === 0x0a || peek[i] === 0x0d)) i++;
+    const isJson = i < peek.length && (peek[i] === 0x7b /* { */ || peek[i] === 0x5b /* [ */);
+    if (isJson) return isGz ? 'gzipped-json' : 'json';
+    return isGz ? 'gzipped-perfetto' : 'perfetto';
 }
 
-function loadDevtools(traceBuffer) {
+// Streaming Perfetto → Chrome-trace JSON → gzip pipeline. The output Blob is
+// what we materialize in memory; for a 23 MB .perfetto.gz that's ~5–10× smaller
+// than the raw expanded JSON, since DevTools' Common.Gzip.fileToString will
+// inflate it lazily on the way into TimelineLoader.
+async function transcodePerfettoToGzippedJson(buffer, isGz) {
+    const view = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+    const source = new ReadableStream({
+        start(controller) {
+            controller.enqueue(view);
+            controller.close();
+        }
+    });
+    let pipeline = source;
+    if (isGz) pipeline = pipeline.pipeThrough(new DecompressionStream('gzip'));
+    // emitCompleteEvents: convert Perfetto B/E pairs into Chrome trace X (Complete)
+    // events. DevTools' RendererHandler.makeCompleteEvent uses ONE global B/E stack
+    // across all threads and chokes on cross-thread overlaps; X events bypass it.
+    const decoder = new PerfettoDecoder({ emitCompleteEvents: true });
+    pipeline = pipeline
+        .pipeThrough(decoder.stream)        // emits JSON text chunks
+        .pipeThrough(new TextEncoderStream())
+        .pipeThrough(new CompressionStream('gzip'));
+    const blob = await new Response(pipeline).blob();
+    return { bytes: blob, name: 'trace.json.gz', mime: 'application/gzip' };
+}
+
+async function loadDevtools(traceBuffer) {
     const path = getDevtoolsPath();
     if (!path || !ui.devtoolsFrame) return;
 
@@ -159,14 +210,28 @@ function loadDevtools(traceBuffer) {
         alreadyReady = true;
     }
 
-    const format = traceBuffer ? sniffTraceFormat(traceBuffer) : null;
-    if (traceBuffer && format === 'binary') {
-        // Perfetto protobuf — DevTools Performance panel expects Chrome-trace JSON.
-        // Transcoding path to be added in a follow-up; for now signal that the
-        // Perfetto tab is the right place to inspect this buffer.
-        ui.devtoolsOverlayContent.innerText =
-            'This trace is in Perfetto binary format — use the Perfetto tab to view it in DevTools-style UI.';
-        return;
+    let payload = null;
+    if (traceBuffer) {
+        const contentType = await sniffTraceContent(traceBuffer);
+        if (contentType === 'json') {
+            payload = { bytes: traceBuffer, name: 'trace.json', mime: 'application/json' };
+        } else if (contentType === 'gzipped-json') {
+            // File.type ending in "gzip" triggers DevTools' internal DecompressionStream path.
+            payload = { bytes: traceBuffer, name: 'trace.json.gz', mime: 'application/gzip' };
+        } else {
+            // perfetto / gzipped-perfetto — TimelineLoader has no streaming entrypoint
+            // for binary Perfetto, so transcode through the existing PerfettoDecoder
+            // TransformStream and re-gzip on the way out so DevTools' own gzip path
+            // bears the cost of holding the inflated JSON in memory.
+            ui.devtoolsOverlayContent.innerText = 'Transcoding Perfetto trace…';
+            try {
+                payload = await transcodePerfettoToGzippedJson(traceBuffer, contentType === 'gzipped-perfetto');
+            } catch (e) {
+                console.warn('[viewer.js] Perfetto → JSON transcode failed:', e);
+                ui.devtoolsOverlayContent.innerText = 'Failed to transcode Perfetto trace for DevTools.';
+                return;
+            }
+        }
     }
 
     const waitForPanelAndLoad = () => {
@@ -183,14 +248,10 @@ function loadDevtools(traceBuffer) {
         const tick = () => {
             const panel = cw.UI && cw.UI.panels && cw.UI.panels.timeline;
             if (panel && typeof panel.loadFromFile === 'function') {
-                if (traceBuffer) {
+                if (payload) {
                     ui.devtoolsOverlayContent.innerText = 'Loading trace into DevTools...';
                     try {
-                        // File.type ending in "gzip" triggers DevTools' internal
-                        // DecompressionStream path; plain JSON files use the default.
-                        const mime = format === 'gzip' ? 'application/gzip' : 'application/json';
-                        const name = format === 'gzip' ? 'trace.json.gz' : 'trace.json';
-                        const file = new cw.File([traceBuffer], name, { type: mime });
+                        const file = new cw.File([payload.bytes], payload.name, { type: payload.mime });
                         Promise.resolve(panel.loadFromFile(file))
                             .catch((err) => console.warn('[viewer.js] DevTools loadFromFile failed:', err))
                             .finally(() => {

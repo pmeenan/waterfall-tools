@@ -11,6 +11,7 @@ import { generateImage } from '../outputs/image.js';
 
 export { identifyFormatFromBuffer };
 export { Layout } from '../renderer/layout.js';
+export { PerfettoDecoder } from '../inputs/utilities/perfetto/decoder.js';
 
 export class WaterfallTools {
     constructor() {
