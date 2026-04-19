@@ -20,6 +20,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
     
+    // Bypass cache for local development
+    const isLocalhost = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+    if (isLocalhost) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+    
     // Only handle http/https requests
     if (!event.request.url.startsWith('http')) return;
 
