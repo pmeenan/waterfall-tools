@@ -55,6 +55,11 @@ describe('Tcpdump Processor', () => {
                 delete e.response.content.text;
                 delete e.response.content.encoding;
             }
+            if (e._chunks) {
+                e._chunks.forEach(c => {
+                    delete c.inflated;
+                });
+            }
         });
 
         const scrubbedHarStr = JSON.parse(JSON.stringify(har));

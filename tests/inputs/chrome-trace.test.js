@@ -7,6 +7,7 @@ import { describe, it, expect } from 'vitest';
 import path from 'node:path';
 import fs from 'node:fs';
 import { WaterfallTools } from '../../src/core/waterfall-tools.js';
+import { identifyFormatFromBuffer } from '../../src/inputs/orchestrator.js';
 
 describe('Chrome Trace Input Processing', () => {
 
@@ -76,5 +77,16 @@ describe('Chrome Trace Input Processing', () => {
             }
         });
     }
+
+    // DevTools-saved trace: `{"metadata":{...},"traceEvents":[...]}` wrapper with
+    // metadata before traceEvents and events leading with `args`, not `pid`.
+    // Regression test for the orchestrator sniff falling through to 'unknown'.
+    it('Auto-detects DevTools-saved trace (metadata-before-traceEvents wrapper)', async () => {
+        const inputPath = path.resolve('Sample/Data/Chrome Traces/roadtrip-devtools.json.gz');
+        const buf = fs.readFileSync(inputPath);
+        const detected = await identifyFormatFromBuffer(buf);
+        expect(detected.format).toBe('chrome-trace');
+        expect(detected.hasTraceEventsWrapper).toBe(true);
+    });
 
 });
