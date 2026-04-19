@@ -495,8 +495,13 @@ async function identifyFormatFromBuffer(buf) {
     if (minText.includes('CLIENT_RANDOM') || minText.includes('CLIENT_HANDSHAKE_TRAFFIC_SECRET') || minText.includes('CLIENT_TRAFFIC_SECRET_0')) return 'keylog';
     if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) &&
         (minText.includes('"median":') || minText.includes('"runs":') || minText.includes('"testRuns":') || minText.includes('"average":'))) return 'wpt';
-    if (minText.startsWith('{"traceEvents":') || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) return 'chrome-trace';
-    if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":')) return 'chrome-trace';
+    // Chrome trace JSON wrapper: plain `{"traceEvents":[...]}` OR DevTools-saved form
+    // `{"metadata":{...},"traceEvents":[...]}` where metadata comes first. Individual
+    // events may lead with any key (args/cat/pid/...), so a substring check on the
+    // `traceEvents` key is the only reliable wrapper signal. Keep in sync with
+    // src/inputs/orchestrator.js.
+    if (minText.includes('"traceEvents":[') || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) return 'chrome-trace';
+    if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":') || minText.startsWith('[{"args":')) return 'chrome-trace';
     if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) return 'cdp';
     if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) return 'har';
 

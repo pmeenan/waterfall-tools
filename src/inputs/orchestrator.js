@@ -138,13 +138,15 @@ function finishSniffing(text, resolve) {
     if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) return resolve({ format: 'netlog' });
     if (minText.includes('CLIENT_RANDOM') || minText.includes('CLIENT_HANDSHAKE_TRAFFIC_SECRET') || minText.includes('CLIENT_TRAFFIC_SECRET_0')) return resolve({ format: 'keylog' });
     if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":') || minText.includes('"testRuns":') || minText.includes('"average":'))) return resolve({ format: 'wpt' });
-    if (minText.startsWith('{"traceEvents":') || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) {
-        return resolve({
-            format: 'chrome-trace',
-            hasTraceEventsWrapper: minText.startsWith('{"traceEvents":')
-        });
+    // Chrome trace JSON wrapper form. Plain captures are `{"traceEvents":[...]}`, but
+    // DevTools-saved traces put `metadata` first (`{"metadata":{...},"traceEvents":[...]}`)
+    // and individual events may lead with any key (e.g. `{"args":..., "cat":..., "pid":...}`),
+    // so a substring check on the `traceEvents` key is the only reliable wrapper signal.
+    const hasTraceEventsWrapper = minText.includes('"traceEvents":[');
+    if (hasTraceEventsWrapper || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) {
+        return resolve({ format: 'chrome-trace', hasTraceEventsWrapper });
     }
-    if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":')) return resolve({ format: 'chrome-trace', hasTraceEventsWrapper: false });
+    if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":') || minText.startsWith('[{"args":')) return resolve({ format: 'chrome-trace', hasTraceEventsWrapper: false });
     if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) return resolve({ format: 'cdp' });
     if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) return resolve({ format: 'har' });
 
