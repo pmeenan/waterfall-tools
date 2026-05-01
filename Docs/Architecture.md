@@ -210,6 +210,7 @@ Interaction is handled by maintaining a spatial index of drawn elements and mapp
 The renderer supports specialized modes configurable via standard options:
 - **Connection View** — groups entries by connection to visualize multiplexing.
 - **Thumbnail View** — dense overview with optional truncation (`thumbMaxReqs`).
+- **Theming hooks** — `rowHeight`, `backgroundColor`, and `palette` on `WaterfallTools.getDefaultOptions()` let callers retheme the canvas without forking. All defaults are inert (`null`/`{}`); when no overrides are supplied the renderer reproduces the historical visual byte-for-byte. Resolved once at the top of `canvas.js#draw()` to local `theme*` consts and referenced everywhere downstream — see AGENTS.md for the convention. MIME-type and page-event metric color tables remain hard-coded; opening those up is a separate change.
 
 Since HAR files can contain multiple pages (e.g. WebPageTest First View + Repeat View), callers are expected to filter global request entries to the active page ID before passing them to the render loop.
 

@@ -97,7 +97,13 @@ export class Layout {
 
     static calculateRows(entries, canvasWidth = 1012, options = {}) {
         let absoluteMaxTime;
-        const rowHeight = options.thumbnailView ? 4 : 18;
+        // `options.rowHeight` is the public theming hook (see
+        // `WaterfallTools.getDefaultOptions()`). When unset (null/undefined)
+        // we keep the historical defaults — 18 for the standard view, 4 for
+        // thumbnail mode — so existing callers see no change.
+        const rowHeight = (typeof options.rowHeight === 'number' && options.rowHeight > 0)
+            ? options.rowHeight
+            : (options.thumbnailView ? 4 : 18);
 
         if (!entries || entries.length === 0) {
             return { rows: [], dimensions: { canvasWidth, canvasHeight: 0, maxTime: 0, labelsWidth: 0, widthPerMs: 0 }};

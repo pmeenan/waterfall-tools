@@ -143,9 +143,27 @@ await wt.renderTo(document.getElementById('waterfall-container'), options);
     showChunks: true,        // per-chunk download blocks
     showJsTiming: true,      // JS execution highlights
     showWait: true,          // TTFB / wait blocks
-    showLegend: true         // bottom legend
+    showLegend: true,        // bottom legend
+    rowHeight: null,         // null → 18 (or 4 in thumbnail view); override with any positive integer
+    backgroundColor: null,   // null → '#ffffff'; any CSS color string
+    palette: {}              // chrome color overrides; see "Theming" below
 }
 ```
+
+#### Theming
+
+`rowHeight`, `backgroundColor`, and `palette` are inert when left at their defaults — the renderer reproduces the historical visual byte-for-byte. Override individual keys to retheme without forking. `palette` accepts:
+
+- `rowStripe` *(default `'#f0f0f0'`)* — alternating row background.
+- `border` *(default `'#000000'`)* — request-area outer border, label divider, and the chart-frame strokes for CPU / BW / Long Tasks bands.
+- `grid` *(default `'rgb(192,192,192)'`)* — vertical time-grid lines.
+- `thumbnailGrid` *(default `'rgb(208,208,208)'`)*, `thumbnailBorder` *(default falls back to `palette.grid`)* — thumbnail-view variants.
+- `longTask` *(default `'rgb(255, 82, 62)'`)* — fill for blocked spans in the Long Tasks band.
+- `userTimingMark` *(default `'rgb(105, 0, 158)'`)* — vertical-line stroke for `_userTimes` / `_userTimingMeasures` / `_user_timing` marks.
+- `text` *(default `'#000'`)* — primary text color (request URL labels, time-scale labels, bottom legend item text).
+- `titleText` *(defaults to `palette.text`, then `'#333'`)* — chart-frame titles (CPU Utilization / BW / Long Tasks). Set independently when the chart titles need a softer tone than the main text; otherwise they follow `palette.text` automatically.
+
+Any CSS color string works. MIME-type colors and page-event metric colors (FCP, LCP, etc.) are not yet themable via `palette` — those keyed maps remain hard-coded and may open up in a follow-up.
 
 `renderTo` also accepts extra options not returned by `getDefaultOptions()`:
 
