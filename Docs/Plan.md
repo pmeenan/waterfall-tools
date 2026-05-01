@@ -223,3 +223,11 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Restructure and optimize Vite build pipeline statically generating exactly three decoupled bundle artifacts resolving fragment bounds inherently natively.
 - [x] Integrate Touch Events and native Responsive layout mappings structurally accommodating mobile targets logically.
 - [x] CI gate for pull requests: `.github/workflows/ci.yml` runs `npm ci`, `npm run lint`, and `npm run build` on Node 22 for every PR targeting `main`, so new lint warnings or build failures block the merge.
+
+## Phase 9a: Renderer Theming Hooks
+**Goal:** Surface row height, canvas background, and chrome colors as `WaterfallTools.getDefaultOptions()` keys so downstream integrations (sitespeed.io, custom dashboards) can theme the canvas without forking. Defaults must reproduce the historical visual byte-for-byte — this phase only opens up the surface.
+- [x] Add `rowHeight`, `backgroundColor`, `palette` to `WaterfallTools.getDefaultOptions()` with inert defaults (`null`, `null`, `{}`).
+- [x] Resolve every theming hook once at the top of `canvas.js#draw()` to a local `theme*` const (`themeBackground`, `themeRowStripe`, `themeBorder`, `themeGrid`, `themeThumbnailGrid`, `themeThumbnailBorder`, `themeLongTask`, `themeUserTimingMark`). Reference those locals everywhere downstream — never sprinkle `palette.foo || …` reads inside the render loop.
+- [x] Honour `options.rowHeight` consistently in `Layout.calculateRows` and `Canvas._getInteractionTarget` so row positions and hover hit-testing stay in sync.
+- [x] Tests assert defaults are inert (existing 36 tests unchanged) and that explicit overrides take effect (`tests/renderer/theming-options.test.js`).
+- [x] MIME-type colors (`Layout.getMimeColor`) and page-event metric colors (`eventColors` for FCP/LCP/etc.) are intentionally **not** opened up — they're keyed maps with their own back-compat surface. Future phase if there's demand.

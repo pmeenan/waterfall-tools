@@ -252,7 +252,9 @@ export class WaterfallCanvas {
         if (!this.drawnRows || !this.drawnRows.rows || this.drawnRows.rows.length === 0) return null;
 
         const dim = this.drawnRows.dimensions;
-        const rowHeight = this.options.thumbnailView ? 4 : 18;
+        const rowHeight = (typeof this.options.rowHeight === 'number' && this.options.rowHeight > 0)
+            ? this.options.rowHeight
+            : (this.options.thumbnailView ? 4 : 18);
         const topOffset = this.drawnRows.rows[0].y1 > 35 ? 35 : 0;
         const bottomY = dim.totalRows * rowHeight + rowHeight + topOffset;
         
@@ -472,7 +474,7 @@ export class WaterfallCanvas {
         else return val.toFixed(places);
     }
 
-    drawLegend(dimensions) {
+    drawLegend(dimensions, textColor = '#000') {
         const legendItems = [
             { label: 'Wait', color: [255, 254, 214], narrow: true },
             { label: 'DNS', color: [0, 123, 132], narrow: true },
@@ -507,7 +509,7 @@ export class WaterfallCanvas {
                 this.drawBar(startX + itemBoxSize / 2, startX + itemBoxSize, legendY, legendY + h - 1, item.color, true);
             }
 
-            this.ctx.fillStyle = '#000';
+            this.ctx.fillStyle = textColor;
             this.ctx.fillText(item.label, startX + itemBoxSize + 6, legendY + 11);
             startX += itemBoxSize + this.ctx.measureText(item.label).width + 16;
         }
@@ -521,17 +523,36 @@ export class WaterfallCanvas {
         }
         this.canvas.width = dimensions.canvasWidth * dpr;
         this.canvas.height = dimensions.canvasHeight * dpr;
-        
+
         this.ctx.scale(dpr, dpr);
 
+        // Resolve theming hooks once. Every key falls back to the historical
+        // hard-coded value when the caller hasn't supplied an override, so
+        // a default `WaterfallTools.getDefaultOptions()` produces an
+        // identical visual to pre-theming releases. See
+        // `WaterfallTools.getDefaultOptions()` for the public surface.
+        const palette = (this.options && this.options.palette) || {};
+        const themeBackground = this.options.backgroundColor || '#ffffff';
+        const themeRowStripe = palette.rowStripe || '#f0f0f0';
+        const themeBorder = palette.border || '#000000';
+        const themeGrid = palette.grid || 'rgb(192,192,192)';
+        const themeThumbnailGrid = palette.thumbnailGrid || 'rgb(208,208,208)';
+        const themeThumbnailBorder = palette.thumbnailBorder || palette.grid || 'rgb(192,192,192)';
+        const themeLongTask = palette.longTask || 'rgb(255, 82, 62)';
+        const themeUserTimingMark = palette.userTimingMark || 'rgb(105, 0, 158)';
+        const themeText = palette.text || '#000';
+        const themeTitleText = palette.titleText || palette.text || '#333';
+
         // 1. Clear background
-        this.ctx.fillStyle = "#ffffff";
+        this.ctx.fillStyle = themeBackground;
         this.ctx.fillRect(0, 0, dimensions.canvasWidth, dimensions.canvasHeight);
 
             // Inherit structured relational time base preventing timeline disconnects intrinsically
             const baseStartMs = dimensions.baseMs || (rows.length > 0 ? rows[0].start : 0);
             const topOffset = rows.length > 0 && rows[0].y1 > 35 ? 35 : 0;
-            const rowHeight = this.options.thumbnailView ? 4 : 18;
+            const rowHeight = (typeof this.options.rowHeight === 'number' && this.options.rowHeight > 0)
+            ? this.options.rowHeight
+            : (this.options.thumbnailView ? 4 : 18);
 
             // 2. Draw row backgrounds
             const drawnYSet = new Set();
@@ -575,7 +596,7 @@ export class WaterfallCanvas {
                     drawnYSet.add(row.y1);
                     const logicalIdx = Math.round((row.y1 - topOffset - rowHeight) / rowHeight);
                     if (logicalIdx % 2 === 1) {
-                        this.ctx.fillStyle = "#f0f0f0";
+                        this.ctx.fillStyle = themeRowStripe;
                         this.ctx.fillRect(0, row.y1, dimensions.canvasWidth, rowHeight);
                     }
                 }
@@ -597,7 +618,7 @@ export class WaterfallCanvas {
             }
             
             // 3. Frame Borders and Dividers
-            this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(192,192,192)' : '#000000';
+            this.ctx.strokeStyle = this.options.thumbnailView ? themeThumbnailBorder : themeBorder;
             this.ctx.beginPath();
             this.ctx.rect(0, topOffset, dimensions.canvasWidth - 1, dimensions.canvasHeight - topOffset - 1);
             
@@ -623,7 +644,7 @@ export class WaterfallCanvas {
 
             // Safety: if maxTime is 0 or intervalMs is 0, skip grid drawing to prevent infinite loops
             if (dimensions.maxTime > 0 && intervalMs > 0) {
-                this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(208,208,208)' : 'rgb(192,192,192)';
+                this.ctx.strokeStyle = this.options.thumbnailView ? themeThumbnailGrid : themeGrid;
                 this.ctx.beginPath();
                 
                 for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
@@ -683,8 +704,8 @@ export class WaterfallCanvas {
 
             // 5.5 User Timing Marks
             if (this.options.showMarks !== false && this.pageData) {
-                // WPT uses RGB(105, 0, 158) for user timing marks
-                this.ctx.strokeStyle = 'rgb(105, 0, 158)';
+                // WPT uses RGB(105, 0, 158) for user timing marks (override via `palette.userTimingMark`)
+                this.ctx.strokeStyle = themeUserTimingMark;
                 this.ctx.lineWidth = 1;
                 
                 const drawMarks = (marksObj) => {
@@ -711,13 +732,13 @@ export class WaterfallCanvas {
             if (!this.options.thumbnailView && dimensions.maxTime > 0 && intervalMs > 0) {
                 const bottomScaleY = dimensions.totalRows * rowHeight + rowHeight + topOffset;
 
-                // Fill opaque white background specifically for the bottom time scale row
+                // Fill opaque background specifically for the bottom time scale row
                 const fillX = Math.floor(dimensions.labelsWidth) + 1;
                 const fillW = dimensions.canvasWidth - fillX - 1;
-                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillStyle = themeBackground;
                 this.ctx.fillRect(fillX, bottomScaleY, fillW, rowHeight - 1);
 
-                this.ctx.fillStyle = '#000';
+                this.ctx.fillStyle = themeText;
                 this.ctx.font = `11px sans-serif`;
                 this.ctx.textAlign = 'center';
 
@@ -939,7 +960,7 @@ export class WaterfallCanvas {
                             this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
                         }
                         
-                        this.ctx.fillStyle = '#000';
+                        this.ctx.fillStyle = themeText;
                         this.ctx.fillText(labelStr, labelX, row.y1 + 13);
                     }
                 }
@@ -960,7 +981,7 @@ export class WaterfallCanvas {
 
             // 7. Legend
             if (rows.length > 0 && rows[0].y1 > 30 && this.options.showLegend !== false && !this.options.thumbnailView) {
-                this.drawLegend(dimensions);
+                this.drawLegend(dimensions, themeText);
             }
 
             // 8. Advanced Metrics Graphs (CPU, BW, Main Thread, Long Tasks)
@@ -971,23 +992,23 @@ export class WaterfallCanvas {
                 const drawChartFrame = (title, y, h, colorLine, line2Title, line2Color, showBands = true, showGrid = true) => {
                     this.ctx.restore(); // Briefly suspend clipping
                     
-                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.fillStyle = themeBackground;
                     this.ctx.fillRect(dimensions.labelsWidth, y, dimensions.canvasWidth - dimensions.labelsWidth, h);
-                    
+
                     if (showBands !== false) {
-                        this.ctx.fillStyle = '#f0f0f0';
+                        this.ctx.fillStyle = themeRowStripe;
                         const bandH = (h - 2) / 4;
                         this.ctx.fillRect(dimensions.labelsWidth, y + 1, dimensions.canvasWidth - dimensions.labelsWidth, bandH);
                         this.ctx.fillRect(dimensions.labelsWidth, y + 1 + bandH * 2, dimensions.canvasWidth - dimensions.labelsWidth, bandH);
                     }
 
                     this.ctx.lineWidth = 1;
-                    this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(192,192,192)' : '#000000';
+                    this.ctx.strokeStyle = this.options.thumbnailView ? themeThumbnailBorder : themeBorder;
                     this.ctx.strokeRect(dimensions.labelsWidth + 0.5, y + 0.5, dimensions.canvasWidth - dimensions.labelsWidth - 1, h - 1);
                     
                     
                     if (showGrid !== false && dimensions.maxTime > 0 && typeof intervalMs !== 'undefined' && typeof xScaler !== 'undefined') {
-                        this.ctx.strokeStyle = this.options.thumbnailView ? 'rgb(208,208,208)' : 'rgb(192,192,192)';
+                        this.ctx.strokeStyle = this.options.thumbnailView ? themeThumbnailGrid : themeGrid;
                         this.ctx.beginPath();
                         for (let t = intervalMs; t <= dimensions.maxTime; t += intervalMs) {
                             const x = Math.floor(xScaler(t)) + 0.5;
@@ -997,12 +1018,12 @@ export class WaterfallCanvas {
                             }
                         }
                         this.ctx.stroke();
-                        this.ctx.strokeStyle = '#000000'; // reset
+                        this.ctx.strokeStyle = themeBorder; // reset
                     }
                     
                     if (dimensions.labelsWidth > 0) {
                         if (title) {
-                            this.ctx.fillStyle = '#333';
+                            this.ctx.fillStyle = themeTitleText;
                             const fontSize = this.options.thumbnailView ? 6 : 11;
                             this.ctx.font = `${fontSize}px sans-serif`;
                             this.ctx.textAlign = 'right';
@@ -1022,7 +1043,7 @@ export class WaterfallCanvas {
                         }
 
                         if (line2Title && line2Color) {
-                            this.ctx.fillStyle = '#333';
+                            this.ctx.fillStyle = themeTitleText;
                             const fontSize = this.options.thumbnailView ? 6 : 11;
                             this.ctx.font = `${fontSize}px sans-serif`;
                             this.ctx.textAlign = 'right';
@@ -1408,7 +1429,7 @@ export class WaterfallCanvas {
                                 const drawEx = Math.min(dimensions.canvasWidth - 1, ex);
                                 
                                 if (drawEx > drawSx) {
-                                    this.ctx.fillStyle = 'rgb(255, 82, 62)'; // Blocked (Red/Orange)
+                                    this.ctx.fillStyle = themeLongTask; // Blocked (Red/Orange) — override via `palette.longTask`
                                     this.ctx.fillRect(drawSx, chartYOffset + 1, drawEx - drawSx, blockHeight - 2);
                                 }
                             }
@@ -1430,7 +1451,7 @@ export class WaterfallCanvas {
                                     const drawEx = Math.min(dimensions.canvasWidth - 1, ex);
                                     
                                     if (drawEx > drawSx) {
-                                        this.ctx.fillStyle = 'rgb(255, 82, 62)'; // Blocked (Red/Orange)
+                                        this.ctx.fillStyle = themeLongTask; // Blocked (Red/Orange) — override via `palette.longTask`
                                         this.ctx.fillRect(drawSx, chartYOffset + 1, drawEx - drawSx, blockHeight - 2);
                                     }
                                 }

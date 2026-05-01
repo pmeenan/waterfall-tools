@@ -602,7 +602,15 @@ export class WaterfallTools {
             showChunks: true,
             showJsTiming: true,
             showWait: true,
-            showLegend: true
+            showLegend: true,
+            // Theming hooks. All `null`/`{}` defaults resolve to the
+            // existing hard-coded values (background `#ffffff`, row stripe
+            // `#f0f0f0`, border `#000000`, grid `rgb(192,192,192)`, etc.)
+            // so the default visual is unchanged. Override individual
+            // keys to retheme without forking the renderer.
+            rowHeight: null,                // null → 18 (or 4 in thumbnail view)
+            backgroundColor: null,          // null → '#ffffff'
+            palette: {}                     // see canvas.js draw() for the resolved keys
         };
     }
 
