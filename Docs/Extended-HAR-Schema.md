@@ -46,7 +46,9 @@ Every request object in the `.log.entries` array maps tightly to standard HAR va
 - **Timing Ext:** `_blocked_queueing`, `_workerFetchStart`, `_workerReady`, `_workerRespondWithSettled`, `_workerStart`
 
 ## Page Sub-object Extensions
-Global WebPageTest page-level timings and context records (such as performance milestones and audit data) are added directly onto the `.log.pages[0]` object with a leading underscore:
+Global WebPageTest page-level timings and context records (such as performance milestones and audit data) are added directly onto the `.log.pages[0]` object with a leading underscore.
+
+> **Producer interop note.** chrome-har and tools that build on it (Browsertime, sitespeed.io) nest the same kind of timing extensions inside `pages[].pageTimings` rather than the page root. The HAR 1.2 spec only mandates the `_` prefix — both placements are valid. The HAR importer (`src/inputs/har.js#liftPageTimingsExtensions`) normalizes the `pageTimings` shape onto the canonical page-root names listed below, so the renderer always reads from a single layout. Originals stay under `pageTimings` for HAR-faithful round-trips. Producers that already write to the page root remain authoritative — page-root values win on conflict.
 
 ### Dictionary & Array Fields
 - **Process & CPU:** `_cpuTimes`, `_cpuTimesDoc`, `_v8Stats`, `_execution_contexts`, `_utilization`
