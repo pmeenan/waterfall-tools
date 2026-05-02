@@ -124,4 +124,43 @@ describe('HAR pageTimings extension lift', () => {
         expect(page.pageTimings._firstContentfulPaint).toBe(120);
         expect(page.pageTimings._longTasks).toEqual([[100, 180], [220, 305]]);
     });
+
+    it('forwards unknown _-prefixed pageTimings extensions to the page root', async () => {
+        // Producers ship custom timing extensions that the named lift
+        // doesn't know about (e.g. _TotalBlockingTime, _cumulativeLayoutShift,
+        // _navigationTiming). The open-ended passthrough surfaces them on
+        // the page root under their source name so renderer-side code and
+        // HAR-consuming extensions can read them without poking into
+        // `pageTimings` directly.
+        const page = await loadHar(makeHarWithPageTimingsExtensions({
+            pageTimings: {
+                _TotalBlockingTime: 320,
+                _cumulativeLayoutShift: 0.05,
+                _navigationTiming: { fetchStart: 12, responseStart: 145 }
+            }
+        }));
+        expect(page._TotalBlockingTime).toBe(320);
+        expect(page._cumulativeLayoutShift).toBe(0.05);
+        expect(page._navigationTiming).toEqual({ fetchStart: 12, responseStart: 145 });
+    });
+
+    it('open-ended passthrough yields to page-root values', async () => {
+        const page = await loadHar(makeHarWithPageTimingsExtensions({
+            pageTimings: { _TotalBlockingTime: 320 },
+            pageRoot: { _TotalBlockingTime: 12 }
+        }));
+        expect(page._TotalBlockingTime).toBe(12);
+    });
+
+    it('open-ended passthrough skips spec fields and named-lifted source keys', async () => {
+        // onLoad / onContentLoad are HAR 1.2 spec fields, not extensions —
+        // they must not bleed onto the page root. _firstPaint is a
+        // named-lift source — it should route to page._render and not also
+        // appear under its own name on the page root.
+        const page = await loadHar(makeHarWithPageTimingsExtensions());
+        expect(page.onLoad).toBeUndefined();
+        expect(page.onContentLoad).toBeUndefined();
+        expect(page._firstPaint).toBeUndefined();
+        expect(page._render).toBe(90);
+    });
 });
