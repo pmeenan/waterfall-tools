@@ -205,7 +205,7 @@ The standalone viewer displays a CSS-animated progress bar driven by this callba
 
 The renderer uses the HTML5 `<canvas>` API rather than per-request DOM nodes — rendering thousands of requests doesn't trigger layout reflow. The canvas is instantiated against a parent container and uses a `ResizeObserver` to recalculate geometry as the viewport changes.
 
-Interaction is handled by maintaining a spatial index of drawn elements and mapping pointer coordinates back to data entries. Application logic plugs in via callback hooks (`onHover`, `onClick`) rather than inheritance.
+Interaction is handled by maintaining a spatial index of drawn elements and mapping pointer coordinates back to data entries. Application logic plugs in via callback hooks (`onHover`, `onClick`) rather than inheritance. `onHover(req, metrics)` keeps the existing request payload as its first argument and uses an optional second argument for visible page-metric vertical lines and user-timing marks. The metric arrays are gated by the same renderer options that draw them (`showPageMetrics`, `showMarks`) so consumers are only notified about features present on screen.
 
 The renderer supports specialized modes configurable via standard options:
 - **Connection View** — groups entries by connection to visualize multiplexing.

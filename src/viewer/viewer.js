@@ -1468,36 +1468,84 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         console.warn(`[viewer.js] Failed to fetch netlog data for ${pageId}:`, e);
     }
 
-    renderOptions.onHover = (data) => {
+    renderOptions.onHover = (data, metrics) => {
         const tooltip = document.getElementById('waterfall-tooltip');
         if (!tooltip) return;
         
-        if (!data) {
+        if (!data && !metrics) {
             tooltip.style.display = 'none';
+            tooltip.replaceChildren();
             return;
         }
-        tooltip.style.display = 'block';
-        
-        let url = data.request.url || data.request._URL || '';
-        
-        // Handle truncation in middle if > 100 chars
-        if (url.length > 100) {
-            url = url.substring(0, 50) + ' ... ' + url.substring(url.length - 45);
+
+        const bubbles = [];
+        const formatMetricTime = (value) => `${(value / 1000).toFixed(value >= 10000 ? 2 : 3)}s`;
+        const makeBubble = (className, lines) => {
+            const bubble = document.createElement('div');
+            bubble.className = `waterfall-tooltip-bubble ${className}`;
+            for (const line of lines) {
+                const row = document.createElement('div');
+                row.className = 'waterfall-tooltip-line';
+                if (line.label) {
+                    const label = document.createElement('span');
+                    label.className = 'waterfall-tooltip-label';
+                    label.textContent = line.label;
+                    row.appendChild(label);
+                }
+                const value = document.createElement('span');
+                value.className = 'waterfall-tooltip-value';
+                value.textContent = line.value;
+                row.appendChild(value);
+                bubble.appendChild(row);
+            }
+            return bubble;
+        };
+
+        if (data && data.request) {
+            const url = data.request.url || data.request._URL || '';
+            bubbles.push(makeBubble('request-tooltip', [{ value: url }]));
         }
+
+        if (metrics && metrics.pageMetrics && metrics.pageMetrics.length > 0) {
+            bubbles.push(makeBubble('page-metrics-tooltip', metrics.pageMetrics.map(metric => ({
+                label: metric.label || metric.name,
+                value: formatMetricTime(metric.value)
+            }))));
+        }
+
+        if (metrics && metrics.userTiming && metrics.userTiming.length > 0) {
+            bubbles.push(makeBubble('user-timing-tooltip', metrics.userTiming.map(mark => ({
+                label: mark.label || mark.name,
+                value: formatMetricTime(mark.value)
+            }))));
+        }
+
+        if (bubbles.length === 0) {
+            tooltip.style.display = 'none';
+            tooltip.replaceChildren();
+            return;
+        }
+
+        tooltip.replaceChildren(...bubbles);
+        tooltip.style.display = 'flex';
         
-        tooltip.textContent = url;
-        
-        if (data.event) {
-            let x = data.event.clientX + 15;
-            let y = data.event.clientY + 15;
-            
-            // Re-calculate bounds
-            if (x + tooltip.offsetWidth > window.innerWidth) {
-                x = window.innerWidth - tooltip.offsetWidth - 10;
+        const hoverEvent = (data && data.event) || (metrics && metrics.event);
+        if (hoverEvent) {
+            let x = hoverEvent.clientX + 15;
+            let y = hoverEvent.clientY + 15;
+            const viewportPadding = 10;
+            const requestBubble = tooltip.querySelector('.request-tooltip');
+            if (requestBubble) {
+                requestBubble.style.maxWidth = (window.innerWidth - (viewportPadding * 2)) + 'px';
             }
-            if (y + tooltip.offsetHeight > window.innerHeight) {
-                y = window.innerHeight - tooltip.offsetHeight - 10;
+            if (x + tooltip.offsetWidth > window.innerWidth - viewportPadding) {
+                x = Math.max(viewportPadding, window.innerWidth - tooltip.offsetWidth - viewportPadding);
             }
+            if (y + tooltip.offsetHeight > window.innerHeight - viewportPadding) {
+                y = window.innerHeight - tooltip.offsetHeight - viewportPadding;
+            }
+            x = Math.max(viewportPadding, x);
+            y = Math.max(viewportPadding, y);
             tooltip.style.left = x + 'px';
             tooltip.style.top = y + 'px';
         }

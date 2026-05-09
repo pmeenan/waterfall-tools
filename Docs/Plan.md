@@ -91,6 +91,7 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Map active spatial indexes on screen to corresponding data representations behind the scenes to identify hovering dynamically.
 - [x] Update the canvas demo (`src/demo/canvas/`) to display the most recent interaction in a status bar across the top of the page to test and validate these API callbacks.
 - [x] Implement X-axis zooming (scaling time bounding) and conditional visibility filtering (e.g. selectively hiding 404s, domains).
+- [x] Extend hover callbacks to include visible page-metric and user-timing line hits near the cursor, and update the standalone viewer to show separate tooltip bubbles for request URLs, page metrics, and user-timing marks.
 
 ## Phase 7: Website Embed Interfaces
 **Goal:** Easy drop-in architecture components into fully functioning generic webpages.

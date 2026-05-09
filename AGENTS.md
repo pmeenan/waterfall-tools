@@ -196,7 +196,7 @@ The canvas renderer expects **relative millisecond offsets** from the earliest `
 - **Queue band:** `row.colors.wait` must end at the earliest absolute start of any active network phase — prevents wait bars spanning uninstrumented preconnect gaps.
 - **Connection phase bounds:** map `sslEnd`/`connectEnd` independently; never interpolate `sslEnd → ttfbStart` as a fallback.
 - **Multi-page filter:** filter `log.entries` by `pageObj.id` before layout.
-- **Callbacks:** `options.onHover(req)`, `options.onClick(req)`.
+- **Callbacks:** `options.onHover(req, metrics)`, `options.onClick(req)`. Keep the first hover/click argument backward-compatible with the existing request payload (`{index, request, event}` or `null`). Hover metric details belong in the optional second argument: `{event, pageMetrics, userTiming}` when the cursor is within ~5 CSS px of visible vertical metric lines. Only report metrics that are actually drawn: `pageMetrics` follows `showPageMetrics`, `userTiming` follows `showMarks`. Keep the standalone viewer tooltip in sync with this shape.
 - **Resize:** viewers persist parsed `ExtendedHAR` globally, debounce `window.resize`, recompute via `Layout.calculateRows` non-destructively.
 - `options.labelsCanvas` + `options.overlapLabels` split labels from data into a separate canvas. Pinch-to-zoom updates `options.startTime`/`endTime` via `updateOptions()` — don't regenerate full layout.
 - `WaterfallTools.getDefaultOptions()` returns canonical boolean/filter dict: `{ connectionView, thumbnailView, thumbMaxReqs, showCpu, showBw, showMainthread, showLongtasks, showMissing, showLabels, showChunks, showJsTiming, showWait, showLegend, reqFilter, startTime, endTime, rowHeight, backgroundColor, palette }`. Keep in sync when adding controls.

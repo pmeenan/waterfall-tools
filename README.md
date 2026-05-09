@@ -132,7 +132,7 @@ await wt.renderTo(document.getElementById('waterfall-container'), options);
     startTime: null,         // clip the view; seconds
     endTime: null,           // clip the view; seconds
     reqFilter: '',           // filter by request id substring
-    showPageMetrics: true,   // horizontal page metric lines (LCP, TTI, etc.)
+    showPageMetrics: true,   // vertical page metric lines (LCP, TTI, etc.)
     showMarks: false,        // user timing marks
     showCpu: true,           // CPU utilization graph
     showBw: true,            // bandwidth graph
@@ -170,7 +170,7 @@ Any CSS color string works. MIME-type colors and page-event metric colors (FCP, 
 - `thumbMaxReqs` *(default 100)* — max requests drawn in `thumbnailView`. `0` disables truncation.
 - `labelsCanvas` — separate canvas for URL labels when you want to split them out.
 - `overlapLabels` — draw request rows full-width, ignoring the label gutter.
-- `onHover(req)` / `onClick(req)` — interaction callbacks.
+- `onHover(req, metrics)` / `onClick(req)` — interaction callbacks. The first `onHover` argument stays backward-compatible with the request payload shape (`{index, request, event}` or `null`). The optional second argument is populated when the cursor is within roughly 5 CSS px of visible page-metric or user-timing vertical lines: `{event, pageMetrics, userTiming}`. Metric arrays are only populated when the corresponding display option (`showPageMetrics`, `showMarks`) is enabled.
 
 ### Embedding
 

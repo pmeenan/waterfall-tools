@@ -19,7 +19,7 @@ export class WaterfallCanvas {
         this.pageObj = null;
         this.pendingRender = null;
         this.drawnRows = null;
-        this.lastHoveredIndex = null;
+        this.lastHoverKey = '';
         
         if (this.container) {
             // Remove existing canvas children natively if reloading dynamically
@@ -60,32 +60,23 @@ export class WaterfallCanvas {
 
     _bindEvents() {
         this.canvas.addEventListener('mousemove', (e) => {
-            const target = this._getInteractionTarget(e.offsetX, e.offsetY);
-            let hoverChanged = false;
-            
-            if (target) {
-                if (this.lastHoveredIndex !== target.index) {
-                    this.lastHoveredIndex = target.index;
-                    hoverChanged = true;
-                } else if (typeof this.options.onHover === 'function') {
-                    // Update location smoothly while inside the row!
-                    this.options.onHover({ index: target.index, request: this.rawEntries[target.index], event: e });
-                }
-            } else {
-                if (this.lastHoveredIndex !== null) {
-                    this.lastHoveredIndex = null;
-                    hoverChanged = true;
-                }
-            }
-            
-            if (hoverChanged && typeof this.options.onHover === 'function') {
-                this.options.onHover(target ? { index: target.index, request: this.rawEntries[target.index], event: e } : null);
+            if (typeof this.options.onHover !== 'function') return;
+
+            const payload = this._getHoverPayload(e.offsetX, e.offsetY, e);
+            const hoverKey = payload ? this._getHoverKey(payload) : '';
+
+            if (hoverKey !== this.lastHoverKey) {
+                this.lastHoverKey = hoverKey;
+                this._emitHover(payload);
+            } else if (payload) {
+                // Update location smoothly while inside the same row/metric set.
+                this._emitHover(payload);
             }
         });
 
         this.canvas.addEventListener('mouseleave', () => {
-            if (this.lastHoveredIndex !== null) {
-                this.lastHoveredIndex = null;
+            if (this.lastHoverKey) {
+                this.lastHoverKey = '';
                 if (typeof this.options.onHover === 'function') {
                     this.options.onHover(null);
                 }
@@ -105,6 +96,39 @@ export class WaterfallCanvas {
                 this.options.onDoubleClick(target ? { index: target.index, request: this.rawEntries[target.index], event: e } : null);
             }
         });
+    }
+
+    _emitHover(payload) {
+        if (typeof this.options.onHover !== 'function') return;
+
+        if (!payload) {
+            this.options.onHover(null);
+            return;
+        }
+
+        const reqPayload = payload.request ? {
+            index: payload.index,
+            request: payload.request,
+            event: payload.event
+        } : null;
+        const hasMetrics = payload.pageMetrics.length > 0 || payload.userTiming.length > 0;
+        const metricsPayload = hasMetrics ? {
+            event: payload.event,
+            pageMetrics: payload.pageMetrics,
+            userTiming: payload.userTiming
+        } : undefined;
+
+        this.options.onHover(reqPayload, metricsPayload);
+    }
+
+    _getHoverKey(payload) {
+        const metricKeys = (payload.pageMetrics || []).map(item => `${item.name}:${item.time}`).join('|');
+        const markKeys = (payload.userTiming || []).map(item => `${item.name}:${item.time}`).join('|');
+        return [
+            payload.index !== undefined ? payload.index : '',
+            metricKeys,
+            markKeys
+        ].join('::');
     }
 
     _bindTouch() {
@@ -294,6 +318,115 @@ export class WaterfallCanvas {
         }
         
         return hitRow || null;
+    }
+
+    _getHoverPayload(x, y, event) {
+        const target = this._getInteractionTarget(x, y);
+        const pageMetrics = this._getHoveredPageMetrics(x, y);
+        const userTiming = this._getHoveredUserTiming(x, y);
+
+        if (!target && pageMetrics.length === 0 && userTiming.length === 0) return null;
+
+        const payload = { event, pageMetrics, userTiming };
+        if (target) {
+            payload.index = target.index;
+            payload.request = this.rawEntries[target.index];
+        }
+        return payload;
+    }
+
+    _getHoverGeometry(y) {
+        if (!this.drawnRows || !this.drawnRows.rows || this.drawnRows.rows.length === 0) return null;
+
+        const dim = this.drawnRows.dimensions;
+        const rowHeight = (typeof this.options.rowHeight === 'number' && this.options.rowHeight > 0)
+            ? this.options.rowHeight
+            : (this.options.thumbnailView ? 4 : 18);
+        const topOffset = this.drawnRows.rows[0].y1 > 35 ? 35 : 0;
+        const requestBottomY = dim.totalRows * rowHeight + rowHeight + topOffset;
+        const lineTopY = topOffset + rowHeight + 1;
+
+        if (y < lineTopY || y > requestBottomY) return null;
+
+        return {
+            dim,
+            xScaler: (ms) => Math.floor(dim.labelsWidth + (ms * dim.widthPerMs)),
+            radiusPx: 5
+        };
+    }
+
+    _getHoveredPageMetrics(x, y) {
+        if (this.options.showPageMetrics === false) return [];
+
+        const geometry = this._getHoverGeometry(y);
+        if (!geometry || !this.drawnRows || !this.drawnRows.pageEvents) return [];
+
+        const labels = {
+            render: 'Start Render',
+            lcp: 'Largest Contentful Paint',
+            dom_element: 'DOM Element',
+            load: 'Load',
+            nav_load: 'Load Event',
+            nav_dom: 'DOM Content Loaded',
+            fcp: 'First Contentful Paint',
+            nav_dom_interactive: 'DOM Interactive',
+            aft: 'Above-the-Fold'
+        };
+        const hovered = [];
+        const addIfHit = (name, time, boundaryLabel) => {
+            if (!(time > 0)) return;
+            const metricX = geometry.xScaler(time) + 0.5;
+            if (Math.abs(x - metricX) <= geometry.radiusPx) {
+                hovered.push({
+                    name,
+                    label: boundaryLabel ? `${labels[name] || name} ${boundaryLabel}` : (labels[name] || name),
+                    time,
+                    value: time
+                });
+            }
+        };
+
+        for (const [name, value] of Object.entries(this.drawnRows.pageEvents)) {
+            if (Array.isArray(value)) {
+                addIfHit(name, value[0], 'Start');
+                addIfHit(name, value[1], 'End');
+            } else {
+                addIfHit(name, value);
+            }
+        }
+        return hovered;
+    }
+
+    _getHoveredUserTiming(x, y) {
+        if (this.options.showMarks === false || !this.pageData) return [];
+
+        const geometry = this._getHoverGeometry(y);
+        if (!geometry) return [];
+
+        const hovered = [];
+        const addMarks = (marksObj) => {
+            if (!marksObj) return;
+            for (const [name, rawValue] of Object.entries(marksObj)) {
+                let time = rawValue;
+                if (time && typeof time === 'object' && time.time) time = time.time;
+                if (!(time > 0) || time > geometry.dim.maxTime) continue;
+
+                const markX = geometry.xScaler(time) + 0.5;
+                if (Math.abs(x - markX) <= geometry.radiusPx) {
+                    hovered.push({
+                        name,
+                        label: name,
+                        time,
+                        value: time
+                    });
+                }
+            }
+        };
+
+        addMarks(this.pageData._userTimes);
+        addMarks(this.pageData._userTimingMeasures);
+        addMarks(this.pageData._user_timing);
+        return hovered;
     }
 
     render(pageData) {
