@@ -129,7 +129,7 @@ Every input format processor ships with a standalone CLI wrapper under `src/inpu
 
 Tests (vitest) parse sample inputs and assert strict equality against committed golden Extended HAR fixtures. Large-object comparisons are routed through `JSON.parse(JSON.stringify(...))` before assertion to avoid `undefined`-vs-missing hangs; dynamically-generated fields (like fallback `startedDateTime` values derived from `Date.now()`) are scrubbed from both sides before comparison.
 
-Pull requests targeting `main` trigger `.github/workflows/ci.yml`, which runs `npm ci`, `npm run lint`, and `npm run build` on Node 22. Lint is a hard gate (`--max-warnings 0`), and the production build must succeed — either failing blocks the merge.
+Pull requests targeting `main` trigger `.github/workflows/ci.yml`, which runs `npm ci`, `npm run lint`, and `npm run build` on Node 22. Lint is a hard gate (`--max-warnings 0`), and the production build must succeed — either failing blocks the merge. Regular audits via `npm audit` are run to ensure that vulnerabilities in third-party dependencies are fixed.
 
 ## Extended HAR
 

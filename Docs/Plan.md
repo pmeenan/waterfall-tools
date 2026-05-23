@@ -232,3 +232,9 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Honour `options.rowHeight` consistently in `Layout.calculateRows` and `Canvas._getInteractionTarget` so row positions and hover hit-testing stay in sync.
 - [x] Tests assert defaults are inert (existing 36 tests unchanged) and that explicit overrides take effect (`tests/renderer/theming-options.test.js`).
 - [x] MIME-type colors (`Layout.getMimeColor`) and page-event metric colors (`eventColors` for FCP/LCP/etc.) are intentionally **not** opened up — they're keyed maps with their own back-compat surface. Future phase if there's demand.
+
+## Phase 9b: Security & Maintenance
+**Goal:** Keep dependencies secure and resolve test regressions.
+- [x] Update vulnerable dependencies (`vite`, `postcss`, `brace-expansion`) via `npm audit fix`.
+- [x] Resolve test suite regression in `tests/inputs/har.test.js` by regenerating the `amazon.har.json` test fixture with the correct page timing extensions.
+

@@ -299,3 +299,11 @@ Single-file, zero-binding Worker providing CORS-safe fetch proxy for viewer URL 
 
 - Dense mathematical / coordinate-mapping logic (canvas rendering, binary parsing) must carry train-of-thought inline comments explaining *why* bounds fire in a specific order. Rollup/Vite strips comments in production — no bloat cost.
 - Don't explain what readable code already shows. Only explain why.
+
+## Dependency & Security Updates
+- **v0.3.0 Maintenance (May 2026):** Ran dependency updates and security maintenance:
+  - Ran `npm audit fix` to address three vulnerabilities (2 moderate, 1 high) in `brace-expansion` (to `5.0.6`), `postcss` (to `8.5.15`), and `vite` (to `8.0.14`).
+  - Ran `npm update` to upgrade all other packages to their latest compatible versions (eslint to `10.4.0`, globals to `17.6.0`, rollup to `4.60.4`, vitest to `4.1.7`, @chrome-devtools/index to `1.20260517.0`, and @napi-rs/canvas to `0.1.100`).
+  - Reconciled stale `package-lock.json` with `package.json`, updating the lockfile version to `0.3.0` and moving `@chrome-devtools/index` from `dependencies` to `devDependencies` and `peerDependencies`.
+  - Regenerated the test fixture `tests/fixtures/amazon.har.json` to resolve the test suite regression by incorporating `_startRender` on pages.
+

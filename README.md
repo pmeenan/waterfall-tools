@@ -290,7 +290,7 @@ npm run build:demo   # bundled demo output under bin/demo/
 
 ### Continuous integration
 
-Every pull request to `main` triggers `.github/workflows/ci.yml`, which installs dependencies with `npm ci` and then runs `npm run lint` and `npm run build` on Node 22. Lint warnings and build failures block the PR.
+Every pull request to `main` triggers `.github/workflows/ci.yml`, which installs dependencies with `npm ci` and then runs `npm run lint` and `npm run build` on Node 22. Lint warnings and build failures block the PR. Periodic security audits are run using `npm audit` to keep third-party dependencies secure.
 
 ## License
 
