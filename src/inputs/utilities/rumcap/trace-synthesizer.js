@@ -32,11 +32,17 @@
  * documentLoaderURL/isLoadingMainFrame/isOutermostMainFrame/navigationId.
  */
 
-// Fixed synthetic identity — one renderer process, main thread + optional profiler thread.
+// Fixed synthetic identity: one renderer process plus a non-renderer process used only for
+// DevTools Network parser inputs. The latter is intentionally not declared in frame metadata,
+// so RendererHandler drops it after NetworkRequestsHandler has consumed the Resource* events.
 const PID = 1000;
+const PID_NETWORK_EVENTS = 1001;
+const PID_EXTENSION_EVENTS = 1002;
 const TID_MAIN = 1;
-const TID_PROFILER = 2;
+const TID_NETWORK = 2;
+const TID_EXTENSION = 3;
 const PERFETTO_PROCESS_NAME = 'Performance Profile';
+const PROFILE_SCRIPT_ID_BASE = 1000000;
 // 32-hex-char frame token, same shape as Chrome's real frame GUIDs.
 const FRAME_ID = 'AAAAAAAAAAAAAAAAAAAAAAAAAARUMCAP';
 const NAVIGATION_ID = 'BBBBBBBBBBBBBBBBBBBBBBBBBBRUMCAP';
@@ -589,6 +595,50 @@ function buildPerfettoRequestPhases(r, startMs, finishMs, requestArgs) {
     return phases;
 }
 
+function normalizeProfileSlices(profile) {
+    if (!profile || !Array.isArray(profile.slices) || profile.slices.length === 0) {
+        return { slices: [], resourceUrls: [] };
+    }
+    const frames = profile.frames || [];
+    const resourceUrls = profile.resources || [];
+    const slices = [];
+    const stack = [];
+
+    for (const slice of profile.slices) {
+        if (!slice || slice.start === undefined) continue;
+        const depth = slice.depth || 0;
+        while (stack.length > 0 && slices[stack[stack.length - 1]].depth >= depth) stack.pop();
+        let ts = us(slice.start);
+        let end = us(slice.start + (slice.duration || 0));
+        const parentIndex = stack.length > 0 ? stack[stack.length - 1] : -1;
+        if (parentIndex >= 0) {
+            const parent = slices[parentIndex];
+            // X-event flame charts require strict containment, but rumcap durations are on
+            // a 1 ms grid, so rounding can push child bounds outside their parent.
+            ts = Math.min(Math.max(ts, parent.ts), parent.end);
+            end = Math.min(Math.max(end, ts), parent.end);
+        }
+
+        const frame = frames[slice.frameId];
+        const index = slices.length;
+        slices.push({
+            children: [],
+            depth,
+            end,
+            frame,
+            index,
+            name: profileFrameName(frame, resourceUrls),
+            parentIndex,
+            slice,
+            ts
+        });
+        if (parentIndex >= 0) slices[parentIndex].children.push(index);
+        stack.push(index);
+    }
+
+    return { slices, resourceUrls };
+}
+
 function addProcessTracks(builder, {
     hasRequestsTrack,
     hasPageMilestonesTrack,
@@ -714,30 +764,12 @@ function addPerfettoRequestTracks(builder, resources) {
 }
 
 function addPerfettoProfile(builder, profile) {
-    if (!profile || !Array.isArray(profile.slices) || profile.slices.length === 0) return;
-    const frames = profile.frames || [];
-    const resourceUrls = profile.resources || [];
-    const stack = [];
-    for (const slice of profile.slices) {
-        if (!slice || slice.start === undefined) continue;
-        const depth = slice.depth || 0;
-        while (stack.length > 0 && stack[stack.length - 1].depth >= depth) stack.pop();
-        let start = us(slice.start);
-        let end = us(slice.start + (slice.duration || 0));
-        const parent = stack.length > 0 ? stack[stack.length - 1] : null;
-        if (parent) {
-            start = Math.min(Math.max(start, parent.start), parent.end);
-            end = Math.min(Math.max(end, start), parent.end);
-        }
-        const frame = frames[slice.frameId];
-        const name = (frame && frame.name)
-            || (frame && frame.resourceId !== undefined && urlBasename(resourceUrls[frame.resourceId]))
-            || '(anonymous)';
-        builder.slice(PERFETTO_TRACKS.PROFILE, name, start, end, ['devtools.timeline'], {
-            depth,
-            frame_id: slice.frameId
+    const normalized = normalizeProfileSlices(profile);
+    for (const item of normalized.slices) {
+        builder.slice(PERFETTO_TRACKS.PROFILE, item.name, item.ts, item.end, ['devtools.timeline'], {
+            depth: item.depth,
+            frame_id: item.slice.frameId
         });
-        stack.push({ depth, start, end });
     }
 }
 
@@ -895,6 +927,508 @@ function addPerfettoLoafFrame(builder, frame, index) {
         type: TRACK_EVENT.SLICE_END,
         trackUuid: track,
         categories: ['loaf.frame']
+    });
+}
+
+function chromeCompleteEvent(events, {
+    name,
+    category,
+    startMs,
+    endMs,
+    data,
+    tid = TID_MAIN
+}) {
+    if (!finiteNumber(startMs) || !finiteNumber(endMs)) return;
+    const ts = us(startMs);
+    const end = Math.max(ts, us(endMs));
+    events.push({
+        args: data ? { data } : {},
+        cat: category,
+        name,
+        ph: 'X',
+        pid: PID,
+        tid,
+        ts,
+        dur: end - ts
+    });
+}
+
+function addDevtoolsTrackMeasure(events, {
+    track,
+    name,
+    startMs,
+    endMs,
+    data,
+    mintId,
+    color,
+    pid = PID_EXTENSION_EVENTS,
+    tid = TID_EXTENSION
+}) {
+    if (!track || !name || !finiteNumber(startMs) || !finiteNumber(endMs)) return;
+    const beginTs = us(startMs);
+    const endTs = Math.max(beginTs, us(endMs));
+    const devtools = {
+        dataType: 'track-entry',
+        track
+    };
+    if (color) devtools.color = color;
+    const detail = { devtools };
+    if (data && typeof data === 'object') {
+        for (const [key, value] of Object.entries(data)) {
+            if (value !== undefined && value !== null) detail[key] = value;
+        }
+    }
+    const encoded = encodeDetail(detail);
+    if (encoded === null) return;
+    const id = mintId();
+    events.push({
+        args: { startTime: startMs, detail: encoded },
+        cat: 'blink.user_timing',
+        id2: { local: id },
+        name,
+        ph: 'b',
+        pid,
+        tid,
+        ts: beginTs
+    });
+    events.push({
+        args: {},
+        cat: 'blink.user_timing',
+        id2: { local: id },
+        name,
+        ph: 'e',
+        pid,
+        tid,
+        ts: endTs
+    });
+}
+
+function addChromeLoafScript(events, script, index, startMs, endMs, mintId) {
+    if (endMs <= startMs) return;
+    const scriptData = {
+        loafType: 'script',
+        ...loafScriptArgs(script),
+        clipped_start_ms: startMs,
+        clipped_end_ms: endMs
+    };
+    chromeCompleteEvent(events, {
+        name: loafScriptName(script, index),
+        category: 'devtools.timeline,loaf.script',
+        startMs,
+        endMs,
+        data: scriptData
+    });
+    addDevtoolsTrackMeasure(events, {
+        track: 'Long Animation Frames',
+        name: loafScriptName(script, index),
+        startMs,
+        endMs,
+        data: scriptData,
+        mintId,
+        color: 'secondary'
+    });
+
+    const executionStart = script.executionStart !== undefined
+        ? Math.min(Math.max(script.executionStart, startMs), endMs)
+        : undefined;
+    if (executionStart !== undefined && executionStart > startMs && executionStart < endMs) {
+        const executionData = {
+            loafType: 'scriptExecution',
+            source_url: script.sourceURL || '',
+            source_function_name: script.sourceFunctionName || '',
+            duration_ms: endMs - executionStart
+        };
+        chromeCompleteEvent(events, {
+            name: 'Script Execution',
+            category: 'devtools.timeline,loaf.script.execution',
+            startMs: executionStart,
+            endMs,
+            data: executionData
+        });
+        addDevtoolsTrackMeasure(events, {
+            track: 'Long Animation Frames',
+            name: 'Script Execution',
+            startMs: executionStart,
+            endMs,
+            data: executionData,
+            mintId,
+            color: 'secondary-dark'
+        });
+    }
+}
+
+function addChromeLoafScripts(events, scripts, startMs, endMs, indexRef, mintId) {
+    for (const script of scripts) {
+        if (script.startTime >= endMs || script.startTime + script.duration <= startMs) continue;
+        const sliceStart = Math.max(startMs, script.startTime);
+        const sliceEnd = Math.min(endMs, script.startTime + script.duration);
+        addChromeLoafScript(events, script, ++indexRef.value, sliceStart, sliceEnd, mintId);
+    }
+}
+
+function addChromeLoafFrame(events, frame, index, mintId) {
+    const frameStart = frame.startTime;
+    const frameEnd = frame.startTime + (finiteNumber(frame.duration) ? Math.max(0, frame.duration) : 0);
+    const frameId = mintId();
+    const frameData = {
+        loafType: 'frame',
+        frame_index: index,
+        ...loafFrameArgs(frame)
+    };
+
+    events.push({
+        args: {
+            id: frameId,
+            animation_frame_timing_info: {
+                blocking_duration_ms: frame.blockingDuration || 0,
+                duration_ms: frame.duration || 0,
+                num_scripts: Array.isArray(frame.scripts) ? frame.scripts.length : 0
+            }
+        },
+        cat: 'devtools.timeline',
+        name: 'AnimationFrame',
+        ph: 'b',
+        pid: PID,
+        tid: TID_MAIN,
+        ts: us(frameStart)
+    });
+    events.push({
+        args: {},
+        cat: 'devtools.timeline',
+        name: 'AnimationFrame',
+        ph: 'e',
+        pid: PID,
+        tid: TID_MAIN,
+        ts: Math.max(us(frameEnd), us(frameStart))
+    });
+    if (finiteNumber(frame.presentationTime)) {
+        events.push({
+            args: { id: frameId },
+            cat: 'devtools.timeline',
+            name: 'AnimationFrame::Presentation',
+            ph: 'n',
+            pid: PID,
+            tid: TID_MAIN,
+            ts: us(frame.presentationTime)
+        });
+    }
+
+    chromeCompleteEvent(events, {
+        name: 'LongAnimationFrame',
+        category: 'devtools.timeline,loaf.frame',
+        startMs: frameStart,
+        endMs: frameEnd,
+        data: frameData
+    });
+    addDevtoolsTrackMeasure(events, {
+        track: 'Long Animation Frames',
+        name: 'LongAnimationFrame',
+        startMs: frameStart,
+        endMs: frameEnd,
+        data: frameData,
+        mintId,
+        color: 'warning'
+    });
+
+    const scripts = Array.isArray(frame.scripts)
+        ? [...frame.scripts]
+            .filter(s => s && finiteNumber(s.startTime) && finiteNumber(s.duration) && s.duration > 0)
+            .sort((a, b) => a.startTime - b.startTime)
+        : [];
+    const rawRenderStart = finiteNumber(frame.renderStart) ? frame.renderStart : undefined;
+    const renderStart = rawRenderStart !== undefined && rawRenderStart >= frameStart && rawRenderStart < frameEnd
+        ? rawRenderStart : undefined;
+    const rawStyleStart = finiteNumber(frame.styleAndLayoutStart) ? frame.styleAndLayoutStart : undefined;
+    const styleStart = renderStart !== undefined
+        && rawStyleStart !== undefined
+        && rawStyleStart >= renderStart
+        && rawStyleStart < frameEnd
+        ? rawStyleStart : undefined;
+    const scriptSeq = { value: 0 };
+    addChromeLoafScripts(
+        events,
+        scripts.filter(s => renderStart === undefined || s.startTime < renderStart),
+        frameStart,
+        renderStart ?? frameEnd,
+        scriptSeq,
+        mintId
+    );
+
+    if (renderStart !== undefined && renderStart < frameEnd) {
+        const renderData = {
+            loafType: 'render',
+            render_start_ms: frame.renderStart,
+            duration_ms: frameEnd - renderStart
+        };
+        chromeCompleteEvent(events, {
+            name: 'Render',
+            category: 'devtools.timeline,loaf.render',
+            startMs: renderStart,
+            endMs: frameEnd,
+            data: renderData
+        });
+        addDevtoolsTrackMeasure(events, {
+            track: 'Long Animation Frames',
+            name: 'Render',
+            startMs: renderStart,
+            endMs: frameEnd,
+            data: renderData,
+            mintId,
+            color: 'tertiary'
+        });
+        addChromeLoafScripts(
+            events,
+            scripts.filter(s => s.startTime >= renderStart && (styleStart === undefined || s.startTime < styleStart)),
+            renderStart,
+            styleStart ?? frameEnd,
+            scriptSeq,
+            mintId
+        );
+        if (styleStart !== undefined && styleStart < frameEnd) {
+            const styleData = {
+                loafType: 'styleLayout',
+                style_and_layout_start_ms: frame.styleAndLayoutStart,
+                duration_ms: frameEnd - styleStart
+            };
+            chromeCompleteEvent(events, {
+                name: 'Style & Layout',
+                category: 'devtools.timeline,loaf.style_layout',
+                startMs: styleStart,
+                endMs: frameEnd,
+                data: styleData
+            });
+            addDevtoolsTrackMeasure(events, {
+                track: 'Long Animation Frames',
+                name: 'Style & Layout',
+                startMs: styleStart,
+                endMs: frameEnd,
+                data: styleData,
+                mintId,
+                color: 'tertiary-dark'
+            });
+            addChromeLoafScripts(
+                events,
+                scripts.filter(s => s.startTime >= styleStart),
+                styleStart,
+                frameEnd,
+                scriptSeq,
+                mintId
+            );
+        }
+    }
+}
+
+function profileFrameName(frame, resourceUrls) {
+    return (frame && frame.name)
+        || (frame && frame.resourceId !== undefined && urlBasename(resourceUrls[frame.resourceId]))
+        || '(anonymous)';
+}
+
+function profileCallFrame(functionName, scriptId, url, lineNumber = -1, columnNumber = -1) {
+    return {
+        columnNumber,
+        functionName,
+        lineNumber,
+        scriptId: String(scriptId),
+        url
+    };
+}
+
+function profileScriptIdForUrl(url, scriptIdByUrl) {
+    let scriptId = scriptIdByUrl.get(url);
+    if (scriptId === undefined) {
+        scriptId = PROFILE_SCRIPT_ID_BASE + scriptIdByUrl.size;
+        scriptIdByUrl.set(url, scriptId);
+    }
+    return scriptId;
+}
+
+function profileCallFrameForSlice(item, resourceUrls, fallbackScriptId, scriptIdByUrl) {
+    const frame = item.frame;
+    const url = frame && frame.resourceId !== undefined ? (resourceUrls[frame.resourceId] || '') : '';
+    const scriptId = url ? profileScriptIdForUrl(url, scriptIdByUrl)
+        : (item.slice.frameId !== undefined ? item.slice.frameId : fallbackScriptId);
+    return profileCallFrame(
+        item.name,
+        scriptId,
+        url,
+        frame && finiteNumber(frame.line) ? frame.line : -1,
+        frame && finiteNumber(frame.column) ? frame.column : -1
+    );
+}
+
+function profileNodeKey(parentNodeId, callFrame) {
+    return [
+        parentNodeId,
+        callFrame.functionName,
+        callFrame.scriptId,
+        callFrame.url,
+        callFrame.lineNumber,
+        callFrame.columnNumber
+    ].join('\u0000');
+}
+
+function appendCpuProfileSample(samples, sampleTimestamps, timestampUs, nodeId) {
+    const ts = Math.max(0, Math.round(timestampUs));
+    if (sampleTimestamps.length > 0 && sampleTimestamps[sampleTimestamps.length - 1] === ts) {
+        samples[samples.length - 1] = nodeId;
+        return;
+    }
+    if (samples.length > 0 && samples[samples.length - 1] === nodeId) return;
+    samples.push(nodeId);
+    sampleTimestamps.push(ts);
+}
+
+function appendProfileSamplesForSlice(profileSlices, index, nodeIdByIndex, samples, sampleTimestamps, rangeStart, rangeEnd) {
+    const item = profileSlices[index];
+    const nodeId = nodeIdByIndex.get(index);
+    if (!item || nodeId === undefined || rangeEnd <= rangeStart) return;
+
+    let cursor = rangeStart;
+    const children = [...item.children].sort((a, b) => {
+        const aItem = profileSlices[a];
+        const bItem = profileSlices[b];
+        return aItem.ts - bItem.ts || aItem.end - bItem.end || a - b;
+    });
+
+    for (const childIndex of children) {
+        const child = profileSlices[childIndex];
+        const childStart = Math.max(rangeStart, child.ts);
+        const childEnd = Math.min(rangeEnd, child.end);
+        if (childEnd <= cursor) continue;
+        if (childStart > cursor) appendCpuProfileSample(samples, sampleTimestamps, cursor, nodeId);
+        appendProfileSamplesForSlice(
+            profileSlices,
+            childIndex,
+            nodeIdByIndex,
+            samples,
+            sampleTimestamps,
+            Math.max(childStart, cursor),
+            childEnd
+        );
+        cursor = Math.max(cursor, childEnd);
+    }
+
+    if (rangeEnd > cursor) appendCpuProfileSample(samples, sampleTimestamps, cursor, nodeId);
+}
+
+function buildCpuProfileFromSlices(normalizedProfile) {
+    const profileSlices = normalizedProfile.slices;
+    if (profileSlices.length === 0) return null;
+    const profileStart = Math.min(...profileSlices.map(s => s.ts));
+    const profileEnd = Math.max(...profileSlices.map(s => s.end));
+    if (profileEnd <= profileStart) return null;
+
+    const rootNodeId = 1;
+    const idleNodeId = 2;
+    let nextNodeId = 3;
+    const nodes = [{
+        callFrame: profileCallFrame('(root)', 0, ''),
+        id: rootNodeId
+    }, {
+        callFrame: profileCallFrame('(idle)', 0, ''),
+        id: idleNodeId,
+        parent: rootNodeId
+    }];
+    const nodeIdByIndex = new Map();
+    const nodeIdByCallFramePath = new Map();
+    const scriptIdByUrl = new Map();
+
+    for (const item of profileSlices) {
+        const parentNodeId = item.parentIndex >= 0 ? nodeIdByIndex.get(item.parentIndex) : rootNodeId;
+        const callFrame = profileCallFrameForSlice(item, normalizedProfile.resourceUrls, nextNodeId, scriptIdByUrl);
+        const key = profileNodeKey(parentNodeId, callFrame);
+        let id = nodeIdByCallFramePath.get(key);
+        if (id === undefined) {
+            id = nextNodeId++;
+            nodeIdByCallFramePath.set(key, id);
+            nodes.push({
+                callFrame,
+                id,
+                parent: parentNodeId
+            });
+        }
+        nodeIdByIndex.set(item.index, id);
+    }
+
+    const samples = [];
+    const sampleTimestamps = [];
+    const roots = profileSlices
+        .filter(item => item.parentIndex < 0)
+        .sort((a, b) => a.ts - b.ts || a.end - b.end || a.index - b.index);
+    let cursor = profileStart;
+    for (const item of roots) {
+        const rootStart = Math.max(profileStart, item.ts);
+        const rootEnd = Math.min(profileEnd, item.end);
+        if (rootEnd <= cursor) continue;
+        if (rootStart > cursor) appendCpuProfileSample(samples, sampleTimestamps, cursor, idleNodeId);
+        appendProfileSamplesForSlice(
+            profileSlices,
+            item.index,
+            nodeIdByIndex,
+            samples,
+            sampleTimestamps,
+            Math.max(rootStart, cursor),
+            rootEnd
+        );
+        cursor = Math.max(cursor, rootEnd);
+    }
+    if (profileEnd > cursor) appendCpuProfileSample(samples, sampleTimestamps, cursor, idleNodeId);
+    appendCpuProfileSample(samples, sampleTimestamps, profileEnd, idleNodeId);
+
+    // Trace CPU profiles store samples as positive deltas from the Profile event timestamp.
+    // Keep the first sample at the real profile start, but put the Profile event just before it.
+    const profileEventTs = profileStart > 0 ? profileStart - 1 : profileStart;
+    const timeDeltas = [];
+    let lastTimestamp = profileEventTs;
+    for (const timestamp of sampleTimestamps) {
+        timeDeltas.push(Math.max(0, timestamp - lastTimestamp));
+        lastTimestamp = timestamp;
+    }
+
+    if (samples.length !== timeDeltas.length || samples.length === 0) return null;
+    return {
+        nodes,
+        profileEventTs,
+        profileEnd,
+        profileStart,
+        samples,
+        timeDeltas
+    };
+}
+
+function addNativeDevtoolsCpuProfile(events, normalizedProfile) {
+    const cpuProfile = buildCpuProfileFromSlices(normalizedProfile);
+    if (!cpuProfile) return;
+    const profileId = '0xrumcapselfprofile';
+    events.push({
+        args: { data: { startTime: cpuProfile.profileEventTs, source: 'SelfProfiling' } },
+        cat: 'disabled-by-default-v8.cpu_profiler',
+        id: profileId,
+        name: 'Profile',
+        ph: 'P',
+        pid: PID,
+        tid: TID_MAIN,
+        ts: cpuProfile.profileEventTs
+    });
+    events.push({
+        args: {
+            data: {
+                cpuProfile: {
+                    nodes: cpuProfile.nodes,
+                    samples: cpuProfile.samples
+                },
+                source: 'SelfProfiling',
+                timeDeltas: cpuProfile.timeDeltas
+            }
+        },
+        cat: 'disabled-by-default-v8.cpu_profiler',
+        id: profileId,
+        name: 'ProfileChunk',
+        ph: 'P',
+        pid: PID,
+        tid: TID_MAIN,
+        ts: cpuProfile.profileEventTs
     });
 }
 
@@ -1173,15 +1707,18 @@ function synthesizeTrace(capture) {
     let nextAsyncId = 1;
     const mintId = () => `0x${(nextAsyncId++).toString(16)}`;
 
+    const resources = [];
+    if (nav) resources.push({ r: nav, isNavigation: true });
+    if (streamPresent(capture, 'resources')) {
+        for (const r of streams.resources || []) resources.push({ r, isNavigation: false });
+    }
+
     const profile = streamPresent(capture, 'profile') ? streams.profile : null;
-    const hasProfilerThread = !!(profile && Array.isArray(profile.slices) && profile.slices.length > 0);
+    const hasProfileSlices = !!(profile && Array.isArray(profile.slices) && profile.slices.length > 0);
 
     // ── Scaffolding ──────────────────────────────────────────────────────────────────────────
     events.push({ args: { name: 'Renderer' }, cat: '__metadata', name: 'process_name', ph: 'M', pid: PID, tid: 0, ts: 0 });
     events.push({ args: { name: 'CrRendererMain' }, cat: '__metadata', name: 'thread_name', ph: 'M', pid: PID, tid: TID_MAIN, ts: 0 });
-    if (hasProfilerThread) {
-        events.push({ args: { name: 'JS Self-Profiling' }, cat: '__metadata', name: 'thread_name', ph: 'M', pid: PID, tid: TID_PROFILER, ts: 0 });
-    }
 
     // DevTools' MetaHandler requires the frames array to establish the main frame + renderer pid.
     events.push({
@@ -1219,12 +1756,6 @@ function synthesizeTrace(capture) {
     });
 
     // ── Network track ────────────────────────────────────────────────────────────────────────
-    const resources = [];
-    if (nav) resources.push({ r: nav, isNavigation: true });
-    if (streamPresent(capture, 'resources')) {
-        for (const r of streams.resources || []) resources.push({ r, isNavigation: false });
-    }
-
     let requestSeq = 0;
     for (const { r, isNavigation } of resources) {
         const requestId = `rumcap.${++requestSeq}`;
@@ -1235,11 +1766,10 @@ function synthesizeTrace(capture) {
         const endMs = r.responseEnd !== undefined ? r.responseEnd : startMs + (r.duration || 0);
         const finishMs = Math.max(startMs, endMs);
         const timing = buildTimingBlock(r);
-
         events.push({
             args: { data: { requestId } },
             cat: 'devtools.timeline', name: 'ResourceWillSendRequest',
-            ph: 'I', pid: PID, s: 'p', tid: TID_MAIN, ts: startTs
+            ph: 'I', pid: PID_NETWORK_EVENTS, s: 'p', tid: TID_NETWORK, ts: startTs
         });
 
         events.push({
@@ -1258,7 +1788,7 @@ function synthesizeTrace(capture) {
                 }
             },
             cat: 'devtools.timeline', name: 'ResourceSendRequest',
-            ph: 'I', pid: PID, s: 't', tid: TID_MAIN, ts: us(sendMs)
+            ph: 'I', pid: PID_NETWORK_EVENTS, s: 't', tid: TID_NETWORK, ts: us(sendMs)
         });
 
         if (r.responseStart !== undefined) {
@@ -1281,7 +1811,7 @@ function synthesizeTrace(capture) {
             events.push({
                 args: { data: responseData },
                 cat: 'devtools.timeline', name: 'ResourceReceiveResponse',
-                ph: 'I', pid: PID, s: 't', tid: TID_MAIN, ts: us(r.responseStart)
+                ph: 'I', pid: PID_NETWORK_EVENTS, s: 't', tid: TID_NETWORK, ts: us(r.responseStart)
             });
         }
 
@@ -1297,7 +1827,7 @@ function synthesizeTrace(capture) {
                 }
             },
             cat: 'devtools.timeline', name: 'ResourceFinish',
-            ph: 'I', pid: PID, s: 't', tid: TID_MAIN, ts: us(finishMs)
+            ph: 'I', pid: PID_NETWORK_EVENTS, s: 't', tid: TID_NETWORK, ts: us(finishMs)
         });
     }
 
@@ -1420,17 +1950,10 @@ function synthesizeTrace(capture) {
     }
 
     if (streamPresent(capture, 'loaf') && streams.loaf) {
+        let loafSeq = 0;
         for (const f of streams.loaf.frames || []) {
             if (!f || f.startTime === undefined) continue;
-            const data = { duration: f.duration || 0 };
-            if (f.blockingDuration !== undefined) data.blockingDuration = f.blockingDuration;
-            if (f.renderStart !== undefined) data.renderStart = f.renderStart;
-            if (f.styleAndLayoutStart !== undefined) data.styleAndLayoutStart = f.styleAndLayoutStart;
-            if (Array.isArray(f.scripts)) data.numScripts = f.scripts.length;
-            events.push({
-                args: { data }, cat: 'devtools.timeline', name: 'LongAnimationFrame',
-                ph: 'X', pid: PID, tid: TID_MAIN, ts: us(f.startTime), dur: us(f.duration || 0)
-            });
+            addChromeLoafFrame(events, f, ++loafSeq, mintId);
         }
     }
 
@@ -1457,7 +1980,7 @@ function synthesizeTrace(capture) {
             }
             events.push({
                 args: { data }, cat: 'blink.user_timing', name: m.name,
-                ph: 'I', pid: PID, s: 't', tid: TID_MAIN, ts: us(m.startTime)
+                ph: 'I', pid: PID_EXTENSION_EVENTS, s: 't', tid: TID_EXTENSION, ts: us(m.startTime)
             });
         }
         for (const m of streams.userTiming.measures || []) {
@@ -1474,11 +1997,12 @@ function synthesizeTrace(capture) {
             const beginTs = us(m.startTime);
             events.push({
                 args: beginArgs, cat: 'blink.user_timing', id2: { local: id }, name: m.name,
-                ph: 'b', pid: PID, tid: TID_MAIN, ts: beginTs
+                ph: 'b', pid: PID_EXTENSION_EVENTS, tid: TID_EXTENSION, ts: beginTs
             });
             events.push({
                 args: {}, cat: 'blink.user_timing', id2: { local: id }, name: m.name,
-                ph: 'e', pid: PID, tid: TID_MAIN, ts: Math.max(us(m.startTime + (m.duration || 0)), beginTs)
+                ph: 'e', pid: PID_EXTENSION_EVENTS, tid: TID_EXTENSION,
+                ts: Math.max(us(m.startTime + (m.duration || 0)), beginTs)
             });
         }
     }
@@ -1512,46 +2036,25 @@ function synthesizeTrace(capture) {
                 if (enc !== null) beginArgs.detail = enc;
                 events.push({
                     args: beginArgs, cat: 'blink.user_timing', id2: { local: id }, name: ev.name,
-                    ph: 'b', pid: PID, tid: TID_MAIN, ts: beginTs
+                    ph: 'b', pid: PID_EXTENSION_EVENTS, tid: TID_EXTENSION, ts: beginTs
                 });
                 events.push({
                     args: {}, cat: 'blink.user_timing', id2: { local: id }, name: ev.name,
-                    ph: 'e', pid: PID, tid: TID_MAIN, ts: Math.max(us(ev.start + (ev.duration || 0)), beginTs)
+                    ph: 'e', pid: PID_EXTENSION_EVENTS, tid: TID_EXTENSION,
+                    ts: Math.max(us(ev.start + (ev.duration || 0)), beginTs)
                 });
             }
         }
     }
 
-    // ── Profile → flame chart on the dedicated profiler thread ──────────────────────────────
-    if (hasProfilerThread) {
-        const frames = profile.frames || [];
-        const resourceUrls = profile.resources || [];
+    // ── Profile → native CPU profile ───────────────────────────────────────────────────────
+    if (hasProfileSlices) {
         // Slices are pre-order (start asc, depth asc); a slice's parent is the nearest
-        // preceding slice at depth-1. X-event flame charts require strict containment, but the
-        // wire stores durations on a 1ms grid — rounding can push a child's end past its
-        // parent's, so clamp child bounds into the parent's [ts, end] as we walk the stack.
-        const stack = []; // [{ depth, ts, end }]
-        for (const slice of profile.slices) {
-            if (!slice || slice.start === undefined) continue;
-            const depth = slice.depth || 0;
-            while (stack.length > 0 && stack[stack.length - 1].depth >= depth) stack.pop();
-            let ts = us(slice.start);
-            let end = us(slice.start + (slice.duration || 0));
-            const parent = stack.length > 0 ? stack[stack.length - 1] : null;
-            if (parent) {
-                ts = Math.min(Math.max(ts, parent.ts), parent.end);
-                end = Math.min(Math.max(end, ts), parent.end);
-            }
-            const frame = frames[slice.frameId];
-            const name = (frame && frame.name)
-                || (frame && frame.resourceId !== undefined && urlBasename(resourceUrls[frame.resourceId]))
-                || '(anonymous)';
-            events.push({
-                args: {}, cat: 'devtools.timeline', name,
-                ph: 'X', pid: PID, tid: TID_PROFILER, ts, dur: end - ts
-            });
-            stack.push({ depth, ts, end });
-        }
+        // preceding slice at depth-1. Avoid duplicate profile timeline entries on CrRendererMain:
+        // SamplesIntegrator merges profile samples with every trace entry on the sampled thread,
+        // so visible X/measure copies split the native stacks.
+        const normalizedProfile = normalizeProfileSlices(profile);
+        addNativeDevtoolsCpuProfile(events, normalizedProfile);
     }
 
     // Metadata (ph M) events lead; everything else sorts by ts. Ties keep emission order

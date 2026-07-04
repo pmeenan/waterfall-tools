@@ -35,6 +35,42 @@ function finiteNumberForTest(v) {
     return typeof v === 'number' && Number.isFinite(v);
 }
 
+function eventHasCategory(e, category) {
+    return String(e.cat || '').split(',').includes(category);
+}
+
+function devtoolsTrackForEvent(e) {
+    const detail = e && e.args && e.args.detail;
+    if (!detail) return null;
+    try {
+        return JSON.parse(detail).devtools?.track || null;
+    } catch {
+        return null;
+    }
+}
+
+function normalizeProfileSlicesForTest(profile) {
+    const slices = [];
+    const stack = [];
+    for (const slice of profile.slices || []) {
+        if (!slice || slice.start === undefined) continue;
+        const depth = slice.depth || 0;
+        while (stack.length > 0 && slices[stack[stack.length - 1]].depth >= depth) stack.pop();
+        let ts = usForTest(slice.start);
+        let end = usForTest(slice.start + (slice.duration || 0));
+        const parentIndex = stack.length > 0 ? stack[stack.length - 1] : -1;
+        if (parentIndex >= 0) {
+            const parent = slices[parentIndex];
+            ts = Math.min(Math.max(ts, parent.ts), parent.end);
+            end = Math.min(Math.max(end, ts), parent.end);
+        }
+        const index = slices.length;
+        slices.push({ depth, end, parentIndex, ts });
+        stack.push(index);
+    }
+    return slices;
+}
+
 function allocateUserTimingMeasureLanesForTest(measures) {
     const lanes = [];
     return measures
@@ -454,24 +490,6 @@ function structuralChecks(trace) {
     return events;
 }
 
-// Profile flame-chart containment: X events on the profiler thread, in array order (pre-order),
-// must nest — each child fully inside its parent's [ts, ts+dur] span.
-function checkProfileNesting(events, profilerTid) {
-    const slices = events.filter(e => e.ph === 'X' && e.tid === profilerTid);
-    const stack = [];
-    for (const e of slices) {
-        const end = e.ts + e.dur;
-        while (stack.length > 0 && e.ts >= stack[stack.length - 1].end) stack.pop();
-        const parent = stack[stack.length - 1];
-        if (parent) {
-            expect(e.ts).toBeGreaterThanOrEqual(parent.ts);
-            expect(end, `slice "${e.name}" @${e.ts} escapes parent ending @${parent.end}`).toBeLessThanOrEqual(parent.end);
-        }
-        stack.push({ ts: e.ts, end });
-    }
-    return slices;
-}
-
 describe('rumcap trace synthesizer', () => {
 
     it('synthesizes a structurally valid trace from the cnn cpu6x capture', async () => {
@@ -492,15 +510,31 @@ describe('rumcap trace synthesizer', () => {
         expect(navStart.args.data.isOutermostMainFrame).toBe(true);
         expect(navStart.args.data.navigationId).toBeTruthy();
 
-        // Network: one Send/WillSend/Finish per resource (navigation + resources stream).
+        const mainThread = events.find(e => e.ph === 'M' && e.name === 'thread_name' && e.args.name === 'CrRendererMain');
+        expect(mainThread).toBeDefined();
+        expect(events.some(e => e.ph === 'M' && e.name === 'thread_name' && e.args.name === 'Network')).toBe(false);
+
+        // Network: DevTools parser markers are retained for the Network model, but kept out of
+        // the renderer process so they do not create a visible point-event thread.
         const resourceCount = 1 + capture.streams.resources.length;
         expect(events.filter(e => e.name === 'ResourceWillSendRequest').length).toBe(resourceCount);
         expect(events.filter(e => e.name === 'ResourceSendRequest').length).toBe(resourceCount);
         expect(events.filter(e => e.name === 'ResourceFinish').length).toBe(resourceCount);
+        const requestMarkers = events.filter(e => [
+            'ResourceWillSendRequest',
+            'ResourceSendRequest',
+            'ResourceReceiveResponse',
+            'ResourceFinish'
+        ].includes(e.name));
+        expect(requestMarkers.length).toBeGreaterThan(resourceCount * 3);
+        expect(requestMarkers.every(e => e.pid !== mainThread.pid)).toBe(true);
+        expect(requestMarkers.some(e => e.tid === mainThread.tid && e.pid === mainThread.pid)).toBe(false);
+        expect(events.some(e => e.name === 'ResourceLoad')).toBe(false);
 
         // ResourceReceiveResponse timing block: requestTime is SECONDS, offsets are ms.
         const rrr = events.find(e => e.name === 'ResourceReceiveResponse');
         expect(rrr).toBeDefined();
+        expect(rrr.pid).not.toBe(mainThread.pid);
         const timing = rrr.args.data.timing;
         const nav = capture.streams.navigation;
         expect(timing.requestTime).toBeCloseTo(nav.fetchStart / 1000, 6);
@@ -516,8 +550,51 @@ describe('rumcap trace synthesizer', () => {
         expect(events.some(e => e.name === 'MarkLoad')).toBe(true);
         expect(events.filter(e => e.name === 'EventTiming' && e.ph === 'b').length)
             .toBe(capture.streams.interactions.events.length);
-        expect(events.filter(e => e.name === 'LongAnimationFrame').length)
-            .toBe(capture.streams.loaf.frames.length);
+
+        const expectedLoafFrames = capture.streams.loaf.frames
+            .filter(f => f && f.startTime !== undefined);
+        const expectedLoafScripts = expectedLoafFrames.reduce((total, f) => {
+            const frameEnd = f.startTime + (finiteNumberForTest(f.duration) ? Math.max(0, f.duration) : 0);
+            return total + (f.scripts || [])
+                .filter(s => s && finiteNumberForTest(s.startTime) && finiteNumberForTest(s.duration) && s.duration > 0)
+                .filter(s => s.startTime < frameEnd && s.startTime + s.duration > f.startTime)
+                .length;
+        }, 0);
+        const expectedRenderFrames = expectedLoafFrames.filter((f) => {
+            const frameEnd = f.startTime + (finiteNumberForTest(f.duration) ? Math.max(0, f.duration) : 0);
+            return finiteNumberForTest(f.renderStart) && f.renderStart >= f.startTime && f.renderStart < frameEnd;
+        });
+        const expectedStyleFrames = expectedLoafFrames.filter((f) => {
+            const frameEnd = f.startTime + (finiteNumberForTest(f.duration) ? Math.max(0, f.duration) : 0);
+            return finiteNumberForTest(f.renderStart)
+                && finiteNumberForTest(f.styleAndLayoutStart)
+                && f.renderStart >= f.startTime
+                && f.styleAndLayoutStart >= f.renderStart
+                && f.styleAndLayoutStart < frameEnd;
+        });
+        expect(events.filter(e => e.name === 'LongAnimationFrame' && e.ph === 'X').length)
+            .toBe(expectedLoafFrames.length);
+        expect(events.filter(e => e.name === 'AnimationFrame' && e.ph === 'b').length)
+            .toBe(expectedLoafFrames.length);
+        expect(events.filter(e => e.name === 'AnimationFrame' && e.ph === 'e').length)
+            .toBe(expectedLoafFrames.length);
+        expect(events.filter(e => e.name === 'AnimationFrame::Presentation' && e.ph === 'n').length)
+            .toBe(expectedLoafFrames.filter(f => finiteNumberForTest(f.presentationTime)).length);
+        const loafScriptSlices = events.filter(e => e.ph === 'X' && eventHasCategory(e, 'loaf.script'));
+        expect(loafScriptSlices.length).toBe(expectedLoafScripts);
+        expect(loafScriptSlices.length).toBeGreaterThan(0);
+        expect(loafScriptSlices[0].name.startsWith('Script: ')).toBe(true);
+        expect(loafScriptSlices[0].args.data.source_url).toBeTruthy();
+        expect(events.filter(e => e.ph === 'X' && eventHasCategory(e, 'loaf.render')).length)
+            .toBe(expectedRenderFrames.length);
+        expect(events.filter(e => e.ph === 'X' && eventHasCategory(e, 'loaf.style_layout')).length)
+            .toBe(expectedStyleFrames.length);
+        const loafExtensionBegins = events.filter(e => e.cat === 'blink.user_timing'
+            && e.ph === 'b'
+            && devtoolsTrackForEvent(e) === 'Long Animation Frames');
+        expect(loafExtensionBegins.length).toBeGreaterThan(expectedLoafFrames.length);
+        expect(loafExtensionBegins.some(e => e.name === 'LongAnimationFrame')).toBe(true);
+        expect(loafExtensionBegins.some(e => e.name.startsWith('Script: '))).toBe(true);
 
         // RunTask X events exist iff the longTasks stream has >= 50ms tasks (cnn has 23).
         const runTasks = events.filter(e => e.name === 'RunTask');
@@ -534,14 +611,116 @@ describe('rumcap trace synthesizer', () => {
         const ut = capture.streams.userTiming;
         const marks = events.filter(e => e.cat === 'blink.user_timing' && e.ph === 'I');
         expect(marks.length).toBe(ut.marks.length);
-        const measureBegins = events.filter(e => e.cat === 'blink.user_timing' && e.ph === 'b');
+        expect(marks.every(e => e.pid !== mainThread.pid)).toBe(true);
+        const measureBegins = events.filter(e => e.cat === 'blink.user_timing'
+            && e.ph === 'b'
+            && ut.measures.some(m => m.name === e.name && e.ts === usForTest(m.startTime)));
         expect(measureBegins.length).toBe(ut.measures.length);
+        expect(measureBegins.every(e => e.pid !== mainThread.pid)).toBe(true);
 
-        // Profile: dedicated thread declared, X events nest within each depth chain.
-        const profThread = events.find(e => e.ph === 'M' && e.name === 'thread_name' && e.args.name === 'JS Self-Profiling');
-        expect(profThread).toBeDefined();
-        const slices = checkProfileNesting(events, profThread.tid);
-        expect(slices.length).toBe(capture.streams.profile.slices.length);
+        // Profile: native CPU-profile events live on Main, with no custom comparison track.
+        // Extra self-profile timeline entries would make DevTools' SamplesIntegrator split
+        // native stacks around duplicate sampled-thread work.
+        expect(events.some(e => e.ph === 'M' && e.args && e.args.name === 'JS Self-Profiling')).toBe(false);
+        const profileTimelineCopies = events.filter(e => e.ph === 'X'
+            && e.tid === mainThread.tid
+            && e.args
+            && e.args.data
+            && e.args.data.selfProfiling);
+        expect(profileTimelineCopies.length).toBe(0);
+        const expectedProfileSlices = normalizeProfileSlicesForTest(capture.streams.profile);
+        const nativeProfile = events.find(e => e.name === 'Profile');
+        const nativeProfileChunk = events.find(e => e.name === 'ProfileChunk');
+        expect(nativeProfile).toBeDefined();
+        expect(nativeProfileChunk).toBeDefined();
+        expect(nativeProfile.cat).toBe('disabled-by-default-v8.cpu_profiler');
+        expect(nativeProfile.ph).toBe('P');
+        expect(nativeProfile.pid).toBe(mainThread.pid);
+        expect(nativeProfile.tid).toBe(mainThread.tid);
+        expect(nativeProfile.id).toBe(nativeProfileChunk.id);
+        expect(nativeProfile.args.data.source).toBe('SelfProfiling');
+        expect(nativeProfileChunk.args.data.source).toBe('SelfProfiling');
+        const cpuProfile = nativeProfileChunk.args.data.cpuProfile;
+        expect(cpuProfile.nodes.length).toBeGreaterThan(2);
+        expect(cpuProfile.nodes.length).toBeLessThanOrEqual(expectedProfileSlices.length + 2);
+        expect(cpuProfile.nodes[0].callFrame.functionName).toBe('(root)');
+        expect(cpuProfile.nodes.some(n => n.callFrame.functionName === '(idle)')).toBe(true);
+        expect(cpuProfile.samples.length).toBe(nativeProfileChunk.args.data.timeDeltas.length);
+        expect(cpuProfile.samples.length).toBeGreaterThan(0);
+        expect(nativeProfileChunk.args.data.timeDeltas[0]).toBeGreaterThan(0);
+        expect(nativeProfileChunk.args.data.timeDeltas.some(d => d > 0)).toBe(true);
+        expect(nativeProfileChunk.args.data.timeDeltas.every(d => Number.isInteger(d) && d >= 0)).toBe(true);
+        const profileStart = Math.min(...expectedProfileSlices.map(e => e.ts));
+        const profileEnd = Math.max(...expectedProfileSlices.map(e => e.end));
+        expect(nativeProfile.ts).toBe(profileStart - 1);
+        expect(nativeProfileChunk.ts).toBe(profileStart - 1);
+        expect(nativeProfileChunk.args.data.timeDeltas.reduce((sum, d) => sum + d, 0))
+            .toBe(profileEnd - nativeProfile.ts);
+        const nodeIds = new Set(cpuProfile.nodes.map(n => n.id));
+        const sampledNodeIds = new Set(cpuProfile.samples);
+        expect([...sampledNodeIds].every(id => nodeIds.has(id))).toBe(true);
+        expect(cpuProfile.nodes.some(n => sampledNodeIds.has(n.id) && n.callFrame.url)).toBe(true);
+        const scriptIdByUrl = new Map();
+        for (const node of cpuProfile.nodes) {
+            const { scriptId, url } = node.callFrame;
+            if (!url) continue;
+            expect(scriptId).not.toBe('0');
+            const previous = scriptIdByUrl.get(url);
+            if (previous !== undefined) {
+                expect(scriptId).toBe(previous);
+            } else {
+                scriptIdByUrl.set(url, scriptId);
+            }
+        }
+        expect(scriptIdByUrl.size).toBeGreaterThan(1);
+        const profileExtensionBegins = events.filter(e => e.cat === 'blink.user_timing'
+            && e.ph === 'b'
+            && devtoolsTrackForEvent(e) === 'JS Self-Profiling');
+        expect(profileExtensionBegins.length).toBe(0);
+    });
+
+    it('keeps frame-less profile slices in the native CPU profile', () => {
+        const capture = {
+            formatVersion: 3,
+            manifest: {
+                clock: { timeOrigin: 1700000000000, captureStart: 0, captureEnd: 500, unit: 'ms', base: 'timeOrigin' },
+                streams: {
+                    navigation: { status: 'present', schemaVersion: 1 },
+                    profile: { status: 'present', schemaVersion: 1 }
+                },
+                config: {}
+            },
+            streams: {
+                navigation: {
+                    name: 'https://example.com/', startTime: 0, duration: 200,
+                    initiatorType: 'navigation', type: 'navigate', redirectCount: 0,
+                    fetchStart: 1, requestStart: 5, responseStart: 50, responseEnd: 200,
+                    transferSize: 1234, encodedBodySize: 1200, decodedBodySize: 4000,
+                    responseStatus: 200, contentType: 'text/html'
+                },
+                profile: {
+                    frames: [],
+                    resources: [],
+                    slices: [
+                        { start: 100, duration: 40, depth: 0 },
+                        { start: 110, duration: 20, depth: 1 }
+                    ]
+                }
+            }
+        };
+
+        const trace = synthesizeChromeTrace(capture);
+        const events = structuralChecks(trace);
+        const chunk = events.find(e => e.name === 'ProfileChunk');
+        expect(chunk).toBeDefined();
+        const cpuProfile = chunk.args.data.cpuProfile;
+        const sampledNodeIds = new Set(cpuProfile.samples);
+        const anonymousNodes = cpuProfile.nodes
+            .filter(n => n.callFrame.functionName === '(anonymous)' && n.callFrame.scriptId !== '0');
+        expect(anonymousNodes.length).toBe(2);
+        expect(anonymousNodes.every(n => sampledNodeIds.has(n.id))).toBe(true);
+        expect(chunk.args.data.timeDeltas.length).toBe(cpuProfile.samples.length);
+        expect(chunk.args.data.timeDeltas.some(d => d > 0)).toBe(true);
     });
 
     it('synthesizes native Perfetto protobuf request tracks without Resource* instants', async () => {
@@ -897,6 +1076,8 @@ describe('rumcap trace synthesizer', () => {
         // profile is present but has ZERO slices -> no profiler thread metadata, no slices.
         expect(capture.streams.profile.slices.length).toBe(0);
         expect(events.some(e => e.ph === 'M' && e.args && e.args.name === 'JS Self-Profiling')).toBe(false);
+        expect(events.some(e => e.name === 'Profile')).toBe(false);
+        expect(events.some(e => e.name === 'ProfileChunk')).toBe(false);
 
         const tsib = events.find(e => e.name === 'TracingStartedInBrowser');
         expect(tsib.args.data.frames[0].url).toBe(capture.streams.navigation.name);
@@ -904,7 +1085,10 @@ describe('rumcap trace synthesizer', () => {
         // User timing counts still match.
         const ut = capture.streams.userTiming;
         expect(events.filter(e => e.cat === 'blink.user_timing' && e.ph === 'I').length).toBe(ut.marks.length);
-        expect(events.filter(e => e.cat === 'blink.user_timing' && e.ph === 'b').length).toBe(ut.measures.length);
+        expect(events.filter(e => e.cat === 'blink.user_timing'
+            && e.ph === 'b'
+            && ut.measures.some(m => m.name === e.name && e.ts === usForTest(m.startTime))).length)
+            .toBe(ut.measures.length);
     });
 
     it('maps customEvents namespaces onto extensibility tracks with depth nesting', () => {
@@ -949,9 +1133,12 @@ describe('rumcap trace synthesizer', () => {
 
         const trace = synthesizeChromeTrace(capture);
         const events = structuralChecks(trace);
+        const mainThread = events.find(e => e.ph === 'M' && e.name === 'thread_name' && e.args.name === 'CrRendererMain');
+        expect(mainThread).toBeDefined();
 
         const begins = events.filter(e => e.cat === 'blink.user_timing' && e.ph === 'b');
         expect(begins.length).toBe(4);
+        expect(begins.every(e => e.pid !== mainThread.pid)).toBe(true);
 
         // Every begin carries args.detail (JSON string) whose parsed devtools.track names the
         // namespace track — the shape DevTools' extensibility handler parses.
