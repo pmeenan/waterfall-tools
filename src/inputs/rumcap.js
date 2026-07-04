@@ -130,6 +130,67 @@ export function computeInpFromInteractions(events) {
 }
 
 /**
+ * Field captures can contain repeated PerformanceMark records with the same name and
+ * timestamp (observed in Chrome's internal marks such as `iml`). Keep the first instance so
+ * the retained capture and synthesized traces don't render duplicate point events.
+ * @param {Object} capture
+ * @returns {number} number of duplicate marks removed
+ */
+function dedupeUserTimingMarks(capture) {
+    const marks = capture.streams && capture.streams.userTiming && capture.streams.userTiming.marks;
+    if (!Array.isArray(marks) || marks.length === 0) return 0;
+    const seen = new Set();
+    const deduped = [];
+    let removed = 0;
+    for (const mark of marks) {
+        if (!mark || mark.name === undefined || mark.startTime === undefined) {
+            deduped.push(mark);
+            continue;
+        }
+        const key = `${mark.name}\u0000${mark.startTime}`;
+        if (seen.has(key)) {
+            removed++;
+            continue;
+        }
+        seen.add(key);
+        deduped.push(mark);
+    }
+    if (removed > 0) capture.streams.userTiming.marks = deduped;
+    return removed;
+}
+
+/**
+ * Field captures can also carry repeated EventTiming records. Treat records with identical
+ * event type, start/end time, and interactionId as duplicates so INP context and synthesized
+ * traces don't display the same interaction more than once.
+ * @param {Object} capture
+ * @returns {number} number of duplicate interaction events removed
+ */
+function dedupeInteractionEvents(capture) {
+    const events = capture.streams && capture.streams.interactions && capture.streams.interactions.events;
+    if (!Array.isArray(events) || events.length === 0) return 0;
+    const seen = new Set();
+    const deduped = [];
+    let removed = 0;
+    for (const ev of events) {
+        if (!ev || ev.name === undefined || ev.startTime === undefined) {
+            deduped.push(ev);
+            continue;
+        }
+        const endTime = ev.startTime + (ev.duration || 0);
+        const key = `${ev.name}\u0000${ev.startTime}\u0000${endTime}\u0000${ev.interactionId}`;
+        if (seen.has(key)) {
+            removed++;
+            continue;
+        }
+        seen.add(key);
+        deduped.push(ev);
+    }
+    if (removed > 0) capture.streams.interactions.events = deduped;
+    return removed;
+}
+
+/**
  * Fold the depth-0 profile slices into the renderer's `_mainThreadSlices` shape. A sampling
  * JS profiler only observes script execution, so all busy time honestly lands in the single
  * `EvaluateScript` category; the other four canonical categories are present but all-zero.
@@ -578,8 +639,16 @@ export async function processRumcapNode(input, options = {}) {
 
         onProgress('Decoding rumcap capture...', 70);
         const capture = await unpack(bytes);
+        const duplicateUserTimingMarks = dedupeUserTimingMarks(capture);
+        const duplicateInteractionEvents = dedupeInteractionEvents(capture);
 
         if (options.debug) {
+            if (duplicateUserTimingMarks > 0) {
+                console.log(`[rumcap.js] Dropped ${duplicateUserTimingMarks} duplicate User Timing mark(s).`);
+            }
+            if (duplicateInteractionEvents > 0) {
+                console.log(`[rumcap.js] Dropped ${duplicateInteractionEvents} duplicate interaction event(s).`);
+            }
             const complaints = checkConsistency(capture);
             if (complaints.length) {
                 console.log(`[rumcap.js] checkConsistency reported ${complaints.length} issue(s):`);

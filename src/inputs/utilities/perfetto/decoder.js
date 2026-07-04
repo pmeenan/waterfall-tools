@@ -538,11 +538,11 @@ export class PerfettoDecoder {
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
             
-            if (field === 16 && wire === 0) { // timestamp_delta_us
+            if (field === 1 && wire === 0) { // timestamp_delta_us
                 const tV = readVarint(data, o);
                 o += tV[1];
                 delta = Number(BigInt.asIntN(64, tV[0]));
-            } else if (field === 17 && wire === 0) { // timestamp_absolute_us
+            } else if (field === 16 && wire === 0) { // timestamp_absolute_us
                 const tV = readVarint(data, o);
                 o += tV[1];
                 absTs = Number(BigInt.asIntN(64, tV[0]));
@@ -596,16 +596,22 @@ export class PerfettoDecoder {
                 while (o < lEnd) {
                     const lV = readVarint(data, o); o += lV[1];
                     const lw = Number(lV[0] & 7n); const lf = Number(lV[0] >> 3n);
-                    if (lf === 6 && lw === 0) { // unscoped_id
+                    if (lf === 2 && lw === 0) { // phase
+                        const v = readVarint(data, o); o += v[1];
+                        trackEvent.legacyPhase = Number(v[0]);
+                    } else if (lf === 3 && lw === 0) { // duration_us
+                        const v = readVarint(data, o); o += v[1];
+                        trackEvent.legacyDurationUs = Number(BigInt.asIntN(64, v[0]));
+                    } else if (lf === 6 && lw === 0) { // unscoped_id
                         const v = readVarint(data, o); o += v[1];
                         trackEvent.id = v[0].toString(16);
-                    } else if (lf === 7 && lw === 0) { // local_id
+                    } else if ((lf === 7 || lf === 10) && lw === 0) { // local_id (7 in old protos, 10 current)
                         const v = readVarint(data, o); o += v[1];
                         trackEvent.id2 = { local: "0x" + v[0].toString(16) };
-                    } else if (lf === 8 && lw === 0) { // global_id
+                    } else if (lf === 11 && lw === 0) { // global_id
                         const v = readVarint(data, o); o += v[1];
                         trackEvent.id2 = { global: "0x" + v[0].toString(16) };
-                    } else if (lf === 11 && lw === 0) { // bind_id
+                    } else if (lf === 8 && lw === 0) { // bind_id
                         const v = readVarint(data, o); o += v[1];
                         trackEvent.bind_id = "0x" + v[0].toString(16);
                     } else {
@@ -857,9 +863,11 @@ export class PerfettoDecoder {
     }
     
     _emitTraceEvent(event, controller, seqNames, seqCats) {
-        // Map Type
+        // Map Type. Legacy phases are char codes (e.g. complete 'X') and are valid
+        // without TrackEvent.type.
         let ph = 'I';
-        if (event.type === 1) ph = 'B';
+        if (event.legacyPhase !== undefined) ph = String.fromCharCode(event.legacyPhase);
+        else if (event.type === 1) ph = 'B';
         else if (event.type === 2) ph = 'E';
         else if (event.type === 3) ph = 'I';
         
@@ -1005,6 +1013,9 @@ export class PerfettoDecoder {
             jsonEvent = {
                 cat: outCat, name: outName, ph, ts: event.ts, pid, tid, args: outArgs,
             };
+            if (ph === 'X' && event.legacyDurationUs !== undefined) {
+                jsonEvent.dur = Math.max(0, event.legacyDurationUs);
+            }
             if (event.id !== undefined) jsonEvent.id = event.id;
             if (event.id2 !== undefined) jsonEvent.id2 = event.id2;
             if (event.bind_id !== undefined) jsonEvent.bind_id = event.bind_id;

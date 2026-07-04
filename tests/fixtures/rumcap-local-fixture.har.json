@@ -17664,30 +17664,6 @@
               "cancelable": false
             },
             {
-              "name": "pointerenter",
-              "startTime": 25.4,
-              "duration": 16,
-              "processingStart": 36.9,
-              "processingEnd": 36.9,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 25.4,
-              "duration": 16,
-              "processingStart": 36.9,
-              "processingEnd": 36.9,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 25.4,
-              "duration": 16,
-              "processingStart": 36.9,
-              "processingEnd": 36.9,
-              "cancelable": false
-            },
-            {
               "name": "mouseover",
               "startTime": 25.4,
               "duration": 16,
@@ -17720,28 +17696,12 @@
               "cancelable": false
             },
             {
-              "name": "pointerleave",
-              "startTime": 1743.5,
-              "duration": 72,
-              "processingStart": 1743.7,
-              "processingEnd": 1743.7,
-              "cancelable": false
-            },
-            {
               "name": "pointerover",
               "startTime": 1743.5,
               "duration": 72,
               "processingStart": 1743.7,
               "processingEnd": 1743.7,
               "cancelable": true
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 1743.5,
-              "duration": 72,
-              "processingStart": 1743.7,
-              "processingEnd": 1743.7,
-              "cancelable": false
             },
             {
               "name": "pointerenter",

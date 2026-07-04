@@ -31,7 +31,7 @@ export class WaterfallTools {
     }
 
     /**
-     * Cleans up managed resources, dropping associated file handlers safely natively
+     * Cleans up staged archive resources and associated file handles.
      */
     async destroy() {
         if (this.data && this.data._opfsStorage && typeof this.data._opfsStorage.destroy === 'function') {
@@ -241,25 +241,30 @@ export class WaterfallTools {
             return { url: URL.createObjectURL(blob), mimeType, buffer: this._rawBuffer };
         }
 
-        if (resourceType === 'trace'
+        if ((resourceType === 'trace' || resourceType === 'perfetto-trace')
             && (this._sourceFormat === 'rumcap' || (this.data && this.data.metadata && this.data.metadata.format === 'rumcap'))
             && this.data && this.data._rumcapCapture) {
             // Trace is SYNTHESIZED from the retained Capture (there is no raw trace in a field
             // capture). Dynamic import keeps the synthesizer out of the base bundle — same
             // pattern as the tcpdump/decompress code-splits.
             if (!this._rumcapTraceCache) this._rumcapTraceCache = {};
-            let bytes = this._rumcapTraceCache[pageId];
+            const cacheKey = resourceType === 'perfetto-trace' ? 'perfetto' : 'devtools';
+            if (!this._rumcapTraceCache[cacheKey]) this._rumcapTraceCache[cacheKey] = {};
+            let bytes = this._rumcapTraceCache[cacheKey][pageId];
+            const mimeType = resourceType === 'perfetto-trace' ? 'application/octet-stream' : 'application/gzip';
             if (!bytes) {
-                const { synthesizeChromeTrace } = await import('../inputs/utilities/rumcap/trace-synthesizer.js');
-                const traceJson = JSON.stringify(synthesizeChromeTrace(this.data._rumcapCapture));
-                // Gzip so DevTools' loadFromFile takes its internal DecompressionStream path
-                // and the Perfetto UI (which sniffs gzip natively) gets a compact buffer.
-                const gzStream = new Blob([new TextEncoder().encode(traceJson)]).stream()
-                    .pipeThrough(new CompressionStream('gzip'));
-                bytes = new Uint8Array(await new Response(gzStream).arrayBuffer());
-                this._rumcapTraceCache[pageId] = bytes;
+                const { synthesizeChromeTrace, synthesizePerfettoProto } = await import('../inputs/utilities/rumcap/trace-synthesizer.js');
+                if (resourceType === 'perfetto-trace') {
+                    bytes = synthesizePerfettoProto(this.data._rumcapCapture);
+                } else {
+                    const traceJson = JSON.stringify(synthesizeChromeTrace(this.data._rumcapCapture));
+                    // Gzip so DevTools' loadFromFile takes its internal DecompressionStream path.
+                    const gzStream = new Blob([new TextEncoder().encode(traceJson)]).stream()
+                        .pipeThrough(new CompressionStream('gzip'));
+                    bytes = new Uint8Array(await new Response(gzStream).arrayBuffer());
+                }
+                this._rumcapTraceCache[cacheKey][pageId] = bytes;
             }
-            const mimeType = 'application/gzip';
             // Same browser/Node contract as the generic ZIP extraction path below: object URL +
             // ArrayBuffer when Blob/URL exist, bare Uint8Array buffer otherwise (Node).
             if (typeof Blob !== 'undefined' && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
@@ -272,6 +277,16 @@ export class WaterfallTools {
         if (resourceType === 'netlog' && this._sourceFormat === 'netlog' && this._rawBuffer) {
             const blob = new Blob([this._rawBuffer], { type: 'application/json' });
             return { url: URL.createObjectURL(blob), mimeType: 'application/json', buffer: this._rawBuffer };
+        }
+
+        // Only these resource types have an archive-backed file naming convention. Types that
+        // only exist as synthesized/raw-buffer resources (e.g. 'perfetto-trace' on a wptagent
+        // zip) miss quietly — the viewer probes them unconditionally and falls back.
+        if (!['screenshot', 'trace', 'netlog', 'tcpdump', 'lighthouse'].includes(resourceType)) {
+            if (this.options && this.options.debug) {
+                console.log(`[getPageResource] No archive-backed handler for resource type '${resourceType}'`);
+            }
+            return null;
         }
 
         if (!this.data._opfsStorage || !this.data._zipFiles) {

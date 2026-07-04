@@ -4,7 +4,7 @@ Waterfall Tools is a fast, zero-bloat library for parsing, analyzing, and visual
 
 ## Features
 
-- **Format agnostic.** Parses HAR, Netlog, Chrome Trace, Perfetto protobuf, CDP, WebPageTest JSON, raw TCPDUMP captures (with automatic TLS/QUIC decryption, bandwidth estimation, per-chunk download timing, and HTTP/2 & HTTP/3 priority extraction), and [rumcap](https://github.com/pmeenan/rumcap) `.rcap` field captures (RUM beacons: navigation/resource timing, paints/LCP/CLS/INP, long tasks, User Timing, JS Self-Profiling — `.rcap` inputs also light up the embedded Perfetto and DevTools viewers via a synthesized Chrome trace).
+- **Format agnostic.** Parses HAR, Netlog, Chrome Trace, Perfetto protobuf, CDP, WebPageTest JSON, raw TCPDUMP captures (with automatic TLS/QUIC decryption, bandwidth estimation, per-chunk download timing, and HTTP/2 & HTTP/3 priority extraction), and [rumcap](https://github.com/pmeenan/rumcap) `.rcap` field captures (RUM beacons: navigation/resource timing, paints/LCP/CLS/INP, long tasks, LoAF, User Timing, JS Self-Profiling — `.rcap` inputs normalize duplicate User Timing marks and also light up embedded DevTools via synthesized Chrome trace JSON and Perfetto via native TrackEvent protobuf).
 - **Unified API.** `WaterfallTools` auto-detects the input format and produces a consistent Extended HAR payload regardless of source.
 - **Isomorphic.** The core runs in Node.js and modern browsers with no polyfills — binary and cryptographic operations use `Uint8Array`, `DataView`, `WebCrypto`, and `DecompressionStream`.
 - **Canvas renderer.** Scales cleanly from 50 to 50,000 requests without DOM thrashing.
@@ -99,10 +99,12 @@ Returns an isomorphic handle — a Blob URL in the browser (`{url, mimeType}`), 
 
 ```javascript
 const resource = await wt.getPageResource('page_1_0_1', 'screenshot');
-// resourceType: 'screenshot' | 'trace' | 'netlog' | 'lighthouse' | ...
+// resourceType: 'screenshot' | 'trace' | 'perfetto-trace' | 'netlog' | 'lighthouse' | ...
 if (resource?.url) document.querySelector('img').src = resource.url;
 if (resource?.buffer) fs.writeFileSync('screen.jpg', resource.buffer);
 ```
+
+When you are finished with a `WaterfallTools` instance, call `await wt.destroy()`. This releases staged OPFS / temporary-file storage used by archive-backed resources such as wptagent screenshots, traces, and netlogs; in Node it also closes any lazy file handles opened by `getPageResource()`.
 
 ### Render to a container (browser)
 
@@ -195,7 +197,7 @@ The library ships with a pre-built standalone viewer — deployable as a static 
 
 Loading a HAR with multiple runs (e.g. WebPageTest First View + Repeat View) presents an interactive **Thumbnail Grid** showing each run's paint metrics, load times, and request counts before drilling into a specific trace.
 
-The viewer integrates tab-switching to self-hosted copies of the **Perfetto Trace Viewer**, the **Chrome DevTools** frontend, and the legacy **Chrome NetLog Viewer** for deep inspection of DevTools metrics, timelines, and raw socket-level network events. The DevTools frontend is pulled in from the `@chrome-devtools/index` npm package at build time and copied under `dist/browser/devtools-<version>/` so it's served versioned alongside the viewer.
+The viewer integrates tab-switching to self-hosted copies of the **Perfetto Trace Viewer**, the **Chrome DevTools** frontend, and the legacy **Chrome NetLog Viewer** for deep inspection of DevTools metrics, timelines, and raw socket-level network events. The DevTools frontend is pulled in from the `@chrome-devtools/index` npm package at build time and copied under `dist/browser/devtools-<version>/` so it's served versioned alongside the viewer. For rumcap captures, Perfetto receives a native TrackEvent protobuf (`getPageResource(pageId, 'perfetto-trace')`) with spec-aligned timestamps and a top-level `Performance Profile` custom track group whose populated child tracks are explicitly ordered for review, including request tracks split into `request.*` ResourceTiming phase categories when available, single-track Long Animation Frames details, one visual User Timing track with marks and merge-laned duration measures, one visual Interactions track with merge-laned event-type slices, plus plain Long Tasks and JS Self-Profiling tracks, while DevTools receives gzipped Chrome trace JSON (`'trace'`).
 
 When inspecting an HTML response that has per-chunk timing and inflated byte counts (available from `tcpdump`, `netlog`, `chrome-trace`, `cdp`, and `wptagent`), the request inspector renders the **Response Body** as a hex-viewer-style table — one row per delivered wire chunk, with arrival timestamps and sizes in the left column and the syntax-highlighted HTML slice that arrived in that delivery on the right. This makes it easy to correlate "what arrived when" against the canvas waterfall.
 

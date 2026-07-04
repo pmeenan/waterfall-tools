@@ -68947,70 +68947,6 @@
               "cancelable": false
             },
             {
-              "name": "pointerenter",
-              "startTime": 647.4,
-              "duration": 56,
-              "processingStart": 695.4,
-              "processingEnd": 695.4,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 647.4,
-              "duration": 56,
-              "processingStart": 695.4,
-              "processingEnd": 695.4,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 647.4,
-              "duration": 56,
-              "processingStart": 695.4,
-              "processingEnd": 695.4,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 647.4,
-              "duration": 56,
-              "processingStart": 695.4,
-              "processingEnd": 695.4,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 647.4,
-              "duration": 56,
-              "processingStart": 695.4,
-              "processingEnd": 695.4,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 647.4,
-              "duration": 56,
-              "processingStart": 695.4,
-              "processingEnd": 695.4,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 647.4,
-              "duration": 56,
-              "processingStart": 695.4,
-              "processingEnd": 695.4,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 647.4,
-              "duration": 56,
-              "processingStart": 695.4,
-              "processingEnd": 695.4,
-              "cancelable": false
-            },
-            {
               "name": "mouseover",
               "startTime": 647.4,
               "duration": 56,
@@ -69038,68 +68974,12 @@
               "cancelable": false
             },
             {
-              "name": "pointerleave",
-              "startTime": 3593.2,
-              "duration": 40,
-              "processingStart": 3602.3,
-              "processingEnd": 3602.3,
-              "cancelable": false
-            },
-            {
-              "name": "pointerleave",
-              "startTime": 3593.2,
-              "duration": 40,
-              "processingStart": 3602.3,
-              "processingEnd": 3602.3,
-              "cancelable": false
-            },
-            {
-              "name": "pointerleave",
-              "startTime": 3593.2,
-              "duration": 40,
-              "processingStart": 3602.3,
-              "processingEnd": 3602.3,
-              "cancelable": false
-            },
-            {
-              "name": "pointerleave",
-              "startTime": 3593.2,
-              "duration": 40,
-              "processingStart": 3602.3,
-              "processingEnd": 3602.3,
-              "cancelable": false
-            },
-            {
-              "name": "pointerleave",
-              "startTime": 3593.2,
-              "duration": 40,
-              "processingStart": 3602.3,
-              "processingEnd": 3602.3,
-              "cancelable": false
-            },
-            {
               "name": "pointerover",
               "startTime": 3593.2,
               "duration": 40,
               "processingStart": 3602.3,
               "processingEnd": 3602.3,
               "cancelable": true
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 3593.2,
-              "duration": 40,
-              "processingStart": 3602.3,
-              "processingEnd": 3602.3,
-              "cancelable": false
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 3593.2,
-              "duration": 40,
-              "processingStart": 3602.3,
-              "processingEnd": 3602.3,
-              "cancelable": false
             },
             {
               "name": "pointerenter",
@@ -69298,14 +69178,6 @@
               "target": {
                 "selector": "html.userconsent-cntry-us.userconsent-state-va > body.layout.layout-live-story-amplify > div:nth-of-type(4) > div > p"
               }
-            },
-            {
-              "name": "pointerenter",
-              "startTime": 9464.6,
-              "duration": 24,
-              "processingStart": 9472.1,
-              "processingEnd": 9472.1,
-              "cancelable": false
             },
             {
               "name": "pointerenter",

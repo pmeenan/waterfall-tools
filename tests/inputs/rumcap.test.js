@@ -7,6 +7,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { unpack } from 'rumcap/decode';
 import { WaterfallTools } from '../../src/core/waterfall-tools.js';
 import { computeClsFromShifts, computeInpFromInteractions, processRumcapNode, buildRumcapHarLog } from '../../src/inputs/rumcap.js';
 
@@ -34,6 +35,31 @@ function checkGoldenFixture(result, fixtureName) {
     const normalizedResult = JSON.parse(JSON.stringify(result));
     const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
     expect(normalizedResult).toEqual(ref);
+}
+
+function duplicateUserTimingMarkCount(marks) {
+    const seen = new Set();
+    let duplicates = 0;
+    for (const mark of marks || []) {
+        if (!mark || mark.name === undefined || mark.startTime === undefined) continue;
+        const key = `${mark.name}\u0000${mark.startTime}`;
+        if (seen.has(key)) duplicates++;
+        else seen.add(key);
+    }
+    return duplicates;
+}
+
+function duplicateInteractionEventCount(events) {
+    const seen = new Set();
+    let duplicates = 0;
+    for (const ev of events || []) {
+        if (!ev || ev.name === undefined || ev.startTime === undefined) continue;
+        const endTime = ev.startTime + (ev.duration || 0);
+        const key = `${ev.name}\u0000${ev.startTime}\u0000${endTime}\u0000${ev.interactionId}`;
+        if (seen.has(key)) duplicates++;
+        else seen.add(key);
+    }
+    return duplicates;
 }
 
 describe('rumcap (.rcap) Input Processor', () => {
@@ -88,6 +114,23 @@ describe('rumcap (.rcap) Input Processor', () => {
         // Internal relational keys must never leak into the HAR shape.
         expect(log.metadata).toBeUndefined();
         expect(log._rumcapCapture).toBeUndefined();
+    });
+
+    it('deduplicates retained User Timing marks and interaction events', async () => {
+        for (const fileName of ['chrome-www-google-com.rcap', 'chrome-www-google-com-cpu6x.rcap']) {
+            const rawBytes = new Uint8Array(fs.readFileSync(path.join(SAMPLE_DIR, fileName)));
+            const rawCapture = await unpack(rawBytes);
+            expect(duplicateUserTimingMarkCount(rawCapture.streams.userTiming.marks)).toBeGreaterThan(0);
+            expect(duplicateInteractionEventCount(rawCapture.streams.interactions.events)).toBeGreaterThan(0);
+
+            const data = await processRumcapNode(rawBytes);
+            const marks = data._rumcapCapture.streams.userTiming.marks;
+            expect(duplicateUserTimingMarkCount(marks)).toBe(0);
+            expect(marks.length).toBeLessThan(rawCapture.streams.userTiming.marks.length);
+            const interactions = data._rumcapCapture.streams.interactions.events;
+            expect(duplicateInteractionEventCount(interactions)).toBe(0);
+            expect(interactions.length).toBeLessThan(rawCapture.streams.interactions.events.length);
+        }
     });
 
     it('emits the navigation as the first entry with the page URL and status mapping', async () => {

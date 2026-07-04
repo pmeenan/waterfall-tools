@@ -66,26 +66,39 @@ let waterfallTool = null;
 let rendererCanvas = null;
 const activeBlobUrls = [];
 let pendingTabLoads = {};
+const PERFETTO_ORIGIN = 'https://ui.perfetto.dev';
+const PERFETTO_RUMCAP_STARTUP_COMMANDS = [
+    { id: 'dev.perfetto.CollapseTracksByRegex', args: ['.*'] },
+    {
+        id: 'dev.perfetto.ExpandTracksByRegex',
+        args: ['^Performance Profile$', 'name']
+    }
+];
 
-function loadTracePerfetto(traceBuffer) {
+function getPerfettoUrl(startupCommands = null) {
+    if (!startupCommands) return PERFETTO_ORIGIN;
+    return `${PERFETTO_ORIGIN}/#!/?startupCommands=${encodeURIComponent(JSON.stringify(startupCommands))}`;
+}
+
+function loadTracePerfetto(traceBuffer, startupCommands = null) {
     ui.traceOverlay.style.display = 'flex';
     ui.traceOverlayContent.innerText = 'Loading Trace Viewer...';
-    
+
+    const frameUrl = getPerfettoUrl(startupCommands);
     if (ui.traceFrame.src === 'about:blank' || !ui.traceFrame.src) {
-        ui.traceFrame.src = 'https://ui.perfetto.dev';
+        ui.traceFrame.src = frameUrl;
     }
 
-    const ORIGIN = 'https://ui.perfetto.dev';
     let loaded = false;
 
     const pingInterval = setInterval(() => {
         if (ui.traceFrame && ui.traceFrame.contentWindow) {
-            ui.traceFrame.contentWindow.postMessage('PING', ORIGIN);
+            ui.traceFrame.contentWindow.postMessage('PING', PERFETTO_ORIGIN);
         }
     }, 500);
 
     const onMessage = (e) => {
-        if (e.origin !== ORIGIN) return;
+        if (e.origin !== PERFETTO_ORIGIN) return;
         if (e.data === 'PONG') {
             if (!loaded) {
                 loaded = true;
@@ -96,7 +109,7 @@ function loadTracePerfetto(traceBuffer) {
                         buffer: traceBuffer,
                         title: 'WaterfallTools Trace'
                     }
-                }, ORIGIN);
+                }, PERFETTO_ORIGIN);
 
                 setTimeout(() => {
                     ui.traceOverlay.style.display = 'none';
@@ -110,7 +123,7 @@ function loadTracePerfetto(traceBuffer) {
 
     const onLoad = () => {
         if (ui.traceFrame && ui.traceFrame.contentWindow && !loaded) {
-            ui.traceFrame.contentWindow.postMessage('PING', ORIGIN);
+            ui.traceFrame.contentWindow.postMessage('PING', PERFETTO_ORIGIN);
         }
     };
     ui.traceFrame.addEventListener('load', onLoad, { once: true });
@@ -1556,20 +1569,23 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     
     try {
         const traceResource = await waterfallTool.getPageResource(pageId, 'trace');
-        if (traceResource && traceResource.buffer && ui.tabTrace) {
+        const rumcapPerfettoResource = await waterfallTool.getPageResource(pageId, 'perfetto-trace');
+        const perfettoTraceResource = rumcapPerfettoResource || traceResource;
+        if (perfettoTraceResource && perfettoTraceResource.buffer && ui.tabTrace) {
             ui.tabTrace.classList.remove('hidden');
             pendingTabLoads.trace = () => {
-                loadTracePerfetto(traceResource.buffer);
+                loadTracePerfetto(
+                    perfettoTraceResource.buffer,
+                    rumcapPerfettoResource ? PERFETTO_RUMCAP_STARTUP_COMMANDS : null
+                );
             };
+        }
 
-            // DevTools tab is gated on the same resource availability — when the tab is
-            // activated we hand the trace buffer to the Performance panel's loadFromFile().
-            if (ui.tabDevtools && getDevtoolsPath()) {
-                ui.tabDevtools.classList.remove('hidden');
-                pendingTabLoads.devtools = () => {
-                    loadDevtools(traceResource.buffer);
-                };
-            }
+        if (traceResource && traceResource.buffer && ui.tabDevtools && getDevtoolsPath()) {
+            ui.tabDevtools.classList.remove('hidden');
+            pendingTabLoads.devtools = () => {
+                loadDevtools(traceResource.buffer);
+            };
         }
     } catch (e) {
         console.warn(`[viewer.js] Failed to fetch trace data for ${pageId}:`, e);
