@@ -95763,7 +95763,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -95791,6 +95791,7 @@
         "_chunks": [],
         "_full_url": "http://127.0.0.1:36877/frame.html",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "iframe",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,

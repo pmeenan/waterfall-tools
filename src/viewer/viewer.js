@@ -446,7 +446,9 @@ function getOptionsFromUrl() {
 }
 
 function humanizeBytes(bytes) {
-    if (bytes === undefined || bytes === null || isNaN(bytes)) return null;
+    if (bytes === undefined || bytes === null || bytes === '') return null;
+    bytes = Number(bytes);
+    if (!isFinite(bytes) || bytes < 0) return null;
     if (bytes === 0) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -455,9 +457,68 @@ function humanizeBytes(bytes) {
 }
 
 function humanizeMs(ms) {
-    if (ms === undefined || ms === null || isNaN(ms)) return null;
+    if (ms === undefined || ms === null || ms === '') return null;
+    ms = Number(ms);
+    if (!isFinite(ms) || ms < 0) return null;
     if (ms >= 1000) return (ms / 1000).toFixed(2) + 's';
     return Math.round(ms) + 'ms';
+}
+
+function finiteNumberOrNull(v) {
+    if (v === undefined || v === null || v === '') return null;
+    const num = Number(v);
+    return isFinite(num) ? num : null;
+}
+
+function isDisplayValue(v) {
+    if (v === undefined || v === null) return false;
+    if (typeof v === 'number') return isFinite(v);
+    if (typeof v === 'string') {
+        const trimmed = v.trim();
+        const lower = trimmed.toLowerCase();
+        return trimmed !== '' && lower !== 'nan' && lower !== 'n/a' && trimmed !== '—';
+    }
+    return true;
+}
+
+function firstDisplayValue(...values) {
+    for (const v of values) {
+        if (isDisplayValue(v)) return v;
+    }
+    return null;
+}
+
+function detailRow(label, value, className = 'req-group-item') {
+    if (!isDisplayValue(value)) return '';
+    return `<tr class="${className}"><td>${highlightSyntax(label, 'text')}</td><td>${highlightSyntax(value, 'text')}</td></tr>`;
+}
+
+function detailGroup(title, rows) {
+    const visibleRows = rows.filter(Boolean).join('');
+    if (!visibleRows) return '';
+    return `<tr><td colspan="2" class="req-group-header">${highlightSyntax(title, 'text')}</td></tr>${visibleRows}`;
+}
+
+function formatStatusValue(request) {
+    const statusNum = finiteNumberOrNull(request.status);
+    const statusText = firstDisplayValue(request.statusText);
+    if (statusNum === null) return null;
+
+    if (statusNum === 0) {
+        return statusText ? `0 ${statusText}` : '0 (request canceled)';
+    }
+    if (statusNum < 0) {
+        return statusText ? `${statusNum} ${statusText}` : `${statusNum} (unavailable)`;
+    }
+
+    let value = `${statusNum}${statusText ? ` ${statusText}` : ''}`;
+    if (request._statusAssumed) {
+        const rawStatus = firstDisplayValue(request._responseStatus);
+        value += rawStatus !== null
+            ? ` (assumed; raw responseStatus ${rawStatus})`
+            : ' (assumed; responseStatus unavailable)';
+    }
+    return value;
 }
 
 // Format an absolute waterfall timestamp (no sign — chunks always land
@@ -1108,8 +1169,6 @@ function renderRequestTab(request, reqNum) {
         // Leave as is if invalid URL
     }
 
-    const val = (v) => (v !== undefined && v !== null) ? v : '';
-
     const toggleIconSvg = `<svg class="acc-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
     const toggleIconSvgCollapsed = `<svg class="acc-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
     
@@ -1137,29 +1196,44 @@ function renderRequestTab(request, reqNum) {
         `;
     };
 
+    const statusValue = formatStatusValue(request);
+    const errorValue = firstDisplayValue(request._error, request.error);
+    const downloadStart = finiteNumberOrNull(request._download_start);
+    const downloadEnd = finiteNumberOrNull(request._download_end);
+    const downloadMs = downloadStart !== null && downloadEnd !== null && downloadEnd >= downloadStart
+        ? humanizeMs(downloadEnd - downloadStart)
+        : null;
+    const requestRows = [
+        detailRow('Host', firstDisplayValue(request._host, host)),
+        detailRow('IP', firstDisplayValue(request.serverIPAddress, request.serverIp, request._ip_addr)),
+        detailRow('Status Code', statusValue),
+        detailRow('Error', errorValue),
+        detailRow('Priority', firstDisplayValue(request._priority, request._initialPriority)),
+        detailRow('Protocol', firstDisplayValue(request.httpVersion, request._protocol)),
+        detailRow('Request ID', firstDisplayValue(request._request_id, request._id, request.id)),
+        detailRow('Render Blocking Status', request._renderBlocking)
+    ];
+    const timingRows = [
+        detailRow('Time to First Byte', humanizeMs(request._ttfb_ms)),
+        detailRow('Content Download', downloadMs)
+    ];
+    const sizeRows = [
+        detailRow('Bytes In (downloaded)', humanizeBytes(firstDisplayValue(request._bytesIn, request.bytes_in))),
+        detailRow('Uncompressed Size', humanizeBytes(firstDisplayValue(request._objectSizeUncompressed, request.objectSizeUncompressed))),
+        detailRow('Bytes Out (uploaded)', humanizeBytes(firstDisplayValue(request._bytesOut, request.bytes_out)))
+    ];
+
     const detailsHtml = `
         <div class="req-section">
             ${createSectionHeader('Details', false, false)}
             <div class="req-section-body">
                 <table class="req-details-table">
-                    <tr><td>URL</td><td>${parsedUrl}</td></tr>
-                    <tr><td>Loaded By</td><td>${val(request._initiator_detail || request._initiator)}</td></tr>
-                    <tr><td>Document</td><td>${val(request._documentURL)}</td></tr>
-                    <tr><td colspan="2" class="req-group-header">Request</td></tr>
-                    <tr class="req-group-item"><td>Host</td><td>${val(request._host || host)}</td></tr>
-                    <tr class="req-group-item"><td>IP</td><td>${val(request.serverIPAddress || request.serverIp || request._ip_addr)}</td></tr>
-                    <tr class="req-group-item"><td>Error/Status Code</td><td>${val(request.status)} ${val(request.statusText) || val(request._error)}</td></tr>
-                    <tr class="req-group-item"><td>Priority</td><td>${val(request._priority || request._initialPriority)}</td></tr>
-                    <tr class="req-group-item"><td>Protocol</td><td>${val(request.httpVersion || request._protocol)}</td></tr>
-                    <tr class="req-group-item"><td>Request ID</td><td>${val(request._request_id || request._id || request.id)}</td></tr>
-                    <tr class="req-group-item"><td>Render Blocking Status</td><td>${val(request._renderBlocking)}</td></tr>
-                    <tr><td colspan="2" class="req-group-header">Timing</td></tr>
-                    <tr class="req-group-item"><td>Time to First Byte</td><td>${request._ttfb_ms !== undefined ? Math.round(request._ttfb_ms) + ' ms' : ''}</td></tr>
-                    <tr class="req-group-item"><td>Content Download</td><td>${(request._download_end && request._download_start) ? Math.round(request._download_end - request._download_start) + ' ms' : ''}</td></tr>
-                    <tr><td colspan="2" class="req-group-header">Size</td></tr>
-                    <tr class="req-group-item"><td>Bytes In (downloaded)</td><td>${humanizeBytes(val(request._bytesIn || request.bytes_in)) || ''}</td></tr>
-                    <tr class="req-group-item"><td>Uncompressed Size</td><td>${humanizeBytes(val(request._objectSizeUncompressed || request.objectSizeUncompressed)) || ''}</td></tr>
-                    <tr class="req-group-item"><td>Bytes Out (uploaded)</td><td>${humanizeBytes(val(request._bytesOut || request.bytes_out)) || ''}</td></tr>
+                    ${detailRow('URL', parsedUrl, '')}
+                    ${detailRow('Loaded By', firstDisplayValue(request._initiator_detail, request._initiator), '')}
+                    ${detailRow('Document', request._documentURL, '')}
+                    ${detailGroup('Request', requestRows)}
+                    ${detailGroup('Timing', timingRows)}
+                    ${detailGroup('Size', sizeRows)}
                 </table>
             </div>
         </div>
@@ -1173,7 +1247,7 @@ function renderRequestTab(request, reqNum) {
         let rawStr = '';
         let hHtml = '<table class="req-details-table">';
         for (const h of headersArr) {
-            hHtml += `<tr><td>${h.name}</td><td>${h.value}</td></tr>`;
+            hHtml += `<tr><td>${highlightSyntax(h.name, 'text')}</td><td>${highlightSyntax(h.value, 'text')}</td></tr>`;
             rawStr += `${h.name}: ${h.value}\n`;
         }
         hHtml += '</table>';

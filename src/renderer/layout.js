@@ -4,45 +4,85 @@
  * See the LICENSE file for details.
  */
 // src/renderer/layout.js
+const CONTENT_TYPE_COLORS = {
+    html: [130, 181, 252],
+    js: [254, 197, 132],
+    css: [178, 234, 148],
+    image: [196, 154, 232],
+    flash: [45, 183, 193],
+    font: [255, 82, 62],
+    video: [33, 194, 162],
+    other: [196, 196, 196]
+};
+
+const EXTENSION_CONTENT_TYPES = {
+    js: 'js',
+    mjs: 'js',
+    cjs: 'js',
+    css: 'css',
+    html: 'html',
+    htm: 'html',
+    png: 'image',
+    gif: 'image',
+    jpg: 'image',
+    jpeg: 'image',
+    webp: 'image',
+    svg: 'image',
+    avif: 'image',
+    jxl: 'image',
+    ico: 'image',
+    bmp: 'image',
+    cur: 'image',
+    eot: 'font',
+    ttf: 'font',
+    woff: 'font',
+    woff2: 'font',
+    otf: 'font',
+    fot: 'font',
+    mp4: 'video',
+    f4v: 'video',
+    flv: 'video',
+    webm: 'video',
+    mov: 'video',
+    m4v: 'video',
+    swf: 'flash'
+};
+
+function getExtensionContentType(url) {
+    if (!url) return null;
+    const urlStr = String(url);
+    const path = urlStr.split('#')[0].split('?')[0];
+    let extMatch = path.match(/\.([a-zA-Z0-9]+)$/);
+    if (!extMatch) {
+        // Preserve the previous whole-URL fallback for query-string payloads such as
+        // `?file=app.js`, while keeping the cheap pathname path as the common case.
+        extMatch = urlStr.match(/\.([a-zA-Z0-9]+)(\?|#|$)/);
+    }
+    if (!extMatch) return null;
+    return EXTENSION_CONTENT_TYPES[extMatch[1].toLowerCase()] || null;
+}
+
 export class Layout {
     static getMimeColor(mime, url = null) {
-        if (!mime) return [196, 196, 196]; // other
-        
         let contentType = 'other';
-        const lowerMime = mime.toLowerCase();
-        
-        if (lowerMime.includes('javascript') || lowerMime.includes('ecmascript') || lowerMime.startsWith('text/js')) contentType = 'js';
-        else if (lowerMime.startsWith('text/css')) contentType = 'css';
-        else if (lowerMime.startsWith('text/html')) contentType = 'html';
-        else if (lowerMime.startsWith('image/')) contentType = 'image';
-        else if (lowerMime.startsWith('video/')) contentType = 'video';
-        else if (lowerMime.includes('flash')) contentType = 'flash';
-        else if (lowerMime.includes('font')) contentType = 'font';
-        else if (url) {
-            const extMatch = url.match(/\.([a-zA-Z0-9]+)(\?|$)/);
-            if (extMatch) {
-                const ext = extMatch[1].toLowerCase();
-                if (ext === 'js') contentType = 'js';
-                else if (ext === 'css') contentType = 'css';
-                else if (ext === 'html' || ext === 'htm') contentType = 'html';
-                else if (['png', 'gif', 'jpg', 'jpeg', 'avif', 'jxl'].includes(ext)) contentType = 'image';
-                else if (['eot', 'ttf', 'woff', 'woff2', 'otf'].includes(ext)) contentType = 'font';
-                else if (['mp4', 'f4v', 'flv'].includes(ext)) contentType = 'video';
-                else if (ext === 'swf') contentType = 'flash';
-            }
+
+        if (mime) {
+            const lowerMime = mime.toLowerCase();
+
+            if (lowerMime.includes('javascript') || lowerMime.includes('ecmascript') || lowerMime.startsWith('text/js')) contentType = 'js';
+            else if (lowerMime.startsWith('text/css')) contentType = 'css';
+            else if (lowerMime.startsWith('text/html')) contentType = 'html';
+            else if (lowerMime.startsWith('image/')) contentType = 'image';
+            else if (lowerMime.startsWith('video/')) contentType = 'video';
+            else if (lowerMime.includes('flash')) contentType = 'flash';
+            else if (lowerMime.includes('font')) contentType = 'font';
         }
-        
-        const colors = {
-            'html':  [130, 181, 252],
-            'js':    [254, 197, 132],
-            'css':   [178, 234, 148],
-            'image': [196, 154, 232],
-            'flash': [45, 183, 193],
-            'font':  [255, 82, 62],
-            'video': [33, 194, 162],
-            'other': [196, 196, 196]
-        };
-        return colors[contentType] || colors.other;
+
+        if (contentType === 'other' && url) {
+            contentType = getExtensionContentType(url) || contentType;
+        }
+
+        return CONTENT_TYPE_COLORS[contentType] || CONTENT_TYPE_COLORS.other;
     }
 
     static scaleRgb(rgb, factor) {

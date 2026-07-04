@@ -69525,7 +69525,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -69553,6 +69553,7 @@
         "_chunks": [],
         "_full_url": "https://www.youtube.com/iframe_api",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -69585,7 +69586,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -69614,6 +69615,7 @@
         "_full_url": "https://cdn.optimizely.com/public/125375509/s/dleprod.js",
         "_protocol": "HTTP/2",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "link",
         "_renderBlocking": "blocking",
         "_bytesIn": 106752,
@@ -69658,7 +69660,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -69686,6 +69688,7 @@
         "_chunks": [],
         "_full_url": "https://lightning.cnn.com/launch/7be62238e4c3/97fa00444124/launch-2878c87af5e3.min.js",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "link",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -69874,7 +69877,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -69902,6 +69905,7 @@
         "_chunks": [],
         "_full_url": "https://registry.api.cnn.io/bundles/fave/latest-4.x/js",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -69934,7 +69938,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -69962,6 +69966,7 @@
         "_chunks": [],
         "_full_url": "https://turnip.cdn.turner.com/top/auth/2.22.3-0/auth.min.js",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -69994,7 +69999,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70022,6 +70027,7 @@
         "_chunks": [],
         "_full_url": "https://ix.cnn.io/dailygraphics/static/js/pym.v1.min.js",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70054,7 +70060,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70082,6 +70088,7 @@
         "_chunks": [],
         "_full_url": "https://turnip.cdn.turner.com/top/freeview/2.19.0-3/freeview.min.js",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70114,7 +70121,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70142,6 +70149,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/thumb-22759245-43632-244-thumb.jpg?c=16x9&q=w_1280,c_fill/f_webp",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70174,7 +70182,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70202,6 +70210,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/julia-benbrook-2025-headshot.jpg?c=16x9&q=h_270,w_480,c_fill/c_thumb,g_face,w_100,h_100",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70234,7 +70243,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70262,6 +70271,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/1418603-2213-r-20241209184842881.jpg?c=16x9&q=h_270,w_480,c_fill/c_thumb,g_face,w_100,h_100",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70294,7 +70304,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70322,6 +70332,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/170110122109-mohammed-tawfeeq.jpg?c=16x9&q=h_270,w_480,c_fill/c_thumb,g_face,w_100,h_100",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70354,7 +70365,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70382,6 +70393,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/1418603-1130-r-ps2560x1440.jpg?c=16x9&q=h_270,w_480,c_fill/c_thumb,g_face,w_100,h_100",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70414,7 +70426,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70442,6 +70454,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/lay.png?c=16x9&q=w_1280,c_fill/f_webp",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70474,7 +70487,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70502,6 +70515,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/170824162227-oren-liebermann.jpg?c=16x9&q=h_270,w_480,c_fill/c_thumb,g_face,w_100,h_100",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70534,7 +70548,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70562,6 +70576,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/gettyimages-2283247365.jpg?c=16x9&q=h_270,w_480,c_fill/f_webp",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70594,7 +70609,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70622,6 +70637,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/gettyimages-2283273845.jpg?c=16x9&q=h_270,w_480,c_fill/f_webp",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70654,7 +70670,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70682,6 +70698,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/c-gettyimages-2282733434.jpg?c=16x9&q=h_270,w_480,c_fill/f_webp",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70714,7 +70731,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70742,6 +70759,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/200616170917-eleni-giokos-profile-photo.jpg?c=16x9&q=h_270,w_480,c_fill/c_thumb,g_face,w_100,h_100",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70774,7 +70792,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70802,6 +70820,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/2026-06-19t081318z-1779876747-rc2twla5d265-rtrmadp-3-iran-crisis-oman-hormuz.JPG?c=16x9&q=h_270,w_480,c_fill/f_webp",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -70834,7 +70853,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -70862,6 +70881,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/2026-06-28t032154z-461426917-rc2m2maf8n3v-rtrmadp-3-venezuela-quake.jpg?c=16x9&q=h_270,w_480,c_fill/f_webp",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -71444,7 +71464,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -71472,6 +71492,7 @@
         "_chunks": [],
         "_full_url": "https://lightning.cnn.com/launch/7be62238e4c3/97fa00444124/74a614ff543f/EX3369274195e2430d9d8ea7012971cb11-libraryCode_source.min.js",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -71636,7 +71657,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -71664,6 +71685,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/thumb-22759245-43632-244-thumb.jpg?c=16x9&q=h_720,w_1280,c_fill/f_webp",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -71832,7 +71854,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -71860,6 +71882,7 @@
         "_chunks": [],
         "_full_url": "https://registry.api.cnn.io/bundles/fave/4.46.0/css",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "link",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -71892,7 +71915,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -71920,6 +71943,7 @@
         "_chunks": [],
         "_full_url": "https://registry.api.cnn.io/bundles/fave/4.46.0/vendorHashes",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -71952,7 +71976,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -71980,6 +72004,7 @@
         "_chunks": [],
         "_full_url": "https://www.youtube.com/s/player/5b27766f/www-widgetapi.vflset/www-widgetapi.js",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -72012,7 +72037,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -72040,6 +72065,7 @@
         "_chunks": [],
         "_full_url": "https://ix.cnn.io/dailygraphics/graphics/20260304-gas-prices-trend-us-live/index.html?date=20260628&initialWidth=610&childId=cms.cnn.com/_components/graphic/instances/cmqy6ayrv000i3b6s7wotwa3p@published&parentTitle=June%2028%2C%202026%20%E2%80%94%20Fragile%20US-Iran%20ceasefire%20strained%2C%20Bahrain%20and%20Kuwait%20targeted%20by%20Tehran%20%7C%20CNN&parentUrl=https%3A%2F%2Fwww.cnn.com%2F2026%2F06%2F28%2Fworld%2Flive-news%2Firan-war-strikes-trump",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "iframe",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -72072,7 +72098,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -72100,6 +72126,7 @@
         "_chunks": [],
         "_full_url": "https://ix.cnn.io/dailygraphics/graphics/20260318-iran-hormuz-eez/index.html?initialWidth=0&childId=cms.cnn.com/_components/graphic/instances/cmqxvnegr00183b6rmg48f1h8@published&parentTitle=June%2028%2C%202026%20%E2%80%94%20Fragile%20US-Iran%20ceasefire%20strained%2C%20Bahrain%20and%20Kuwait%20targeted%20by%20Tehran%20%7C%20CNN&parentUrl=https%3A%2F%2Fwww.cnn.com%2F2026%2F06%2F28%2Fworld%2Flive-news%2Firan-war-strikes-trump",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "iframe",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -72132,7 +72159,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -72160,6 +72187,7 @@
         "_chunks": [],
         "_full_url": "https://registry.api.cnn.io/bundles/fave/vendor-f4e1c46d/vendor",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -72192,7 +72220,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -72220,6 +72248,7 @@
         "_chunks": [],
         "_full_url": "https://registry.api.cnn.io/bundles/fave/4.46.0/app",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -72392,7 +72421,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/3",
           "cookies": [],
@@ -72421,6 +72450,7 @@
         "_full_url": "https://js.stripe.com/dahlia/stripe.js",
         "_protocol": "HTTP/3",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 273330,
@@ -72750,7 +72780,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -72778,6 +72808,7 @@
         "_chunks": [],
         "_full_url": "https://ix.cnn.io/dailygraphics/graphics/20260304-gas-prices-trend-us-live/index.html?date=20260628&initialWidth=610&childId=cms.cnn.com/_components/graphic/instances/cmqy6ayrv000i3b6s7wotwa3p@published&parentTitle=June%2028%2C%202026%20%E2%80%94%20Fragile%20US-Iran%20ceasefire%20strained%2C%20Bahrain%20and%20Kuwait%20targeted%20by%20Tehran%20%7C%20CNN&parentUrl=https%3A%2F%2Fwww.cnn.com%2F2026%2F06%2F28%2Fworld%2Flive-news%2Firan-war-strikes-trump",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "iframe",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -72810,7 +72841,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -72838,6 +72869,7 @@
         "_chunks": [],
         "_full_url": "https://ix.cnn.io/dailygraphics/graphics/20260318-iran-hormuz-eez/index.html?initialWidth=0&childId=cms.cnn.com/_components/graphic/instances/cmqxvnegr00183b6rmg48f1h8@published&parentTitle=June%2028%2C%202026%20%E2%80%94%20Fragile%20US-Iran%20ceasefire%20strained%2C%20Bahrain%20and%20Kuwait%20targeted%20by%20Tehran%20%7C%20CNN&parentUrl=https%3A%2F%2Fwww.cnn.com%2F2026%2F06%2F28%2Fworld%2Flive-news%2Firan-war-strikes-trump",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "iframe",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -72870,7 +72902,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -72898,6 +72930,7 @@
         "_chunks": [],
         "_full_url": "https://ix.cnn.io/dailygraphics/graphics/20260312-hormuz-ship-tracker-map/index.html?initialWidth=0&childId=cms.cnn.com/_components/graphic/instances/cmqxmvg46000o3b6r80w3q6fg@published&parentTitle=June%2028%2C%202026%20%E2%80%94%20Fragile%20US-Iran%20ceasefire%20strained%2C%20Bahrain%20and%20Kuwait%20targeted%20by%20Tehran%20%7C%20CNN&parentUrl=https%3A%2F%2Fwww.cnn.com%2F2026%2F06%2F28%2Fworld%2Flive-news%2Firan-war-strikes-trump",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "iframe",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -72930,7 +72963,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -72959,6 +72992,7 @@
         "_full_url": "https://imasdk.googleapis.com/js/sdkloader/ima3.js",
         "_protocol": "HTTP/2",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 157150,
@@ -73003,7 +73037,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -73031,6 +73065,7 @@
         "_chunks": [],
         "_full_url": "https://registry.api.cnn.io/bundles/fave/boltPlayer-b783ddd7/boltPlayer",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -73063,7 +73098,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -73091,6 +73126,7 @@
         "_chunks": [],
         "_full_url": "https://registry.api.cnn.io/bundles/fave/boltInstance-7fd499a0/boltInstance",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -73123,7 +73159,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -73151,6 +73187,7 @@
         "_chunks": [],
         "_full_url": "https://accounts.google.com/gsi/client",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -73473,7 +73510,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -73501,6 +73538,7 @@
         "_chunks": [],
         "_full_url": "https://accounts.google.com/gsi/style",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "link",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -74401,7 +74439,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -74429,6 +74467,7 @@
         "_chunks": [],
         "_full_url": "https://registry.api.cnn.io/bundles/fave/ui-2aea8db2/ui",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -74461,7 +74500,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/3",
           "cookies": [],
@@ -74490,6 +74529,7 @@
         "_full_url": "https://js.stripe.com/v3/m-outer-3437aaddcdf6922d623e172c2d6f9278.html#url=https%3A%2F%2Fwww.cnn.com%2F2026%2F06%2F28%2Fworld%2Flive-news%2Firan-war-strikes-trump&title=June%2028%2C%202026%20%E2%80%94%20Fragile%20US-Iran%20ceasefire%20strained%2C%20Bahrain%20and%20Kuwait%20targeted%20by%20Tehran%20%7C%20CNN&referrer=&muid=NA&sid=NA&version=6&preview=false&__shared_params__[version]=dahlia",
         "_protocol": "HTTP/3",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "iframe",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 500,
@@ -74654,7 +74694,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -74682,6 +74722,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/thumb-22759245-43632-244-thumb.jpg?c=16x9&q=h_540,w_960,c_fill",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "css",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -74836,7 +74877,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -74864,6 +74905,7 @@
         "_chunks": [],
         "_full_url": "https://media.cnn.com/api/v1/images/stellar/prod/lay.png?c=16x9&q=h_540,w_960,c_fill",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "css",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,

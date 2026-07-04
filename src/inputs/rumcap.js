@@ -222,11 +222,11 @@ function buildEntry(r, pageId, timeOrigin, isNavigation) {
     const endTime = r.responseEnd !== undefined ? r.responseEnd : startTime + (r.duration || 0);
     const protocol = mapProtocol(r.nextHopProtocol);
 
-    // rumcap's responseStatus 0 is a PRESENT opaque/CORS-hidden status, not absence. HAR 0
-    // renders as a canceled/error row and omission would let har-converter fabricate a 200,
-    // so both 0 and absent map to -1 (the netlog unknown-status convention); the raw value is
-    // preserved on `_responseStatus` whenever it was present.
-    const status = (r.responseStatus !== undefined && r.responseStatus > 0) ? r.responseStatus : -1;
+    // rumcap's responseStatus 0 is a PRESENT opaque/CORS-hidden status, not a network
+    // failure. Treat hidden/absent statuses as successful so the waterfall doesn't paint
+    // cross-origin rows as errors; preserve the raw capture value on `_responseStatus`.
+    const statusAssumed = !(r.responseStatus > 0);
+    const status = statusAssumed ? 200 : r.responseStatus;
 
     // Standard HAR timings (informational — the renderer uses the absolute `_` fields):
     // -1 marks unknowable phases per HAR convention. `wait` is derived so that
@@ -287,6 +287,7 @@ function buildEntry(r, pageId, timeOrigin, isNavigation) {
     if (isNavigation) entry._is_base_page = true;
     if (protocol) entry._protocol = protocol;
     if (r.responseStatus !== undefined) entry._responseStatus = r.responseStatus;
+    if (statusAssumed) entry._statusAssumed = true;
     if (r.contentType !== undefined) entry._contentType = r.contentType;
     if (r.contentEncoding !== undefined) entry._contentEncoding = r.contentEncoding;
     if (r.initiatorType !== undefined) entry._initiator_type = r.initiatorType;

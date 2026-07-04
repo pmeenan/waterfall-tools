@@ -158,7 +158,7 @@ The canvas renderer expects **relative millisecond offsets** from the earliest `
 ### rumcap (`.rcap`)
 - **Clock model:** every rcap timeline value is RelMs from `manifest.clock.timeOrigin` (epoch ms). Page zero == timeOrigin: `page.startedDateTime = new Date(timeOrigin)`, `entry.startedDateTime = new Date(timeOrigin + startTime)`, `entry._created = startTime` — which makes `layout.js`'s baseEpoch resolve to page zero. Never re-derive epochs from anything else (netlog 1970 lesson).
 - **Outer-gunzip first:** detect by magic bytes (`1f 8b`), never extension. A plain `.rcap` carries its own internal gzip *after* the cleartext `F5 52 55 4D` header — the outer layer only exists on user-gzipped `.rcap.gz`. Then hand bytes to `rumcap/decode#unpack` (decoder-only import so the encoder tree-shakes; `checkConsistency` runs under `debug` and logs, never throws).
-- **Absence semantics:** the manifest is TOTAL — `page._rumcapManifest` is always emitted; every other stream maps to `_` fields only when `present`. Absent source values → omitted `_` fields, never 0. `responseStatus: 0` is *present* data (opaque/CORS-hidden) → HAR `response.status = -1` (netlog unknown-status convention; HAR `0` paints an error row, omission lets `har-converter.js` default-fabricate `200`) with the raw value preserved on `entry._responseStatus`.
+- **Absence semantics:** the manifest is TOTAL — `page._rumcapManifest` is always emitted; every other stream maps to `_` fields only when `present`. Absent source values → omitted `_` fields, never 0. `responseStatus: 0` is *present* opaque/CORS-hidden data, not failure; map it to assumed-success HAR `response.status = 200`, preserve the raw value on `entry._responseStatus` when present, and set `entry._statusAssumed = true` whenever status was fabricated from hidden/missing source data.
 - **`_longTasks` tri-state per manifest:** entries when found, `[]` when the stream is `present` but empty, omitted when `unsupported`/`not-requested`/`dropped`/`policy-blocked`.
 - **`_user_timing`** is the renderer's map shape: name → RelMs number (marks) or `{ time, duration }` (measures). Measure `detail` stays on the retained capture for trace synthesis.
 - **Profile fold:** only depth-0 call-tree slices count toward busy time (children are contained). All busy time lands in `EvaluateScript` — a sampling JS profiler only sees script execution, so the other four `_mainThreadSlices` categories are present but all-zero. Grid width via the shared `computeSliceGridUsecs` in `src/core/mainthread-categories.js` (extracted from `chrome-trace.js` — don't duplicate the `10^n`/>2000-slices loop). `entry._js_timing` via frame `resourceId` → script URL matched against `_full_url`, first-match-wins (`$used` de-dup).
@@ -199,6 +199,7 @@ The canvas renderer expects **relative millisecond offsets** from the earliest `
 - **Render blocking:** `_renderBlocking === 'blocking'` → 14px `#ff9900` circle, 1.5px white-stroke X. Drawn from canvas primitives (no PNG asset).
 - **Label layering:** metric labels paint opaque background (`#ffffff` or `#f0f0f0` matching row stripe) behind text to prevent grid bleed.
 - **Legend:** connection phases = solid uniform bars. MIME types = 20px split bars, left half `scaleRgb(color, 0.65)` TTFB tint, right half primary download color.
+- **MIME color fallback:** when `entry.mimeType` is unavailable, `Layout.getMimeColor(mime, url)` must classify common URL extensions before falling back to gray: scripts (`js/mjs/cjs`), stylesheets (`css`), images (`jpg/jpeg/png/gif/webp/svg/avif/jxl/ico/bmp/cur`), fonts (`eot/ttf/woff/woff2/otf/fot`), video (`mp4/f4v/flv/webm/mov/m4v`), and Flash (`swf`). Keep this path allocation-light because it runs per visible request on redraw; avoid `new URL()` in the hot path.
 - **Utilization graphs (CPU, BW):** stair-stepped. Value = window-aggregated, not instantaneous — draw horizontal to new-ts-at-old-value, then vertical to new value. Diagonal interpolation is wrong.
 - **Bandwidth normalization:** rolling deficit carries instantaneous overflow forward into subsequent buckets (dark green, WPT standard).
 - **Connection View** (`options.connectionView`): suppress per-request TTFB backgrounds, JS-execution highlights, per-request timing labels.
@@ -232,6 +233,7 @@ The canvas renderer expects **relative millisecond offsets** from the earliest `
   - other binary → byte-size estimate.
   - fallback: URL for images when body absent.
   - `body` field excluded from Raw Details JSON.
+- **Request details:** build Details rows only from meaningful values. Omit optional rows for `undefined`, `null`, empty strings, non-finite numbers, `N/A`, and `NaN`; keep zero as valid. Byte/time formatters must return `null` for invalid input and negative sentinels rather than rendering `NaN`/`-1ms`. Canceled (`0`) and unknown (`<0`) statuses are meaningful and must render with an explanatory label. Header names/values are untrusted HAR data and must be escaped before interpolation.
 - **Chunked HTML body viewer** (`buildChunkedHtmlBody`): for HTML MIME with `_chunks[].ts` and base64 body, renders a hex-viewer-style two-col table, one row per wire chunk.
   - Slice by `inflated` when present; fall back to `bytes`. Leftover from undercounts absorbed into final chunk; overflow clamped from tail.
   - UTF-8 boundary safe via `TextDecoder('utf-8').decode(slice, { stream: true })` on raw `Uint8Array` slices.
@@ -313,9 +315,9 @@ Single-file, zero-binding Worker providing CORS-safe fetch proxy for viewer URL 
 
 ## Dependency & Security Updates
 - **rumcap session (July 2026):** Added `rumcap@^0.0.1` as a runtime dependency (Apache-2.0, zero-dep ESM — only `rumcap/decode` is imported so the encoder tree-shakes away). Bumped `@chrome-devtools/index` to `1.20260628.0` per the every-session cadence (devDependencies + peerDependencies kept in step).
+- **rumcap waterfall manual-test fixes (July 2026):** Opaque/CORS-hidden `responseStatus: 0` now maps to assumed-success HAR `200` while preserving raw `_responseStatus` and setting `_statusAssumed`; request colors fall back to URL extensions when MIME is hidden; viewer Details rows omit absent/invalid values and byte/time formatters return `null` instead of rendering `NaN`/negative sentinels.
 - **v0.3.0 Maintenance (May 2026):** Ran dependency updates and security maintenance:
   - Ran `npm audit fix` to address three vulnerabilities (2 moderate, 1 high) in `brace-expansion` (to `5.0.6`), `postcss` (to `8.5.15`), and `vite` (to `8.0.14`).
   - Ran `npm update` to upgrade all other packages to their latest compatible versions (eslint to `10.4.0`, globals to `17.6.0`, rollup to `4.60.4`, vitest to `4.1.7`, @chrome-devtools/index to `1.20260517.0`, and @napi-rs/canvas to `0.1.100`).
   - Reconciled stale `package-lock.json` with `package.json`, updating the lockfile version to `0.3.0` and moving `@chrome-devtools/index` from `dependencies` to `devDependencies` and `peerDependencies`.
   - Regenerated the test fixture `tests/fixtures/amazon.har.json` to resolve the test suite regression by incorporating `_startRender` on pages.
-

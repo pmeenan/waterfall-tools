@@ -1246,7 +1246,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -1274,6 +1274,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/excm=_b,_tp,homeview/ed=1/dg=0/wt=2/ujg=1/rs=ALfA75eNY8UJp_dWNkHVFO8zjPoXeWDLNw/dti=1/m=_b,_tp",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -1306,7 +1307,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -1334,6 +1335,7 @@
         "_chunks": [],
         "_full_url": "https://www.googletagmanager.com/gtag/js?id=G-GYEF2DC8WG",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -1366,7 +1368,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/2",
           "cookies": [],
@@ -1395,6 +1397,7 @@
         "_full_url": "https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500",
         "_protocol": "HTTP/2",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "link",
         "_renderBlocking": "blocking",
         "_bytesIn": 2459,
@@ -1643,7 +1646,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -1671,6 +1674,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.home.saxo&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -1703,7 +1707,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -1731,6 +1735,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://247wallst.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -1763,7 +1768,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -1791,6 +1796,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.nytimes.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -1823,7 +1829,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -1851,6 +1857,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://finance.yahoo.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -1883,7 +1890,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -1911,6 +1918,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.barrons.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -1943,7 +1951,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -1971,6 +1979,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.benzinga.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2003,7 +2012,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2031,6 +2040,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://simplywall.st&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2063,7 +2073,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2091,6 +2101,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.marketscreener.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2123,7 +2134,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2151,6 +2162,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.aol.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2183,7 +2195,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2211,6 +2223,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.investors.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2243,7 +2256,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2271,6 +2284,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://seekingalpha.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2303,7 +2317,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2331,6 +2345,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.cnbc.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2363,7 +2378,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2391,6 +2406,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.fool.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2423,7 +2439,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2451,6 +2467,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.marketwatch.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2483,7 +2500,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2511,6 +2528,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.businesswire.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2543,7 +2561,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2571,6 +2589,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.reuters.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2603,7 +2622,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2631,6 +2650,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.morningstar.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2663,7 +2683,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2691,6 +2711,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.bloomberg.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2723,7 +2744,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2751,6 +2772,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.theblock.co&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2783,7 +2805,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2811,6 +2833,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://awealthofcommonsense.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2843,7 +2866,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2871,6 +2894,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.ft.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2903,7 +2927,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2931,6 +2955,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.npr.org&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -2963,7 +2988,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -2991,6 +3016,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.globenewswire.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3023,7 +3049,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3051,6 +3077,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/og/_/js/k=og.qtm.en_US.Amijwnuwtog.2019.O/rt=j/m=qabr,q_dnp,qcwid,qapid,qads/exm=qaaw,qadd,qaid,qein,qhaw,qhba,qhbr,qhch,qhga,qhid,qhin/d=1/ed=1/rs=AA2YrTuDWbAN8-VT3mmz0owHPs0Sou5KiA",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3083,7 +3110,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3111,6 +3138,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/og/_/ss/k=og.qtm.dx8igAtVUKc.L.W.O/m=qcwid,d_b_gm3,d_wi_gm3,d_lo_gm3/excm=qaaw,qadd,qaid,qein,qhaw,qhba,qhbr,qhch,qhga,qhid,qhin/d=1/ed=1/ct=zgms/rs=AA2YrTuRXSIc6ZAkT0f0eC2Gvh5vLRXhMw",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "link",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3143,7 +3171,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3171,6 +3199,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=_b,_tp/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=ws9Tlc,O6y8ed,aW3pY,n73qwf,UUJqVe,IZT63,YYmHzb,e5qFLc,pw70Gc,KUM7Z,O1Gjze,byfTOb,lsjVmc,xUdipf,ZDZcre,OTA3Ae,ZwDk9d,RyvaUb,mI3LFb,CpEtFb,ebZ3mb,HU2IR,aIe7ef,ax9Vtb,v6sEpd,mpIzMd,I6Pxve,W8bNCd,CR0yf,RE7MXd,bMnEOc,QVAk9c,B9DV4b,zPA3Tc,gYfsDd,PE3ys,Vh2Tqc,CwGjRb,hton8c,uC5ezf,MpJwZc,PrPYRd,LEikZe,NwH0H,V3dDOb,lazG7b,XVMNvd,duFQFc,QIhFr,xQtZb,lwddkf,gychg,w9hDv,RMhBfe,Wq6lxf,Br7nPe,Wf0Cmd,SdcwHb,EFQ78c,Ulmmrd,A7fCU,mdR7q,Rr5NOe,hc6Ubd,JNoxi,MI6k7c,kjKdXe,BVgquf,SpsfSb,hKSk3e,Z5uLle,BBI74,MdUzUe,zbML3c,zr1jrb,aomhLc,xisSze,pkYo2c,OvCQqe,Uas9Hd,pjICDe",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3203,7 +3232,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3231,6 +3260,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,HU2IR,I6Pxve,IZT63,JNoxi,KUM7Z,LEikZe,MI6k7c,MdUzUe,MpJwZc,NwH0H,O1Gjze,O6y8ed,OTA3Ae,OvCQqe,PE3ys,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,byfTOb,duFQFc,e5qFLc,ebZ3mb,gYfsDd,gychg,hKSk3e,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,pjICDe,pkYo2c,pw70Gc,uC5ezf,v6sEpd,w9hDv,ws9Tlc,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=ZvHseb,PIVayb,LBaJxb,bZ0mod,uoEu0c,EKHvcb,bShTnc,NYR6fd,O626Fe,xNSwve,AXXMkb,xBCn9,tw4SJc,dsBBae,VBl5Ff,gW5sDd,w9C4d,EUYPub,Jaab7",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3324,7 +3354,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3352,6 +3382,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/feedback/js/help/prod/service/lazy.min.js",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3384,7 +3415,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3412,6 +3443,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,PE3ys,PIVayb,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,pjICDe,pkYo2c,pw70Gc,tw4SJc,uC5ezf,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=p3hmRc,LvGhrf,RqjULd",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3444,7 +3476,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3472,6 +3504,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,PE3ys,PIVayb,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,tw4SJc,uC5ezf,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=cBEcj",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3504,7 +3537,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3532,6 +3565,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,PE3ys,PIVayb,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,tw4SJc,uC5ezf,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=cl3jf",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3564,7 +3598,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3592,6 +3626,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,PE3ys,PIVayb,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,cl3jf,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,tw4SJc,uC5ezf,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=uPaolb",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3624,7 +3659,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3652,6 +3687,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,PE3ys,PIVayb,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,cl3jf,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,tw4SJc,uC5ezf,uPaolb,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=sOXFj,q0xTif,df57rc",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3684,7 +3720,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3712,6 +3748,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,PE3ys,PIVayb,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,cl3jf,df57rc,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,q0xTif,sOXFj,tw4SJc,uC5ezf,uPaolb,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=Tv7dAe",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3814,7 +3851,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3842,6 +3879,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,PE3ys,PIVayb,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,Tv7dAe,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,cl3jf,df57rc,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,q0xTif,sOXFj,tw4SJc,uC5ezf,uPaolb,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=P6sQOc",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3874,7 +3912,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3902,6 +3940,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,P6sQOc,PE3ys,PIVayb,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,Tv7dAe,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,cl3jf,df57rc,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,q0xTif,sOXFj,tw4SJc,uC5ezf,uPaolb,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=hOWHj",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3934,7 +3973,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -3962,6 +4001,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,P6sQOc,PE3ys,PIVayb,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,Tv7dAe,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,cl3jf,df57rc,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hOWHj,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,q0xTif,sOXFj,tw4SJc,uC5ezf,uPaolb,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,zPA3Tc,zbML3c,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=PZXO1d,zkYLec,yIOaIc,D8Gxhe",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -3994,7 +4034,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -4022,6 +4062,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,D8Gxhe,EFQ78c,EKHvcb,EUYPub,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,P6sQOc,PE3ys,PIVayb,PZXO1d,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,Tv7dAe,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,Wq6lxf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,cl3jf,df57rc,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hOWHj,hc6Ubd,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,q0xTif,sOXFj,tw4SJc,uC5ezf,uPaolb,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,yIOaIc,zPA3Tc,zbML3c,zkYLec,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=Wt6vjf,hhhU8,FCpbqb,WhJNk",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -4054,7 +4095,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -4082,6 +4123,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/finance/favicon/favicon.png",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "other",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -4114,7 +4156,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -4142,6 +4184,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/finance/favicon/finance_v2_512x512.png",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "other",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -4313,7 +4356,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -4341,6 +4384,7 @@
         "_chunks": [],
         "_full_url": "https://www.google-analytics.com/g/collect?v=2&tid=G-GYEF2DC8WG&gtm=45je66o1h1v9223950037za200zd9223950037&_p=1782737062836&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAE&ae=a&are=1&cid=1920510520.1782737063&frm=0&pscdl=noapi&rcb=8&sr=1366x768&uaa=&uab=&uafvl=&uam=&uamb=0&uap=&uapv=&uaw=0&ul=en-us&_s=1&tag_exp=115616986~115938465~115938469~119027224~119527019~119576876~119576880~119576891~119576895&sid=1782737063&sct=1&seg=0&dl=https%3A%2F%2Fwww.google.com%2Ffinance%2Fbeta&dt=Google%20Finance&_tu=QA&en=scroll&_fv=1&_nsi=1&_ss=1&ep.anonymize_ip=true&epn.percent_scrolled=90&tfd=615",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "fetch",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5001,7 +5045,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5029,6 +5073,7 @@
         "_chunks": [],
         "_full_url": "https://play.google.com/log?hasfast=true&authuser=0&format=json",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "beacon",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5131,7 +5176,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5159,6 +5204,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.tradingkey.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5191,7 +5237,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5219,6 +5265,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://trendspider.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5251,7 +5298,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5279,6 +5326,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.zacks.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5381,7 +5429,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5409,6 +5457,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.thestreet.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5441,7 +5490,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5469,6 +5518,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.ssga.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5501,7 +5551,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5529,6 +5579,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.kucoin.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5561,7 +5612,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5589,6 +5640,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://blog.liquide.life&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5621,7 +5673,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5649,6 +5701,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.dailyforex.com&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5681,7 +5734,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5709,6 +5762,7 @@
         "_chunks": [],
         "_full_url": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.ibja.co&client=FINANCE_HUB&size=32&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "img",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -5951,7 +6005,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -5979,6 +6033,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,D8Gxhe,EFQ78c,EKHvcb,EUYPub,FCpbqb,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,P6sQOc,PE3ys,PIVayb,PZXO1d,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,Tv7dAe,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,WhJNk,Wq6lxf,Wt6vjf,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,cl3jf,df57rc,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hOWHj,hc6Ubd,hhhU8,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,q0xTif,sOXFj,tw4SJc,uC5ezf,uPaolb,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,yIOaIc,zPA3Tc,zbML3c,zkYLec,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=XTf4dd",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -6011,7 +6066,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -6039,6 +6094,7 @@
         "_chunks": [],
         "_full_url": "https://www.gstatic.com/_/mss/boq-finhub/_/js/k=boq-finhub.FinHubUi.en_US.XDMPSLAn5YA.2018.O/ck=boq-finhub.FinHubUi.2eK5MJpg6IM.L.B1.O/am=CAgBAAAAAAAAAAAAAAAQAAAAAAAAAAECABBAKBgAiABIFCIAAAAOAAAAgKMACwAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKnAAAAAAAAAQ/d=1/exm=A7fCU,AXXMkb,B9DV4b,BBI74,BVgquf,Br7nPe,CR0yf,CpEtFb,CwGjRb,D8Gxhe,EFQ78c,EKHvcb,EUYPub,FCpbqb,HU2IR,I6Pxve,IZT63,JNoxi,Jaab7,KUM7Z,LBaJxb,LEikZe,LvGhrf,MI6k7c,MdUzUe,MpJwZc,NYR6fd,NwH0H,O1Gjze,O626Fe,O6y8ed,OTA3Ae,OvCQqe,P6sQOc,PE3ys,PIVayb,PZXO1d,PrPYRd,QIhFr,QVAk9c,RE7MXd,RMhBfe,RqjULd,Rr5NOe,RyvaUb,SdcwHb,SpsfSb,Tv7dAe,UUJqVe,Uas9Hd,Ulmmrd,V3dDOb,VBl5Ff,Vh2Tqc,W8bNCd,Wf0Cmd,WhJNk,Wq6lxf,Wt6vjf,XTf4dd,XVMNvd,YYmHzb,Z5uLle,ZDZcre,ZvHseb,ZwDk9d,_b,_tp,aIe7ef,aW3pY,aomhLc,ax9Vtb,bMnEOc,bShTnc,bZ0mod,byfTOb,cBEcj,cl3jf,df57rc,dsBBae,duFQFc,e5qFLc,ebZ3mb,gW5sDd,gYfsDd,gychg,hKSk3e,hOWHj,hc6Ubd,hhhU8,hton8c,kjKdXe,lazG7b,lsjVmc,lwddkf,mI3LFb,mdR7q,mpIzMd,n73qwf,p3hmRc,pjICDe,pkYo2c,pw70Gc,q0xTif,sOXFj,tw4SJc,uC5ezf,uPaolb,uoEu0c,v6sEpd,w9C4d,w9hDv,ws9Tlc,xBCn9,xNSwve,xQtZb,xUdipf,xisSze,yIOaIc,zPA3Tc,zbML3c,zkYLec,zr1jrb/excm=_b,_tp,homeview/ed=1/wt=2/ujg=1/rs=ALfA75dWY1_6IGeDnMRZpct-9W3Lgdi8SQ/ee=AfeaP:TkrAjf;BgS6mb:fidj5d;BjwMce:cXX2Wb;CxXAWb:YyRLvc;DQEued:Fevhcf;DULqB:RKfG5c;DpcR3d:zL72xf;EABSZ:MXZt9d;EVNhjf:pw70Gc;EmZ2Bf:zr1jrb;EnlcNd:WeHg4;F9mqte:UoRcbe;FSxmUe:fiZR8b;G0KhTb:LIaoZ;GleZL:J1A7Od;HMDDWe:G8QUdb;JXJSm:ii1RGf;JXS8fb:Qj0suc;JqSq7d:y9ePhe;JsbNhc:Xd8iUd;K5nYTd:ZDZcre;KDb6nb:fE9n2;KQzWid:ZMKkN;LBgRLc:SdcwHb;MNkAde:KMCd1d;Me32dd:MEeYgc;NJ1rfe:qTnoBf;NPKaK:SdcwHb;NSEoX:lazG7b;NjIwef:YVgi7d;Np8Qkd:Dpx6qc;Nyt6ic:jn2sGd;OgagBe:cNTe0;OiqE2c:TFpEK;Pjplud:EEDORb;QGR0gd:Mlhmy;R9Ulx:CR7Ufe;SLtqO:Kh1xYe;SNUn3:ZwDk9d;ScI3Yc:e7Hzgb;SzQQ3e:dNhofb;TroZ1d:vVVzjb;UDrY1c:eps46d;UVmjEd:EesRsb;UYRIEb:HzTAQc;Uvc8o:VDovNc;V2HTTe:RolTY;VGRfx:VFqbr;VN6jIc:ddQyuf;VOcgDe:YquhTb;VhA7bd:vAmQFf;WDGyFe:jcVOxd;Wfmdue:g3MJlb;Y3c5sd:FGbfLe;YIZmRd:A1yn5d;YymWX:gJzDyc;ZMvdv:PHFPjb;ZSH6tc:QAvyLe;a56pNe:JEfCwb;aAJE9c:WHW6Ef;aCJ9tf:qKftvc;aVZq3e:EMeVIb;aZ61od:arTwJ;aci7y:Z5Tr6c;bUIkwb:WMwEHe;bcPXSc:gSZLJb;cEt90b:ws9Tlc;cFTWae:gT8qnd;dIoSBb:SpsfSb;dowIGb:ebZ3mb;dtl0hd:lLQWFe;eBAeSb:zbML3c;eBZ5Nd:audvde;eHDfl:ofjVkb;eJKchc:ATg1be;euOXY:OZjbQ;g8nkx:U4MzKc;gaub4:TN6bMe;gtVSi:ekUOYd;h3MYod:iAmrSd;hjRo6e:F62sG;hlqGX:FWz1ic;hsLsYc:Vl118;iFQyKf:QIhFr;kbAm9d:MkHyGd;lOO0Vd:OTA3Ae;lbfkyf:MqGdUd;nBZnZe:CvErjb;oGtAuc:sOXFj;oiBhre:OuMkRd;pKJiXd:VCenhc;pNsl2d:j9Yuyc;pXdRYb:MdUzUe;qQEoOc:KUM7Z;qZx2Fc:j0xrE;qaS3gd:yiLg6e;qafBPd:yDVVkb;qavrXe:I0C9u;qddgKe:xQtZb;ropkZ:hjoqoe;sTsDMc:JksfDf;teSRSb:BMLai;tosKvd:ZCqP3;trZL0b:qY8PFe;uuQkY:u2V3ud;w3bZCb:ZPGaIb;w4rSdf:XKiZ9;w9w86d:aIe7ef;wQlYve:aLUfP;wR5FRb:O1Gjze;wV5Pjc:L8KGxe;wtUFaf:SKlaeb;xBbsrc:NEW1Qc;xqZiqf:BBI74;ysNiMc:CpIBjd;yxTchf:KUM7Z;z97YGf:oug9te;zxnPse:duFQFc/dti=1/m=ECTceb",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "script",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,
@@ -6343,7 +6399,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": -1,
+          "status": 200,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],
@@ -6371,6 +6427,7 @@
         "_chunks": [],
         "_full_url": "https://www.google-analytics.com/g/collect?v=2&tid=G-GYEF2DC8WG&gtm=45je66o1h1v9223950037za200zd9223950037&_p=1782737062836&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1920510520.1782737063&frm=0&pscdl=noapi&rcb=8&sr=1366x768&uaa=&uab=&uafvl=&uam=&uamb=0&uap=&uapv=&uaw=0&ul=en-us&_s=2&tag_exp=115616986~115938465~115938469~119027224~119527019~119576876~119576880~119576891~119576895&sid=1782737063&sct=1&seg=1&dl=https%3A%2F%2Fwww.google.com%2Ffinance%2Fbeta&dt=Google%20Finance&_tu=QA&en=page_view&_ee=1&ep.anonymize_ip=true&_et=2&tfd=5620",
         "_responseStatus": 0,
+        "_statusAssumed": true,
         "_initiator_type": "fetch",
         "_renderBlocking": "non-blocking",
         "_bytesIn": 0,

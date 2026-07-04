@@ -76,6 +76,7 @@
  * @property {boolean} [_final_base_page]
  * @property {number} [_responseCode]
  * @property {number} [_responseStatus] - Raw ResourceTiming responseStatus as reported (incl. 0 = opaque/CORS-hidden; rumcap)
+ * @property {boolean} [_statusAssumed] - HAR response.status was assumed successful because ResourceTiming status was 0 or absent (rumcap)
  * @property {number} [_first_interim_response] - Early Hints (HTTP 103) interim response start, relative ms (rumcap)
  * @property {number|string} [_socket]
  * @property {number|string} [_initiator_line]

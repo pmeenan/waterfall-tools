@@ -106,11 +106,12 @@ describe('rumcap (.rcap) Input Processor', () => {
         // Page zero == timeOrigin; navigation startTime is 0
         expect(new Date(nav.startedDateTime).getTime()).toBe(new Date(page.startedDateTime).getTime());
 
-        // Opaque/CORS-hidden responseStatus 0 → HAR -1, raw value preserved on _responseStatus
+        // Opaque/CORS-hidden responseStatus 0 → assumed successful HAR 200, raw value preserved on _responseStatus
         const opaque = entries.find(e => e._responseStatus === 0);
         expect(opaque).toBeDefined();
-        expect(opaque.response.status).toBe(-1);
+        expect(opaque.response.status).toBe(200);
         expect(opaque._responseStatus).toBe(0);
+        expect(opaque._statusAssumed).toBe(true);
     });
 
     it('maps absolute timing extensions only when the source phase is present', async () => {

@@ -48,10 +48,12 @@ Every request object in the `.log.entries` array maps tightly to standard HAR va
 - **Response Ext:** `_error`, `_fetchedViaServiceWorker`, `_transferSize`
 - **Timing Ext:** `_blocked_queueing`, `_workerFetchStart`, `_workerReady`, `_workerRespondWithSettled`, `_workerStart`
 - `_responseStatus` (number): The raw ResourceTiming `responseStatus` as the producer reported it,
-  including `0` for opaque / CORS-hidden responses. HAR `response.status` maps rumcap's `0` (and a
-  missing status) to `-1` — the unknown-status convention, since a HAR `0` renders as a
-  canceled/error row and omission would let downstream defaulting fabricate a `200` — so this field
-  preserves what was actually observed for the details view. Sources: **rumcap**.
+  including `0` for opaque / CORS-hidden responses. rumcap maps `0` and missing statuses to assumed
+  successful HAR `response.status = 200` so hidden cross-origin data does not render as a failed
+  request; this field preserves the raw observed value for details/raw views. Sources: **rumcap**.
+- `_statusAssumed` (boolean): Present when a parser intentionally assumed the public HAR
+  `response.status` because the source hid or omitted the true status. Currently emitted by
+  **rumcap** when ResourceTiming `responseStatus` is `0` or absent.
 - `_first_interim_response` (number): Relative-ms offset (page zero) of the first interim HTTP
   response (Early Hints / HTTP 103), from ResourceTiming `firstInterimResponseStart`. Only present
   when an interim response occurred. Sources: **rumcap**.

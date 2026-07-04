@@ -65,4 +65,14 @@ describe('Theming options surface', () => {
         const thumb = Layout.calculateRows(oneEntry, 1000, { thumbnailView: true, rowHeight: 12 });
         expect(thumb.rows[0].y2 - thumb.rows[0].y1 + 1).toBe(12);
     });
+
+    it('falls back to URL extensions when the MIME type is unavailable', () => {
+        expect(Layout.getMimeColor('', 'https://example.com/app.js?v=1')).toEqual([254, 197, 132]);
+        expect(Layout.getMimeColor('', 'https://example.com/styles/main.css#v1')).toEqual([178, 234, 148]);
+        expect(Layout.getMimeColor('', 'https://cdn.example.com/photo.webp')).toEqual([196, 154, 232]);
+        expect(Layout.getMimeColor('', 'https://cdn.example.com/icon.svg?cache=1')).toEqual([196, 154, 232]);
+        expect(Layout.getMimeColor('', 'https://cdn.example.com/font.woff2')).toEqual([255, 82, 62]);
+        expect(Layout.getMimeColor('', 'https://example.com/api?file=app.js')).toEqual([254, 197, 132]);
+        expect(Layout.getMimeColor('', 'https://example.com/unknown.bin')).toEqual([196, 196, 196]);
+    });
 });

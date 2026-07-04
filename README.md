@@ -163,7 +163,7 @@ await wt.renderTo(document.getElementById('waterfall-container'), options);
 - `text` *(default `'#000'`)* — primary text color (request URL labels, time-scale labels, bottom legend item text).
 - `titleText` *(defaults to `palette.text`, then `'#333'`)* — chart-frame titles (CPU Utilization / BW / Long Tasks). Set independently when the chart titles need a softer tone than the main text; otherwise they follow `palette.text` automatically.
 
-Any CSS color string works. MIME-type colors and page-event metric colors (FCP, LCP, etc.) are not yet themable via `palette` — those keyed maps remain hard-coded and may open up in a follow-up.
+Any CSS color string works. MIME-type colors and page-event metric colors (FCP, LCP, etc.) are not yet themable via `palette` — those keyed maps remain hard-coded and may open up in a follow-up. When a response MIME type is unavailable, the renderer falls back to well-known URL extensions (`.js`, `.css`, common images, and common font extensions) before using the generic gray style.
 
 `renderTo` also accepts extra options not returned by `getDefaultOptions()`:
 
@@ -198,6 +198,8 @@ Loading a HAR with multiple runs (e.g. WebPageTest First View + Repeat View) pre
 The viewer integrates tab-switching to self-hosted copies of the **Perfetto Trace Viewer**, the **Chrome DevTools** frontend, and the legacy **Chrome NetLog Viewer** for deep inspection of DevTools metrics, timelines, and raw socket-level network events. The DevTools frontend is pulled in from the `@chrome-devtools/index` npm package at build time and copied under `dist/browser/devtools-<version>/` so it's served versioned alongside the viewer.
 
 When inspecting an HTML response that has per-chunk timing and inflated byte counts (available from `tcpdump`, `netlog`, `chrome-trace`, `cdp`, and `wptagent`), the request inspector renders the **Response Body** as a hex-viewer-style table — one row per delivered wire chunk, with arrival timestamps and sizes in the left column and the syntax-highlighted HTML slice that arrived in that delivery on the right. This makes it easy to correlate "what arrived when" against the canvas waterfall.
+
+Request details omit optional fields when the underlying capture did not provide meaningful data, so field-captured formats such as rumcap do not show empty or `NaN` rows for hidden cross-origin timing/header data. Canceled or unknown-status requests still display an explicit status note, and rumcap statuses that were assumed successful are labeled as assumed in the details/raw data via `_statusAssumed`.
 
 A persistent **Waterfall History** in IndexedDB records every URL the viewer loads (from the landing page or via query parameters) along with test metadata.
 
