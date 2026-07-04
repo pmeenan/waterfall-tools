@@ -38,6 +38,7 @@
  * @property {Object} [_image_details]
  * @property {Object} [_securityDetails]
  * @property {Object} [_tls_cipher_suite]
+ * @property {Array<{name: string, duration?: number, description?: string}>} [_server_timing] - Server-Timing metrics (entry-level; rumcap)
  * 
  * -- Waterfall Tools Extended Request Scalars --
  * @property {string} [_id]
@@ -74,6 +75,8 @@
  * @property {boolean} [_is_base_page]
  * @property {boolean} [_final_base_page]
  * @property {number} [_responseCode]
+ * @property {number} [_responseStatus] - Raw ResourceTiming responseStatus as reported (incl. 0 = opaque/CORS-hidden; rumcap)
+ * @property {number} [_first_interim_response] - Early Hints (HTTP 103) interim response start, relative ms (rumcap)
  * @property {number|string} [_socket]
  * @property {number|string} [_initiator_line]
  * @property {number|string} [_initiator_column]
@@ -178,6 +181,16 @@
  * @property {Object} [_axe]
  * @property {Object} [_userTimes]
  * @property {Object} [_userTimingMeasures]
+ * @property {Object<string, number|{time: number, duration?: number}>} [_user_timing] - User Timing vertical marks by name (HAR pageTimings lift, rumcap)
+ * @property {Object} [_rumcapManifest] - rumcap per-stream manifest: status/schemaVersion/loss/provenance (always present on rumcap pages)
+ * @property {Object} [_rumcapEnvironment] - rumcap environment stream (UA/UA-CH, device, connection, viewport)
+ * @property {Object} [_rumcapMetadata] - rumcap caller-supplied capture metadata
+ * @property {Object} [_rumcapErrors] - rumcap errors stream ({errors: []})
+ * @property {Object} [_rumcapVisibility] - rumcap visibility stream ({states: []})
+ * @property {Object} [_rumcapLoaf] - rumcap Long Animation Frames stream ({frames: []})
+ * @property {Object} [_rumcapInteractions] - rumcap raw Event Timing stream ({events: []})
+ * @property {Object} [_rumcapElementTiming] - rumcap Element Timing stream ({elements: []})
+ * @property {Object} [_rumcapCustomEvents] - rumcap custom-event tracks ({tracks: []})
  * @property {Object} [_custom]
  * @property {Object} [_aurora]
  * @property {Object} [_cms]
@@ -236,6 +249,9 @@
  * @property {string} [_base_page_dns_server]
  * @property {string} [_LargestContentfulPaintType]
  * @property {string} [_LargestContentfulPaintNodeType]
+ * @property {number} [_LargestContentfulPaint] - LCP milestone, relative ms
+ * @property {number} [_CumulativeLayoutShift] - CLS (max session window: <1s gap, <5s span, hadRecentInput=false shifts)
+ * @property {number} [_InteractionToNextPaint] - INP (web-vitals p98 estimator); omitted when no interactions were observed
  * @property {number} [_loadTime]
  * @property {number} [_docTime]
  * @property {number} [_fullyLoaded]

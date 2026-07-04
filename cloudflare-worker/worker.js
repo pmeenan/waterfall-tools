@@ -444,7 +444,10 @@ function buildReplayStream(sniffedChunks, reader, alreadyDone, onDone) {
 // Format sniffing — mirror of src/inputs/orchestrator.js. Keep in sync.
 // -----------------------------------------------------------------------------
 
-async function identifyFormatFromBuffer(buf) {
+// Exported (named) so detection tests can assert parity with the orchestrator
+// sniff; Cloudflare module workers tolerate extra named exports alongside the
+// default fetch handler.
+export async function identifyFormatFromBuffer(buf) {
     if (!buf || buf.length === 0) return 'unknown';
 
     const gzipped = buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
@@ -469,6 +472,17 @@ async function identifyFormatFromBuffer(buf) {
         const magicLE = readUint32LE(textBuf, 0);
         const pcapMagics = [0xa1b2c3d4, 0xd4c3b2a1, 0x0a0d0d0a];
         if (pcapMagics.includes(magic) || pcapMagics.includes(magicLE)) return 'tcpdump';
+    }
+
+    // rumcap (.rcap) cleartext magic: 0xF5 then ASCII "RUM" (0x52 0x55 0x4D).
+    // 0xF5 is deliberately invalid UTF-8, so 4 bytes are unambiguous. The
+    // file's internal payload is gzip-compressed AFTER this header, so a plain
+    // .rcap doesn't start with 1f 8b — but a user-gzipped .rcap.gz does, and
+    // the gunzipPrefix pass above already exposed the inner magic in textBuf.
+    // Compare bytes individually (don't compose a uint32 constant).
+    if (textBuf.length >= 4 &&
+        textBuf[0] === 0xf5 && textBuf[1] === 0x52 && textBuf[2] === 0x55 && textBuf[3] === 0x4d) {
+        return 'rumcap';
     }
 
     // Perfetto protobuf: first byte is TracePacket tag (0x0a = field 1, wire 2).

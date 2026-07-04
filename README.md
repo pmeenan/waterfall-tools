@@ -1,10 +1,10 @@
 # Waterfall Tools
 
-Waterfall Tools is a fast, zero-bloat library for parsing, analyzing, and visualizing network waterfalls in the browser or Node.js. It normalizes a wide range of network trace formats — PCAP, Netlog, Chrome Trace, Perfetto, CDP, WebPageTest JSON, HAR — into a single Extended HAR intermediate, then renders them via `<canvas>` in WebPageTest style without building thousands of DOM nodes.
+Waterfall Tools is a fast, zero-bloat library for parsing, analyzing, and visualizing network waterfalls in the browser or Node.js. It normalizes a wide range of network trace formats — PCAP, Netlog, Chrome Trace, Perfetto, CDP, WebPageTest JSON, HAR, rumcap `.rcap` field captures — into a single Extended HAR intermediate, then renders them via `<canvas>` in WebPageTest style without building thousands of DOM nodes.
 
 ## Features
 
-- **Format agnostic.** Parses HAR, Netlog, Chrome Trace, Perfetto protobuf, CDP, WebPageTest JSON, and raw TCPDUMP captures (with automatic TLS/QUIC decryption, bandwidth estimation, per-chunk download timing, and HTTP/2 & HTTP/3 priority extraction).
+- **Format agnostic.** Parses HAR, Netlog, Chrome Trace, Perfetto protobuf, CDP, WebPageTest JSON, raw TCPDUMP captures (with automatic TLS/QUIC decryption, bandwidth estimation, per-chunk download timing, and HTTP/2 & HTTP/3 priority extraction), and [rumcap](https://github.com/pmeenan/rumcap) `.rcap` field captures (RUM beacons: navigation/resource timing, paints/LCP/CLS/INP, long tasks, User Timing, JS Self-Profiling — `.rcap` inputs also light up the embedded Perfetto and DevTools viewers via a synthesized Chrome trace).
 - **Unified API.** `WaterfallTools` auto-detects the input format and produces a consistent Extended HAR payload regardless of source.
 - **Isomorphic.** The core runs in Node.js and modern browsers with no polyfills — binary and cryptographic operations use `Uint8Array`, `DataView`, `WebCrypto`, and `DecompressionStream`.
 - **Canvas renderer.** Scales cleanly from 50 to 50,000 requests without DOM thrashing.
@@ -238,6 +238,12 @@ When embedding the viewer in an iframe, it exposes a global for pushing data wit
 
 ```bash
 npx waterfall-tools dump.cap.gz --keylog dump_keys.txt.gz > out.har
+```
+
+The CLI auto-detects every supported input format from the file bytes — HAR, WPT JSON, Chrome trace, Perfetto, netlog, CDP, tcpdump, wptagent zips, and rumcap `.rcap` (plain or gzipped `.rcap.gz`) all work the same way:
+
+```bash
+npx waterfall-tools capture.rcap > out.har
 ```
 
 ## Developer guide

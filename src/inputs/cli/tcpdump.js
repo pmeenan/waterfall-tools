@@ -4,6 +4,7 @@
  * See the LICENSE file for details.
  */
 import { processTcpdumpNode } from '../tcpdump.js';
+import { relationalToHar } from '../../core/har-export.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { decompressBody, decompressBodyPerChunk } from '../../core/decompress.js';
@@ -42,8 +43,10 @@ async function run() {
         options.deps.decompressBodyPerChunk = decompressBodyPerChunk;
         options.deps.sniffMimeType = sniffMimeType;
         
-        const extendedHar = await processTcpdumpNode(inputPath, options);
-        
+        const data = await processTcpdumpNode(inputPath, options);
+        // Convert the internal relational object to true Extended HAR ({ log: {...} })
+        const extendedHar = relationalToHar(data);
+
         const outputDir = path.dirname(outputPath);
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });

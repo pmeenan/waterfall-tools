@@ -11,6 +11,7 @@ import { processNetlogFileNode } from './netlog.js';
 
 import { processWptagentZip } from './wptagent.js';
 import { processPerfettoFileNode } from './perfetto.js';
+import { processRumcapNode } from './rumcap.js';
 import { decompressBody, decompressBodyPerChunk } from '../core/decompress.js';
 import { sniffMimeType } from '../core/har-converter.js';
 
@@ -34,7 +35,8 @@ export const parsers = {
             throw new Error('TCPDump decoding support is missing or not packaged in this build.', { cause: e });
         }
     },
-    'wptagent': processWptagentZip
+    'wptagent': processWptagentZip,
+    'rumcap': processRumcapNode
 };
 
 function isGzip(buf) {
@@ -228,6 +230,17 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
         if ([0xa1b2c3d4, 0xd4c3b2a1, 0x0a0d0d0a].includes(magic) || [0xa1b2c3d4, 0xd4c3b2a1, 0x0a0d0d0a].includes(magicLE)) {
             return { format: 'tcpdump', isGz };
         }
+    }
+
+    // rumcap (.rcap) cleartext magic: 0xF5 then ASCII "RUM" (0x52 0x55 0x4D).
+    // 0xF5 is deliberately invalid UTF-8, so 4 bytes are unambiguous. The
+    // file's internal payload is gzip-compressed AFTER this header, so a plain
+    // .rcap doesn't start with 1f 8b — but a user-gzipped .rcap.gz does, and
+    // the gzip pre-pass above already exposed the inner magic in textBuf.
+    // Compare bytes individually (don't compose a uint32 constant).
+    if (textBuf.length >= 4 &&
+        textBuf[0] === 0xf5 && textBuf[1] === 0x52 && textBuf[2] === 0x55 && textBuf[3] === 0x4d) {
+        return { format: 'rumcap', isGz };
     }
 
     // Heuristically detect Perfetto by checking first TracePacket tag bytes safely

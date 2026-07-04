@@ -41,6 +41,29 @@ export const SCRIPT_TIMING_EVENTS = new Set([
 ]);
 
 /**
+ * Slice sizing for main-thread CPU aggregation: the largest power of 10 µs that still yields
+ * more than 2000 slices across `spanUs`. Mirrors the Python heuristic in wptagent's
+ * trace_parser.py (`while slice_count > 2000`) — `lastExp` is the last exponent that produced
+ * > 2000 slices, so `sliceUsecs = 10^lastExp`. Shared by `chrome-trace.js` and `rumcap.js` so
+ * both parsers land on identical grids for identical spans.
+ *
+ * @param {number} spanUs - Total span to slice, in microseconds.
+ * @returns {{sliceUsecs: number, sliceCount: number}} Fixed slice width (µs) and the resulting
+ *          slice count (`ceil(spanUs / sliceUsecs)`; 0 when spanUs <= 0).
+ */
+export function computeSliceGridUsecs(spanUs) {
+    let exp = 0, lastExp = 0;
+    let sliceCount = spanUs;
+    while (sliceCount > 2000) {
+        lastExp = exp;
+        exp++;
+        sliceCount = Math.ceil(spanUs / Math.pow(10, exp));
+    }
+    const sliceUsecs = Math.pow(10, lastExp);
+    return { sliceUsecs, sliceCount: Math.ceil(spanUs / sliceUsecs) };
+}
+
+/**
  * Fold a wptagent-style CPU slices payload (`{main_thread, slice_usecs, total_usecs, slices:
  * {thread: {event_name: usecs[]}}}`) into the compact `_mainThreadSlices` form consumed by the
  * renderer: only the primary `main_thread` is kept and raw Chrome event names are collapsed into

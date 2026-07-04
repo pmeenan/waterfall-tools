@@ -13,7 +13,6 @@
  */
 
 import fs from 'node:fs';
-import path from 'node:path';
 import { WaterfallTools } from '../dist/node/waterfall-tools.es.js';
 
 async function main() {
@@ -23,7 +22,10 @@ async function main() {
         console.error(
             'Usage:\n' +
             '  waterfall-tools <input-file> [output-file] [--keylog <keylog-file>] [--debug]\n' +
-            '  waterfall-tools install-viewer <target-dir>'
+            '  waterfall-tools install-viewer <target-dir>\n' +
+            '\n' +
+            'Omit [output-file] to write the Extended HAR JSON to stdout\n' +
+            '(status messages go to stderr, so `waterfall-tools in.cap > out.har` is safe).'
         );
         process.exit(1);
     }
@@ -51,13 +53,6 @@ async function main() {
         }
     }
     
-    if (!outputFile) {
-        // default output: input.har
-        const basename = path.basename(inputFile);
-        const name = basename.split('.')[0];
-        outputFile = `${name}.har`;
-    }
-    
     if (!fs.existsSync(inputFile)) {
         console.error(`Error: File ${inputFile} not found.`);
         process.exit(1);
@@ -66,16 +61,31 @@ async function main() {
     if (keyLogPath) {
         options.keyLogInput = keyLogPath;
     }
-    
+
+    // Stdout is reserved for HAR JSON (emitted via process.stdout.write); the library's
+    // `debug` telemetry convention is console.log, so reroute ALL console.log output
+    // (parser debug lines, stray dependency logging) to stderr for the process lifetime.
+    // Unconditional for consistency: file-output mode keeps a clean stdout too.
+    console.log = (...logArgs) => console.error(...logArgs);
+
     try {
-        console.log(`Processing file: ${inputFile}`);
+        // Status goes to stderr: with no [output-file] the HAR JSON is written to stdout
+        // (the README-documented `waterfall-tools in.cap > out.har` contract), so stdout
+        // must stay pure JSON.
+        console.error(`Processing file: ${inputFile}`);
         const tool = new WaterfallTools();
         await tool.loadFile(inputFile, options);
         const har = tool.getHar(options);
-        
-        fs.writeFileSync(outputFile, JSON.stringify(har, null, 2));
-        console.log(`Successfully parsed network data.`);
-        console.log(`Saved Extended HAR to ${outputFile}`);
+        const json = JSON.stringify(har, null, 2);
+
+        if (outputFile) {
+            fs.writeFileSync(outputFile, json);
+            console.error(`Successfully parsed network data.`);
+            console.error(`Saved Extended HAR to ${outputFile}`);
+        } else {
+            process.stdout.write(json + '\n');
+            console.error(`Successfully parsed network data.`);
+        }
     } catch (e) {
         console.error("Failed to process file:", e);
         process.exit(1);

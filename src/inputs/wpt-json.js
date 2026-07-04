@@ -5,6 +5,7 @@
  */
 import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
+import { VERSION } from '../core/version.js';
 
 // WebPageTest JSON Input Processor
 // Processes natively without node polyfills using purely Web Streams mapping seamlessly
@@ -22,7 +23,7 @@ export function getBaseWptHar() {
             version: '1.2',
             creator: {
                 name: 'waterfall-tools',
-                version: '1.0.0'
+                version: VERSION
             },
             pages: [],
             entries: []

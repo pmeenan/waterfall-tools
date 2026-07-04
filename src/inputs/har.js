@@ -11,6 +11,7 @@
 
 import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
+import { VERSION } from '../core/version.js';
 
 /**
  * Normalizes a parsed HAR object into the Extended HAR format.
@@ -25,7 +26,7 @@ export function normalizeHAR(rawHar) {
             version: "1.2",
             creator: {
                 name: "waterfall-tools",
-                version: "1.0.0"
+                version: VERSION
             },
             pages: [],
             entries: []

@@ -6,7 +6,7 @@
 import { Netlog, normalizeNetlogToHAR } from './netlog.js';
 import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
-import { foldCpuSlices, SCRIPT_TIMING_EVENTS } from '../core/mainthread-categories.js';
+import { foldCpuSlices, SCRIPT_TIMING_EVENTS, computeSliceGridUsecs } from '../core/mainthread-categories.js';
 
 const PRIORITY_MAP = {
     "VeryHigh": "Highest",
@@ -159,19 +159,10 @@ function buildMainThreadActivity(rawEvents, baseUs, startUs, metaMainThreads, su
         return { cpu: null, scripts: null, longTasks: [] };
     }
 
-    // Slice sizing: largest power of 10 µs that still gives us > 2000 slices. This mirrors
-    // Python's `while slice_count > 2000` loop — `last_exp` is the last exp that produced
-    // > 2000 slices, so slice_usecs = 10^last_exp.
+    // Slice sizing: largest power of 10 µs that still gives us > 2000 slices (shared helper —
+    // mirrors Python's `while slice_count > 2000` loop in wptagent's trace_parser.py).
     const spanUs = endUs - baseUs;
-    let exp = 0, lastExp = 0;
-    let sliceCount = spanUs;
-    while (sliceCount > 2000) {
-        lastExp = exp;
-        exp++;
-        sliceCount = Math.ceil(spanUs / Math.pow(10, exp));
-    }
-    const sliceUsecs = Math.pow(10, lastExp);
-    const finalSliceCount = Math.ceil(spanUs / sliceUsecs);
+    const { sliceUsecs, sliceCount: finalSliceCount } = computeSliceGridUsecs(spanUs);
     if (finalSliceCount <= 0) {
         return { cpu: null, scripts: null, longTasks: [] };
     }

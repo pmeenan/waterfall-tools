@@ -13,7 +13,7 @@ Client-side, high-performance network waterfall library (WebPageTest-style).
 
 - Vanilla JS only in library core. No React/Vue/Svelte/Angular. External libs allowed if they improve the architecture.
 - Use `<canvas>` for waterfalls — no per-request DOM elements (1000+ requests are common).
-- Every input format maps to **Extended HAR** before rendering or output. HAR `log.creator` must identify `waterfall-tools`. Custom fields prefix with `_` (e.g. `_priority`, `_load_ms`, `_ttfb_ms`, `_bytesIn`). Schema: `Docs/Extended-HAR-Schema.md`. Types: JSDoc in `src/core/har-types.js`.
+- Every input format maps to **Extended HAR** before rendering or output. HAR `log.creator` must identify `waterfall-tools`; the creator version comes from `src/core/version.js#VERSION` (single source — never hard-code it; `tests/core/version.test.js` asserts it matches `package.json`, so version bumps must touch both). Custom fields prefix with `_` (e.g. `_priority`, `_load_ms`, `_ttfb_ms`, `_bytesIn`). Schema: `Docs/Extended-HAR-Schema.md`. Types: JSDoc in `src/core/har-types.js`.
 - Pluggable, decoupled modules. Orchestrator transports verified HAR across renderers/outputs without implicit mutation. Tree-shakeable exports.
 - Target: latest stable Chrome, Firefox, Safari, Node. No polyfills or transpilation. UMD abandoned — ESM only.
 - Licenses: MIT / BSD / Apache-2 / ISC / MPL only. **No GPL** in any form.
@@ -63,7 +63,8 @@ Client-side, high-performance network waterfall library (WebPageTest-style).
 - `src/inputs/orchestrator.js` auto-detects format by magic bytes / token sniffing. Callers don't pass format.
 - Every parser signature: `processXNode(input, options)` accepting either file path or `Readable`.
 - `Conductor` class exposes `processFile` and `processStream`.
-- Unified CLI: `bin/waterfall-tools.js`. Auto-discovers matching `keylog` files.
+- Unified CLI: `bin/waterfall-tools.js`. Auto-discovers matching `keylog` files. **Stdout is reserved for HAR JSON**: with no `[output-file]` argument the Extended HAR goes to stdout and all status text goes to stderr (`waterfall-tools in.cap > out.har` is the README-documented contract). `src/inputs/cli/perfetto.js` follows the same rule (optional `--output <path>`).
+- `getHar()`/`getPage()` delegate to `src/core/har-export.js` (`relationalToHar`/`getPageFromData`) — raw-Node-safe (only imports `version.js`), used by all `src/inputs/cli/*` wrappers to emit true Extended HAR (`{ log: {...} }`) instead of the internal relational object. Shape locked by `tests/inputs/cli-har-shape.test.js`.
 - All entry points honour `options.debug` → structured `console.log`/`error` telemetry. Default off for zero production cost.
 - `options.onProgress(phase, percent)` — every parser supports it. Tcpdump reports fine-grained phases; other parsers report `bytesRead/totalBytes`. `totalBytes` injected by `loadBuffer()`.
 - **Dependency injection:** orchestrator passes `options.deps` (`decompressBody`, `decompressBodyPerChunk`, `sniffMimeType`). CLI harnesses (`src/inputs/cli/tcpdump.js`) must populate these. Recursively pass `options` through nested async extraction calls.
@@ -153,6 +154,16 @@ The canvas renderer expects **relative millisecond offsets** from the earliest `
 - **Uncompressed size:** track `_objectSizeUncompressed` in `extractAndStoreBody()` when decompression output differs from wire.
 - **Event-loop yielding:** `yieldToEventLoop = () => new Promise(r => setTimeout(r, 0))` at module scope. Yield at phase transitions and every 5 TLS connections / 10 TCP decodings. Prevents "script taking too long" dialogs.
 - **Base64 encoding:** chunk to 8KB slices with `String.fromCharCode.apply(null, subarray)`, join once. Per-char concat is O(n²).
+
+### rumcap (`.rcap`)
+- **Clock model:** every rcap timeline value is RelMs from `manifest.clock.timeOrigin` (epoch ms). Page zero == timeOrigin: `page.startedDateTime = new Date(timeOrigin)`, `entry.startedDateTime = new Date(timeOrigin + startTime)`, `entry._created = startTime` — which makes `layout.js`'s baseEpoch resolve to page zero. Never re-derive epochs from anything else (netlog 1970 lesson).
+- **Outer-gunzip first:** detect by magic bytes (`1f 8b`), never extension. A plain `.rcap` carries its own internal gzip *after* the cleartext `F5 52 55 4D` header — the outer layer only exists on user-gzipped `.rcap.gz`. Then hand bytes to `rumcap/decode#unpack` (decoder-only import so the encoder tree-shakes; `checkConsistency` runs under `debug` and logs, never throws).
+- **Absence semantics:** the manifest is TOTAL — `page._rumcapManifest` is always emitted; every other stream maps to `_` fields only when `present`. Absent source values → omitted `_` fields, never 0. `responseStatus: 0` is *present* data (opaque/CORS-hidden) → HAR `response.status = -1` (netlog unknown-status convention; HAR `0` paints an error row, omission lets `har-converter.js` default-fabricate `200`) with the raw value preserved on `entry._responseStatus`.
+- **`_longTasks` tri-state per manifest:** entries when found, `[]` when the stream is `present` but empty, omitted when `unsupported`/`not-requested`/`dropped`/`policy-blocked`.
+- **`_user_timing`** is the renderer's map shape: name → RelMs number (marks) or `{ time, duration }` (measures). Measure `detail` stays on the retained capture for trace synthesis.
+- **Profile fold:** only depth-0 call-tree slices count toward busy time (children are contained). All busy time lands in `EvaluateScript` — a sampling JS profiler only sees script execution, so the other four `_mainThreadSlices` categories are present but all-zero. Grid width via the shared `computeSliceGridUsecs` in `src/core/mainthread-categories.js` (extracted from `chrome-trace.js` — don't duplicate the `10^n`/>2000-slices loop). `entry._js_timing` via frame `resourceId` → script URL matched against `_full_url`, first-match-wins (`$used` de-dup).
+- **Trace-synthesis contract:** the decoded `Capture` is retained top-level on the relational data object as `data._rumcapCapture` — NOT a page `_` field (page `_` fields are copied into `getHar()` output). `getPageResource(pageId, 'trace')` is gated on `_sourceFormat === 'rumcap'` / `data.metadata.format === 'rumcap'` and lazily dynamic-imports `src/inputs/utilities/rumcap/trace-synthesizer.js`, synthesizes Chrome-trace JSON, gzips via `CompressionStream`, and caches per page — one hook feeds both the Perfetto and DevTools tabs. Synthesizer shapes are grounded against the DevTools trace model: user-timing measures put `detail` on the async BEGIN event's `args.detail` as a JSON *string* (marks: `args.data.detail`); a `devtools` key inside that parsed detail (`{ track }`) drives DevTools' extensibility tracks (customEvents namespaces become tracks this way); every `Resource*` event must carry `args.data.requestId` (`DEVTOOLS_REQUIRED_ARG_PATHS`).
+- **Worker sniff lockstep:** magic `F5 52 55 4D`, compare bytes individually (it's deliberately invalid UTF-8 — no string compare). `cloudflare-worker/worker.js` inlines the same 4-byte check; keep it in sync with `src/inputs/orchestrator.js`.
 
 ## Content decompression (`src/core/decompress.js`)
 
@@ -301,6 +312,7 @@ Single-file, zero-binding Worker providing CORS-safe fetch proxy for viewer URL 
 - Don't explain what readable code already shows. Only explain why.
 
 ## Dependency & Security Updates
+- **rumcap session (July 2026):** Added `rumcap@^0.0.1` as a runtime dependency (Apache-2.0, zero-dep ESM — only `rumcap/decode` is imported so the encoder tree-shakes away). Bumped `@chrome-devtools/index` to `1.20260628.0` per the every-session cadence (devDependencies + peerDependencies kept in step).
 - **v0.3.0 Maintenance (May 2026):** Ran dependency updates and security maintenance:
   - Ran `npm audit fix` to address three vulnerabilities (2 moderate, 1 high) in `brace-expansion` (to `5.0.6`), `postcss` (to `8.5.15`), and `vite` (to `8.0.14`).
   - Ran `npm update` to upgrade all other packages to their latest compatible versions (eslint to `10.4.0`, globals to `17.6.0`, rollup to `4.60.4`, vitest to `4.1.7`, @chrome-devtools/index to `1.20260517.0`, and @napi-rs/canvas to `0.1.100`).

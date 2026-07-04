@@ -707,6 +707,7 @@ function renderSummary(pageData) {
         { label: 'Speed Index', value: pageData._SpeedIndex !== undefined ? parseInt(pageData._SpeedIndex) : null },
         { label: 'Largest Contentful Paint', value: humanizeMs(pageData._LargestContentfulPaint), rating: getRating(pageData._LargestContentfulPaint, [2500, 4000]) },
         { label: 'Cumulative Layout Shift', value: clsDisplay, rating: getRating(clsRaw, [0.1, 0.25]) },
+        { label: 'Interaction to Next Paint', value: humanizeMs(pageData._InteractionToNextPaint), rating: getRating(pageData._InteractionToNextPaint, [200, 500]) },
         { label: 'Total Blocking Time', value: humanizeMs(pageData._TotalBlockingTime), rating: getRating(pageData._TotalBlockingTime, [200, 600]) },
         { label: 'Doc Complete', value: humanizeMs(pageData._docTime) },
         { label: 'Doc Requests', value: pageData._requestsDoc },
@@ -872,6 +873,50 @@ function renderSummary(pageData) {
                 }
             });
         }
+    }
+
+    // Raw page-level data (collapsed) — surfaces parser extras that have no
+    // dedicated summary row (e.g. rumcap's `_rumcapManifest` / `_rumcapEnvironment` /
+    // `_rumcapErrors` capture streams) without requiring a HAR export. Rendered LAZILY on
+    // first expand: eagerly stringifying the page (wptagent pages carry ~1 MB of slices /
+    // utilization arrays) would bloat the DOM for a section most visits never open.
+    ui.summaryView.innerHTML += `
+        <div class="summary-section collapsed" id="raw-page-data-section">
+            <div class="summary-section-header" id="raw-page-data-header">
+                Raw Page Data
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="summary-section-body"></div>
+        </div>
+    `;
+    const rawHeader = ui.summaryView.querySelector('#raw-page-data-header');
+    if (rawHeader) {
+        rawHeader.addEventListener('click', () => {
+            const section = rawHeader.parentElement;
+            section.classList.toggle('collapsed');
+            const svg = rawHeader.querySelector('svg polyline');
+            svg.setAttribute('points', section.classList.contains('collapsed') ? '6 9 12 15 18 9' : '18 15 12 9 6 15');
+
+            const body = section.querySelector('.summary-section-body');
+            if (!section.classList.contains('collapsed') && !body.dataset.rendered) {
+                body.dataset.rendered = 'true';
+                try {
+                    const cache = new Set();
+                    const rawPageJson = JSON.stringify(pageData, (key, value) => {
+                        if (key === 'requests') return undefined; // per-request data lives in the waterfall / request tabs
+                        if (typeof value === 'object' && value !== null) {
+                            if (cache.has(value)) return '[Circular]';
+                            cache.add(value);
+                        }
+                        return value;
+                    }, 2);
+                    body.innerHTML = `<pre class="req-code-block">${highlightSyntax(rawPageJson, 'json')}</pre>`;
+                } catch {
+                    // Non-serializable page data — show a note rather than break the summary.
+                    body.innerHTML = '<pre class="req-code-block">(page data could not be serialized)</pre>';
+                }
+            }
+        });
     }
 
     ui.summaryView.querySelectorAll('.copy-btn').forEach(btn => {
@@ -1109,7 +1154,7 @@ function renderRequestTab(request, reqNum) {
                     <tr class="req-group-item"><td>Request ID</td><td>${val(request._request_id || request._id || request.id)}</td></tr>
                     <tr class="req-group-item"><td>Render Blocking Status</td><td>${val(request._renderBlocking)}</td></tr>
                     <tr><td colspan="2" class="req-group-header">Timing</td></tr>
-                    <tr class="req-group-item"><td>Time to First Byte</td><td>${request._ttfb_ms !== undefined ? request._ttfb_ms + ' ms' : ''}</td></tr>
+                    <tr class="req-group-item"><td>Time to First Byte</td><td>${request._ttfb_ms !== undefined ? Math.round(request._ttfb_ms) + ' ms' : ''}</td></tr>
                     <tr class="req-group-item"><td>Content Download</td><td>${(request._download_end && request._download_start) ? Math.round(request._download_end - request._download_start) + ' ms' : ''}</td></tr>
                     <tr><td colspan="2" class="req-group-header">Size</td></tr>
                     <tr class="req-group-item"><td>Bytes In (downloaded)</td><td>${humanizeBytes(val(request._bytesIn || request.bytes_in)) || ''}</td></tr>

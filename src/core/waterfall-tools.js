@@ -4,6 +4,7 @@
  * See the LICENSE file for details.
  */
 import { identifyFormat, identifyFormatFromBuffer, parsers } from '../inputs/orchestrator.js';
+import { getPageFromData, relationalToHar } from './har-export.js';
 import { ZipReader } from '../inputs/utilities/zip.js';
 import { cleanupOrphans } from '../platforms/storage.js';
 import { WaterfallCanvas } from '../renderer/canvas.js';
@@ -58,7 +59,14 @@ export class WaterfallTools {
         if (!parser) {
             throw new Error(`No parser registered for format: ${format}`);
         }
-        
+
+        // Format-gated resource routes (getPageResource 'trace'/'netlog') key on this — it must
+        // be set on every load path, not just loadBuffer(). Reused-instance guard: the raw
+        // buffer and synthesized-trace cache belong to the PREVIOUS load — a file load has no
+        // backing buffer, so both must drop or the resource routes serve stale bytes.
+        this._sourceFormat = format;
+        this._rawBuffer = null;
+        this._rumcapTraceCache = null;
         options.instanceId = this.instanceId;
         this.data = await parser(filePath, options);
         return this;
@@ -80,7 +88,13 @@ export class WaterfallTools {
         if (!parser) {
             throw new Error(`No parser registered for format: ${format}`);
         }
-        
+
+        // Same assignment as loadBuffer()/loadFile() — loadBuffer() delegates here, so the
+        // double-assign of the identical resolved format is harmless. The stale-state clears
+        // mirror loadFile(); loadBuffer() re-attaches its own buffer AFTER this returns.
+        this._sourceFormat = format;
+        this._rawBuffer = null;
+        this._rumcapTraceCache = null;
         options.instanceId = this.instanceId;
         this.data = await parser(stream, options);
         return this;
@@ -135,9 +149,11 @@ export class WaterfallTools {
         streamOptions.totalBytes = buf.byteLength;
 
         this._sourceFormat = format;
+        const result = await this.loadStream(stream, streamOptions);
+        // AFTER loadStream() — it clears the raw-buffer state as its reused-instance guard;
+        // re-attach the bytes backing THIS load so trace/netlog passthrough works.
         this._rawBuffer = buf.buffer; // Store ArrayBuffer
-
-        return await this.loadStream(stream, streamOptions);
+        return result;
     }
 
     /**
@@ -167,104 +183,9 @@ export class WaterfallTools {
      * @returns {Object} The flattened page object
      */
     getPage(pageId, options = { includeRequests: false }) {
-        if (!this.data.pages[pageId]) return null;
-
-        const page = JSON.parse(JSON.stringify(this.data.pages[pageId])); // deep copy baseline
-        
-        if (!options.includeRequests) {
-            delete page.requests;
-            return page;
-        }
-
-        if (page.requests) {
-            // First, find the "owner" requests for each connection and DNS lookup
-            const connectionMap = {}; // conn_id -> earliest request_id
-            const dnsMap = {}; // dns_id -> earliest request_id
-            
-            for (const [reqId, req] of Object.entries(page.requests)) {
-                // Ensure internal data map key matches specifically as interaction payload property natively
-                if (req.id !== undefined && req.id !== reqId) {
-                    req.srcId = req.id;
-                }
-                req.id = reqId;
-
-                // Filter out non-http protocols strictly
-                const u = req.url ? req.url.toLowerCase() : '';
-                if (!u.startsWith('http://') && !u.startsWith('https://')) {
-                    delete page.requests[reqId];
-                    continue;
-                }
-
-                if (req.connection_id && (!connectionMap[req.connection_id] || req.time_start < connectionMap[req.connection_id].time)) {
-                    connectionMap[req.connection_id] = { id: reqId, time: req.time_start };
-                }
-                if (req.dns_query_id && (!dnsMap[req.dns_query_id] || req.time_start < dnsMap[req.dns_query_id].time)) {
-                    dnsMap[req.dns_query_id] = { id: reqId, time: req.time_start };
-                }
-            }
-
-            for (const [reqId, req] of Object.entries(page.requests)) {
-                // Determine explicit bindings
-                const isConnOwner = req.connection_id && connectionMap[req.connection_id]?.id === reqId;
-                const isDnsOwner = req.dns_query_id && dnsMap[req.dns_query_id]?.id === reqId;
-
-                req.timings = { dns: -1, connect: -1, ssl: -1, send: 0, wait: 0, receive: 0 };
-                
-                let connObj = null;
-                if (req.connection_id) {
-                    if (this.data.tcp_connections && this.data.tcp_connections[req.connection_id]) {
-                        connObj = this.data.tcp_connections[req.connection_id];
-                    } else if (this.data.quic_connections && this.data.quic_connections[req.connection_id]) {
-                        connObj = this.data.quic_connections[req.connection_id];
-                    }
-                }
-
-                let dnsObj = null;
-                if (req.dns_query_id && this.data.dns && this.data.dns[req.dns_query_id]) {
-                    dnsObj = this.data.dns[req.dns_query_id];
-                }
-
-                if (isDnsOwner && dnsObj && dnsObj.end_time >= dnsObj.start_time) {
-                    req.timings.dns = dnsObj.end_time - dnsObj.start_time;
-                }
-
-                if (isConnOwner && connObj && connObj.end_time >= connObj.start_time) {
-                    req.timings.connect = connObj.end_time - connObj.start_time;
-                    if (connObj.tls && connObj.tls.start_time) {
-                        req.timings.ssl = Math.max(0, connObj.end_time - connObj.tls.start_time);
-                    }
-                }
-
-                // Standard Wait / Receive Phase
-                const reqTimeStartMs = req.time_start;
-                const firstDataMs = req.first_data_time > 0 ? req.first_data_time : req.time_end;
-                const lastDataMs = req.time_end;
-
-                req.timings.wait = Math.max(0, firstDataMs - reqTimeStartMs);
-                req.timings.receive = Math.max(0, lastDataMs - firstDataMs);
-
-                // Additional flattened metadata for renderer parity
-                if (dnsObj && isDnsOwner) {
-                    req._dnsTimeMs = dnsObj.start_time;
-                    req._dnsEndTimeMs = dnsObj.end_time;
-                }
-                
-                if (connObj && isConnOwner) {
-                    req._connectTimeMs = connObj.start_time;
-                    req._connectEndTimeMs = connObj.end_time;
-                    if (connObj.tls && connObj.tls.start_time) {
-                        req._sslStartTimeMs = connObj.tls.start_time;
-                    }
-                }
-
-                // Copy stream data if any mapping resolves
-                if (req.stream_id && connObj && connObj.streams && connObj.streams[req.stream_id]) {
-                    req._stream = connObj.streams[req.stream_id];
-                }
-            }
-        }
-        
-        return page;
+        // Delegates to the raw-Node-safe extraction in har-export.js (shared with the
+        // per-format CLI wrappers, which can't import this class).
+        return getPageFromData(this.data, pageId, options);
     }
 
     /**
@@ -318,6 +239,34 @@ export class WaterfallTools {
             const mimeType = this._sourceFormat === 'chrome-trace' ? 'application/json' : 'application/octet-stream';
             const blob = new Blob([this._rawBuffer], { type: mimeType });
             return { url: URL.createObjectURL(blob), mimeType, buffer: this._rawBuffer };
+        }
+
+        if (resourceType === 'trace'
+            && (this._sourceFormat === 'rumcap' || (this.data && this.data.metadata && this.data.metadata.format === 'rumcap'))
+            && this.data && this.data._rumcapCapture) {
+            // Trace is SYNTHESIZED from the retained Capture (there is no raw trace in a field
+            // capture). Dynamic import keeps the synthesizer out of the base bundle — same
+            // pattern as the tcpdump/decompress code-splits.
+            if (!this._rumcapTraceCache) this._rumcapTraceCache = {};
+            let bytes = this._rumcapTraceCache[pageId];
+            if (!bytes) {
+                const { synthesizeChromeTrace } = await import('../inputs/utilities/rumcap/trace-synthesizer.js');
+                const traceJson = JSON.stringify(synthesizeChromeTrace(this.data._rumcapCapture));
+                // Gzip so DevTools' loadFromFile takes its internal DecompressionStream path
+                // and the Perfetto UI (which sniffs gzip natively) gets a compact buffer.
+                const gzStream = new Blob([new TextEncoder().encode(traceJson)]).stream()
+                    .pipeThrough(new CompressionStream('gzip'));
+                bytes = new Uint8Array(await new Response(gzStream).arrayBuffer());
+                this._rumcapTraceCache[pageId] = bytes;
+            }
+            const mimeType = 'application/gzip';
+            // Same browser/Node contract as the generic ZIP extraction path below: object URL +
+            // ArrayBuffer when Blob/URL exist, bare Uint8Array buffer otherwise (Node).
+            if (typeof Blob !== 'undefined' && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+                const blob = new Blob([bytes], { type: mimeType });
+                return { url: URL.createObjectURL(blob), mimeType, buffer: bytes.buffer };
+            }
+            return { buffer: bytes, mimeType };
         }
 
         if (resourceType === 'netlog' && this._sourceFormat === 'netlog' && this._rawBuffer) {
@@ -423,159 +372,9 @@ export class WaterfallTools {
      * @param {Object} options 
      */
     getHar(_options = {}) {
-        const pagesOut = [];
-        const entriesOut = [];
-
-        for (const [pageId, pData] of Object.entries(this.data.pages)) {
-            const page = this.getPage(pageId, { includeRequests: true });
-            
-            let globalEarliestMs = Number.MAX_SAFE_INTEGER;
-            if (page.requests) {
-                for (const req of Object.values(page.requests)) {
-                    if (req.time_start > 0 && req.time_start < globalEarliestMs) globalEarliestMs = req.time_start;
-                    if (req._dnsTimeMs > 0 && req._dnsTimeMs < globalEarliestMs) globalEarliestMs = req._dnsTimeMs;
-                    if (req._connectTimeMs > 0 && req._connectTimeMs < globalEarliestMs) globalEarliestMs = req._connectTimeMs;
-                }
-            }
-
-            // Bind explicitly
-            if (globalEarliestMs === Number.MAX_SAFE_INTEGER) {
-                globalEarliestMs = pData.startedDateTime ? new Date(pData.startedDateTime).getTime() : Date.now();
-            }
-
-            const pageOut = {
-                id: pageId,
-                title: page.title || page.url,
-                startedDateTime: new Date(globalEarliestMs).toISOString(),
-                pageTimings: page.pageTimings || {}
-            };
-
-            for (const key of Object.keys(pData)) {
-                if (key.startsWith('_')) {
-                    pageOut[key] = pData[key];
-                }
-            }
-
-            pagesOut.push(pageOut);
-
-            if (page.requests) {
-                const reqArray = Object.values(page.requests);
-                const getLoadStartMs = (req) => {
-                    const hasAbsoluteTimings = req._load_start !== undefined || req._dns_start !== undefined || req._ttfb_start !== undefined;
-                    
-                    if (hasAbsoluteTimings) {
-                        const baseEpoch = globalEarliestMs;
-                        const blockedEnd = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : 0));
-                        
-                        const dnsStart = (req._dns_start !== undefined && req._dns_start >= 0) ? baseEpoch + req._dns_start : blockedEnd;
-                        const dnsEnd = (req._dns_end !== undefined && req._dns_end >= 0) ? baseEpoch + req._dns_end : dnsStart;
-                        
-                        const connectStart = (req._connect_start !== undefined && req._connect_start >= 0) ? baseEpoch + req._connect_start : dnsEnd;
-                        const connectEnd = (req._connect_end !== undefined && req._connect_end >= 0) ? baseEpoch + req._connect_end : connectStart;
-                        
-                        const sslStart = (req._ssl_start !== undefined && req._ssl_start >= 0) ? baseEpoch + req._ssl_start : connectEnd;
-                        const sslEnd = (req._ssl_end !== undefined && req._ssl_end >= 0) ? baseEpoch + req._ssl_end : sslStart;
-                        
-                        const requestStart = baseEpoch + (req._load_start !== undefined ? req._load_start : (req._ttfb_start !== undefined ? req._ttfb_start : (sslEnd - baseEpoch)));
-
-                        return Math.max(requestStart, connectEnd);
-                    }
-
-                    // Fallback to time_start plus blocking/DNS/TCP delays modeling TTFB request start
-                    let delay = 0;
-                    if (req.timings) {
-                        if (req.timings.blocked > 0) delay += req.timings.blocked;
-                        if (req.timings.dns > 0) delay += req.timings.dns;
-                        if (req.timings.connect > 0) delay += req.timings.connect;
-                        if (req.timings.send > 0) delay += req.timings.send;
-                    }
-                    return req.time_start + delay;
-                };
-
-                reqArray.sort((a, b) => getLoadStartMs(a) - getLoadStartMs(b));
-
-                for (const req of reqArray) {
-                    
-                    let timeTotal = 0;
-                    if (req.timings.dns > 0) timeTotal += req.timings.dns;
-                    if (req.timings.connect > 0) timeTotal += req.timings.connect;
-                    timeTotal += req.timings.wait;
-                    timeTotal += req.timings.receive;
-
-                    const entry = {
-                        startedDateTime: new Date(req.time_start).toISOString(),
-                        time: timeTotal,
-                        pageref: pageId,
-                        request: {
-                            method: req.method || 'GET',
-                            url: req.url || '',
-                            httpVersion: req.httpVersion || 'HTTP/1.1',
-                            cookies: [],
-                            headers: req.headers || [],
-                            queryString: [],
-                            headersSize: -1,
-                            bodySize: -1
-                        },
-                        response: {
-                            status: req.status || 200,
-                            statusText: req.statusText || '',
-                            httpVersion: req.httpVersion || 'HTTP/1.1',
-                            cookies: [],
-                            headers: req.responseHeaders || [],
-                            content: Object.assign({
-                                size: req.bytes_in || 0,
-                                mimeType: req.mimeType || '',
-                                compression: 0
-                            }, req.body !== undefined ? { text: req.body, encoding: req.bodyEncoding || undefined } : {}),
-                            redirectURL: "",
-                            headersSize: -1,
-                            bodySize: req.bytes_in || 0
-                        },
-                        cache: {},
-                        timings: Object.assign({}, req.timings),
-                        serverIPAddress: req.serverIp || '',
-                        connection: req.connection_id ? req.connection_id.toString() : '',
-                    };
-
-                    // Intelligently map any trailing custom properties defined by parser outputs explicitly
-                    for (const key of Object.keys(req)) {
-                        if (key.startsWith('_') && entry[key] === undefined) {
-                            entry[key] = req[key];
-                        }
-                    }
-
-                    // WebPageTest compatibility tracking fallbacks cleanly preserving mapped metrics
-                    if (req.time_start > 0 && entry._load_start === undefined) entry._load_start = Math.floor(req.time_start - globalEarliestMs);
-                    if (req._dnsTimeMs > 0 && entry._dns_start === undefined) entry._dns_start = Math.floor(req._dnsTimeMs - globalEarliestMs);
-                    if (req._dnsEndTimeMs > 0 && entry._dns_end === undefined) entry._dns_end = Math.floor(req._dnsEndTimeMs - globalEarliestMs);
-                    if (req._connectTimeMs > 0 && entry._connect_start === undefined) entry._connect_start = Math.floor(req._connectTimeMs - globalEarliestMs);
-                    if (req._connectEndTimeMs > 0 && entry._connect_end === undefined) entry._connect_end = Math.floor(req._connectEndTimeMs - globalEarliestMs);
-                    if (req._sslStartTimeMs > 0 && entry._ssl_start === undefined) entry._ssl_start = Math.floor(req._sslStartTimeMs - globalEarliestMs);
-                    if (req.time_start > 0 && req.timings.ssl > 0 && entry._ssl_end === undefined) entry._ssl_end = entry._load_start;
-                    if (req.time_start > 0 && entry._ttfb_start === undefined) entry._ttfb_start = entry._load_start;
-                    if (req.first_data_time > 0 && entry._ttfb_end === undefined) entry._ttfb_end = Math.floor(req.first_data_time - globalEarliestMs);
-                    if (req.first_data_time > 0 && entry._download_start === undefined) entry._download_start = entry._ttfb_end;
-                    if (req.time_end > 0 && entry._download_end === undefined) {
-                        entry._download_end = Math.floor(req.time_end - globalEarliestMs);
-                        if (entry._all_end === undefined) entry._all_end = entry._download_end;
-                    }
-                    
-                    entriesOut.push(entry);
-                }
-            }
-        }
-
-        return {
-            log: {
-                version: "1.2",
-                creator: {
-                    name: "waterfall-tools",
-                    version: "0.2.0"
-                },
-                pages: pagesOut,
-                entries: entriesOut
-            }
-        };
+        // Delegates to the raw-Node-safe extraction in har-export.js (shared with the
+        // per-format CLI wrappers, which can't import this class).
+        return relationalToHar(this.data, _options);
     }
 
     /**

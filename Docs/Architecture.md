@@ -20,6 +20,7 @@ graph TD
         ChromeTrace[Chrome Trace / CDP / Perfetto]
         WPT[WPT JSON / wptagent / Netlog]
         Tcpdump[PCAP / PCAPNG captures]
+        Rumcap[rumcap .rcap field captures]
     end
 
     subgraph Core ["Core orchestration (src/core/)"]
@@ -49,6 +50,7 @@ graph TD
     ChromeTrace --> Orchestrator
     WPT --> Orchestrator
     Tcpdump --> Orchestrator
+    Rumcap --> Orchestrator
 
     Orchestrator --> HAR_Ext
     HAR_Ext --> Conductor
@@ -75,7 +77,8 @@ graph TD
 │   ├── inputs/                        # Input format processors
 │   │   ├── cli/                       # Per-format CLI wrappers (Node-only)
 │   │   ├── utilities/                 # Internal parsers / binary protocol helpers
-│   │   │   └── tcpdump/               # Deep packet inspection (TLS, QUIC, TCP/UDP, HPACK, QPACK)
+│   │   │   ├── tcpdump/               # Deep packet inspection (TLS, QUIC, TCP/UDP, HPACK, QPACK)
+│   │   │   └── rumcap/                # Chrome-trace synthesizer for .rcap captures
 │   │   ├── har.js                     # HAR passthrough
 │   │   ├── chrome-trace.js            # Chrome DevTools Trace → Extended HAR
 │   │   ├── perfetto.js                # Perfetto protobuf (pure-JS)
@@ -84,6 +87,7 @@ graph TD
 │   │   ├── netlog.js                  # Chrome Netlog
 │   │   ├── cdp.js                     # Chrome DevTools Protocol events
 │   │   ├── tcpdump.js                 # PCAP / PCAPNG
+│   │   ├── rumcap.js                  # rumcap .rcap field captures → Extended HAR
 │   │   └── orchestrator.js            # Format sniffing + routing
 │   ├── outputs/
 │   │   ├── image.js                   # Waterfall image export
@@ -125,7 +129,7 @@ graph TD
 
 ## CLI modes and testing
 
-Every input format processor ships with a standalone CLI wrapper under `src/inputs/cli/[format].js` that ingests one file and emits normalized Extended HAR JSON. The unified CLI at `bin/waterfall-tools.js` wraps the same pipeline with format auto-detection and automatic keylog discovery.
+Every input format processor ships with a standalone CLI wrapper under `src/inputs/cli/[format].js` that ingests one file and emits normalized Extended HAR JSON (`{ log: {...} }`) by passing the parser's relational output through `relationalToHar()` in `src/core/har-export.js` — the same raw-Node-safe conversion that `WaterfallTools.getHar()` delegates to. The unified CLI at `bin/waterfall-tools.js` wraps the same pipeline with format auto-detection and automatic keylog discovery.
 
 Tests (vitest) parse sample inputs and assert strict equality against committed golden Extended HAR fixtures. Large-object comparisons are routed through `JSON.parse(JSON.stringify(...))` before assertion to avoid `undefined`-vs-missing hangs; dynamically-generated fields (like fallback `startedDateTime` values derived from `Date.now()`) are scrubbed from both sides before comparison.
 
@@ -171,6 +175,14 @@ Stream priority is extracted per protocol:
 - **HTTP/3** — from the `priority` request header using the RFC 9218 Extensible Priorities urgency value.
 
 Request overhead (`_bytesOut`) is estimated from the serialized request line and headers. Uncompressed response size (`_objectSizeUncompressed`) is tracked when decompression produces a different byte count than the wire bytes.
+
+### rumcap field captures (`.rcap`)
+
+[rumcap](https://github.com/pmeenan/rumcap) `.rcap` files are compact RUM beacons captured in the field: navigation/resource timing, paint milestones, LCP/CLS/INP inputs, long tasks, LoAF, User Timing, JS errors, and a JS Self-Profiling call tree. The pipeline is:
+
+1. **Sniff** — cleartext magic `F5 52 55 4D` (checked in `src/inputs/orchestrator.js` and mirrored byte-for-byte in `cloudflare-worker/worker.js`). A user-gzipped `.rcap.gz` is outer-gunzipped first; the capture's own internal gzip sits *after* the cleartext header and is handled by the decoder.
+2. **Decode** — `src/inputs/rumcap.js` calls `rumcap/decode#unpack` (only the decoder is imported, so the encoder tree-shakes away) and maps the relational capture to Extended HAR: one page per capture, entries from the navigation + resource timing streams with the full absolute-timing field set, page-level milestones/vitals, and the non-rendered capture streams attached as `_rumcap*` page fields. All timeline values are already relative ms from `clock.timeOrigin`, so no epoch re-derivation is needed.
+3. **Trace synthesis** — the decoded `Capture` is retained top-level on the relational data object (`data._rumcapCapture`, not a page `_` field so it stays out of `getHar()` output). When the viewer asks for `getPageResource(pageId, 'trace')`, `src/inputs/utilities/rumcap/trace-synthesizer.js` is dynamically imported (code-split out of the base bundle), synthesizes Chrome-trace-format JSON from the capture, gzips it via `CompressionStream`, and caches it per page. That one hook lights up both the embedded Perfetto and DevTools tabs, exactly like a native Chrome trace import.
 
 ### Multi-file archives & OPFS integration
 

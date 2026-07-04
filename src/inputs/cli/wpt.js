@@ -4,6 +4,7 @@
  * See the LICENSE file for details.
  */
 import { processWPTFileNode } from '../wpt-json.js';
+import { relationalToHar } from '../../core/har-export.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -30,8 +31,10 @@ async function run() {
     console.log(`Processing WebPageTest JSON file: ${inputPath}...`);
     try {
         const startTime = Date.now();
-        const extendedHar = await processWPTFileNode(inputPath);
-        
+        const data = await processWPTFileNode(inputPath);
+        // Convert the internal relational object to true Extended HAR ({ log: {...} })
+        const extendedHar = relationalToHar(data);
+
         const outputDir = path.dirname(outputPath);
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });

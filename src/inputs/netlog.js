@@ -4,6 +4,7 @@
  * See the LICENSE file for details.
  */
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
+import { VERSION } from '../core/version.js';
 
 const PRIORITY_MAP = {
     "VeryHigh": "Highest",
@@ -1116,7 +1117,7 @@ export function normalizeNetlogToHAR(requests, unlinked_sockets, unlinked_dns, p
             version: '1.2',
             creator: {
                 name: 'waterfall-tools',
-                version: '1.0.0'
+                version: VERSION
             },
             pages: [],
             entries: []
