@@ -173,6 +173,16 @@ Any CSS color string works. MIME-type colors and page-event metric colors (FCP, 
 - `labelsCanvas` — separate canvas for URL labels when you want to split them out.
 - `overlapLabels` — draw request rows full-width, ignoring the label gutter.
 - `onHover(req, metrics)` / `onClick(req)` — interaction callbacks. The first `onHover` argument stays backward-compatible with the request payload shape (`{index, request, event}` or `null`). The optional second argument is populated when the cursor is within roughly 5 CSS px of visible page-metric or user-timing vertical lines: `{event, pageMetrics, userTiming}`. Metric arrays are only populated when the corresponding display option (`showPageMetrics`, `showMarks`) is enabled.
+- `onZoom({startTime, endTime})` — fired whenever a user gesture changes the visible time window: a mouse drag-selection zoom or a touch pinch/pan. The renderer updates its own `startTime`/`endTime` options before firing, so the callback is a notification (sync UI, persist state), not a request for action.
+
+#### Zooming
+
+The rendered waterfall supports two zoom gestures out of the box:
+
+- **Mouse drag-to-zoom** — press the left button inside the data area and drag horizontally; a translucent highlight tracks the selection across the full height of the waterfall, and releasing sets `startTime`/`endTime` to the selected range. Releasing outside the canvas (or pressing `Escape` mid-drag) cancels. Drags shorter than 5 px are treated as clicks, so `onClick` request selection still works, and the gesture is deliberately mouse-only — touch scrolling can't trigger it.
+- **Touch pinch/pan** — two-finger pinch zooms around the gesture focal point; one-finger horizontal pan scrolls a zoomed view.
+
+Both gestures re-render via `updateOptions()` and fire `onZoom`. To reset, call `updateOptions({ startTime: null, endTime: null })` (the standalone viewer exposes this as a **Reset** button next to **Options** whenever the view is zoomed).
 
 ### Embedding
 

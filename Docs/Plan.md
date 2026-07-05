@@ -297,3 +297,10 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] Let request coloring fall back from missing MIME type to URL extension for common scripts, stylesheets, images (including WebP/SVG), fonts, and video.
 - [x] Clean up the standalone viewer request details table so optional empty/invalid fields are omitted and byte/time formatters cannot render `NaN`.
 - [x] Follow-up review fixes: show canceled/unknown statuses in Details, avoid `null` → `0` timing coercion, suppress negative millisecond sentinels, mark assumed rumcap statuses with `_statusAssumed`, avoid `new URL()` in the renderer hot path, and escape header values in request tabs.
+
+## Phase 11: Interactive drag-to-zoom
+**Goal:** Mouse-driven time-range zooming on the rendered waterfall with a viewer-level reset affordance.
+- [x] Renderer (`src/renderer/canvas.js`): left-button drag inside the data area selects a horizontal time range, visualized as a translucent full-height DOM overlay; release inside the canvas applies `startTime`/`endTime` via `updateOptions()`, release outside the canvas or `Escape` cancels. Mouse-only by design (touch stays on the pinch/pan handlers; a tap's synthetic mouse events can't cross the 5px activation threshold). Sub-threshold drags remain clicks, and a completed drag suppresses the trailing `click` so request details don't open. Disabled in `thumbnailView`.
+- [x] New `options.onZoom({startTime, endTime})` renderer callback, fired by drag zoom and by the existing touch pinch/pan paths after `updateOptions()`.
+- [x] Viewer: `🔄 Reset` button in the header immediately left of `⚙️ Options`, visible only while the waterfall tab is active and the view is time-zoomed (any source: drag, pinch, Time Span inputs, URL state). Resets `startTime`/`endTime` to `null`, clears the Options Time Span fields, and drops the params from the shareable URL. `onZoom` keeps the Time Span inputs, Reset visibility, and URL state in sync after gestures.
+- [x] Docs: README `renderTo` callbacks + Zooming section, `Docs/Architecture.md` interaction/gesture sections, AGENTS.md renderer + viewer contracts.

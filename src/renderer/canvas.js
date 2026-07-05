@@ -20,6 +20,9 @@ export class WaterfallCanvas {
         this.pendingRender = null;
         this.drawnRows = null;
         this.lastHoverKey = '';
+        this.dragZoom = null;
+        this._zoomOverlay = null;
+        this._suppressNextClick = false;
         
         if (this.container) {
             // Remove existing canvas children natively if reloading dynamically
@@ -50,6 +53,11 @@ export class WaterfallCanvas {
     }
     
     destroy() {
+        this._endDragZoom();
+        if (this._zoomOverlay && this._zoomOverlay.parentNode) {
+            this._zoomOverlay.parentNode.removeChild(this._zoomOverlay);
+        }
+        this._zoomOverlay = null;
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
         }
@@ -59,7 +67,13 @@ export class WaterfallCanvas {
     }
 
     _bindEvents() {
+        // Drag-to-zoom is mouse-only by design: touch scrolling/pinching goes
+        // through the touch handlers, and the synthetic mouse events a tap
+        // generates can never travel the horizontal activation threshold.
+        this.canvas.addEventListener('mousedown', (e) => this._onDragZoomDown(e));
+
         this.canvas.addEventListener('mousemove', (e) => {
+            if (this.dragZoom && this.dragZoom.active) return; // selection in progress — no hover churn
             if (typeof this.options.onHover !== 'function') return;
 
             const payload = this._getHoverPayload(e.offsetX, e.offsetY, e);
@@ -84,6 +98,13 @@ export class WaterfallCanvas {
         });
 
         this.canvas.addEventListener('click', (e) => {
+            // A completed selection drag ends with mousedown+mouseup on the
+            // canvas, which the browser also reports as a click — swallow it
+            // so releasing a zoom never opens a request's details.
+            if (this._suppressNextClick) {
+                this._suppressNextClick = false;
+                return;
+            }
             if (typeof this.options.onClick === 'function') {
                 const target = this._getInteractionTarget(e.offsetX, e.offsetY);
                 this.options.onClick(target ? { index: target.index, request: this.rawEntries[target.index], event: e } : null);
@@ -216,6 +237,7 @@ export class WaterfallCanvas {
                 }
                 
                 this.updateOptions({ startTime: newStartMs, endTime: newEndMs });
+                this._emitZoom(newStartMs, newEndMs);
             }
         } else if (e.touches.length === 1) {
             const deltaX = touch1.clientX - this.touchState.startX1;
@@ -253,7 +275,157 @@ export class WaterfallCanvas {
                 }
                 
                 this.updateOptions({ startTime: newStartMs, endTime: newEndMs });
+                this._emitZoom(newStartMs, newEndMs);
             }
+        }
+    }
+
+    // --- Drag-to-zoom (mouse selection) ---
+
+    _getDragZoomBounds() {
+        if (!this.drawnRows || !this.drawnRows.dimensions) return null;
+        const dim = this.drawnRows.dimensions;
+        if (!(dim.widthPerMs > 0) || !(dim.maxTime > 0)) return null;
+        // The selectable region is the data area: right of the labels column,
+        // capped at the last drawable millisecond (layout.js reserves 5px of
+        // right padding, so maxTime * widthPerMs lands short of canvasWidth).
+        return { x1: dim.labelsWidth, x2: dim.labelsWidth + dim.maxTime * dim.widthPerMs, dim };
+    }
+
+    _onDragZoomDown(e) {
+        if (e.button !== 0 || this.touchState || this.dragZoom) return;
+        if (this.options.thumbnailView) return; // thumbnails are previews — a drag there is never a zoom
+
+        const bounds = this._getDragZoomBounds();
+        if (!bounds) return;
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        if (x < bounds.x1 || x > bounds.x2) return; // must start inside the data area
+
+        e.preventDefault(); // keep the browser from starting a text-selection/drag gesture
+
+        const state = {
+            anchorX: x,
+            currentX: x,
+            active: false,
+            canceled: false,
+            onMove: (ev) => this._onDragZoomMove(ev),
+            onUp: (ev) => this._onDragZoomUp(ev),
+            onKey: (ev) => {
+                if (ev.key === 'Escape' && this.dragZoom) {
+                    // Keep listening until mouseup so the trailing click still
+                    // gets suppressed — just stop selecting and hide the overlay.
+                    this.dragZoom.canceled = true;
+                    this._hideZoomOverlay();
+                }
+            },
+            // If focus leaves the window mid-drag the mouseup may never arrive.
+            onBlur: () => this._endDragZoom()
+        };
+        this.dragZoom = state;
+        window.addEventListener('mousemove', state.onMove);
+        window.addEventListener('mouseup', state.onUp);
+        window.addEventListener('keydown', state.onKey);
+        window.addEventListener('blur', state.onBlur);
+    }
+
+    _onDragZoomMove(ev) {
+        const state = this.dragZoom;
+        if (!state || state.canceled) return;
+        const bounds = this._getDragZoomBounds();
+        if (!bounds) return;
+
+        const rect = this.canvas.getBoundingClientRect();
+        state.currentX = Math.max(bounds.x1, Math.min(bounds.x2, ev.clientX - rect.left));
+
+        // Horizontal threshold separates a zoom drag from a sloppy click (and
+        // from the synthetic mouse events a touch tap produces).
+        if (!state.active && Math.abs(state.currentX - state.anchorX) >= 5) {
+            state.active = true;
+            if (this.lastHoverKey && typeof this.options.onHover === 'function') {
+                this.lastHoverKey = '';
+                this.options.onHover(null);
+            }
+        }
+        if (state.active) this._updateZoomOverlay(state);
+    }
+
+    _onDragZoomUp(ev) {
+        const state = this.dragZoom;
+        this._endDragZoom();
+        if (!state || !state.active) return;
+
+        const rect = this.canvas.getBoundingClientRect();
+        const inCanvas = ev.clientX >= rect.left && ev.clientX <= rect.right &&
+                         ev.clientY >= rect.top && ev.clientY <= rect.bottom;
+        if (inCanvas) this._suppressNextClick = true;
+        if (state.canceled || !inCanvas) return; // Esc or released outside the waterfall → ignore the zoom
+
+        const bounds = this._getDragZoomBounds();
+        if (!bounds) return;
+        const dim = bounds.dim;
+        const xLo = Math.min(state.anchorX, state.currentX);
+        const xHi = Math.max(state.anchorX, state.currentX);
+
+        // Pixels → seconds within the *current* window: options.startTime is
+        // the visible window's origin, so nested zooms compound naturally.
+        const baseSec = this.options.startTime || 0;
+        let startSec = baseSec + ((xLo - dim.labelsWidth) / dim.widthPerMs) / 1000;
+        let endSec = baseSec + ((xHi - dim.labelsWidth) / dim.widthPerMs) / 1000;
+        if (!isFinite(startSec) || !isFinite(endSec)) return;
+        startSec = Math.max(0, Math.round(startSec * 1000) / 1000);
+        endSec = Math.round(endSec * 1000) / 1000;
+        if (endSec - startSec < 0.01) endSec = startSec + 0.01; // same minimum span as pinch zoom
+
+        this.updateOptions({ startTime: startSec, endTime: endSec });
+        this._emitZoom(startSec, endSec);
+    }
+
+    _endDragZoom() {
+        const state = this.dragZoom;
+        if (!state) return;
+        this.dragZoom = null;
+        window.removeEventListener('mousemove', state.onMove);
+        window.removeEventListener('mouseup', state.onUp);
+        window.removeEventListener('keydown', state.onKey);
+        window.removeEventListener('blur', state.onBlur);
+        this._hideZoomOverlay();
+    }
+
+    _updateZoomOverlay(state) {
+        if (!this.container) return;
+        if (!this._zoomOverlay) {
+            const overlay = document.createElement('div');
+            overlay.style.position = 'absolute';
+            overlay.style.pointerEvents = 'none';
+            overlay.style.background = 'rgba(66, 133, 244, 0.2)';
+            overlay.style.borderLeft = '1px solid rgba(66, 133, 244, 0.9)';
+            overlay.style.borderRight = '1px solid rgba(66, 133, 244, 0.9)';
+            overlay.style.display = 'none';
+            // The overlay positions against the container, which must establish
+            // a containing block for absolutely positioned children.
+            if (typeof getComputedStyle === 'function' && getComputedStyle(this.container).position === 'static') {
+                this.container.style.position = 'relative';
+            }
+            this.container.appendChild(overlay);
+            this._zoomOverlay = overlay;
+        }
+        const xLo = Math.min(state.anchorX, state.currentX);
+        const xHi = Math.max(state.anchorX, state.currentX);
+        this._zoomOverlay.style.left = (this.canvas.offsetLeft + xLo) + 'px';
+        this._zoomOverlay.style.top = this.canvas.offsetTop + 'px';
+        this._zoomOverlay.style.width = Math.max(1, xHi - xLo) + 'px';
+        this._zoomOverlay.style.height = this.canvas.offsetHeight + 'px';
+        this._zoomOverlay.style.display = 'block';
+    }
+
+    _hideZoomOverlay() {
+        if (this._zoomOverlay) this._zoomOverlay.style.display = 'none';
+    }
+
+    _emitZoom(startTime, endTime) {
+        if (typeof this.options.onZoom === 'function') {
+            this.options.onZoom({ startTime, endTime });
         }
     }
 

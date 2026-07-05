@@ -506,7 +506,7 @@ body, html {
     font-family: var(--font-stack);
 }
 
-#btn-back-tiles, #btn-settings {
+#btn-back-tiles, #btn-settings, #btn-reset-zoom {
     background: #fff;
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -517,7 +517,7 @@ body, html {
     margin-bottom: 8px; /* align with tab baseline */
 }
 
-#btn-back-tiles:hover, #btn-settings:hover {
+#btn-back-tiles:hover, #btn-settings:hover, #btn-reset-zoom:hover {
     background: #f0f0f0;
 }
 

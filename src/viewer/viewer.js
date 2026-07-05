@@ -22,6 +22,7 @@ const ui = {
     tileGrid: document.getElementById('tile-grid'),
     btnBackTiles: document.getElementById('btn-back-tiles'),
     btnSettings: document.getElementById('btn-settings'),
+    btnResetZoom: document.getElementById('btn-reset-zoom'),
     settingsOverlay: document.getElementById('settings-overlay'),
     btnSettingsClose: document.getElementById('btn-settings-close'),
     viewerTitle: document.getElementById('viewer-title'),
@@ -1691,6 +1692,15 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         renderRequestTab(data.request, data.index + 1);
     };
 
+    // Fired by the renderer whenever a gesture (mouse drag-select or touch
+    // pinch/pan) changes the visible time window — keep the Options form,
+    // the Reset button, and the shareable URL in sync with the new bounds.
+    renderOptions.onZoom = () => {
+        syncTimeSpanInputs();
+        updateResetZoomButton();
+        updateUrlWithCurrentState();
+    };
+
     rendererCanvas = await waterfallTool.renderTo(ui.waterfallView, renderOptions);
     
     // Sync Settings form securely
@@ -1753,7 +1763,8 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     if (activeTab && activeTab.dataset.tabId === 'waterfall' && ui.btnSettings) {
         ui.btnSettings.style.display = 'block';
     }
-    
+    updateResetZoomButton();
+
     updateUrlWithCurrentState();
 }
 
@@ -1783,6 +1794,8 @@ function resetWaterfallUI() {
     
     const tooltip = document.getElementById('waterfall-tooltip');
     if (tooltip) tooltip.style.display = 'none';
+
+    if (ui.btnResetZoom) ui.btnResetZoom.style.display = 'none';
 }
 
 /**
@@ -2032,6 +2045,28 @@ function updateUrlWithCurrentState() {
     }
 }
 
+function syncTimeSpanInputs() {
+    const opts = (rendererCanvas && rendererCanvas.options) ? rendererCanvas.options : {};
+    const stEl = document.getElementById('ui-start-time');
+    if (stEl) stEl.value = (typeof opts.startTime === 'number' && isFinite(opts.startTime)) ? opts.startTime : '';
+    const etEl = document.getElementById('ui-end-time');
+    if (etEl) etEl.value = (typeof opts.endTime === 'number' && isFinite(opts.endTime)) ? opts.endTime : '';
+}
+
+function updateResetZoomButton() {
+    if (!ui.btnResetZoom) return;
+    let zoomed = false;
+    if (rendererCanvas && rendererCanvas.options) {
+        const st = rendererCanvas.options.startTime;
+        const et = rendererCanvas.options.endTime;
+        zoomed = (typeof st === 'number' && isFinite(st) && st > 0) || (typeof et === 'number' && isFinite(et));
+    }
+    const activeTab = document.querySelector('.viewer-tab.active');
+    const onWaterfall = !!(activeTab && activeTab.dataset.tabId === 'waterfall');
+    const canvasVisible = ui.canvasContainer && !ui.canvasContainer.classList.contains('hidden');
+    ui.btnResetZoom.style.display = (zoomed && onWaterfall && canvasVisible) ? 'block' : 'none';
+}
+
 window.WaterfallViewer = {
     loadData: async (bufferOrFile, options = {}) => {
         await resetViewerState();
@@ -2056,6 +2091,7 @@ window.WaterfallViewer = {
         
         const pageData = waterfallTool.getPage(pageId, { includeRequests: true });
         rendererCanvas.render(pageData);
+        updateResetZoomButton();
     }
 };
 
@@ -2262,8 +2298,19 @@ async function initViewer() {
     });
 
 
-    // Initially hide settings
+    // Initially hide settings + zoom reset
     if (ui.btnSettings) ui.btnSettings.style.display = 'none';
+    if (ui.btnResetZoom) ui.btnResetZoom.style.display = 'none';
+
+    // Reset drag/pinch zoom back to the full time range
+    if (ui.btnResetZoom) {
+        ui.btnResetZoom.addEventListener('click', () => {
+            window.WaterfallViewer.updateOptions({ startTime: null, endTime: null });
+            syncTimeSpanInputs();
+            updateResetZoomButton();
+            updateUrlWithCurrentState();
+        });
+    }
     
     // Evaluate Data happens at the very bottom
 
@@ -2307,6 +2354,7 @@ async function initViewer() {
                     optVal = optVal !== '' ? optVal : undefined;
                 }
                 window.WaterfallViewer.updateOptions({ [optKey]: optVal });
+                updateResetZoomButton();
                 updateUrlWithCurrentState();
             });
         }
@@ -2348,6 +2396,7 @@ async function initViewer() {
                 ui.btnSettings.style.display = 'none';
                 if (ui.labelsSlider) ui.labelsSlider.classList.remove('active');
             }
+            updateResetZoomButton();
             
             if (tab.querySelector('.tab-close') && ui.btnCloseTab) {
                 ui.btnCloseTab.classList.remove('hidden');
