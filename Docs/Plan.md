@@ -354,6 +354,15 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] STREAM byte fallback: `quic:stream_data_moved` supplies `_bytesIn`/`_bytesOut`, `_chunks`, and fallback `_bwDown` when packet STREAM frames are absent, preferring transport/network movement over application/transport movement when available while packet-derived timing stays authoritative when both sources exist.
 - [x] Focused verification: qlog/loadBuffers suites and lint pass after the hardening; full build verification belongs to the session wrap-up.
 
+### Phase 12g: qlog connection-detail extraction (July 2026)
+**Goal:** Extract and display the connection-level information the sample corpus showed we were dropping (from the "anything else in these files?" review of the quiche captures), attached the same way netlog attaches socket details to requests.
+- [x] `quic:parameters_set`: TLS cipher (→ `_qlogTraces[].tlsCipher` + owner-entry `_tls_cipher_suite`) and curated scalar transport parameters per side (`parametersLocal`/`parametersRemote` + `_quic_parameters_local`/`_quic_parameters_remote`); spec-final `initiator` and draft `owner` keying both handled.
+- [x] `quic:connection_closed` (+ `connectivity:` spelling): initiator/error/reason scalars with page-relative time → `_qlogTraces[].connectionClosed` + owner-entry `_connection_closed`.
+- [x] Recovery metrics extras: `bytesInFlight` series added to `_qlogMetrics`; congestion/loss summary (`minRtt`, `smoothedRtt`, `rttVariance`, `ssthresh`, peak `ptoCount`, `lostPackets`/`lostBytes` from quiche `cf_lost_*` counters or `packet_lost` event counts) → `_qlogTraces[].congestion`. `> MAX_SAFE_INTEGER` "unset" sentinels (quiche `ssthresh: u64::MAX`) are dropped.
+- [x] ALPN (`alpn_information`) → `_tls_next_proto`, chosen QUIC version (`version_information`) → `_quic_version`, producer trace title → `_qlogTraces[].title`.
+- [x] Endpoint addresses: `connectivity:connection_started` / `path_assigned` (also under `quic:`) vantage-mapped to `_server_address`/`_client_address` on every entry of the connection + standard `serverIPAddress` (lights up the viewer's IP Details row). No current sample producer emits these — synthetic dual-vantage test coverage; real Cloudflare edge captures (issue #12) would exercise it live.
+- [x] Tests: quiche/aioquic assertions + synthetic connectivity-address test (suite 160); qlog golden fixtures regenerated. Docs: `AGENTS.md`, `Extended-HAR-Schema.md`, `Architecture.md`, `README.md`. No viewer code changes needed (IP row keys off existing `serverIp`; everything else surfaces in Raw Details, matching netlog's TLS-field precedent).
+
 ## Phase 13: Pre-release security & correctness hardening
 **Goal:** Close the three-agent review findings before the rumcap/qlog release candidate.
 - [x] Viewer security: escape capture-controlled strings before injecting into `innerHTML` or HTML attributes (tile titles, custom metric keys, request image previews, and dynamic errors); make custom metric DOM ids collision-resistant; keep syntax-highlighted body/details values escaped.

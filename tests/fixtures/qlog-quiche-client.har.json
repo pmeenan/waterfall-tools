@@ -32,7 +32,51 @@
             "qlogVersion": "urn:ietf:params:qlog:file:sequential",
             "format": "JSON-SEQ",
             "eventCount": 840,
-            "anchored": true
+            "anchored": true,
+            "title": "quiche-client qlog",
+            "tlsCipher": "AES128_GCM",
+            "parametersLocal": {
+              "disable_active_migration": true,
+              "max_idle_timeout": 30000,
+              "max_udp_payload_size": 1350,
+              "ack_delay_exponent": 3,
+              "max_ack_delay": 25,
+              "active_connection_id_limit": 2,
+              "initial_max_data": 10000000,
+              "initial_max_stream_data_bidi_local": 1000000,
+              "initial_max_stream_data_bidi_remote": 1000000,
+              "initial_max_stream_data_uni": 1000000,
+              "initial_max_streams_bidi": 100,
+              "initial_max_streams_uni": 100
+            },
+            "parametersRemote": {
+              "original_destination_connection_id": "7583215733fc13038ece39565bb2cf6b",
+              "disable_active_migration": true,
+              "max_idle_timeout": 30000,
+              "max_udp_payload_size": 1350,
+              "ack_delay_exponent": 3,
+              "max_ack_delay": 25,
+              "active_connection_id_limit": 2,
+              "initial_max_data": 10000000,
+              "initial_max_stream_data_bidi_local": 1000000,
+              "initial_max_stream_data_bidi_remote": 1000000,
+              "initial_max_stream_data_uni": 1000000,
+              "initial_max_streams_bidi": 100,
+              "initial_max_streams_uni": 100
+            },
+            "connectionClosed": {
+              "time": 15.269,
+              "initiator": "local",
+              "application_error": "unknown",
+              "error_code": 256,
+              "reason": "kthxbye"
+            },
+            "congestion": {
+              "minRtt": 0.07,
+              "smoothedRtt": 0.869,
+              "rttVariance": 0.62,
+              "ptoCount": 0
+            }
           }
         ],
         "_qlogMetrics": {
@@ -58,6 +102,76 @@
             [
               0.023,
               13500
+            ]
+          ],
+          "bytesInFlight": [
+            [
+              0.023,
+              314
+            ],
+            [
+              0.36,
+              344
+            ],
+            [
+              1.408,
+              0
+            ],
+            [
+              1.637,
+              111
+            ],
+            [
+              1.637,
+              1252
+            ],
+            [
+              1.677,
+              1296
+            ],
+            [
+              1.685,
+              1340
+            ],
+            [
+              1.688,
+              1455
+            ],
+            [
+              1.691,
+              1533
+            ],
+            [
+              1.694,
+              1610
+            ],
+            [
+              1.696,
+              1689
+            ],
+            [
+              1.699,
+              1767
+            ],
+            [
+              1.701,
+              1836
+            ],
+            [
+              2.233,
+              0
+            ],
+            [
+              3.536,
+              54
+            ],
+            [
+              3.606,
+              0
+            ],
+            [
+              4.187,
+              49
             ]
           ]
         }
@@ -2487,6 +2601,43 @@
         "_full_url": "https://127.0.0.1:4433/index.html",
         "_protocol": "HTTP/3",
         "_stream_id": 0,
+        "_tls_cipher_suite": "AES128_GCM",
+        "_quic_parameters_local": {
+          "disable_active_migration": true,
+          "max_idle_timeout": 30000,
+          "max_udp_payload_size": 1350,
+          "ack_delay_exponent": 3,
+          "max_ack_delay": 25,
+          "active_connection_id_limit": 2,
+          "initial_max_data": 10000000,
+          "initial_max_stream_data_bidi_local": 1000000,
+          "initial_max_stream_data_bidi_remote": 1000000,
+          "initial_max_stream_data_uni": 1000000,
+          "initial_max_streams_bidi": 100,
+          "initial_max_streams_uni": 100
+        },
+        "_quic_parameters_remote": {
+          "original_destination_connection_id": "7583215733fc13038ece39565bb2cf6b",
+          "disable_active_migration": true,
+          "max_idle_timeout": 30000,
+          "max_udp_payload_size": 1350,
+          "ack_delay_exponent": 3,
+          "max_ack_delay": 25,
+          "active_connection_id_limit": 2,
+          "initial_max_data": 10000000,
+          "initial_max_stream_data_bidi_local": 1000000,
+          "initial_max_stream_data_bidi_remote": 1000000,
+          "initial_max_stream_data_uni": 1000000,
+          "initial_max_streams_bidi": 100,
+          "initial_max_streams_uni": 100
+        },
+        "_connection_closed": {
+          "time": 15.269,
+          "initiator": "local",
+          "application_error": "unknown",
+          "error_code": 256,
+          "reason": "kthxbye"
+        },
         "_bytesIn": 354,
         "_bytesOut": 72,
         "_objectSize": 297,

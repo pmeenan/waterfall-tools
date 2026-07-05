@@ -34,7 +34,48 @@
             "qlogVersion": "0.3",
             "format": "JSON-SEQ",
             "eventCount": 318,
-            "anchored": false
+            "anchored": false,
+            "parametersLocal": {
+              "initial_source_connection_id": "8d68f614829cba9d78f79a0bf94b330e20ba23e2",
+              "disable_active_migration": false,
+              "max_idle_timeout": 0,
+              "max_udp_payload_size": 65527,
+              "ack_delay_exponent": 3,
+              "max_ack_delay": 25,
+              "active_connection_id_limit": 2,
+              "initial_max_data": 1048576000,
+              "initial_max_stream_data_bidi_local": 32768,
+              "initial_max_stream_data_bidi_remote": 32768,
+              "initial_max_stream_data_uni": 1048576000,
+              "initial_max_streams_bidi": 262144,
+              "initial_max_streams_uni": 262144,
+              "max_datagram_frame_size": 0,
+              "grease_quic_bit": false
+            },
+            "parametersRemote": {
+              "initial_source_connection_id": "01c708fc889e77ce6ac57afc7b9e73f61fe13a83",
+              "original_destination_connection_id": "048246e710e2d8a4cd799f6b168083a38d5b208c",
+              "disable_active_migration": true,
+              "max_idle_timeout": 180000,
+              "max_udp_payload_size": 65527,
+              "ack_delay_exponent": 3,
+              "max_ack_delay": 25,
+              "active_connection_id_limit": 2,
+              "initial_max_data": 10485760,
+              "initial_max_stream_data_bidi_local": 0,
+              "initial_max_stream_data_bidi_remote": 1048576,
+              "initial_max_stream_data_uni": 1048576,
+              "initial_max_streams_bidi": 100,
+              "initial_max_streams_uni": 3,
+              "max_datagram_frame_size": 0,
+              "grease_quic_bit": false
+            },
+            "congestion": {
+              "minRtt": 8,
+              "smoothedRtt": 11,
+              "rttVariance": 3,
+              "ptoCount": 0
+            }
           }
         ],
         "_qlogMetrics": {
@@ -1305,6 +1346,640 @@
               154,
               15398
             ]
+          ],
+          "bytesInFlight": [
+            [
+              0,
+              1200
+            ],
+            [
+              0,
+              2400
+            ],
+            [
+              13,
+              1200
+            ],
+            [
+              15,
+              0
+            ],
+            [
+              16,
+              0
+            ],
+            [
+              16,
+              0
+            ],
+            [
+              16,
+              0
+            ],
+            [
+              16,
+              0
+            ],
+            [
+              16,
+              0
+            ],
+            [
+              17,
+              0
+            ],
+            [
+              17,
+              128
+            ],
+            [
+              17,
+              1126
+            ],
+            [
+              17,
+              2532
+            ],
+            [
+              18,
+              2614
+            ],
+            [
+              19,
+              2810
+            ],
+            [
+              29,
+              1684
+            ],
+            [
+              29,
+              1684
+            ],
+            [
+              29,
+              1684
+            ],
+            [
+              29,
+              1684
+            ],
+            [
+              29,
+              1684
+            ],
+            [
+              32,
+              0
+            ],
+            [
+              32,
+              1444
+            ],
+            [
+              33,
+              1444
+            ],
+            [
+              35,
+              1444
+            ],
+            [
+              38,
+              1444
+            ],
+            [
+              38,
+              1444
+            ],
+            [
+              38,
+              1444
+            ],
+            [
+              38,
+              1444
+            ],
+            [
+              38,
+              1444
+            ],
+            [
+              38,
+              1444
+            ],
+            [
+              38,
+              1444
+            ],
+            [
+              38,
+              1444
+            ],
+            [
+              38,
+              1493
+            ],
+            [
+              38,
+              1493
+            ],
+            [
+              38,
+              1493
+            ],
+            [
+              38,
+              1493
+            ],
+            [
+              39,
+              1493
+            ],
+            [
+              41,
+              1493
+            ],
+            [
+              41,
+              49
+            ],
+            [
+              46,
+              49
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              0
+            ],
+            [
+              47,
+              51
+            ],
+            [
+              48,
+              51
+            ],
+            [
+              50,
+              51
+            ],
+            [
+              51,
+              51
+            ],
+            [
+              51,
+              51
+            ],
+            [
+              51,
+              51
+            ],
+            [
+              51,
+              51
+            ],
+            [
+              51,
+              51
+            ],
+            [
+              51,
+              51
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              0
+            ],
+            [
+              56,
+              50
+            ],
+            [
+              58,
+              50
+            ],
+            [
+              59,
+              50
+            ],
+            [
+              59,
+              50
+            ],
+            [
+              60,
+              50
+            ],
+            [
+              60,
+              50
+            ],
+            [
+              60,
+              50
+            ],
+            [
+              60,
+              50
+            ],
+            [
+              60,
+              50
+            ],
+            [
+              60,
+              50
+            ],
+            [
+              60,
+              100
+            ],
+            [
+              61,
+              100
+            ],
+            [
+              61,
+              100
+            ],
+            [
+              61,
+              100
+            ],
+            [
+              65,
+              50
+            ],
+            [
+              65,
+              50
+            ],
+            [
+              65,
+              50
+            ],
+            [
+              65,
+              50
+            ],
+            [
+              65,
+              50
+            ],
+            [
+              65,
+              50
+            ],
+            [
+              65,
+              50
+            ],
+            [
+              65,
+              50
+            ],
+            [
+              65,
+              50
+            ],
+            [
+              65,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              66,
+              100
+            ],
+            [
+              71,
+              50
+            ],
+            [
+              74,
+              0
+            ],
+            [
+              154,
+              0
+            ],
+            [
+              154,
+              0
+            ]
           ]
         }
       }
@@ -1408,6 +2083,41 @@
         "_protocol": "HTTP/3",
         "_statusAssumed": true,
         "_stream_id": 0,
+        "_quic_parameters_local": {
+          "initial_source_connection_id": "8d68f614829cba9d78f79a0bf94b330e20ba23e2",
+          "disable_active_migration": false,
+          "max_idle_timeout": 0,
+          "max_udp_payload_size": 65527,
+          "ack_delay_exponent": 3,
+          "max_ack_delay": 25,
+          "active_connection_id_limit": 2,
+          "initial_max_data": 1048576000,
+          "initial_max_stream_data_bidi_local": 32768,
+          "initial_max_stream_data_bidi_remote": 32768,
+          "initial_max_stream_data_uni": 1048576000,
+          "initial_max_streams_bidi": 262144,
+          "initial_max_streams_uni": 262144,
+          "max_datagram_frame_size": 0,
+          "grease_quic_bit": false
+        },
+        "_quic_parameters_remote": {
+          "initial_source_connection_id": "01c708fc889e77ce6ac57afc7b9e73f61fe13a83",
+          "original_destination_connection_id": "048246e710e2d8a4cd799f6b168083a38d5b208c",
+          "disable_active_migration": true,
+          "max_idle_timeout": 180000,
+          "max_udp_payload_size": 65527,
+          "ack_delay_exponent": 3,
+          "max_ack_delay": 25,
+          "active_connection_id_limit": 2,
+          "initial_max_data": 10485760,
+          "initial_max_stream_data_bidi_local": 0,
+          "initial_max_stream_data_bidi_remote": 1048576,
+          "initial_max_stream_data_uni": 1048576,
+          "initial_max_streams_bidi": 100,
+          "initial_max_streams_uni": 3,
+          "max_datagram_frame_size": 0,
+          "grease_quic_bit": false
+        },
         "_bytesIn": 126135,
         "_bytesOut": 35,
         "_created": 0,

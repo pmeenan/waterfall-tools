@@ -33,7 +33,43 @@
             "qlogVersion": "0.3",
             "format": "JSON",
             "eventCount": 6528,
-            "anchored": true
+            "anchored": true,
+            "alpn": "h3",
+            "quicVersion": "1",
+            "parametersLocal": {
+              "max_idle_timeout": 60000,
+              "initial_max_data": 1048576,
+              "initial_max_stream_data_bidi_local": 1048576,
+              "initial_max_stream_data_bidi_remote": 1048576,
+              "initial_max_stream_data_uni": 1048576,
+              "initial_max_streams_bidi": 128,
+              "initial_max_streams_uni": 128,
+              "ack_delay_exponent": 3,
+              "max_ack_delay": 25,
+              "disable_active_migration": false,
+              "active_connection_id_limit": 8,
+              "initial_source_connection_id": "605157835c3212a2"
+            },
+            "parametersRemote": {
+              "original_destination_connection_id": "0871f2e9444efcee",
+              "max_idle_timeout": 240000,
+              "stateless_reset_token": "0be0550e3845df69899865aa32937202",
+              "max_udp_payload_size": 1472,
+              "initial_max_data": 196608,
+              "initial_max_stream_data_bidi_local": 131072,
+              "initial_max_stream_data_bidi_remote": 131072,
+              "initial_max_stream_data_uni": 131072,
+              "initial_max_streams_bidi": 100,
+              "initial_max_streams_uni": 103,
+              "disable_active_migration": false,
+              "initial_source_connection_id": "e871f2e9444efcee",
+              "max_datagram_frame_size": 65536
+            },
+            "congestion": {
+              "minRtt": 9.037,
+              "smoothedRtt": 11.676,
+              "rttVariance": 3.15
+            }
           }
         ],
         "_qlogMetrics": {
@@ -775,6 +811,528 @@
             [
               1788.053,
               29895
+            ]
+          ],
+          "bytesInFlight": [
+            [
+              2.531,
+              523
+            ],
+            [
+              15.192,
+              0
+            ],
+            [
+              16.689,
+              0
+            ],
+            [
+              36.146,
+              105
+            ],
+            [
+              36.15,
+              199
+            ],
+            [
+              36.527,
+              364
+            ],
+            [
+              47.216,
+              259
+            ],
+            [
+              49.676,
+              0
+            ],
+            [
+              119.478,
+              33
+            ],
+            [
+              128.776,
+              0
+            ],
+            [
+              180.362,
+              634
+            ],
+            [
+              186.776,
+              1834
+            ],
+            [
+              186.78,
+              3034
+            ],
+            [
+              186.782,
+              3390
+            ],
+            [
+              198.136,
+              1556
+            ],
+            [
+              198.668,
+              0
+            ],
+            [
+              302.318,
+              80
+            ],
+            [
+              317.406,
+              0
+            ],
+            [
+              317.903,
+              33
+            ],
+            [
+              354.856,
+              0
+            ],
+            [
+              504.405,
+              1200
+            ],
+            [
+              504.411,
+              1547
+            ],
+            [
+              516.448,
+              0
+            ],
+            [
+              530.712,
+              33
+            ],
+            [
+              540.693,
+              66
+            ],
+            [
+              542.647,
+              33
+            ],
+            [
+              576.378,
+              0
+            ],
+            [
+              591.878,
+              230
+            ],
+            [
+              606.889,
+              0
+            ],
+            [
+              607.13,
+              33
+            ],
+            [
+              641.504,
+              244
+            ],
+            [
+              642.354,
+              211
+            ],
+            [
+              658.479,
+              0
+            ],
+            [
+              658.652,
+              33
+            ],
+            [
+              700.887,
+              0
+            ],
+            [
+              744.083,
+              33
+            ],
+            [
+              753.243,
+              65
+            ],
+            [
+              754.779,
+              107
+            ],
+            [
+              755.837,
+              74
+            ],
+            [
+              768.604,
+              0
+            ],
+            [
+              787.397,
+              33
+            ],
+            [
+              798.811,
+              0
+            ],
+            [
+              799.225,
+              32
+            ],
+            [
+              802.063,
+              73
+            ],
+            [
+              813.666,
+              0
+            ],
+            [
+              862.389,
+              504
+            ],
+            [
+              879.097,
+              0
+            ],
+            [
+              880.598,
+              40
+            ],
+            [
+              916.969,
+              0
+            ],
+            [
+              938.582,
+              799
+            ],
+            [
+              944.959,
+              1265
+            ],
+            [
+              957.829,
+              0
+            ],
+            [
+              963.246,
+              101
+            ],
+            [
+              976.711,
+              0
+            ],
+            [
+              982.795,
+              33
+            ],
+            [
+              992.547,
+              66
+            ],
+            [
+              993.052,
+              33
+            ],
+            [
+              1005.246,
+              0
+            ],
+            [
+              1035.989,
+              33
+            ],
+            [
+              1057.795,
+              0
+            ],
+            [
+              1116.54,
+              140
+            ],
+            [
+              1130.905,
+              0
+            ],
+            [
+              1147.479,
+              525
+            ],
+            [
+              1155.052,
+              641
+            ],
+            [
+              1160.582,
+              764
+            ],
+            [
+              1164.44,
+              239
+            ],
+            [
+              1168.289,
+              123
+            ],
+            [
+              1172.054,
+              156
+            ],
+            [
+              1177.324,
+              33
+            ],
+            [
+              1179.011,
+              66
+            ],
+            [
+              1179.746,
+              1266
+            ],
+            [
+              1179.757,
+              1676
+            ],
+            [
+              1180.889,
+              1709
+            ],
+            [
+              1185.124,
+              1676
+            ],
+            [
+              1185.464,
+              1709
+            ],
+            [
+              1191.477,
+              1676
+            ],
+            [
+              1194.536,
+              0
+            ],
+            [
+              1216.268,
+              33
+            ],
+            [
+              1222.601,
+              502
+            ],
+            [
+              1230.395,
+              469
+            ],
+            [
+              1234.161,
+              1669
+            ],
+            [
+              1234.174,
+              1867
+            ],
+            [
+              1235.849,
+              2776
+            ],
+            [
+              1237.84,
+              2307
+            ],
+            [
+              1250.603,
+              0
+            ],
+            [
+              1284.334,
+              33
+            ],
+            [
+              1295.757,
+              0
+            ],
+            [
+              1310.744,
+              39
+            ],
+            [
+              1311.398,
+              72
+            ],
+            [
+              1322.959,
+              0
+            ],
+            [
+              1325.789,
+              33
+            ],
+            [
+              1327.031,
+              151
+            ],
+            [
+              1338.005,
+              118
+            ],
+            [
+              1341.558,
+              0
+            ],
+            [
+              1345.421,
+              33
+            ],
+            [
+              1358.328,
+              0
+            ],
+            [
+              1381.141,
+              108
+            ],
+            [
+              1393.282,
+              0
+            ],
+            [
+              1431.86,
+              33
+            ],
+            [
+              1447.537,
+              0
+            ],
+            [
+              1450.37,
+              36
+            ],
+            [
+              1462.391,
+              573
+            ],
+            [
+              1463.109,
+              537
+            ],
+            [
+              1464.301,
+              1260
+            ],
+            [
+              1471.573,
+              1325
+            ],
+            [
+              1475.845,
+              65
+            ],
+            [
+              1485.41,
+              0
+            ],
+            [
+              1492.983,
+              33
+            ],
+            [
+              1493.145,
+              144
+            ],
+            [
+              1500.874,
+              177
+            ],
+            [
+              1507.233,
+              33
+            ],
+            [
+              1509.542,
+              66
+            ],
+            [
+              1515.673,
+              33
+            ],
+            [
+              1522.635,
+              0
+            ],
+            [
+              1525.848,
+              176
+            ],
+            [
+              1536.454,
+              209
+            ],
+            [
+              1541.209,
+              33
+            ],
+            [
+              1544.223,
+              66
+            ],
+            [
+              1550.633,
+              33
+            ],
+            [
+              1557.105,
+              489
+            ],
+            [
+              1558.31,
+              1042
+            ],
+            [
+              1561.555,
+              1009
+            ],
+            [
+              1574.518,
+              0
+            ],
+            [
+              1597.507,
+              33
+            ],
+            [
+              1610.978,
+              0
+            ],
+            [
+              1622.81,
+              495
+            ],
+            [
+              1634.098,
+              528
+            ],
+            [
+              1638.874,
+              33
+            ],
+            [
+              1639.077,
+              66
+            ],
+            [
+              1788.053,
+              0
             ]
           ]
         }
@@ -1809,6 +2367,37 @@
         "_protocol": "HTTP/3",
         "_contentType": "text/html; charset=UTF-8",
         "_stream_id": 0,
+        "_tls_next_proto": "h3",
+        "_quic_version": "1",
+        "_quic_parameters_local": {
+          "max_idle_timeout": 60000,
+          "initial_max_data": 1048576,
+          "initial_max_stream_data_bidi_local": 1048576,
+          "initial_max_stream_data_bidi_remote": 1048576,
+          "initial_max_stream_data_uni": 1048576,
+          "initial_max_streams_bidi": 128,
+          "initial_max_streams_uni": 128,
+          "ack_delay_exponent": 3,
+          "max_ack_delay": 25,
+          "disable_active_migration": false,
+          "active_connection_id_limit": 8,
+          "initial_source_connection_id": "605157835c3212a2"
+        },
+        "_quic_parameters_remote": {
+          "original_destination_connection_id": "0871f2e9444efcee",
+          "max_idle_timeout": 240000,
+          "stateless_reset_token": "0be0550e3845df69899865aa32937202",
+          "max_udp_payload_size": 1472,
+          "initial_max_data": 196608,
+          "initial_max_stream_data_bidi_local": 131072,
+          "initial_max_stream_data_bidi_remote": 131072,
+          "initial_max_stream_data_uni": 131072,
+          "initial_max_streams_bidi": 100,
+          "initial_max_streams_uni": 103,
+          "disable_active_migration": false,
+          "initial_source_connection_id": "e871f2e9444efcee",
+          "max_datagram_frame_size": 65536
+        },
         "_bytesIn": 239068,
         "_bytesOut": 134,
         "_created": 2.536,

@@ -37,7 +37,14 @@
  * @property {Object} [_font_details]
  * @property {Object} [_image_details]
  * @property {Object} [_securityDetails]
- * @property {Object} [_tls_cipher_suite]
+ * @property {Object} [_tls_cipher_suite] - Negotiated cipher: numeric IANA suite id (netlog) or cipher name string (qlog; connection-owner entry only)
+ * @property {string} [_tls_next_proto] - Negotiated ALPN (netlog; qlog connection-owner entry)
+ * @property {string} [_server_address] - Server "ip:port" (netlog sockets; qlog connectivity events — also populates the standard serverIPAddress, port stripped)
+ * @property {string} [_client_address] - Client "ip:port" (netlog sockets; qlog connectivity events)
+ * @property {string} [_quic_version] - Chosen QUIC version (qlog version_information; connection-owner entry only)
+ * @property {Object} [_quic_parameters_local] - Curated scalar QUIC transport parameters, vantage-local side (qlog parameters_set; connection-owner entry only)
+ * @property {Object} [_quic_parameters_remote] - Curated scalar QUIC transport parameters, remote side (qlog parameters_set; connection-owner entry only)
+ * @property {{time: number}} [_connection_closed] - Connection close info: page-relative ms + producer scalars (initiator, error_code, reason, ...; qlog connection-owner entry only)
  * @property {Array<{name: string, duration?: number, description?: string}>} [_server_timing] - Server-Timing metrics (entry-level; rumcap)
  * 
  * -- Waterfall Tools Extended Request Scalars --
@@ -193,8 +200,8 @@
  * @property {Object} [_rumcapInteractions] - rumcap raw Event Timing stream ({events: []})
  * @property {Object} [_rumcapElementTiming] - rumcap Element Timing stream ({elements: []})
  * @property {Object} [_rumcapCustomEvents] - rumcap custom-event tracks ({tracks: []})
- * @property {Array<{vantagePoint: Object|null, odcid: string, qlogVersion: string, format: string, eventCount: number, anchored: boolean}>} [_qlogTraces] - Per-connection qlog context (always present on qlog pages)
- * @property {{rtt: Array<[number, number]>, cwnd: Array<[number, number]>}} [_qlogMetrics] - qlog rtt/cwnd samples [[relMs, value]], merged across connections, capped ~300 points/series (not rendered yet)
+ * @property {Array<{vantagePoint: Object|null, odcid: string, qlogVersion: string, format: string, eventCount: number, anchored: boolean, title?: string, tlsCipher?: string, alpn?: string, quicVersion?: string, serverAddress?: string, clientAddress?: string, parametersLocal?: Object, parametersRemote?: Object, connectionClosed?: Object, congestion?: Object}>} [_qlogTraces] - Per-connection qlog context (always present on qlog pages; optional connection details only when the producer logged them)
+ * @property {{rtt: Array<[number, number]>, cwnd: Array<[number, number]>, bytesInFlight?: Array<[number, number]>}} [_qlogMetrics] - qlog rtt/cwnd/bytes-in-flight samples [[relMs, value]], merged across connections, capped ~300 points/series (not rendered yet)
  * @property {Object} [_custom]
  * @property {Object} [_aurora]
  * @property {Object} [_cms]

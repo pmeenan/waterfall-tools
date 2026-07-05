@@ -304,6 +304,21 @@ describe('qlog Input Processor (rich mode: aioquic plain JSON)', () => {
         expect(log.pages[0]._qlogMetrics.cwnd.length).toBeGreaterThan(0);
         expect(log.pages[0]._qlogMetrics.rtt.length).toBeLessThanOrEqual(301);
         expect(log.pages[0]._qlogMetrics.cwnd.length).toBeLessThanOrEqual(301);
+
+        // Connection details from aioquic's draft-era events: alpn_information (a single
+        // offered client ALPN on a completed connection is the negotiated one),
+        // version_information, and owner/remote parameters_set.
+        expect(log.pages[0]._qlogTraces[0].alpn).toBe('h3');
+        expect(log.pages[0]._qlogTraces[0].quicVersion).toBe('1');
+        expect(owners[0]._tls_next_proto).toBe('h3');
+        expect(owners[0]._quic_version).toBe('1');
+        // Draft producers key parameters_set on `owner` rather than `initiator`.
+        expect(owners[0]._quic_parameters_local.max_idle_timeout).toBe(60000);
+        expect(owners[0]._quic_parameters_remote.max_idle_timeout).toBe(240000);
+        // Nested/array fields (e.g. unknown_parameters) never leak into the curated copy.
+        for (const value of Object.values(owners[0]._quic_parameters_remote)) {
+            expect(['string', 'number', 'boolean']).toContain(typeof value);
+        }
     });
 
     it('maps RFC 9218 priority, bytes, and timing derivations coherently', async () => {
@@ -405,8 +420,30 @@ describe('qlog Input Processor (spec-final quiche, both vantage points)', () => 
         // Spec-final files carry no qlog_version — the file-schema URN identifies them.
         expect(log.pages[0]._qlogTraces[0].qlogVersion).toBe('urn:ietf:params:qlog:file:sequential');
         // quic:recovery_metrics_updated (renamed from recovery:metrics_updated) feeds
-        // the metrics series.
+        // the metrics series, including the bytes-in-flight samples.
         expect(log.pages[0]._qlogMetrics.rtt.length).toBeGreaterThan(0);
+        expect(log.pages[0]._qlogMetrics.bytesInFlight.length).toBeGreaterThan(0);
+
+        // Connection-level details lifted from parameters_set / connection_closed /
+        // recovery metrics land on the per-connection trace record...
+        const trace = log.pages[0]._qlogTraces[0];
+        expect(trace.title).toBe('quiche-client qlog');
+        expect(trace.tlsCipher).toBe('AES128_GCM');
+        expect(trace.parametersLocal.max_idle_timeout).toBe(30000);
+        expect(trace.parametersRemote.initial_max_data).toBe(10000000);
+        expect(trace.connectionClosed.reason).toBe('kthxbye');
+        expect(trace.connectionClosed.error_code).toBe(256);
+        expect(trace.congestion.minRtt).toBeGreaterThan(0);
+        // quiche's u64::MAX "unset" ssthresh sentinel must be dropped, not surfaced.
+        expect(trace.congestion.ssthresh).toBeUndefined();
+
+        // ...and on the connection-owner entry (netlog socket-attachment convention).
+        const owner = log.entries.find(e => e._connect_start !== undefined);
+        expect(owner._tls_cipher_suite).toBe('AES128_GCM');
+        expect(owner._quic_parameters_remote.max_udp_payload_size).toBe(1350);
+        expect(owner._connection_closed.reason).toBe('kthxbye');
+        const nonOwner = log.entries.find(e => e._connect_start === undefined);
+        expect(nonOwner._tls_cipher_suite).toBeUndefined();
 
         const paths = log.entries.map(e => new URL(e.request.url).pathname).sort();
         expect(paths).toEqual([...URLS].sort());
@@ -536,6 +573,71 @@ describe('qlog buildQlogHarLog (CLI Extended HAR contract)', () => {
         expect(log.entries.length).toBe(1);
         expect(log.entries[0].request.url).toBe('https://example.com/');
         expect(log.entries[0].response.status).toBe(200);
+    });
+
+    it('maps connectivity addresses to server/client by vantage point', async () => {
+        // No current sample producer logs connectivity events (quiche/aioquic/curl all
+        // omit them) — but the spec defines connection_started/path_assigned, and real
+        // Cloudflare edge captures may carry them. src / path_local is always the
+        // vantage-LOCAL endpoint, so the server/client mapping flips with the vantage.
+        const streamEvents = [
+            { time: 6, name: 'http3:frame_created', data: { stream_id: 0, frame: { frame_type: 'headers', headers: [
+                { name: ':method', value: 'GET' }, { name: ':scheme', value: 'https' },
+                { name: ':authority', value: 'example.com' }, { name: ':path', value: '/' }
+            ] } } },
+            { time: 21, name: 'quic:packet_received', data: { header: { packet_type: '1RTT' }, frames: [
+                { frame_type: 'stream', stream_id: 0, offset: 0, length: 500, fin: true }
+            ] } },
+            { time: 22, name: 'quic:packet_received', data: { header: { packet_type: '1RTT' }, frames: [
+                { frame_type: 'stream', stream_id: 4, offset: 0, length: 100, fin: true }
+            ] } }
+        ];
+        const clientLog = await buildQlogHarLog([{
+            qlogFormat: 'JSON', qlogVersion: '0.4', vantagePoint: { type: 'client' },
+            commonFields: { reference_time: 1700000000000 },
+            events: [
+                { time: 0, name: 'connectivity:connection_started', data: {
+                    src_ip: '192.0.2.10', src_port: 51234, dst_ip: '203.0.113.7', dst_port: 443
+                } },
+                ...streamEvents
+            ]
+        }]);
+        // Client vantage: dst is the server. Addresses ride every entry on the connection.
+        expect(clientLog.entries.length).toBe(2);
+        for (const entry of clientLog.entries) {
+            expect(entry._server_address).toBe('203.0.113.7:443');
+            expect(entry._client_address).toBe('192.0.2.10:51234');
+            expect(entry.serverIPAddress).toBe('203.0.113.7');
+        }
+        expect(clientLog.pages[0]._qlogTraces[0].serverAddress).toBe('203.0.113.7:443');
+        expect(clientLog.pages[0]._qlogTraces[0].clientAddress).toBe('192.0.2.10:51234');
+
+        const serverLog = await buildQlogHarLog([{
+            qlogFormat: 'JSON', qlogVersion: '0.4', vantagePoint: { type: 'server' },
+            commonFields: { reference_time: 1700000000000 },
+            events: [
+                // path_assigned form (PathEndpointInfo), IPv6 to exercise bracketing.
+                { time: 0, name: 'quic:path_assigned', data: {
+                    path_id: '0',
+                    path_local: { ip_v4: '203.0.113.7', port_v4: 443 },
+                    path_remote: { ip_v6: '2001:db8::2', port_v6: 51234 }
+                } },
+                // Server vantage flips the h3/packet direction semantics too.
+                { time: 6, name: 'http3:frame_parsed', data: { stream_id: 0, frame: { frame_type: 'headers', headers: [
+                    { name: ':method', value: 'GET' }, { name: ':scheme', value: 'https' },
+                    { name: ':authority', value: 'example.com' }, { name: ':path', value: '/' }
+                ] } } },
+                { time: 21, name: 'quic:packet_sent', data: { header: { packet_type: '1RTT' }, frames: [
+                    { frame_type: 'stream', stream_id: 0, offset: 0, length: 500, fin: true }
+                ] } }
+            ]
+        }]);
+        // Server vantage: LOCAL (path_local) is the server, the remote peer is the client.
+        expect(serverLog.entries.length).toBe(1);
+        expect(serverLog.entries[0]._server_address).toBe('203.0.113.7:443');
+        expect(serverLog.entries[0]._client_address).toBe('[2001:db8::2]:51234');
+        expect(serverLog.entries[0].serverIPAddress).toBe('203.0.113.7');
+        expect(serverLog.pages[0]._qlogTraces[0].clientAddress).toBe('[2001:db8::2]:51234');
     });
 
     it('uses stream_data_moved as a packet-free byte/chunk fallback and surfaces h3 metadata', async () => {

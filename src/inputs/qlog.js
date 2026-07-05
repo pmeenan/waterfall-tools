@@ -379,6 +379,72 @@ function handleH3Priority(model, data) {
     if (priority) getStream(model, sid).priority = priority;
 }
 
+/**
+ * Copy the JSON-scalar fields (string / finite number / boolean) of a qlog event's data
+ * object, dropping nested structures and the keys in `skip`. Keeps connection-detail
+ * attachments lean and JSON-safe regardless of producer extensions.
+ */
+function scalarFields(data, skip) {
+    const out = {};
+    for (const [key, value] of Object.entries(data)) {
+        if (skip && skip.includes(key)) continue;
+        const type = typeof value;
+        if (type === 'string' || type === 'boolean' || (type === 'number' && Number.isFinite(value))) {
+            out[key] = value;
+        }
+    }
+    return out;
+}
+
+/** Join ip + port into netlog's "ip:port" / "[v6]:port" display form (null when no ip). */
+function formatEndpoint(ip, port) {
+    if (typeof ip !== 'string' || ip.length === 0) return null;
+    const portNum = Number(port);
+    if (!Number.isFinite(portNum)) return ip;
+    return ip.includes(':') ? `[${ip}]:${portNum}` : `${ip}:${portNum}`;
+}
+
+/** PathEndpointInfo (connectivity:path_assigned) → "ip:port", preferring IPv4. */
+function endpointFromPathInfo(info) {
+    if (!info || typeof info !== 'object') return null;
+    return formatEndpoint(info.ip_v4, info.port_v4) || formatEndpoint(info.ip_v6, info.port_v6);
+}
+
+/** Strip the port back off a formatted endpoint for the standard HAR serverIPAddress. */
+function ipFromEndpoint(endpoint) {
+    if (typeof endpoint !== 'string') return null;
+    const v6 = endpoint.match(/^\[([^\]]+)\]/);
+    if (v6) return v6[1];
+    const colon = endpoint.indexOf(':');
+    return colon > 0 ? endpoint.substring(0, colon) : endpoint;
+}
+
+/**
+ * Record the connection's local/remote addresses from connectivity events, mapping to
+ * server/client by vantage. `connection_started` src is always the LOCAL endpoint (and
+ * `path_assigned` path_local likewise), so on a server vantage src IS the server.
+ * First observation wins — later path events (migration) don't overwrite the original.
+ */
+function recordAddresses(model, isServer, local, remote) {
+    const server = isServer ? local : remote;
+    const client = isServer ? remote : local;
+    if (server && model.serverAddress === null) model.serverAddress = server;
+    if (client && model.clientAddress === null) model.clientAddress = client;
+}
+
+/** Fold one parameters_set event into the model (side keyed by spec-final `initiator`
+ *  or draft `owner`; `tls_cipher` is a connection property logged on either side). */
+function handleParametersSet(model, data) {
+    if (model.tlsCipher === null && typeof data.tls_cipher === 'string' && data.tls_cipher) {
+        model.tlsCipher = data.tls_cipher;
+    }
+    const side = data.initiator !== undefined ? data.initiator : data.owner;
+    const curated = scalarFields(data, ['initiator', 'owner', 'tls_cipher']);
+    if (Object.keys(curated).length === 0) return;
+    if (side === 'local' && model.paramsLocal === null) model.paramsLocal = curated;
+    else if (side === 'remote' && model.paramsRemote === null) model.paramsRemote = curated;
+}
+
 /** States (across producers) that mean the QUIC handshake finished. */
 const HANDSHAKE_COMPLETE_STATES = new Set(['handshake_complete', 'handshake_confirmed', 'confirmed']);
 
@@ -418,6 +484,7 @@ async function buildTraceModel(trace, traceIndex) {
         vantagePoint: trace.vantagePoint || null,
         qlogVersion: trace.qlogVersion || '',
         qlogFormat: trace.qlogFormat || '',
+        title: typeof trace.title === 'string' ? trace.title : '',
         eventCount: events.length,
         clock,
         anchored: clock.anchored,
@@ -431,6 +498,20 @@ async function buildTraceModel(trace, traceIndex) {
         rxMovedWire: [],
         rtt: [],
         cwnd: [],
+        bytesInFlight: [],
+        // Connection-level details (netlog socket-attachment analog): negotiated TLS
+        // cipher / ALPN, transport parameters per side, endpoint addresses, close info,
+        // and latest recovery-metric scalars for the congestion summary.
+        tlsCipher: null,
+        alpn: null,
+        quicVersion: null,
+        paramsLocal: null,
+        paramsRemote: null,
+        serverAddress: null,
+        clientAddress: null,
+        connectionClosed: null,
+        congestion: {},
+        lostPacketEvents: 0,
         minRel: Infinity,
         maxRel: -Infinity
     };
@@ -487,6 +568,49 @@ async function buildTraceModel(trace, traceIndex) {
                     model.handshakeDone = t;
                 }
                 break;
+            // Connectivity events moved into the quic: namespace in the current drafts —
+            // accept both spellings for each (quiche emits neither today; real Cloudflare
+            // edge captures and other producers may).
+            case 'connectivity:connection_started':
+            case 'quic:connection_started':
+                // src is the vantage-local endpoint per the spec, dst the remote peer.
+                recordAddresses(model, isServer,
+                    formatEndpoint(data.src_ip, data.src_port),
+                    formatEndpoint(data.dst_ip, data.dst_port));
+                break;
+            case 'connectivity:path_assigned':
+            case 'quic:path_assigned':
+                recordAddresses(model, isServer,
+                    endpointFromPathInfo(data.path_local),
+                    endpointFromPathInfo(data.path_remote));
+                break;
+            case 'quic:connection_closed':
+            case 'connectivity:connection_closed':
+                if (model.connectionClosed === null) {
+                    model.connectionClosed = { t, fields: scalarFields(data, null) };
+                }
+                break;
+            case 'quic:parameters_set':
+                handleParametersSet(model, data);
+                break;
+            case 'quic:alpn_information':
+                // chosen_alpn is the negotiated protocol; a single offered client ALPN on
+                // a completed connection is equally determined (the handshake would have
+                // failed otherwise) — aioquic only logs client_alpns.
+                if (model.alpn === null) {
+                    if (typeof data.chosen_alpn === 'string' && data.chosen_alpn) {
+                        model.alpn = data.chosen_alpn;
+                    } else if (Array.isArray(data.client_alpns) && data.client_alpns.length === 1
+                        && typeof data.client_alpns[0] === 'string') {
+                        model.alpn = data.client_alpns[0];
+                    }
+                }
+                break;
+            case 'quic:version_information':
+                if (model.quicVersion === null && data.chosen_version !== undefined) {
+                    model.quicVersion = String(data.chosen_version);
+                }
+                break;
             // The current drafts folded the recovery namespace into quic:
             // (`quic:recovery_metrics_updated`, emitted by quiche); draft-0.3 producers
             // use `recovery:metrics_updated`. Same payload either way.
@@ -498,8 +622,35 @@ async function buildTraceModel(trace, traceIndex) {
                 const cwnd = typeof data.congestion_window === 'number' ? data.congestion_window
                     : (typeof data.cwnd === 'number' ? data.cwnd : null);
                 if (cwnd !== null) model.cwnd.push([t, cwnd]);
+                if (typeof data.bytes_in_flight === 'number') {
+                    model.bytesInFlight.push([t, data.bytes_in_flight]);
+                }
+                // Latest-value scalars for the per-connection congestion summary.
+                // cf_lost_* are quiche vendor extensions (cumulative loss counters).
+                for (const [src, dst] of [
+                    ['min_rtt', 'minRtt'], ['smoothed_rtt', 'smoothedRtt'],
+                    ['rtt_variance', 'rttVariance'], ['ssthresh', 'ssthresh'],
+                    ['cf_lost_packets', 'lostPackets'], ['cf_lost_bytes', 'lostBytes']
+                ]) {
+                    // Values past MAX_SAFE_INTEGER are "unset" sentinels (quiche logs
+                    // ssthresh as u64::MAX before slow start exits) — and already
+                    // float-mangled by JSON. Drop them; missing is better than wrong.
+                    if (typeof data[src] === 'number' && data[src] <= Number.MAX_SAFE_INTEGER) {
+                        model.congestion[dst] = data[src];
+                    }
+                }
+                // pto_count resets after recovery (RFC 9002) — keep the peak, the
+                // "did this connection stall into PTOs" signal.
+                if (typeof data.pto_count === 'number'
+                    && (model.congestion.ptoCount === undefined || data.pto_count > model.congestion.ptoCount)) {
+                    model.congestion.ptoCount = data.pto_count;
+                }
                 break;
             }
+            case 'quic:packet_lost':
+            case 'recovery:packet_lost':
+                model.lostPacketEvents++;
+                break;
             default:
                 break;
         }
@@ -578,6 +729,27 @@ function capSeries(series, maxPoints) {
     for (let i = 0; i < series.length; i += stride) out.push(series[i]);
     if (out[out.length - 1] !== series[series.length - 1]) out.push(series[series.length - 1]);
     return out;
+}
+
+/**
+ * Per-connection congestion/loss summary from the latest recovery-metric scalars.
+ * lostPackets prefers quiche's cumulative cf_lost_packets counter and falls back to
+ * counting spec `packet_lost` events; null when the producer logged neither.
+ */
+function congestionSummary(model) {
+    const out = {};
+    const c = model.congestion;
+    for (const key of ['minRtt', 'smoothedRtt', 'rttVariance']) {
+        if (c[key] !== undefined) out[key] = round3(c[key]);
+    }
+    for (const key of ['ssthresh', 'ptoCount']) {
+        if (c[key] !== undefined) out[key] = c[key];
+    }
+    const lostPackets = c.lostPackets !== undefined ? c.lostPackets
+        : (model.lostPacketEvents > 0 ? model.lostPacketEvents : undefined);
+    if (lostPackets !== undefined) out.lostPackets = lostPackets;
+    if (c.lostBytes !== undefined) out.lostBytes = c.lostBytes;
+    return Object.keys(out).length > 0 ? out : null;
 }
 
 /** Find a request header by (lowercased) name in an [{name, value}] list. */
@@ -750,6 +922,29 @@ function buildEntry(stream, model, pageRel, pageEpochMs, isConnectionOwner) {
     if (respContentType !== undefined) entry._contentType = respContentType;
     entry._stream_id = stream.id;
 
+    // Connection-level details, mirroring netlog's socket attachment: addresses ride every
+    // request on the connection; handshake-scoped details (TLS cipher, ALPN, transport
+    // parameters, close info) live on the connection-owner entry only.
+    if (model.serverAddress) {
+        entry._server_address = model.serverAddress;
+        const serverIp = ipFromEndpoint(model.serverAddress);
+        if (serverIp) entry.serverIPAddress = serverIp;
+    }
+    if (model.clientAddress) entry._client_address = model.clientAddress;
+    if (isConnectionOwner) {
+        if (model.tlsCipher) entry._tls_cipher_suite = model.tlsCipher;
+        if (model.alpn) entry._tls_next_proto = model.alpn;
+        if (model.quicVersion) entry._quic_version = model.quicVersion;
+        if (model.paramsLocal) entry._quic_parameters_local = model.paramsLocal;
+        if (model.paramsRemote) entry._quic_parameters_remote = model.paramsRemote;
+        if (model.connectionClosed) {
+            entry._connection_closed = {
+                time: round3(pageRel(model.connectionClosed.t)),
+                ...model.connectionClosed.fields
+            };
+        }
+    }
+
     if (stream.rxBytes > 0) entry._bytesIn = stream.rxBytes;
     if (stream.txBytes > 0) entry._bytesOut = stream.txBytes;
     if (contentLength !== undefined) entry._objectSize = contentLength;
@@ -910,31 +1105,58 @@ export async function buildQlogHarLog(rawTraces, options = {}) {
     const bwDown = calculateMaxBandwidth(allRxPackets);
     if (bwDown > 0) page._bwDown = bwDown;
 
-    // Compact per-connection context for the details UI (small, JSON-safe).
-    page._qlogTraces = models.map(model => ({
-        vantagePoint: model.vantagePoint,
-        odcid: model.odcid,
-        qlogVersion: model.qlogVersion,
-        format: model.qlogFormat,
-        eventCount: model.eventCount,
-        anchored: model.anchored
-    }));
+    // Compact per-connection context for the details UI (small, JSON-safe). Optional
+    // connection details only appear when the producer logged them — missing over wrong.
+    page._qlogTraces = models.map(model => {
+        const trace = {
+            vantagePoint: model.vantagePoint,
+            odcid: model.odcid,
+            qlogVersion: model.qlogVersion,
+            format: model.qlogFormat,
+            eventCount: model.eventCount,
+            anchored: model.anchored
+        };
+        if (model.title) trace.title = model.title;
+        if (model.tlsCipher) trace.tlsCipher = model.tlsCipher;
+        if (model.alpn) trace.alpn = model.alpn;
+        if (model.quicVersion) trace.quicVersion = model.quicVersion;
+        if (model.serverAddress) trace.serverAddress = model.serverAddress;
+        if (model.clientAddress) trace.clientAddress = model.clientAddress;
+        if (model.paramsLocal) trace.parametersLocal = model.paramsLocal;
+        if (model.paramsRemote) trace.parametersRemote = model.paramsRemote;
+        if (model.connectionClosed) {
+            trace.connectionClosed = {
+                time: round3(pageRelFns.get(model)(model.connectionClosed.t)),
+                ...model.connectionClosed.fields
+            };
+        }
+        const congestion = congestionSummary(model);
+        if (congestion) trace.congestion = congestion;
+        return trace;
+    });
 
-    // rtt / cwnd samples merged across connections, capped so the page object stays lean.
+    // rtt / cwnd / bytes-in-flight samples merged across connections, capped so the page
+    // object stays lean.
     const rtt = [];
     const cwnd = [];
+    const bytesInFlight = [];
     for (const model of models) {
         const pageRel = pageRelFns.get(model);
         for (const [t, v] of model.rtt) rtt.push([pageRel(t), round3(v)]);
         for (const [t, v] of model.cwnd) cwnd.push([pageRel(t), v]);
+        for (const [t, v] of model.bytesInFlight) bytesInFlight.push([pageRel(t), v]);
     }
-    if (rtt.length > 0 || cwnd.length > 0) {
+    if (rtt.length > 0 || cwnd.length > 0 || bytesInFlight.length > 0) {
         rtt.sort((a, b) => a[0] - b[0]);
         cwnd.sort((a, b) => a[0] - b[0]);
         page._qlogMetrics = {
             rtt: capSeries(rtt, 300),
             cwnd: capSeries(cwnd, 300)
         };
+        if (bytesInFlight.length > 0) {
+            bytesInFlight.sort((a, b) => a[0] - b[0]);
+            page._qlogMetrics.bytesInFlight = capSeries(bytesInFlight, 300);
+        }
     }
 
     const log = {

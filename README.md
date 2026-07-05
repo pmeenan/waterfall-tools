@@ -88,6 +88,8 @@ const har = wt.getHar();   // one page, all connections merged
 
 One qlog file describes one QUIC connection, so a full page load usually produces several files (one per origin). Drop them all on the standalone viewer at once, pass them together to `loadBuffers()`, or list them all on the CLI with `--output`, and they merge into a single page-wide waterfall. Fidelity depends on the producer: logs that include HTTP/3 events (e.g. aioquic/quiche) get real URLs, methods, statuses, headers, MIME types, RFC 9218 priority signals, and interim-response timing when present; transport-only logs (e.g. curl/ngtcp2, where headers stay QPACK-encoded on the wire) still render every request stream with synthetic per-stream URLs and assumed statuses. For producers that log HTTP/3 payload movement via `quic:stream_data_moved` instead of packet STREAM frame details, waterfall-tools uses that as a byte/chunk fallback, preferring transport/network movement times when available.
 
+Connection-level details are also extracted when the producer logs them and attached netlog-style (visible in the viewer's request details / raw data): negotiated TLS cipher and ALPN, chosen QUIC version, the QUIC transport parameters of both sides, close initiator/error/reason, endpoint IP addresses and ports (from qlog `connectivity` events, when present), and a per-connection congestion summary (RTT, peak PTO count, packet-loss counters) alongside RTT / congestion-window / bytes-in-flight sample series on the page object.
+
 Generating captures:
 
 ```bash

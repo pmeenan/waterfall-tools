@@ -72,6 +72,25 @@ Every request object in the `.log.entries` array maps tightly to standard HAR va
   response (Early Hints / HTTP 103), from ResourceTiming `firstInterimResponseStart` or qlog
   1xx response HEADERS. Only present when an interim response occurred. Sources: **rumcap**,
   **qlog**.
+- **QUIC connection details** (Sources: **qlog**; mirrors netlog's socket-attachment
+  convention — addresses ride every entry on the connection, handshake-scoped details live
+  on the connection-owner entry only, i.e. the entry carrying `_connect_start`):
+  - `_server_address` / `_client_address` (string): `"ip:port"` (`"[v6]:port"`) endpoint
+    addresses from `connection_started` / `path_assigned` connectivity events, mapped to
+    server/client by vantage point. When present, the standard HAR `serverIPAddress` is
+    also populated (port stripped). Same field names as **netlog**'s socket addresses.
+  - `_tls_cipher_suite` (string): Negotiated TLS cipher from `parameters_set.tls_cipher`
+    (e.g. `AES128_GCM`). Netlog emits the same field as the numeric IANA suite id.
+  - `_tls_next_proto` (string): Negotiated ALPN (`alpn_information.chosen_alpn`, or the
+    single offered client ALPN on a completed connection). Same field name as **netlog**.
+  - `_quic_version` (string): Chosen QUIC version from `version_information`.
+  - `_quic_parameters_local` / `_quic_parameters_remote` (Object): Curated
+    JSON-scalar QUIC transport parameters per side from `parameters_set` (spec-final
+    `initiator` or draft `owner` keying) — flow-control limits, idle timeout, max UDP
+    payload size, migration flag, etc.
+  - `_connection_closed` (Object): `{ time, initiator, error_code, reason, … }` from
+    `connection_closed` (`time` is page-relative ms; other fields are the producer's
+    scalars verbatim).
 
 ## Page Sub-object Extensions
 Global WebPageTest page-level timings and context records (such as performance milestones and audit data) are added directly onto the `.log.pages[0]` object with a leading underscore.
@@ -113,12 +132,25 @@ Global WebPageTest page-level timings and context records (such as performance m
   - `_qlogTraces` (Array): One record per merged QUIC connection —
     `{ vantagePoint, odcid, qlogVersion, format, eventCount, anchored }`. Always present on
     qlog pages. `anchored` is false when the trace carried no wall-clock anchor (see
-    `_clockSynthesized`).
-  - `_qlogMetrics` (Object): `{ rtt: [[relMs, ms], ...], cwnd: [[relMs, bytes], ...] }` —
-    rtt / congestion-window samples from `recovery:metrics_updated`, merged across
-    connections and capped at ~300 points per series. Carried for details / future graphs;
-    not rendered by the waterfall yet. Only present when the producer logged recovery
-    metrics.
+    `_clockSynthesized`). Optional connection details appear only when the producer logged
+    them (missing over wrong): `title` (producer trace title), `tlsCipher`
+    (`parameters_set.tls_cipher`, e.g. quiche's `AES128_GCM`), `alpn` (negotiated ALPN from
+    `alpn_information`), `quicVersion` (`version_information.chosen_version`),
+    `serverAddress` / `clientAddress` (`"ip:port"` from `connection_started` /
+    `path_assigned` connectivity events, vantage-mapped), `parametersLocal` /
+    `parametersRemote` (curated scalar QUIC transport parameters per side — flow-control
+    limits, idle timeout, max UDP payload, migration flag, …), `connectionClosed`
+    (`{ time, initiator, error_code, reason, … }`, `time` page-relative ms), and
+    `congestion` (`{ minRtt, smoothedRtt, rttVariance, ssthresh, ptoCount, lostPackets,
+    lostBytes }` — latest recovery-metric scalars; `ptoCount` is the observed peak,
+    `lostPackets`/`lostBytes` come from quiche's cumulative `cf_lost_*` counters or spec
+    `packet_lost` event counts).
+  - `_qlogMetrics` (Object): `{ rtt: [[relMs, ms], ...], cwnd: [[relMs, bytes], ...],
+    bytesInFlight: [[relMs, bytes], ...] }` — rtt / congestion-window / bytes-in-flight
+    samples from `recovery:metrics_updated`, merged across connections and capped at ~300
+    points per series (`bytesInFlight` only present when the producer logged it). Carried
+    for details / future graphs; not rendered by the waterfall yet. Only present when the
+    producer logged recovery metrics.
 - **External Data (Often Dropped):** `_almanac`, `_CrUX`
 
 ### Scalar Fields (Partial List)
