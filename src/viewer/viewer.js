@@ -1891,7 +1891,14 @@ async function processData(arrayBuffer, options = {}, keylogArrayBuffer = null) 
              loadOptions.keyLogInput = await fileToReadable(blob);
         }
 
-        await waterfallTool.loadBuffer(arrayBuffer, loadOptions);
+        if (Array.isArray(arrayBuffer)) {
+            // Multi-connection merge (all-qlog drops): every member was already sniffed as
+            // the same mergeable format by processFiles; loadBuffers re-validates and fails
+            // loudly on any mismatch instead of misparsing.
+            await waterfallTool.loadBuffers(arrayBuffer, loadOptions);
+        } else {
+            await waterfallTool.loadBuffer(arrayBuffer, loadOptions);
+        }
 
         // Determine active view before hiding loader so UI doesn't visually jump
         const loadPageOverride = Object.keys(waterfallTool.data.pages).length > 1 ? options.pageId : null;
@@ -1936,19 +1943,34 @@ async function processFiles(files) {
         let mainFile = files[0];
         let keylogFile = null;
 
-        if (files.length === 2) {
-            const arr0 = await files[0].slice(0, 65536).arrayBuffer();
-            const format0 = (await identifyFormatFromBuffer(new Uint8Array(arr0))).format;
+        if (files.length >= 2) {
+            // Sniff every dropped file by content (never by name/extension) — the same
+            // contract the tcpdump+keylog pairing has always used.
+            const formats = [];
+            for (const file of files) {
+                const head = await file.slice(0, 65536).arrayBuffer();
+                formats.push((await identifyFormatFromBuffer(new Uint8Array(head))).format);
+            }
 
-            const arr1 = await files[1].slice(0, 65536).arrayBuffer();
-            const format1 = (await identifyFormatFromBuffer(new Uint8Array(arr1))).format;
+            // All-qlog multi-drop: each file is one QUIC connection from the same page
+            // load — merge them into a single waterfall via loadBuffers().
+            if (formats.every(f => f === 'qlog')) {
+                const buffers = [];
+                for (const file of files) {
+                    buffers.push(new Uint8Array(await file.arrayBuffer()));
+                }
+                await processData(buffers, {});
+                return;
+            }
 
-            if (format0 === 'tcpdump' && format1 === 'keylog') {
-                mainFile = files[0];
-                keylogFile = files[1];
-            } else if (format1 === 'tcpdump' && format0 === 'keylog') {
-                mainFile = files[1];
-                keylogFile = files[0];
+            if (files.length === 2) {
+                if (formats[0] === 'tcpdump' && formats[1] === 'keylog') {
+                    mainFile = files[0];
+                    keylogFile = files[1];
+                } else if (formats[1] === 'tcpdump' && formats[0] === 'keylog') {
+                    mainFile = files[1];
+                    keylogFile = files[0];
+                }
             }
         }
 

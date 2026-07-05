@@ -14,6 +14,28 @@ export { identifyFormatFromBuffer };
 export { Layout } from '../renderer/layout.js';
 export { PerfettoDecoder } from '../inputs/utilities/perfetto/decoder.js';
 
+// Formats whose parser accepts an ARRAY of inputs merged into a single page. Today that is
+// only qlog (one file per QUIC connection — a page load over HTTP/3 produces several).
+const MULTI_BUFFER_FORMATS = ['qlog'];
+
+/**
+ * Normalize ArrayBuffer / Uint8Array / Node Buffer / other TypedArray views to Uint8Array
+ * without depending on the Node-specific Buffer class.
+ * @param {ArrayBuffer|Uint8Array} buffer
+ * @returns {Uint8Array}
+ */
+function toUint8Array(buffer) {
+    if (buffer instanceof Uint8Array) {
+        return buffer;
+    } else if (buffer instanceof ArrayBuffer) {
+        return new Uint8Array(buffer);
+    } else if (buffer && buffer.buffer instanceof ArrayBuffer) {
+        // Handles Node Buffer and other TypedArray views
+        return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    }
+    return new Uint8Array(buffer);
+}
+
 export class WaterfallTools {
     constructor() {
         this.instanceId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.floor(Math.random() * 1000000000).toString();
@@ -110,17 +132,7 @@ export class WaterfallTools {
      */
     async loadBuffer(buffer, options = {}) {
         // Normalize to Uint8Array without requiring Node's Buffer class
-        let buf;
-        if (buffer instanceof Uint8Array) {
-            buf = buffer;
-        } else if (buffer instanceof ArrayBuffer) {
-            buf = new Uint8Array(buffer);
-        } else if (buffer && buffer.buffer instanceof ArrayBuffer) {
-            // Handles Node Buffer and other TypedArray views
-            buf = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-        } else {
-            buf = new Uint8Array(buffer);
-        }
+        const buf = toUint8Array(buffer);
 
         let format = options.format;
         let isGz = options.isGz;
@@ -154,6 +166,64 @@ export class WaterfallTools {
         // re-attach the bytes backing THIS load so trace/netlog passthrough works.
         this._rawBuffer = buf.buffer; // Store ArrayBuffer
         return result;
+    }
+
+    /**
+     * Processes MULTIPLE raw buffers as one merged load. Only formats whose parser accepts
+     * an input array support this — today that is qlog, where each file carries a single
+     * QUIC connection and a page load produces one file per origin.
+     *
+     * Every member is format-sniffed independently; the load fails loudly when members
+     * disagree (never silently misparses a stray HAR mixed into a qlog drop) or when the
+     * common format has no multi-input merge support.
+     *
+     * A single-member array delegates to loadBuffer() so it behaves exactly like a
+     * conventional single-file load (including raw-buffer retention).
+     * @param {Array<ArrayBuffer|Uint8Array>} buffers
+     * @param {Object} options
+     * @returns {Promise<WaterfallTools>}
+     */
+    async loadBuffers(buffers, options = {}) {
+        if (!Array.isArray(buffers) || buffers.length === 0) {
+            throw new Error('loadBuffers requires a non-empty array of buffers');
+        }
+        if (buffers.length === 1) {
+            return await this.loadBuffer(buffers[0], options);
+        }
+
+        const bufs = buffers.map(toUint8Array);
+        const formats = [];
+        for (const buf of bufs) {
+            formats.push((await identifyFormatFromBuffer(buf, options)).format);
+        }
+
+        const format = formats[0];
+        if (!formats.every(f => f === format)) {
+            throw new Error(`loadBuffers requires all buffers to share one format; detected: ${formats.join(', ')}`);
+        }
+        if (!MULTI_BUFFER_FORMATS.includes(format)) {
+            throw new Error(`Format '${format}' does not support multi-buffer merging (supported: ${MULTI_BUFFER_FORMATS.join(', ')})`);
+        }
+
+        const parser = parsers[format];
+        if (!parser) {
+            throw new Error(`No parser registered for format: ${format}`);
+        }
+
+        // Same reused-instance guards as loadFile()/loadStream(). A merged load has no
+        // single backing buffer, so the raw-buffer resource passthrough stays cleared.
+        this._sourceFormat = format;
+        this._rawBuffer = null;
+        this._rumcapTraceCache = null;
+
+        const parseOptions = {
+            ...options,
+            format,
+            instanceId: this.instanceId,
+            totalBytes: bufs.reduce((sum, b) => sum + b.byteLength, 0)
+        };
+        this.data = await parser(bufs, parseOptions);
+        return this;
     }
 
     /**

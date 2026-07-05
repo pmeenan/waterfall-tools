@@ -1,10 +1,10 @@
 # Waterfall Tools
 
-Waterfall Tools is a fast, zero-bloat library for parsing, analyzing, and visualizing network waterfalls in the browser or Node.js. It normalizes a wide range of network trace formats — PCAP, Netlog, Chrome Trace, Perfetto, CDP, WebPageTest JSON, HAR, rumcap `.rcap` field captures — into a single Extended HAR intermediate, then renders them via `<canvas>` in WebPageTest style without building thousands of DOM nodes.
+Waterfall Tools is a fast, zero-bloat library for parsing, analyzing, and visualizing network waterfalls in the browser or Node.js. It normalizes a wide range of network trace formats — PCAP, Netlog, Chrome Trace, Perfetto, CDP, WebPageTest JSON, HAR, rumcap `.rcap` field captures, qlog QUIC/HTTP-3 logs — into a single Extended HAR intermediate, then renders them via `<canvas>` in WebPageTest style without building thousands of DOM nodes.
 
 ## Features
 
-- **Format agnostic.** Parses HAR, Netlog, Chrome Trace, Perfetto protobuf, CDP, WebPageTest JSON, raw TCPDUMP captures (with automatic TLS/QUIC decryption, bandwidth estimation, per-chunk download timing, and HTTP/2 & HTTP/3 priority extraction), and [rumcap](https://github.com/pmeenan/rumcap) `.rcap` field captures (RUM beacons: navigation/resource timing, paints/LCP/CLS/INP, long tasks, LoAF, User Timing, JS Self-Profiling — `.rcap` inputs normalize duplicate User Timing marks and also light up embedded DevTools via synthesized Chrome trace JSON and Perfetto via native TrackEvent protobuf).
+- **Format agnostic.** Parses HAR, Netlog, Chrome Trace, Perfetto protobuf, CDP, WebPageTest JSON, raw TCPDUMP captures (with automatic TLS/QUIC decryption, bandwidth estimation, per-chunk download timing, and HTTP/2 & HTTP/3 priority extraction), [rumcap](https://github.com/pmeenan/rumcap) `.rcap` field captures (RUM beacons: navigation/resource timing, paints/LCP/CLS/INP, long tasks, LoAF, User Timing, JS Self-Profiling — `.rcap` inputs normalize duplicate User Timing marks and also light up embedded DevTools via synthesized Chrome trace JSON and Perfetto via native TrackEvent protobuf), and — in beta — [qlog](https://quicwg.org/) QUIC/HTTP-3 structured logs (`.qlog` plain JSON and `.sqlog` JSON-SEQ; one file per QUIC connection, with multi-file merging into a single waterfall — see [qlog captures](#qlog-captures-beta) below).
 - **Unified API.** `WaterfallTools` auto-detects the input format and produces a consistent Extended HAR payload regardless of source.
 - **Isomorphic.** The core runs in Node.js and modern browsers with no polyfills — binary and cryptographic operations use `Uint8Array`, `DataView`, `WebCrypto`, and `DecompressionStream`.
 - **Canvas renderer.** Scales cleanly from 50 to 50,000 requests without DOM thrashing.
@@ -71,6 +71,34 @@ Use when you already have the full file as `Buffer`, `ArrayBuffer`, or `Uint8Arr
 const wt = new WaterfallTools();
 await wt.loadBuffer(await uploadedFile.arrayBuffer());
 ```
+
+### Merge multiple buffers into one page
+
+`loadBuffers(buffers, options)` accepts an array of in-memory buffers and merges them into a single waterfall page. Every member is format-sniffed independently — the load fails loudly if the members don't all share one format, or if the shared format doesn't support multi-input merging (today only `qlog`, where each file carries one QUIC connection and a page load produces one file per origin). A single-member array behaves exactly like `loadBuffer()`.
+
+```javascript
+const wt = new WaterfallTools();
+await wt.loadBuffers(await Promise.all(files.map(f => f.arrayBuffer())));
+const har = wt.getHar();   // one page, all connections merged
+```
+
+### qlog captures (beta)
+
+[qlog](https://quicwg.org/) is the IETF structured logging format for QUIC/HTTP-3 (still an Internet-Draft; support here is **beta** — validated against curl/ngtcp2 and aioquic client captures, with server-vantage captures implemented but awaiting real-world samples). Both serializations are auto-detected from content: plain JSON `.qlog` and JSON-SEQ `.sqlog` (RFC 7464), plain or gzipped.
+
+One qlog file describes one QUIC connection, so a full page load usually produces several files (one per origin). Drop them all on the standalone viewer at once, pass them together to `loadBuffers()`, or list them all on the CLI, and they merge into a single page-wide waterfall. Fidelity depends on the producer: logs that include HTTP/3 events (e.g. aioquic) get real URLs, methods, statuses, and headers; transport-only logs (e.g. curl/ngtcp2, where headers stay QPACK-encoded on the wire) still render every request stream with synthetic per-stream URLs and assumed statuses.
+
+Generating captures:
+
+```bash
+# curl (ngtcp2 backend, HTTP/3-enabled build): one .sqlog per connection in QLOGDIR
+QLOGDIR=/tmp/qlogs curl --http3-only https://cloudflare-quic.com/
+
+# aioquic: pass --quic-log to the example HTTP/3 client
+python3 examples/http3_client.py --quic-log /tmp/qlogs https://example.com/
+```
+
+See `Sample/Data/qlog/README.md` for sample provenance and full regeneration recipes.
 
 ### Progress tracking
 
@@ -254,10 +282,17 @@ When embedding the viewer in an iframe, it exposes a global for pushing data wit
 npx waterfall-tools dump.cap.gz --keylog dump_keys.txt.gz > out.har
 ```
 
-The CLI auto-detects every supported input format from the file bytes — HAR, WPT JSON, Chrome trace, Perfetto, netlog, CDP, tcpdump, wptagent zips, and rumcap `.rcap` (plain or gzipped `.rcap.gz`) all work the same way:
+The CLI auto-detects every supported input format from the file bytes — HAR, WPT JSON, Chrome trace, Perfetto, netlog, CDP, tcpdump, wptagent zips, rumcap `.rcap` (plain or gzipped `.rcap.gz`), and qlog `.qlog` / `.sqlog` all work the same way:
 
 ```bash
 npx waterfall-tools capture.rcap > out.har
+npx waterfall-tools capture.sqlog > out.har
+```
+
+qlog files carry one QUIC connection each; to merge a whole page load's connections into one HAR, pass multiple files to the per-format wrapper:
+
+```bash
+node src/inputs/cli/qlog.js www.example.com.qlog.gz cdn.example.com.qlog.gz --output out.har
 ```
 
 ## Developer guide

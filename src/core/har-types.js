@@ -76,7 +76,7 @@
  * @property {boolean} [_final_base_page]
  * @property {number} [_responseCode]
  * @property {number} [_responseStatus] - Raw ResourceTiming responseStatus as reported (incl. 0 = opaque/CORS-hidden; rumcap)
- * @property {boolean} [_statusAssumed] - HAR response.status was assumed successful because ResourceTiming status was 0 or absent (rumcap)
+ * @property {boolean} [_statusAssumed] - HAR response.status was assumed successful because the source hid or omitted the true status (rumcap: ResourceTiming status 0/absent; qlog: transport-only captures with no decodable :status)
  * @property {number} [_first_interim_response] - Early Hints (HTTP 103) interim response start, relative ms (rumcap)
  * @property {number|string} [_socket]
  * @property {number|string} [_initiator_line]
@@ -139,6 +139,7 @@
  * @property {string|number} [_server_port]
  * @property {string} [_socket_group]
  * @property {number} [_http2_stream_id]
+ * @property {number} [_stream_id] - QUIC stream id carrying the request (client bidi streams, id % 4 === 0; qlog — `connection` holds the ODCID)
  * @property {number} [_jpeg_scan_count]
  * @property {number} [_score_progressive_jpeg]
  */
@@ -192,6 +193,8 @@
  * @property {Object} [_rumcapInteractions] - rumcap raw Event Timing stream ({events: []})
  * @property {Object} [_rumcapElementTiming] - rumcap Element Timing stream ({elements: []})
  * @property {Object} [_rumcapCustomEvents] - rumcap custom-event tracks ({tracks: []})
+ * @property {Array<{vantagePoint: Object|null, odcid: string, qlogVersion: string, format: string, eventCount: number, anchored: boolean}>} [_qlogTraces] - Per-connection qlog context (always present on qlog pages)
+ * @property {{rtt: Array<[number, number]>, cwnd: Array<[number, number]>}} [_qlogMetrics] - qlog rtt/cwnd samples [[relMs, value]], merged across connections, capped ~300 points/series (not rendered yet)
  * @property {Object} [_custom]
  * @property {Object} [_aurora]
  * @property {Object} [_cms]
@@ -274,6 +277,8 @@
  * @property {number} [_main_frame]
  * @property {number} [_run]
  * @property {number} [_step]
+ * @property {number} [_bwDown] - Peak download bandwidth estimate, Kbps (100ms sliding window over server→client packets; tcpdump, qlog)
+ * @property {boolean} [_clockSynthesized] - Page epoch synthesized from Date.now() because the capture carried no wall-clock anchor (qlog unanchored traces)
  * @property {number} [_start_epoch]
  * @property {number} [_date]
  * @property {number} [_connections]

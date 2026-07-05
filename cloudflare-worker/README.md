@@ -14,8 +14,8 @@ on the proxied response.
 - Sniffs the first 64 KB of the upstream response and allows the stream to
   continue **only if** the content matches a format waterfall-tools actually
   parses (HAR, WPT JSON, Netlog, CDP, Chrome Trace, Perfetto, wptagent ZIP,
-  pcap/pcapng, rumcap `.rcap`, TLS key log). Any other content is rejected
-  with 415.
+  pcap/pcapng, rumcap `.rcap`, qlog `.qlog`/`.sqlog`, TLS key log). Any other
+  content is rejected with 415.
 - Streams the matched response body back to the caller **byte-for-byte**
   from the point where sniffing finished — no reassembly, no content
   transformation.

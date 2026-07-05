@@ -18,7 +18,7 @@
       }
     }
     </script>
-    <link rel="stylesheet" href="./style.css?v=5">
+    <link rel="stylesheet" href="./style.css?v=6">
 </head>
 <body>
     <div id="loading" class="hidden">
@@ -44,7 +44,7 @@
                 </div>
                 <div class="featureCard">
                     <h3>Format Agnostic</h3>
-                    <p>Natively analyze <strong>HAR, WPT json, Chrome traces, Chrome netlogs, tcpdump (.cap.gz), and rumcap (.rcap)</strong> field captures &amp; lab files automatically mapped to an Extended HAR format. Chrome traces and <code>.rcap</code> captures also open in the embedded Perfetto and DevTools viewers.</p>
+                    <p>Natively analyze <strong>HAR, WPT json, Chrome traces, Chrome netlogs, tcpdump (.cap.gz), rumcap (.rcap), and qlog QUIC/HTTP-3 logs (.qlog / .sqlog) — beta</strong> field captures &amp; lab files automatically mapped to an Extended HAR format. Chrome traces and <code>.rcap</code> captures also open in the embedded Perfetto and DevTools viewers.</p>
                 </div>
                 <div class="featureCard">
                     <h3>Embeddable Everywhere</h3>
@@ -62,7 +62,7 @@
                 <p class="upload-hint">...or Drag & Drop anywhere to load your files, or input them locally</p>
                 <input type="file" id="file-input" multiple class="hidden">
                 <button id="upload-btn">Select File(s)</button>
-                <p class="sub-hint">For tcpdump with TLS Decryption, select or drop both the <code>.cap.gz</code> and your SSL keylog file together.</p>
+                <p class="sub-hint">For tcpdump with TLS Decryption, select or drop both the <code>.cap.gz</code> and your SSL keylog file together. For qlog, drop all of a page load's per-connection <code>.qlog</code>/<code>.sqlog</code> files together to see one merged waterfall.</p>
             </div>
 
             <div class="external-links">
@@ -248,6 +248,6 @@
             });
         }
     </script>
-    <script type="module" src="./viewer.js?v=5"></script>
+    <script type="module" src="./viewer.js?v=6"></script>
 </body>
 </html>

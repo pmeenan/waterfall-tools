@@ -15,6 +15,7 @@ import { processNetlogFileNode } from '../../src/inputs/netlog.js';
 import { processChromeTraceFileNode } from '../../src/inputs/chrome-trace.js';
 import { processWPTFileNode } from '../../src/inputs/wpt-json.js';
 import { processRumcapNode } from '../../src/inputs/rumcap.js';
+import { processQlogNode } from '../../src/inputs/qlog.js';
 import { processTcpdumpNode } from '../../src/inputs/tcpdump.js';
 import { decompressBody, decompressBodyPerChunk } from '../../src/core/decompress.js';
 import { sniffMimeType } from '../../src/core/har-converter.js';
@@ -77,6 +78,11 @@ describe('CLI wrapper HAR shape (relationalToHar over each parser output)', () =
 
     it('rumcap', async () => {
         const data = await processRumcapNode(path.join(SAMPLE_DIR, 'rumcap/chrome/chrome-www-google-com.rcap'), { debug: true });
+        assertHarShape(relationalToHar(data));
+    });
+
+    it('qlog', async () => {
+        const data = await processQlogNode(path.join(SAMPLE_DIR, 'qlog/aioquic/www.google.com.qlog.gz'), { debug: true });
         assertHarShape(relationalToHar(data));
     });
 

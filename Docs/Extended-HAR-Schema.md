@@ -30,6 +30,9 @@ Every request object in the `.log.entries` array maps tightly to standard HAR va
     When streaming is not available for the encoding (e.g. brotli without native
     `DecompressionStream` support forcing the non-streaming pure-JS fallback), `inflated` is
     omitted entirely — we never report approximate per-chunk sizes.
+  - **qlog**: `{ts, bytes}` per QUIC packet, coalescing multiple STREAM frames for the same
+    stream inside one packet. `inflated` is never emitted — qlog only logs wire-level frame
+    lengths, and missing is better than wrong.
 - `_headers` (Object): Parsed request/response headers block.
 - `_server_timing` (Array): Server-Timing metrics for the response, entry-level (NOT nested under
   `response`). Each item: `{ name, duration?, description? }` mirroring the `PerformanceServerTiming`
@@ -53,7 +56,18 @@ Every request object in the `.log.entries` array maps tightly to standard HAR va
   request; this field preserves the raw observed value for details/raw views. Sources: **rumcap**.
 - `_statusAssumed` (boolean): Present when a parser intentionally assumed the public HAR
   `response.status` because the source hid or omitted the true status. Currently emitted by
-  **rumcap** when ResourceTiming `responseStatus` is `0` or absent.
+  **rumcap** when ResourceTiming `responseStatus` is `0` or absent, and by **qlog** for
+  degraded (transport-only) captures where response headers stay QPACK-encoded on the wire
+  and no `:status` is observable.
+- `_priority` (string): Request priority label (`Highest` / `High` / `Medium` / `Low` /
+  `Lowest`, the WebPageTest/Chrome naming). Sources: **netlog** / **chrome-trace** (Chrome's
+  own request priority), **tcpdump** (HTTP/2 HEADERS/PRIORITY frame weights; HTTP/3
+  `priority` header urgency), **qlog** (rich mode only — RFC 9218 `priority: u=N` request
+  header, same urgency mapping as tcpdump).
+- `_stream_id` (number): QUIC stream id carrying this request (client-initiated
+  bidirectional streams, id % 4 === 0 per RFC 9000 §2.1). The standard HAR `connection`
+  field carries the connection's ODCID so Connection View groups multiplexed streams per
+  QUIC connection. Sources: **qlog**.
 - `_first_interim_response` (number): Relative-ms offset (page zero) of the first interim HTTP
   response (Early Hints / HTTP 103), from ResourceTiming `firstInterimResponseStart`. Only present
   when an interim response occurred. Sources: **rumcap**.
@@ -94,10 +108,27 @@ Global WebPageTest page-level timings and context records (such as performance m
     `_InteractionToNextPaint` was derived from.
   - `_rumcapElementTiming` (Object): Element Timing stream (`{ elements: [...] }`).
   - `_rumcapCustomEvents` (Object): App/library custom-event tracks (`{ tracks: [...] }`).
+- **qlog capture context:**
+  - `_qlogTraces` (Array): One record per merged QUIC connection —
+    `{ vantagePoint, odcid, qlogVersion, format, eventCount, anchored }`. Always present on
+    qlog pages. `anchored` is false when the trace carried no wall-clock anchor (see
+    `_clockSynthesized`).
+  - `_qlogMetrics` (Object): `{ rtt: [[relMs, ms], ...], cwnd: [[relMs, bytes], ...] }` —
+    rtt / congestion-window samples from `recovery:metrics_updated`, merged across
+    connections and capped at ~300 points per series. Carried for details / future graphs;
+    not rendered by the waterfall yet. Only present when the producer logged recovery
+    metrics.
 - **External Data (Often Dropped):** `_almanac`, `_CrUX`
 
 ### Scalar Fields (Partial List)
 - **Loading metrics:** `_loadTime`, `_docTime`, `_fullyLoaded`, `_TTFB`, `_SpeedIndex`, `_LastInteractive`, `_TotalBlockingTime`, `_maxFID`
+- `_bwDown` (number): Estimated peak download bandwidth in Kbps, from a 100 ms sliding
+  window over server→client packet sizes. The renderer uses it to compute per-chunk
+  download durations. Sources: **tcpdump**, **qlog**.
+- `_clockSynthesized` (boolean): Present (`true`) when the capture carried no wall-clock
+  anchor and the page epoch was synthesized from `Date.now()` at parse time — relative
+  timings are exact but `startedDateTime` values are not real capture times. Sources:
+  **qlog** (unanchored traces, e.g. curl/ngtcp2's `reference_time: 0`).
 - **Core Web Vitals:** `_LargestContentfulPaint`, `_CumulativeLayoutShift` (max-session-window over
   `hadRecentInput === false` shifts: a shift joins the current window when the gap since the previous
   shift is < 1 s and the window span is < 5 s; CLS = max window sum), `_InteractionToNextPaint`
