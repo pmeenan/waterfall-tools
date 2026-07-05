@@ -5,6 +5,7 @@
 -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,6 +21,7 @@
     </script>
     <link rel="stylesheet" href="./style.css?v=6">
 </head>
+
 <body>
     <div id="loading" class="hidden">
         <div class="spinner"></div>
@@ -36,19 +38,23 @@
             <img src="./logo.jpg" alt="Waterfall Tools Logo" class="landing-logo">
             <h2>Waterfall Tools</h2>
             <p class="tagline">The most advanced, client-side network request waterfall viewer.</p>
-            
+
             <div class="features">
                 <div class="featureCard">
                     <h3>High Performance Viewer</h3>
-                    <p>Designed with raw native canvas operations for frictionless, 60fps scrolling latency buffers across giant waterfalls.</p>
+                    <p>Designed with raw native canvas operations for frictionless, 60fps scrolling latency buffers
+                        across giant waterfalls.</p>
                 </div>
                 <div class="featureCard">
                     <h3>Format Agnostic</h3>
-                    <p>Natively analyze <strong>HAR, WPT json, Chrome traces, Chrome netlogs, tcpdump (.cap.gz), rumcap (.rcap), and qlog QUIC/HTTP-3 logs (.qlog / .sqlog) — beta</strong> field captures &amp; lab files automatically mapped to an Extended HAR format. Chrome traces and <code>.rcap</code> captures also open in the embedded Perfetto and DevTools viewers.</p>
+                    <p>Supports <strong>HAR, WPT json, Chrome traces, Chrome netlogs, tcpdump (.cap.gz), rumcap
+                            (.rcap), and qlog</strong> files. Chrome traces and <code>.rcap</code> sources also open in
+                        the embedded Perfetto and DevTools viewers.</p>
                 </div>
                 <div class="featureCard">
                     <h3>Embeddable Everywhere</h3>
-                    <p>Easily incorporate visualization capabilities into your own custom React apps, network dashboards, or external projects.</p>
+                    <p>Easily incorporate visualization capabilities into your own custom React apps, network
+                        dashboards, or external projects.</p>
                 </div>
             </div>
 
@@ -62,7 +68,10 @@
                 <p class="upload-hint">...or Drag & Drop anywhere to load your files, or input them locally</p>
                 <input type="file" id="file-input" multiple class="hidden">
                 <button id="upload-btn">Select File(s)</button>
-                <p class="sub-hint">For tcpdump with TLS Decryption, select or drop both the <code>.cap.gz</code> and your SSL keylog file together. For qlog, drop all of a page load's per-connection <code>.qlog</code>/<code>.sqlog</code> files together to see one merged waterfall.</p>
+                <p class="sub-hint">For tcpdump with TLS Decryption, select or drop both the <code>.cap.gz</code> and
+                    your SSL keylog file together. For qlog, drop all of a page load's per-connection
+                    <code>.qlog</code>/<code>.sqlog</code> files together to see one merged waterfall.
+                </p>
             </div>
 
             <div class="external-links">
@@ -97,20 +106,37 @@
                     <span id="history-page-info">Page 1 of 1</span>
                     <button id="history-next-btn" aria-label="Next Page">▶</button>
                 </div>
-                <button id="history-clear-btn" style="border: 1px solid #fca5a5; color: #dc2626; background: #fef2f2; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Clear History</button>
+                <button id="history-clear-btn"
+                    style="border: 1px solid #fca5a5; color: #dc2626; background: #fef2f2; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Clear
+                    History</button>
             </div>
         </header>
         <div id="history-table-wrapper">
             <table id="history-table">
                 <thead>
                     <tr>
-                        <th data-sort="testUrl">Page URL <span class="sort-icon"></span><div class="resizer"></div></th>
-                        <th data-sort="url" style="width:160px">Source <span class="sort-icon"></span><div class="resizer"></div></th>
-                        <th data-sort="type" style="width:80px">Type <span class="sort-icon"></span><div class="resizer"></div></th>
-                        <th data-sort="numPages" style="width:80px">Pages <span class="sort-icon"></span><div class="resizer"></div></th>
-                        <th data-sort="title">Description <span class="sort-icon"></span><div class="resizer"></div></th>
-                        <th data-sort="comment">Comments <span class="sort-icon"></span><div class="resizer"></div></th>
-                        <th data-sort="firstLoaded" style="width:160px" class="sort-desc">Last Viewed <span class="sort-icon">▼</span><div class="resizer"></div></th>
+                        <th data-sort="testUrl">Page URL <span class="sort-icon"></span>
+                            <div class="resizer"></div>
+                        </th>
+                        <th data-sort="url" style="width:160px">Source <span class="sort-icon"></span>
+                            <div class="resizer"></div>
+                        </th>
+                        <th data-sort="type" style="width:80px">Type <span class="sort-icon"></span>
+                            <div class="resizer"></div>
+                        </th>
+                        <th data-sort="numPages" style="width:80px">Pages <span class="sort-icon"></span>
+                            <div class="resizer"></div>
+                        </th>
+                        <th data-sort="title">Description <span class="sort-icon"></span>
+                            <div class="resizer"></div>
+                        </th>
+                        <th data-sort="comment">Comments <span class="sort-icon"></span>
+                            <div class="resizer"></div>
+                        </th>
+                        <th data-sort="firstLoaded" style="width:160px" class="sort-desc">Last Viewed <span
+                                class="sort-icon">▼</span>
+                            <div class="resizer"></div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="history-tbody"></tbody>
@@ -121,7 +147,12 @@
     <div id="canvas-container" class="hidden">
         <header class="viewer-header has-tabs">
             <button id="hamburger-btn" class="responsive-menu-btn" aria-label="Menu">
-                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
             </button>
             <button id="btn-back-tiles" class="hidden">🔙 Back to Runs</button>
             <div class="tabs-scroll-wrapper" id="tabs-scroll-wrapper">
@@ -149,13 +180,15 @@
                 <button id="tab-scroll-right" class="tab-scroll-btn hidden">▶</button>
             </div>
             <div class="header-right-actions">
-                <button id="btn-reset-zoom" title="Reset the waterfall to the full time range" style="display: none;">🔄 Reset</button>
+                <button id="btn-reset-zoom" title="Reset the waterfall to the full time range" style="display: none;">🔄
+                    Reset</button>
                 <button id="btn-settings">⚙️ Options</button>
                 <button id="btn-close-tab" class="hidden" aria-label="Close Tab">❌</button>
             </div>
         </header>
         <div class="tabs-body">
-            <div id="summary-view" class="tab-content active" style="padding: 20px; overflow-y: auto; background: #fff;"></div>
+            <div id="summary-view" class="tab-content active"
+                style="padding: 20px; overflow-y: auto; background: #fff;"></div>
             <div id="labels-slider" class="labels-slider">
                 <div id="labels-slider-content"></div>
                 <button id="labels-slider-toggle" aria-label="Toggle Labels">▶</button>
@@ -199,22 +232,27 @@
             </div>
             <div class="settings-body">
                 <div class="view-mode-toggle" style="margin-bottom: 15px;">
-                    <strong>View Mode:</strong><br/>
-                    <label style="display:inline-block; margin-right: 15px;"><input type="radio" name="ui-view-type" value="waterfall" checked> Waterfall</label>
-                    <label style="display:inline-block;"><input type="radio" name="ui-view-type" value="connection"> Connection</label>
+                    <strong>View Mode:</strong><br />
+                    <label style="display:inline-block; margin-right: 15px;"><input type="radio" name="ui-view-type"
+                            value="waterfall" checked> Waterfall</label>
+                    <label style="display:inline-block;"><input type="radio" name="ui-view-type" value="connection">
+                        Connection</label>
                 </div>
                 <div class="settings-separator"></div>
                 <h4>Time Span</h4>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                    <input type="number" id="ui-start-time" step="any" placeholder="start (seconds)" style="flex: 1; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
+                    <input type="number" id="ui-start-time" step="any" placeholder="start (seconds)"
+                        style="flex: 1; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
                     <span style="font-weight: 600; color: #555;">to</span>
-                    <input type="number" id="ui-end-time" step="any" placeholder="end (seconds)" style="flex: 1; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
+                    <input type="number" id="ui-end-time" step="any" placeholder="end (seconds)"
+                        style="flex: 1; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
                 </div>
-                
+
                 <div class="settings-separator"></div>
                 <h4>Request Filtering</h4>
                 <div style="margin-bottom: 20px;">
-                    <input type="text" id="ui-req-filter" placeholder="e.g. 1, 5-10, 15" style="width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
+                    <input type="text" id="ui-req-filter" placeholder="e.g. 1, 5-10, 15"
+                        style="width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
                 </div>
                 <div class="settings-separator"></div>
                 <h4>Rendering Features</h4>
@@ -250,4 +288,5 @@
     </script>
     <script type="module" src="./viewer.js?v=6"></script>
 </body>
+
 </html>
