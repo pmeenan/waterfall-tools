@@ -63,14 +63,15 @@ Every request object in the `.log.entries` array maps tightly to standard HAR va
   `Lowest`, the WebPageTest/Chrome naming). Sources: **netlog** / **chrome-trace** (Chrome's
   own request priority), **tcpdump** (HTTP/2 HEADERS/PRIORITY frame weights; HTTP/3
   `priority` header urgency), **qlog** (rich mode only — RFC 9218 `priority: u=N` request
-  header, same urgency mapping as tcpdump).
+  header or `http3:priority_updated`, same urgency mapping as tcpdump).
 - `_stream_id` (number): QUIC stream id carrying this request (client-initiated
   bidirectional streams, id % 4 === 0 per RFC 9000 §2.1). The standard HAR `connection`
   field carries the connection's ODCID so Connection View groups multiplexed streams per
   QUIC connection. Sources: **qlog**.
 - `_first_interim_response` (number): Relative-ms offset (page zero) of the first interim HTTP
-  response (Early Hints / HTTP 103), from ResourceTiming `firstInterimResponseStart`. Only present
-  when an interim response occurred. Sources: **rumcap**.
+  response (Early Hints / HTTP 103), from ResourceTiming `firstInterimResponseStart` or qlog
+  1xx response HEADERS. Only present when an interim response occurred. Sources: **rumcap**,
+  **qlog**.
 
 ## Page Sub-object Extensions
 Global WebPageTest page-level timings and context records (such as performance milestones and audit data) are added directly onto the `.log.pages[0]` object with a leading underscore.

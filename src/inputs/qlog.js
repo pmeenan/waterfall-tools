@@ -43,6 +43,53 @@ function round3(v) {
     return Math.round(v * 1000) / 1000;
 }
 
+function firstFiniteNumber(...values) {
+    for (const value of values) {
+        if (value === undefined || value === null) continue;
+        const n = Number(value);
+        if (Number.isFinite(n)) return n;
+    }
+    return 0;
+}
+
+function decodeHexString(value) {
+    if (typeof value !== 'string') return '';
+    const hex = value.replace(/\s+/g, '');
+    if (hex.length === 0 || hex.length % 2 !== 0 || /[^0-9a-f]/i.test(hex)) return '';
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+    }
+    try {
+        return new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+    } catch {
+        return '';
+    }
+}
+
+function headerName(header) {
+    if (!header || typeof header !== 'object') return '';
+    if (typeof header.name === 'string') return header.name;
+    return decodeHexString(header.name_bytes);
+}
+
+function headerValue(header) {
+    if (!header || typeof header !== 'object') return '';
+    if (header.value !== undefined) return String(header.value);
+    return decodeHexString(header.value_bytes);
+}
+
+function normalizeHeaders(headers) {
+    if (!Array.isArray(headers)) return [];
+    const normalized = [];
+    for (const h of headers) {
+        const name = headerName(h);
+        if (!name) continue;
+        normalized.push({ name, value: headerValue(h) });
+    }
+    return normalized;
+}
+
 /**
  * Collect an entire web ReadableStream into a single Uint8Array, reporting read progress.
  * @param {ReadableStream} stream
@@ -127,6 +174,20 @@ function priorityFromUrgency(urgency) {
     return 'Lowest';
 }
 
+function priorityFromValue(value) {
+    let urgency = null;
+    if (typeof value === 'number') {
+        urgency = value;
+    } else if (typeof value === 'string') {
+        const match = value.match(/(?:^|[,;\s])u\s*=\s*(\d+)/i);
+        if (match) urgency = parseInt(match[1], 10);
+    } else if (value && typeof value === 'object') {
+        if (value.urgency !== undefined) urgency = Number(value.urgency);
+        else if (value.u !== undefined) urgency = Number(value.u);
+    }
+    return Number.isFinite(urgency) ? priorityFromUrgency(urgency) : null;
+}
+
 /** Lazily create the per-stream accumulator inside a trace model. */
 function getStream(model, id) {
     let s = model.streams.get(id);
@@ -143,6 +204,12 @@ function getStream(model, id) {
             respHeaders: null,
             respTime: null,        // first response HEADERS evidence (interim included)
             respStatus: null,
+            firstInterimTime: null,
+            priority: null,
+            movedTx: [],           // fallback stream_data_moved ledgers when packet STREAM frames are absent
+            movedRx: [],
+            movedTxWire: [],       // prefer transport<->network timings over app<->transport when available
+            movedRxWire: [],
             excluded: false        // control / QPACK / push streams never become entries
         };
         model.streams.set(id, s);
@@ -193,7 +260,7 @@ function handlePacket(model, dir, t, data) {
             // `payload_length` is the stream data and `length` is the full frame
             // including headers — prefer the payload semantics in that order.
             const raw = frame.raw || {};
-            const len = Number(frame.length) || Number(raw.payload_length) || Number(raw.length) || 0;
+            const len = firstFiniteNumber(frame.length, raw.payload_length, raw.length);
             if (!perStream) perStream = new Map();
             const acc = perStream.get(sid) || { bytes: 0, fin: false };
             acc.bytes += len;
@@ -222,6 +289,44 @@ function handlePacket(model, dir, t, data) {
     }
 }
 
+function handleStreamDataMoved(model, dir, boundary, t, data) {
+    const sid = Number(data.stream_id);
+    if (!Number.isFinite(sid)) return;
+    const raw = data.raw || {};
+    const len = firstFiniteNumber(data.length, raw.payload_length, raw.length);
+    const stream = getStream(model, sid);
+    const record = {
+        t,
+        bytes: Math.max(0, len),
+        fin: data.fin === true || data.additional_info === 'fin_set'
+    };
+    if (dir === 'c2s') {
+        (boundary === 'wire' ? stream.movedTxWire : stream.movedTx).push(record);
+    } else {
+        (boundary === 'wire' ? stream.movedRxWire : stream.movedRx).push(record);
+        if (record.bytes > 0) {
+            const target = boundary === 'wire' ? model.rxMovedWire : model.rxMoved;
+            target.push({ t, bytes: record.bytes });
+        }
+    }
+}
+
+function classifyMovedDirection(isServer, data) {
+    if (data.from === 'application' && data.to === 'transport') {
+        return { dir: isServer ? 's2c' : 'c2s', boundary: 'app' };
+    }
+    if (data.from === 'transport' && data.to === 'network') {
+        return { dir: isServer ? 's2c' : 'c2s', boundary: 'wire' };
+    }
+    if (data.from === 'network' && data.to === 'transport') {
+        return { dir: isServer ? 'c2s' : 's2c', boundary: 'wire' };
+    }
+    if (data.from === 'transport' && data.to === 'application') {
+        return { dir: isServer ? 'c2s' : 's2c', boundary: 'app' };
+    }
+    return null;
+}
+
 /**
  * Fold one HTTP/3 frame event into the owning stream's request/response state.
  * @param {Object} model
@@ -238,34 +343,55 @@ function handleH3Frame(model, side, t, data) {
     touchStream(stream, t);
 
     if (frame.frame_type === 'headers' && Array.isArray(frame.headers)) {
+        const headers = normalizeHeaders(frame.headers);
+        if (headers.length === 0) return;
         if (side === 'request') {
             // First HEADERS wins — later ones on the same stream are trailers.
             if (stream.reqTime === null) {
                 stream.reqTime = t;
-                stream.reqHeaders = frame.headers;
+                stream.reqHeaders = headers;
             }
         } else {
             if (stream.respTime === null) stream.respTime = t;
+            const statusHeader = findHeader(headers, ':status');
             let status = null;
-            for (const h of frame.headers) {
-                if (h && h.name === ':status') {
-                    const parsed = parseInt(h.value, 10);
-                    if (isFinite(parsed)) status = parsed;
-                    break;
-                }
+            if (statusHeader) {
+                const parsed = parseInt(statusHeader.value, 10);
+                if (isFinite(parsed)) status = parsed;
+            }
+            if (status !== null && status >= 100 && status < 200 && stream.firstInterimTime === null) {
+                stream.firstInterimTime = t;
             }
             // Interim (1xx) responses are first-byte evidence but not the final status —
             // keep replacing until a >= 200 lands.
             if (stream.respStatus === null || stream.respStatus < 200) {
-                stream.respHeaders = frame.headers;
+                stream.respHeaders = headers;
                 if (status !== null) stream.respStatus = status;
             }
         }
     }
 }
 
+function handleH3Priority(model, data) {
+    const sid = Number(data.stream_id);
+    if (!Number.isFinite(sid)) return;
+    const priority = priorityFromValue(data.new !== undefined ? data.new : data.priority_field_value);
+    if (priority) getStream(model, sid).priority = priority;
+}
+
 /** States (across producers) that mean the QUIC handshake finished. */
 const HANDSHAKE_COMPLETE_STATES = new Set(['handshake_complete', 'handshake_confirmed', 'confirmed']);
+
+function firstEventCommonFields(trace) {
+    const cf = { ...(trace.commonFields || {}) };
+    const first = (trace.events || []).find(ev => ev && typeof ev === 'object');
+    if (first) {
+        for (const key of ['time_format', 'reference_time', 'group_id', 'ODCID', 'odcid']) {
+            if (cf[key] === undefined && first[key] !== undefined) cf[key] = first[key];
+        }
+    }
+    return cf;
+}
 
 /**
  * Replay one decoded trace's events into a per-connection model: per-stream byte/timing
@@ -277,11 +403,11 @@ const HANDSHAKE_COMPLETE_STATES = new Set(['handshake_complete', 'handshake_conf
 async function buildTraceModel(trace, traceIndex) {
     const events = trace.events || [];
     const firstEventTime = events.length > 0 ? events[0].time : undefined;
-    const clock = resolveClock(trace.commonFields, firstEventTime);
+    const cf = firstEventCommonFields(trace);
+    const clock = resolveClock(cf, firstEventTime);
     const toRel = createTimeConverter(clock, firstEventTime);
     const isServer = !!(trace.vantagePoint && trace.vantagePoint.type === 'server');
 
-    const cf = trace.commonFields || {};
     const odcid = (typeof cf.group_id === 'string' && cf.group_id)
         || (typeof cf.ODCID === 'string' && cf.ODCID)
         || (typeof cf.odcid === 'string' && cf.odcid)
@@ -301,6 +427,8 @@ async function buildTraceModel(trace, traceIndex) {
         handshakeDone: null,
         first1Rtt: null,
         rxPackets: [],
+        rxMoved: [],
+        rxMovedWire: [],
         rtt: [],
         cwnd: [],
         minRel: Infinity,
@@ -324,6 +452,11 @@ async function buildTraceModel(trace, traceIndex) {
             case 'quic:packet_received':
                 handlePacket(model, isServer ? 'c2s' : 's2c', t, data);
                 break;
+            case 'quic:stream_data_moved': {
+                const moved = classifyMovedDirection(isServer, data);
+                if (moved) handleStreamDataMoved(model, moved.dir, moved.boundary, t, data);
+                break;
+            }
             case 'http3:frame_created':
                 // The local endpoint creates frames it SENDS: requests on a client
                 // vantage, responses on a server vantage.
@@ -331,6 +464,9 @@ async function buildTraceModel(trace, traceIndex) {
                 break;
             case 'http3:frame_parsed':
                 handleH3Frame(model, isServer ? 'request' : 'response', t, data);
+                break;
+            case 'http3:priority_updated':
+                handleH3Priority(model, data);
                 break;
             case 'http3:stream_type_set': {
                 // Identifies stream roles (control/QPACK/push/...). Uni streams can never
@@ -377,6 +513,27 @@ async function buildTraceModel(trace, traceIndex) {
     if (model.minRel === Infinity) {
         model.minRel = 0;
         model.maxRel = 0;
+    }
+
+    for (const stream of model.streams.values()) {
+        stream.tx.sort((a, b) => a.t - b.t);
+        stream.rx.sort((a, b) => a.t - b.t);
+        stream.movedTx.sort((a, b) => a.t - b.t);
+        stream.movedRx.sort((a, b) => a.t - b.t);
+        stream.movedTxWire.sort((a, b) => a.t - b.t);
+        stream.movedRxWire.sort((a, b) => a.t - b.t);
+        const movedTx = stream.movedTxWire.length > 0 ? stream.movedTxWire : stream.movedTx;
+        const movedRx = stream.movedRxWire.length > 0 ? stream.movedRxWire : stream.movedRx;
+        if (stream.tx.length === 0 && movedTx.length > 0) {
+            stream.tx = movedTx;
+            stream.txBytes = stream.tx.reduce((sum, r) => sum + r.bytes, 0);
+            for (const r of stream.tx) touchStream(stream, r.t);
+        }
+        if (stream.rx.length === 0 && movedRx.length > 0) {
+            stream.rx = movedRx;
+            stream.rxBytes = stream.rx.reduce((sum, r) => sum + r.bytes, 0);
+            for (const r of stream.rx) touchStream(stream, r.t);
+        }
     }
     return model;
 }
@@ -427,7 +584,10 @@ function capSeries(series, maxPoints) {
 function findHeader(headers, name) {
     if (!Array.isArray(headers)) return null;
     for (const h of headers) {
-        if (h && typeof h.name === 'string' && h.name.toLowerCase() === name) return h;
+        const hName = headerName(h);
+        if (hName && hName.toLowerCase() === name) {
+            return { name: hName, value: headerValue(h) };
+        }
     }
     return null;
 }
@@ -507,6 +667,7 @@ function buildEntry(stream, model, pageRel, pageEpochMs, isConnectionOwner) {
     const downloadEnd = endRxT !== null ? pageRel(endRxT) : null;
 
     let allEnd = loadStart;
+    if (ttfbEnd !== null && ttfbEnd > allEnd) allEnd = ttfbEnd;
     if (downloadEnd !== null && downloadEnd > allEnd) allEnd = downloadEnd;
     if (lastTx !== null && pageRel(lastTx) > allEnd) allEnd = pageRel(lastTx);
 
@@ -559,7 +720,7 @@ function buildEntry(stream, model, pageRel, pageEpochMs, isConnectionOwner) {
             url,
             httpVersion: 'HTTP/3',
             cookies: [],
-            headers: rich ? stream.reqHeaders.map(h => ({ name: h.name, value: h.value })) : [],
+            headers: rich ? normalizeHeaders(stream.reqHeaders) : [],
             queryString: [],
             headersSize: -1,
             bodySize: -1
@@ -569,7 +730,7 @@ function buildEntry(stream, model, pageRel, pageEpochMs, isConnectionOwner) {
             statusText: '',
             httpVersion: 'HTTP/3',
             cookies: [],
-            headers: (rich && stream.respHeaders) ? stream.respHeaders.map(h => ({ name: h.name, value: h.value })) : [],
+            headers: (rich && stream.respHeaders) ? normalizeHeaders(stream.respHeaders) : [],
             content: {
                 size: contentLength !== undefined ? contentLength : stream.rxBytes,
                 mimeType: respContentType || ''
@@ -594,11 +755,13 @@ function buildEntry(stream, model, pageRel, pageEpochMs, isConnectionOwner) {
     if (contentLength !== undefined) entry._objectSize = contentLength;
 
     // RFC 9218 Extensible Priorities from the request `priority` header (u=N urgency).
-    if (rich) {
+    if (stream.priority) {
+        entry._priority = stream.priority;
+    } else if (rich) {
         const pri = findHeader(stream.reqHeaders, 'priority');
         if (pri && typeof pri.value === 'string') {
-            const match = pri.value.match(/u=(\d)/);
-            if (match) entry._priority = priorityFromUrgency(parseInt(match[1], 10));
+            const priority = priorityFromValue(pri.value);
+            if (priority) entry._priority = priority;
         }
     }
 
@@ -614,6 +777,9 @@ function buildEntry(stream, model, pageRel, pageEpochMs, isConnectionOwner) {
         entry._ttfb_end = round3(ttfbEnd);
         entry._download_start = round3(ttfbEnd);
         entry._ttfb_ms = round3(Math.max(0, ttfbEnd - loadStart));
+    }
+    if (stream.firstInterimTime !== null) {
+        entry._first_interim_response = round3(pageRel(stream.firstInterimTime));
     }
     if (downloadEnd !== null) {
         entry._download_end = round3(downloadEnd);
@@ -737,7 +903,9 @@ export async function buildQlogHarLog(rawTraces, options = {}) {
     const allRxPackets = [];
     for (const model of models) {
         const pageRel = pageRelFns.get(model);
-        for (const p of model.rxPackets) allRxPackets.push({ t: pageRel(p.t), bytes: p.bytes });
+        const rxSource = model.rxPackets.length > 0 ? model.rxPackets
+            : (model.rxMovedWire.length > 0 ? model.rxMovedWire : model.rxMoved);
+        for (const p of rxSource) allRxPackets.push({ t: pageRel(p.t), bytes: p.bytes });
     }
     const bwDown = calculateMaxBandwidth(allRxPackets);
     if (bwDown > 0) page._bwDown = bwDown;

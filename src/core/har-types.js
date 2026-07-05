@@ -77,7 +77,7 @@
  * @property {number} [_responseCode]
  * @property {number} [_responseStatus] - Raw ResourceTiming responseStatus as reported (incl. 0 = opaque/CORS-hidden; rumcap)
  * @property {boolean} [_statusAssumed] - HAR response.status was assumed successful because the source hid or omitted the true status (rumcap: ResourceTiming status 0/absent; qlog: transport-only captures with no decodable :status)
- * @property {number} [_first_interim_response] - Early Hints (HTTP 103) interim response start, relative ms (rumcap)
+ * @property {number} [_first_interim_response] - Early Hints (HTTP 103) interim response start, relative ms (rumcap, qlog)
  * @property {number|string} [_socket]
  * @property {number|string} [_initiator_line]
  * @property {number|string} [_initiator_column]

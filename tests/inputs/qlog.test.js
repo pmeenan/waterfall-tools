@@ -103,6 +103,13 @@ describe('qlog decoder utilities', () => {
         expect(parseReferenceTime({ clock_type: 'monotonic', epoch: 'unknown' })).toBeNull();
         expect(parseReferenceTime({ clock_type: 'system', epoch: '2026-01-02T03:04:05.000Z' }))
             .toBe(Date.parse('2026-01-02T03:04:05.000Z'));
+        // A real epoch is the reference; wall_clock_time is only a fallback for unknown
+        // monotonic epochs.
+        expect(parseReferenceTime({
+            clock_type: 'system',
+            epoch: '1970-01-01T00:00:00.000Z',
+            wall_clock_time: '2026-01-02T03:04:05.000Z'
+        })).toBe(0);
     });
 
     it('resolves the clock: truthy reference_time anchors relative times', () => {
@@ -134,6 +141,16 @@ describe('qlog decoder utilities', () => {
         expect(createTimeConverter(clock, 0)(17)).toBe(17);
     });
 
+    it('resolves the clock: default object epoch 1970 with small times stays unanchored', () => {
+        const clock = resolveClock({
+            time_format: 'relative_to_epoch',
+            reference_time: { clock_type: 'system', epoch: '1970-01-01T00:00:00.000Z' }
+        }, 5);
+        expect(clock.anchored).toBe(false);
+        expect(clock.anchorEpochMs).toBeNull();
+        expect(createTimeConverter(clock, 5)(17)).toBe(17);
+    });
+
     it('resolves the clock: a declared-absolute trace with sub-epoch times degrades to unanchored', () => {
         const clock = resolveClock({ time_format: 'absolute' }, 12.5);
         expect(clock.anchored).toBe(false);
@@ -151,6 +168,19 @@ describe('qlog decoder utilities', () => {
         expect(toRel(5)).toBe(5);
         expect(toRel(3)).toBe(8);
         expect(toRel(2.5)).toBe(10.5);
+    });
+
+    it('cumulative-sums the spec-final relative_to_previous_event spelling', () => {
+        const clock = resolveClock({
+            time_format: 'relative_to_previous_event',
+            reference_time: { clock_type: 'system', epoch: '2026-01-02T03:04:05.000Z' }
+        }, 0);
+        expect(clock.timeFormat).toBe('delta');
+        expect(clock.anchored).toBe(true);
+        const toRel = createTimeConverter(clock, 0);
+        expect(toRel(0)).toBe(0);
+        expect(toRel(7)).toBe(7);
+        expect(toRel(5)).toBe(12);
     });
 
     it('detects JSON-SEQ by the RFC 7464 record separator, not extension', () => {
@@ -501,6 +531,133 @@ describe('qlog buildQlogHarLog (CLI Extended HAR contract)', () => {
         expect(log.entries.length).toBe(1);
         expect(log.entries[0].request.url).toBe('https://example.com/');
         expect(log.entries[0].response.status).toBe(200);
+    });
+
+    it('uses stream_data_moved as a packet-free byte/chunk fallback and surfaces h3 metadata', async () => {
+        const traces = [{
+            qlogFormat: 'JSON',
+            qlogVersion: 'urn:ietf:params:qlog:events:http3-12',
+            vantagePoint: { type: 'client' },
+            commonFields: {
+                time_format: 'relative_to_previous_event',
+                reference_time: { clock_type: 'system', epoch: '2026-01-02T03:04:05.000Z' },
+                group_id: 'streamdata-fallback'
+            },
+            events: [
+                { time: 0, name: 'http3:frame_created', data: { stream_id: 0, frame: { frame_type: 'headers', headers: [
+                    { name_bytes: '3a6d6574686f64', value_bytes: '474554' },
+                    { name: ':scheme', value: 'https' },
+                    { name: ':authority', value: 'example.com' },
+                    { name: ':path', value: '/asset.js' },
+                    { name: 'priority', value: 'u=5' }
+                ] } } },
+                { time: 5, name: 'quic:stream_data_moved', data: {
+                    stream_id: 0, from: 'application', to: 'transport', raw: { length: 42 }, additional_info: 'fin_set'
+                } },
+                { time: 10, name: 'http3:priority_updated', data: { stream_id: 0, new: 'u=1, i' } },
+                { time: 20, name: 'http3:frame_parsed', data: { stream_id: 0, frame: { frame_type: 'headers', headers: [
+                    { name_bytes: '3a737461747573', value: '103' },
+                    { name: 'link', value: '</style.css>; rel=preload' }
+                ] } } },
+                { time: 5, name: 'quic:stream_data_moved', data: {
+                    stream_id: 0, from: 'transport', to: 'application', raw: { length: 120 }
+                } },
+                { time: 5, name: 'http3:frame_parsed', data: { stream_id: 0, frame: { frame_type: 'headers', headers: [
+                    { name: ':status', value: '200' },
+                    { name: 'content-type', value: 'application/javascript' },
+                    { name: 'content-length', value: '200' }
+                ] } } },
+                { time: 10, name: 'quic:stream_data_moved', data: {
+                    stream_id: 0, from: 'transport', to: 'application', length: 80, additional_info: 'fin_set'
+                } }
+            ]
+        }];
+        const log = await buildQlogHarLog(traces);
+        expect(log.entries.length).toBe(1);
+        const entry = log.entries[0];
+        expect(entry.request.method).toBe('GET');
+        expect(entry.request.url).toBe('https://example.com/asset.js');
+        expect(entry.response.status).toBe(200);
+        expect(entry.response.content.mimeType).toBe('application/javascript');
+        expect(entry.response.content.size).toBe(200);
+        expect(entry._priority).toBe('Highest');
+        expect(entry._first_interim_response).toBe(35);
+        expect(entry._bytesOut).toBe(42);
+        expect(entry._bytesIn).toBe(200);
+        expect(entry._chunks.map(c => c.bytes)).toEqual([120, 80]);
+        expect(entry._ttfb_end).toBe(35);
+        expect(entry._download_end).toBe(55);
+        expect(entry._all_end).toBeGreaterThanOrEqual(entry._download_end);
+        expect(log.pages[0]._bwDown).toBeGreaterThan(0);
+    });
+
+    it('prefers wire-side stream_data_moved fallback timing when present', async () => {
+        const pageEpoch = 1700000000000;
+        const traces = [{
+            qlogFormat: 'JSON',
+            qlogVersion: 'urn:ietf:params:qlog:events:http3-12',
+            vantagePoint: { type: 'client' },
+            commonFields: { reference_time: pageEpoch, group_id: 'wire-streamdata' },
+            events: [
+                { time: 0, name: 'http3:frame_created', data: { stream_id: 0, frame: { frame_type: 'headers', headers: [
+                    { name: ':method', value: 'GET' },
+                    { name: ':scheme', value: 'https' },
+                    { name: ':authority', value: 'example.com' },
+                    { name: ':path', value: '/wire' }
+                ] } } },
+                { time: 1, name: 'quic:stream_data_moved', data: {
+                    stream_id: 0, from: 'application', to: 'transport', raw: { length: 50 }
+                } },
+                { time: 2, name: 'quic:stream_data_moved', data: {
+                    stream_id: 0, from: 'transport', to: 'network', raw: { length: 50 }
+                } },
+                { time: 3, name: 'quic:stream_data_moved', data: {
+                    stream_id: 0, from: 'network', to: 'transport', raw: { length: 75 }
+                } },
+                { time: 4, name: 'quic:stream_data_moved', data: {
+                    stream_id: 0, from: 'transport', to: 'application', raw: { length: 75 }, additional_info: 'fin_set'
+                } },
+                { time: 5, name: 'http3:frame_parsed', data: { stream_id: 0, frame: { frame_type: 'headers', headers: [
+                    { name: ':status', value: '200' },
+                    { name: 'content-length', value: '75' }
+                ] } } }
+            ]
+        }];
+        const log = await buildQlogHarLog(traces);
+        const entry = log.entries[0];
+        expect(entry._bytesOut).toBe(50);
+        expect(entry._bytesIn).toBe(75);
+        expect(entry._ttfb_end).toBe(3);
+        expect(entry._download_end).toBe(3);
+        expect(entry._chunks).toEqual([{ ts: pageEpoch + 3, bytes: 75 }]);
+    });
+
+    it('keeps rich header-only streams visible through their response-header time', async () => {
+        const traces = [{
+            qlogFormat: 'JSON',
+            qlogVersion: '0.4',
+            vantagePoint: { type: 'client' },
+            commonFields: { reference_time: 1700000000000 },
+            events: [
+                { time: 10, name: 'http3:frame_created', data: { stream_id: 0, frame: { frame_type: 'headers', headers: [
+                    { name: ':method', value: 'GET' },
+                    { name: ':scheme', value: 'https' },
+                    { name: ':authority', value: 'example.com' },
+                    { name: ':path', value: '/headers-only' }
+                ] } } },
+                { time: 40, name: 'http3:frame_parsed', data: { stream_id: 0, frame: { frame_type: 'headers', headers: [
+                    { name: ':status', value: '204' }
+                ] } } }
+            ]
+        }];
+        const log = await buildQlogHarLog(traces);
+        expect(log.entries.length).toBe(1);
+        const entry = log.entries[0];
+        expect(entry.response.status).toBe(204);
+        expect(entry.time).toBe(30);
+        expect(entry._ttfb_end).toBe(30);
+        expect(entry._all_end).toBe(30);
+        expect(entry._download_end).toBeUndefined();
     });
 
     it('rejects invalid file paths safely', async () => {

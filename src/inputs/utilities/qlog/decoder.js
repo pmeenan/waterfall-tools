@@ -90,15 +90,26 @@ export function parseReferenceTime(rt) {
         return isFinite(parsed) && parsed > 0 ? parsed : null;
     }
     if (typeof rt === 'object') {
-        // wall_clock_time is the direct anchor; `epoch` is only usable when it is a real
-        // RFC3339 date ("unknown" / "monotonic" epochs carry no wall-clock meaning).
-        for (const field of ['wall_clock_time', 'epoch']) {
-            const v = rt[field];
-            if (typeof v === 'number' && v > 0) return v;
-            if (typeof v === 'string' && v !== 'unknown') {
-                const parsed = Date.parse(v);
-                if (isFinite(parsed) && parsed > 0) return parsed;
+        // `epoch` is the actual reference for relative_to_epoch timestamps. Only fall
+        // back to wall_clock_time when the epoch is unknown (monotonic-clock traces).
+        const epoch = rt.epoch;
+        if (epoch !== undefined && epoch !== null && epoch !== 'unknown') {
+            if (typeof epoch === 'number' && epoch >= 0) return epoch;
+            if (typeof epoch === 'string') {
+                const n = Number(epoch);
+                if (isFinite(n) && n >= 0) return n;
+                const parsed = Date.parse(epoch);
+                if (isFinite(parsed) && parsed >= 0) return parsed;
             }
+        }
+
+        const wallClock = rt.wall_clock_time;
+        if (typeof wallClock === 'number' && wallClock > 0) return wallClock;
+        if (typeof wallClock === 'string' && wallClock !== 'unknown') {
+            const n = Number(wallClock);
+            if (isFinite(n) && n > 0) return n;
+            const parsed = Date.parse(wallClock);
+            if (isFinite(parsed) && parsed > 0) return parsed;
         }
     }
     return null;
@@ -122,15 +133,29 @@ export function parseReferenceTime(rt) {
  */
 export function resolveClock(commonFields, firstEventTime) {
     const cf = commonFields || {};
-    const referenceTimeMs = parseReferenceTime(cf.reference_time);
-    let timeFormat = cf.time_format;
+    let referenceTimeMs = parseReferenceTime(cf.reference_time);
+    const rawTimeFormat = cf.time_format;
+    let timeFormat;
+
+    // The qlog schema's default epoch is 1970. That is meaningful when event times are
+    // epoch-ms-sized, but for small relative captures it is indistinguishable from "no
+    // useful wall-clock anchor" and would poison downstream date heuristics.
+    if (referenceTimeMs === 0 && !(typeof firstEventTime === 'number' && firstEventTime > 1e12)) {
+        referenceTimeMs = null;
+    }
 
     // Absolute-epoch heuristic: with no anchor declared but times deep in epoch-ms range,
     // the times themselves ARE the anchor. Applied liberally (even over a declared
     // "relative") because a relative offset of 56,000+ years is not a real timeline.
     if (referenceTimeMs === null && typeof firstEventTime === 'number' && firstEventTime > 1e12) {
         timeFormat = 'absolute';
-    } else if (timeFormat !== 'absolute' && timeFormat !== 'delta') {
+    } else if (rawTimeFormat === 'relative_to_previous_event' || rawTimeFormat === 'delta') {
+        timeFormat = 'delta';
+    } else if (rawTimeFormat === 'absolute') {
+        timeFormat = 'absolute';
+    } else {
+        // Current qlog spells the default "relative_to_epoch"; older draft-era producers
+        // used "relative" or omitted it. All mean event.time is relative to reference_time.
         timeFormat = 'relative';
     }
 
