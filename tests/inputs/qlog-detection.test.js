@@ -51,6 +51,26 @@ describe('qlog format detection (orchestrator)', () => {
         expect(detected.format).toBe('qlog');
         expect(detected.isGz).toBe(true);
     });
+
+    it('does not misidentify qlog-derived Extended HAR as qlog', async () => {
+        const har = {
+            log: {
+                version: '1.2',
+                creator: { name: 'waterfall-tools', version: 'test' },
+                pages: [{
+                    id: 'page_1',
+                    startedDateTime: new Date(0).toISOString(),
+                    title: 'qlog export',
+                    pageTimings: {},
+                    _qlogTraces: [{ qlogVersion: 'urn:ietf:params:qlog:file:sequential' }]
+                }],
+                entries: []
+            }
+        };
+        const buf = new TextEncoder().encode(JSON.stringify(har));
+        expect((await identifyFormatFromBuffer(buf, { debug: true })).format).toBe('har');
+        expect(await workerIdentifyFormat(buf)).toBe('har');
+    });
 });
 
 describe('qlog format detection (spec-final quiche: no qlog_version token)', () => {

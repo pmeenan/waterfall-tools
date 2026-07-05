@@ -41,7 +41,7 @@ graph TD
         Interactions[Interaction hooks<br/>hover / click / zoom / filter]
     end
 
-    subgraph Embed ["Embeddable viewers (src/embed/)"]
+    subgraph Viewer ["Standalone viewer integrations (src/viewer/)"]
         DirectEmbed[renderTo API]
         Iframe[Iframe + query params]
         External[Embedded Perfetto / NetLog viewer]
@@ -95,15 +95,10 @@ graph TD
 │   │   └── orchestrator.js            # Format sniffing + routing
 │   ├── outputs/
 │   │   ├── image.js                   # Waterfall image export
-│   │   ├── thumbnail.js               # Thumbnail export
 │   │   └── simple-json.js             # Flattened 1D request array
 │   ├── renderer/
 │   │   ├── canvas.js                  # Core render loop
-│   │   ├── layout.js                  # Row layout + geometry
-│   │   └── interaction.js             # Hover / click / zoom / filter hooks
-│   ├── embed/
-│   │   ├── iframe-embed.js            # Iframe query-param wiring
-│   │   └── external/                  # Perfetto / NetLog viewer wrappers
+│   │   └── layout.js                  # Row layout + geometry
 │   ├── core/
 │   │   ├── waterfall-tools.js         # Main WaterfallTools class
 │   │   ├── har-converter.js           # HAR ↔ internal shape
@@ -133,11 +128,11 @@ graph TD
 
 ## CLI modes and testing
 
-Every input format processor ships with a standalone CLI wrapper under `src/inputs/cli/[format].js` that ingests one file and emits normalized Extended HAR JSON (`{ log: {...} }`) by passing the parser's relational output through `relationalToHar()` in `src/core/har-export.js` — the same raw-Node-safe conversion that `WaterfallTools.getHar()` delegates to. The unified CLI at `bin/waterfall-tools.js` wraps the same pipeline with format auto-detection and automatic keylog discovery.
+Every input format processor ships with a standalone CLI wrapper under `src/inputs/cli/[format].js` that ingests one file and emits normalized Extended HAR JSON (`{ log: {...} }`) by passing the parser's relational output through `relationalToHar()` in `src/core/har-export.js` — the same raw-Node-safe conversion that `WaterfallTools.getHar()` delegates to. The unified CLI at `bin/waterfall-tools.js` wraps the same pipeline with format auto-detection, automatic keylog discovery, and packaged multi-file qlog merging when multiple positional input files are supplied with `--output`.
 
 Tests (vitest) parse sample inputs and assert strict equality against committed golden Extended HAR fixtures. Large-object comparisons are routed through `JSON.parse(JSON.stringify(...))` before assertion to avoid `undefined`-vs-missing hangs; dynamically-generated fields (like fallback `startedDateTime` values derived from `Date.now()`) are scrubbed from both sides before comparison.
 
-Pull requests targeting `main` trigger `.github/workflows/ci.yml`, which runs `npm ci`, `npm run lint`, and `npm run build` on Node 22. Lint is a hard gate (`--max-warnings 0`), and the production build must succeed — either failing blocks the merge. Regular audits via `npm audit` are run to ensure that vulnerabilities in third-party dependencies are fixed.
+Pull requests targeting `main` trigger `.github/workflows/ci.yml`, which runs `npm ci`, `npm run lint`, `npm test -- --run`, `npm run build`, and `npm audit --audit-level=moderate` on Node 22. Lint is a hard gate (`--max-warnings 0`), and any test, build, or audit failure blocks the merge.
 
 ## Extended HAR
 
@@ -192,13 +187,13 @@ Request overhead (`_bytesOut`) is estimated from the serialized request line and
 
 qlog is the IETF structured logging format for QUIC and HTTP/3 ([main schema](https://quicwg.org/qlog/draft-ietf-quic-qlog-main-schema.html), [QUIC events](https://quicwg.org/qlog/draft-ietf-quic-qlog-quic-events.html), [HTTP/3 events](https://quicwg.org/qlog/draft-ietf-quic-qlog-h3-events.html) — all still Internet-Drafts). One qlog file describes one QUIC connection, so a page load typically produces several files (one per origin). Support is **beta**: validated against curl/ngtcp2 transport-only captures, aioquic rich client captures, and Cloudflare quiche spec-final captures from both client and server vantage points; real Cloudflare edge captures from GitHub issue #12 are still welcome. The pipeline:
 
-1. **Sniff** — content-based, never extension-based, mirrored between `src/inputs/orchestrator.js` and `cloudflare-worker/worker.js`. JSON-SEQ `.sqlog` (RFC 7464): first meaningful byte is the `0x1E` record separator plus a qlog identity token within the sniff window. Plain JSON `.qlog`: the same identity token is checked ahead of the chrome-trace/HAR sniffs. Identity token means draft-era `"qlog_version"` or spec-final `urn:ietf:params:qlog` schema URNs (`file_schema` / `event_schemas`). An outer user-applied gzip layer is detected by magic bytes and inflated first.
-2. **Decode** (`src/inputs/utilities/qlog/decoder.js`) — JSON-SEQ streams are split on the `0x1E` separator and parsed per record (malformed/truncated records are skipped, so partial captures keep every complete event; concatenated logs are legal — each header record starts a fresh trace/connection). Plain JSON is stream-parsed with `@streamparser/json` on `$.traces.*` paths, never `JSON.parse`'d whole. Event namespaces are normalized from the draft-0.3 names (`transport:` → `quic:`, `http:` → `http3:`; `.` separators tolerated) so the parser reasons about one canonical set.
+1. **Sniff** — content-based, never extension-based, mirrored between `src/inputs/orchestrator.js` and `cloudflare-worker/worker.js`. JSON-SEQ `.sqlog` (RFC 7464): first meaningful byte is the `0x1E` record separator plus a qlog identity token within the sniff window. Plain JSON `.qlog`: the same identity token is checked after HAR so qlog-derived Extended HAR exports round-trip as HAR even though they preserve qlog URNs in page metadata. Identity token means draft-era `"qlog_version"` or spec-final `urn:ietf:params:qlog` schema URNs (`file_schema` / `event_schemas`). An outer user-applied gzip layer is detected by magic bytes and inflated to the decompressed sniff cap before format checks.
+2. **Decode** (`src/inputs/utilities/qlog/decoder.js`) — JSON-SEQ streams are split on the `0x1E` separator and parsed per record (malformed/truncated records are skipped, with a synthetic skipped-time event retained when possible so delta-clock traces do not shift; concatenated logs are legal — each header record starts a fresh trace/connection). Plain JSON is stream-parsed with `@streamparser/json` on `$.traces.*` paths, never `JSON.parse`'d whole. Event namespaces are normalized from the draft-0.3 names (`transport:` → `quic:`, `http:` → `http3:`; `.` separators tolerated) so the parser reasons about one canonical set.
 3. **Clock resolution** (per trace) — a truthy `reference_time` anchors the trace; object-form anchors use a real `epoch` when present and fall back to `wall_clock_time` for monotonic `epoch: "unknown"` traces. The qlog default epoch `1970-01-01` only anchors epoch-ms-sized event times; small relative captures with that default are treated as unanchored so they never render as 1970. With no anchor but event times deep in epoch-ms range (> 1e12, e.g. aioquic), the times themselves are the anchor; otherwise the trace is unanchored (curl's numeric `reference_time: 0`) and the page epoch is synthesized from `Date.now()` with `page._clockSynthesized = true`. `time_format: "relative_to_previous_event"` / `"delta"` times are cumulative-summed.
 4. **Stream assembly** (`src/inputs/qlog.js`) — events replay into a per-connection model: per-stream tx/rx byte ledgers from packet STREAM frames, `quic:stream_data_moved` fallback ledgers for producers that omit packet STREAM details (preferring transport/network movement times over application/transport movement when both are logged), handshake bounds, server→client packet/data sizes (for a tcpdump-style 100 ms sliding-window `_bwDown` estimate), and rtt/cwnd samples from draft and spec-final recovery metric names. One HAR entry per client-initiated bidirectional stream (id % 4 === 0) with request/payload evidence; `http3:stream_type_set` excludes streams declared with a non-`request` role. Vantage-point aware — server captures flip packet/frame direction semantics.
 5. **Extended HAR** — two fidelity modes. *Rich* (HTTP/3 HEADERS events present, e.g. aioquic/quiche): real method/URL/status/headers/MIME type, `_priority` from RFC 9218 `priority: u=N` request headers or `http3:priority_updated`, and `_first_interim_response` for 1xx response HEADERS. *Degraded* (transport-only, e.g. curl/ngtcp2, whose headers stay QPACK-encoded inside opaque STREAM bytes): synthetic `https://connection-<odcid8>/stream-<id>` URLs, `GET`, assumed status `200` with `_statusAssumed` (rumcap precedent). Timings use the renderer's absolute-timings fields; header-only rich streams stay visible through response-header time even when no rx STREAM frame was logged. The QUIC handshake is TLS-integral so `_connect_*` and `_ssl_*` share one span, carried by the earliest request on each connection. No `_dns_*` is ever emitted — qlog has no DNS events and missing is better than wrong. The connection ODCID lands on `entry.connection` so Connection View groups streams per QUIC connection, and per-connection context (`page._qlogTraces`) plus capped rtt/cwnd series (`page._qlogMetrics`) ride along for the details UI.
 
-**Multi-connection merge:** `processQlogNode` accepts a single input or an array (file paths, streams, or buffers) and merges all connections into one page — anchored traces align by wall clock, unanchored traces anchor at page zero. The public API exposes this as `WaterfallTools.loadBuffers(buffers, options)` (each member independently format-sniffed; all must agree on a format listed in `MULTI_BUFFER_FORMATS`), the viewer merges all-qlog multi-file drops automatically, and the per-format CLI wrapper accepts multiple positional files. Sample captures with regeneration recipes live under `Sample/Data/qlog/`.
+**Multi-connection merge:** `processQlogNode` accepts a single input or an array (file paths, streams, or buffers) and merges all connections into one page — anchored traces align by wall clock, unanchored traces anchor at page zero. The public API exposes this as `WaterfallTools.loadBuffers(buffers, options)` (each member independently format-sniffed; all must agree on a format listed in `MULTI_BUFFER_FORMATS`), the viewer merges all-qlog multi-file drops automatically, the unified CLI accepts multiple qlog input files with `--output`, and the per-format CLI wrapper accepts multiple positional files in source-tree development. Sample captures with regeneration recipes live under `Sample/Data/qlog/`.
 
 ### Multi-file archives & OPFS integration
 

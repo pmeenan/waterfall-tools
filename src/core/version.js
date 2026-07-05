@@ -10,4 +10,4 @@
  * import-attribute support. `tests/core/version.test.js` asserts it matches package.json,
  * so a version bump that misses this file fails the suite.
  */
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';

@@ -90,7 +90,7 @@ describe('CLI wrapper HAR shape (relationalToHar over each parser output)', () =
         // Wire options.deps exactly the way src/inputs/cli/tcpdump.js does.
         const options = {
             debug: true,
-            keyLogPath: path.join(SAMPLE_DIR, 'tcpdump/www.google.com-tcpdump.key_log.txt.gz'),
+            keyLogInput: path.join(SAMPLE_DIR, 'tcpdump/www.google.com-tcpdump.key_log.txt.gz'),
             deps: { decompressBody, decompressBodyPerChunk, sniffMimeType }
         };
         const data = await processTcpdumpNode(path.join(SAMPLE_DIR, 'tcpdump/www.google.com-tcpdump.cap.gz'), options);

@@ -524,11 +524,11 @@ export async function identifyFormatFromBuffer(buf) {
     if (minText.includes('CLIENT_RANDOM') || minText.includes('CLIENT_HANDSHAKE_TRAFFIC_SECRET') || minText.includes('CLIENT_TRAFFIC_SECRET_0')) return 'keylog';
     if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) &&
         (minText.includes('"median":') || minText.includes('"runs":') || minText.includes('"testRuns":') || minText.includes('"average":'))) return 'wpt';
+    if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) return 'har';
     // qlog plain JSON (.qlog): the qlog_version token (draft era) and the
-    // urn:ietf:params:qlog schema URNs (spec-final, e.g. quiche) are unambiguous
-    // across all supported formats (also catches JSON-SEQ files whose 0x1E byte
-    // check was bypassed). Placed before the chrome-trace/HAR patterns to document
-    // the precedence explicitly — qlog events can't satisfy those patterns anyway.
+    // urn:ietf:params:qlog schema URNs (spec-final, e.g. quiche) identify qlog
+    // payloads. HAR is checked first because qlog-derived Extended HAR exports
+    // legitimately preserve qlog URNs in page._qlogTraces metadata.
     if (minText.includes('"qlog_version"') || minText.includes('urn:ietf:params:qlog')) return 'qlog';
     // Chrome trace JSON wrapper: plain `{"traceEvents":[...]}` OR DevTools-saved form
     // `{"metadata":{...},"traceEvents":[...]}` where metadata comes first. Individual
@@ -538,7 +538,6 @@ export async function identifyFormatFromBuffer(buf) {
     if (minText.includes('"traceEvents":[') || (minText.includes('{"pid":') && minText.includes('"ts":') && minText.includes('"cat":'))) return 'chrome-trace';
     if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":') || minText.startsWith('[{"args":')) return 'chrome-trace';
     if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) return 'cdp';
-    if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) return 'har';
 
     return 'unknown';
 }
@@ -578,6 +577,16 @@ function looksLikeWptagentZip(buf) {
 // Best-effort decompress of the first ~64KB of a gzipped buffer. Falls back
 // to the raw input on error.
 async function gunzipPrefix(buf) {
+    // `chunks`/`total` live OUTSIDE the try so a mid-stream decode error still
+    // returns what was already decoded. The Worker only buffers the first
+    // SNIFF_SIZE *compressed* upstream bytes, so an incompressible payload
+    // (a user-gzipped .rcap.gz whose inner body is already gzipped, or a .cap.gz
+    // of encrypted traffic) truncates and errors before a clean end — but the
+    // format magic sits at the very start of the decoded output. Returning raw
+    // `buf` on error would drop that prefix and mis-detect the format as unknown
+    // (415). Keep in sync with src/inputs/orchestrator.js#gunzipPrefixFromBuffer.
+    const chunks = [];
+    let total = 0;
     try {
         const ds = new DecompressionStream('gzip');
         const writer = ds.writable.getWriter();
@@ -585,8 +594,6 @@ async function gunzipPrefix(buf) {
         writer.close().catch(() => { });
 
         const reader = ds.readable.getReader();
-        const chunks = [];
-        let total = 0;
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
@@ -599,11 +606,11 @@ async function gunzipPrefix(buf) {
                 }
             }
         }
-        if (total === 0) return buf;
-        return concatUint8(chunks, total);
     } catch (_e) {
-        return buf;
+        // Truncated/corrupt stream — fall through and keep whatever decoded.
     }
+    if (total === 0) return buf;
+    return concatUint8(chunks, Math.min(total, GZIP_SNIFF_DECOMPRESSED_CAP));
 }
 
 // -----------------------------------------------------------------------------
@@ -838,28 +845,91 @@ function isPrivateIPv4(ip) {
     return false;
 }
 
-function isPrivateIPv6(ip) {
+function parseIPv4Parts(ip) {
+    const parts = ip.split('.').map((p) => Number(p));
+    if (parts.length !== 4 || parts.some((p) => !Number.isFinite(p) || p < 0 || p > 255)) return null;
+    return parts;
+}
+
+function expandIPv6(ip) {
+    let h = ip.toLowerCase().trim();
+    if (h.startsWith('[') && h.endsWith(']')) h = h.slice(1, -1);
+    const zoneIndex = h.indexOf('%');
+    if (zoneIndex >= 0) h = h.slice(0, zoneIndex);
+
+    const dottedMatch = h.match(/(^|:)(\d{1,3}(?:\.\d{1,3}){3})$/);
+    if (dottedMatch) {
+        const parts = parseIPv4Parts(dottedMatch[2]);
+        if (!parts) return null;
+        const high = ((parts[0] << 8) | parts[1]).toString(16);
+        const low = ((parts[2] << 8) | parts[3]).toString(16);
+        h = h.slice(0, h.length - dottedMatch[2].length) + high + ':' + low;
+    }
+
+    let groups;
+    if (h.includes('::')) {
+        const pieces = h.split('::');
+        if (pieces.length !== 2) return null;
+        const left = pieces[0] ? pieces[0].split(':') : [];
+        const right = pieces[1] ? pieces[1].split(':') : [];
+        const zeros = Array(8 - left.length - right.length).fill('0');
+        if (zeros.length < 0) return null;
+        groups = [...left, ...zeros, ...right];
+    } else {
+        groups = h.split(':');
+    }
+
+    if (groups.length !== 8) return null;
+    const parsed = groups.map(g => {
+        if (!/^[0-9a-f]{1,4}$/i.test(g)) return NaN;
+        return parseInt(g, 16);
+    });
+    return parsed.some(n => !Number.isFinite(n)) ? null : parsed;
+}
+
+function ipv4FromGroups(high, low) {
+    return [
+        (high >> 8) & 0xff,
+        high & 0xff,
+        (low >> 8) & 0xff,
+        low & 0xff
+    ].join('.');
+}
+
+export function isPrivateIPv6(ip) {
     if (!ip) return true;
-    const h = ip.toLowerCase().trim();
-    if (h === '::1' || h === '::') return true;
+    const groups = expandIPv6(ip);
+    if (!groups) return true;
+
+    const first = groups[0];
+    const allZeroThroughFive = groups.slice(0, 6).every(g => g === 0);
+    const allZeroThroughFour = groups.slice(0, 5).every(g => g === 0);
+    const allZero = groups.every(g => g === 0);
+    if (allZero || (allZeroThroughFive && groups[6] === 0 && groups[7] === 1)) return true;
 
     // ULA fc00::/7 (both fc.. and fd.. first byte).
-    if (/^fc[0-9a-f]{0,2}:/i.test(h) || /^fd[0-9a-f]{0,2}:/i.test(h)) return true;
+    if ((first & 0xfe00) === 0xfc00) return true;
 
     // Link-local fe80::/10 — first 10 bits are 1111111010, covering
     // fe80–febf. Guard against false matches on public addresses like
     // "fe00:..." by matching only the fe80..febf range.
-    if (/^fe[89ab][0-9a-f]?:/i.test(h)) return true;
+    if ((first & 0xffc0) === 0xfe80) return true;
 
-    // IPv4-mapped IPv6, e.g. ::ffff:127.0.0.1
-    const mappedMatch = h.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/i);
-    if (mappedMatch) return isPrivateIPv4(mappedMatch[1]);
+    // IPv4-mapped IPv6, including normalized hex forms such as ::ffff:7f00:1.
+    if (allZeroThroughFour && groups[5] === 0xffff) {
+        return isPrivateIPv4(ipv4FromGroups(groups[6], groups[7]));
+    }
+
+    // IPv4-compatible IPv6 (::a.b.c.d / ::7f00:1) is deprecated and ambiguous
+    // for a proxy SSRF guard; fail closed instead of trying to distinguish
+    // public from private embedded IPv4 addresses.
+    if (allZeroThroughFive) return true;
 
     // 64:ff9b::/96 (NAT64) and 100::/64 (discard prefix) — forwarding traffic
     // into these ranges can still hit private hosts depending on the
     // deployment, so treat them as suspicious.
-    if (h.startsWith('64:ff9b:')) return true;
-    if (/^100:0?:0?:0?:/i.test(h) || h === '100::') return true;
+    if (groups[0] === 0x0064 && groups[1] === 0xff9b && groups.slice(2, 6).every(g => g === 0)) return true;
+    if (groups[0] === 0x0100 && groups.slice(1, 4).every(g => g === 0)) return true;
 
     return false;
 }

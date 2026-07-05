@@ -37,7 +37,7 @@ async function run() {
     console.log(`Processing PCAP/PCAPNG file: ${inputPath}...`);
     try {
         const startTime = Date.now();
-        const options = keyLogPath ? { keyLogPath } : {};
+        const options = keyLogPath ? { keyLogInput: keyLogPath } : {};
         if (!options.deps) options.deps = {};
         options.deps.decompressBody = decompressBody;
         options.deps.decompressBodyPerChunk = decompressBodyPerChunk;

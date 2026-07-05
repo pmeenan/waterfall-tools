@@ -256,6 +256,14 @@ export function parseJsonSeqTraces(bytes, options = {}) {
                     }
                 }
             } catch {
+                const timeMatch = text.match(/"time"\s*:\s*(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/);
+                if (current && timeMatch) {
+                    current.events.push({
+                        time: Number(timeMatch[1]),
+                        name: 'qlog:skipped_corrupt_record',
+                        data: { skipped: true }
+                    });
+                }
                 skipped++; // truncated tail / corrupt record — keep everything before it
             }
         }
@@ -313,8 +321,14 @@ export async function parseJsonTraces(bytes, options = {}) {
 
     // Feed in slices so huge files keep the event loop responsive and report progress.
     const CHUNK = 256 * 1024;
+    let parseError = null;
     for (let offset = 0; offset < bytes.length; offset += CHUNK) {
-        parser.write(bytes.subarray(offset, Math.min(bytes.length, offset + CHUNK)));
+        try {
+            parser.write(bytes.subarray(offset, Math.min(bytes.length, offset + CHUNK)));
+        } catch (e) {
+            parseError = e;
+            break;
+        }
         onProgress(Math.min(1, (offset + CHUNK) / bytes.length));
         if (bytes.length > CHUNK) {
             await new Promise(resolve => setTimeout(resolve, 0));
@@ -328,6 +342,7 @@ export async function parseJsonTraces(bytes, options = {}) {
     }
 
     if (options.debug) {
+        if (parseError) console.log(`[qlog decoder] Plain-JSON qlog parse stopped early: ${parseError.message || parseError}`);
         console.log(`[qlog decoder] Parsed ${traces.length} trace(s) from plain-JSON qlog (version ${qlogVersion || 'unknown'}).`);
     }
     return traces;

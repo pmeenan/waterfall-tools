@@ -86,7 +86,7 @@ const har = wt.getHar();   // one page, all connections merged
 
 [qlog](https://quicwg.org/) is the IETF structured logging format for QUIC/HTTP-3 (still an Internet-Draft; support here is **beta** — validated against curl/ngtcp2 and aioquic client captures plus Cloudflare quiche spec-final captures from both the client and server vantage points). Both serializations are auto-detected from content: plain JSON `.qlog` and JSON-SEQ `.sqlog` (RFC 7464), plain or gzipped, across both the draft-0.3 and final-spec dialects.
 
-One qlog file describes one QUIC connection, so a full page load usually produces several files (one per origin). Drop them all on the standalone viewer at once, pass them together to `loadBuffers()`, or list them all on the CLI, and they merge into a single page-wide waterfall. Fidelity depends on the producer: logs that include HTTP/3 events (e.g. aioquic/quiche) get real URLs, methods, statuses, headers, MIME types, RFC 9218 priority signals, and interim-response timing when present; transport-only logs (e.g. curl/ngtcp2, where headers stay QPACK-encoded on the wire) still render every request stream with synthetic per-stream URLs and assumed statuses. For producers that log HTTP/3 payload movement via `quic:stream_data_moved` instead of packet STREAM frame details, waterfall-tools uses that as a byte/chunk fallback, preferring transport/network movement times when available.
+One qlog file describes one QUIC connection, so a full page load usually produces several files (one per origin). Drop them all on the standalone viewer at once, pass them together to `loadBuffers()`, or list them all on the CLI with `--output`, and they merge into a single page-wide waterfall. Fidelity depends on the producer: logs that include HTTP/3 events (e.g. aioquic/quiche) get real URLs, methods, statuses, headers, MIME types, RFC 9218 priority signals, and interim-response timing when present; transport-only logs (e.g. curl/ngtcp2, where headers stay QPACK-encoded on the wire) still render every request stream with synthetic per-stream URLs and assumed statuses. For producers that log HTTP/3 payload movement via `quic:stream_data_moved` instead of packet STREAM frame details, waterfall-tools uses that as a byte/chunk fallback, preferring transport/network movement times when available.
 
 Generating captures:
 
@@ -295,10 +295,10 @@ npx waterfall-tools capture.rcap > out.har
 npx waterfall-tools capture.sqlog > out.har
 ```
 
-qlog files carry one QUIC connection each; to merge a whole page load's connections into one HAR, pass multiple files to the per-format wrapper:
+qlog files carry one QUIC connection each; to merge a whole page load's connections into one HAR, pass multiple files and use `--output` for the destination:
 
 ```bash
-node src/inputs/cli/qlog.js www.example.com.qlog.gz cdn.example.com.qlog.gz --output out.har
+npx waterfall-tools www.example.com.qlog.gz cdn.example.com.qlog.gz --output out.har
 ```
 
 ## Developer guide

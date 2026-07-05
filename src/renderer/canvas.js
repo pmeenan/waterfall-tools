@@ -451,7 +451,7 @@ export class WaterfallCanvas {
         const rowHeight = (typeof this.options.rowHeight === 'number' && this.options.rowHeight > 0)
             ? this.options.rowHeight
             : (this.options.thumbnailView ? 4 : 18);
-        const topOffset = this.drawnRows.rows[0].y1 > 35 ? 35 : 0;
+        const topOffset = this.drawnRows.dimensions.yOffset || 0;
         const bottomY = dim.totalRows * rowHeight + rowHeight + topOffset;
         
         if (y < topOffset + rowHeight || y > bottomY) return null;
@@ -514,7 +514,7 @@ export class WaterfallCanvas {
         const rowHeight = (typeof this.options.rowHeight === 'number' && this.options.rowHeight > 0)
             ? this.options.rowHeight
             : (this.options.thumbnailView ? 4 : 18);
-        const topOffset = this.drawnRows.rows[0].y1 > 35 ? 35 : 0;
+        const topOffset = this.drawnRows.dimensions.yOffset || 0;
         const requestBottomY = dim.totalRows * rowHeight + rowHeight + topOffset;
         const lineTopY = topOffset + rowHeight + 1;
 
@@ -525,6 +525,14 @@ export class WaterfallCanvas {
             xScaler: (ms) => Math.floor(dim.labelsWidth + (ms * dim.widthPerMs)),
             radiusPx: 5
         };
+    }
+
+    _viewOffsetMs() {
+        return this.options.startTime ? this.options.startTime * 1000 : 0;
+    }
+
+    _toVisibleMs(ms) {
+        return ms - this._viewOffsetMs();
     }
 
     _getHoveredPageMetrics(x, y) {
@@ -547,7 +555,9 @@ export class WaterfallCanvas {
         const hovered = [];
         const addIfHit = (name, time, boundaryLabel) => {
             if (!(time > 0)) return;
-            const metricX = geometry.xScaler(time) + 0.5;
+            const visibleTime = this._toVisibleMs(time);
+            if (visibleTime < 0 || visibleTime > geometry.dim.maxTime) return;
+            const metricX = geometry.xScaler(visibleTime) + 0.5;
             if (Math.abs(x - metricX) <= geometry.radiusPx) {
                 hovered.push({
                     name,
@@ -581,9 +591,10 @@ export class WaterfallCanvas {
             for (const [name, rawValue] of Object.entries(marksObj)) {
                 let time = rawValue;
                 if (time && typeof time === 'object' && time.time) time = time.time;
-                if (!(time > 0) || time > geometry.dim.maxTime) continue;
+                const visibleTime = this._toVisibleMs(time);
+                if (!(time > 0) || visibleTime < 0 || visibleTime > geometry.dim.maxTime) continue;
 
-                const markX = geometry.xScaler(time) + 0.5;
+                const markX = geometry.xScaler(visibleTime) + 0.5;
                 if (Math.abs(x - markX) <= geometry.radiusPx) {
                     hovered.push({
                         name,
@@ -854,7 +865,7 @@ export class WaterfallCanvas {
 
             // Inherit structured relational time base preventing timeline disconnects intrinsically
             const baseStartMs = dimensions.baseMs || (rows.length > 0 ? rows[0].start : 0);
-            const topOffset = rows.length > 0 && rows[0].y1 > 35 ? 35 : 0;
+            const topOffset = dimensions.yOffset || 0;
             const rowHeight = (typeof this.options.rowHeight === 'number' && this.options.rowHeight > 0)
             ? this.options.rowHeight
             : (this.options.thumbnailView ? 4 : 18);
@@ -936,6 +947,17 @@ export class WaterfallCanvas {
             const targetCount = (dimensions.canvasWidth - dimensions.labelsWidth) / 40.0;
             const intervalMs = this.getTimeScaleInterval(dimensions.maxTime, targetCount);
             const xScaler = (ms) => Math.floor(dimensions.labelsWidth + (ms * dimensions.widthPerMs));
+            const viewOffsetMs = this._viewOffsetMs();
+            const seriesScaleMs = Math.max(dimensions.maxTime || 0, dimensions.absoluteMaxTime || 0);
+            const toVisibleMs = (ms) => ms - viewOffsetMs;
+            const normalizeSeriesTime = (ts) => {
+                let internalTs = ts;
+                if (internalTs > 1000000000000000) internalTs = internalTs / 1000;
+                if (internalTs > 1000000000 && internalTs < 1000000000000) internalTs = internalTs * 1000;
+                if (internalTs > 1000000000000) return internalTs - baseStartMs;
+                if (seriesScaleMs > 0 && internalTs > seriesScaleMs * 50) internalTs = internalTs / 1000;
+                return internalTs - viewOffsetMs;
+            };
             
             const requestBottomY = dimensions.totalRows * rowHeight + rowHeight + topOffset;
             const gridY1 = topOffset + rowHeight + 1;
@@ -962,6 +984,11 @@ export class WaterfallCanvas {
             }
 
             // 5. Standard Page Event Lines (always drawn: DOM loaded, LCP, Start Render, etc.)
+            // Drawn BEFORE the request blocks (pass 6) on purpose: WPT's waterfall renders
+            // these vertical event lines BEHIND the request cascade, so bars paint over them
+            // where they overlap and the lines show through the gaps. Do not move this pass
+            // (or the user-timing marks at 5.5) after the request passes — that would occlude
+            // the bars and break WPT visual parity. See AGENTS.md "Layer order".
             const eventColors = {
                 'render': [40, 188, 0],
                 'lcp': [0, 128, 0],
@@ -979,8 +1006,8 @@ export class WaterfallCanvas {
                     const eventVal = pageEvents[eventName];
                     if (eventColors[eventName] && eventVal) {
                         if (Array.isArray(eventVal)) {
-                            const startMs = eventVal[0];
-                            const endMs = eventVal[1];
+                            const startMs = toVisibleMs(eventVal[0]);
+                            const endMs = toVisibleMs(eventVal[1]);
                             if (endMs > 0) {
                                 const x1 = Math.floor(xScaler(startMs));
                                 let x2 = Math.floor(xScaler(endMs));
@@ -991,7 +1018,9 @@ export class WaterfallCanvas {
                                 this.ctx.fillRect(x1, topOffset + rowHeight + 1, (x2 - x1) + 1, requestBottomY - topOffset - rowHeight - 1);
                             }
                         } else if (eventVal > 0) {
-                            const x = Math.floor(xScaler(eventVal)) + 0.5;
+                            const visibleEventVal = toVisibleMs(eventVal);
+                            if (visibleEventVal < 0 || visibleEventVal > dimensions.maxTime) return;
+                            const x = Math.floor(xScaler(visibleEventVal)) + 0.5;
                             this.ctx.strokeStyle = `rgb(${eventColors[eventName].join(',')})`;
                             this.ctx.lineWidth = 2; // WPT draws exactly 2px metric indicator lines 
                             this.ctx.beginPath();
@@ -1018,8 +1047,9 @@ export class WaterfallCanvas {
                     Object.keys(marksObj).forEach(markName => {
                         let markTimeMs = marksObj[markName];
                         if (typeof markTimeMs === 'object' && markTimeMs.time) markTimeMs = markTimeMs.time;
-                        if (markTimeMs > 0 && markTimeMs <= dimensions.maxTime) {
-                            const x = Math.floor(xScaler(markTimeMs)) + 0.5;
+                        const visibleMarkTimeMs = toVisibleMs(markTimeMs);
+                        if (markTimeMs > 0 && visibleMarkTimeMs >= 0 && visibleMarkTimeMs <= dimensions.maxTime) {
+                            const x = Math.floor(xScaler(visibleMarkTimeMs)) + 0.5;
                             this.ctx.beginPath();
                             this.ctx.moveTo(x, topOffset + rowHeight + 1);
                             this.ctx.lineTo(x, requestBottomY);
@@ -1261,7 +1291,7 @@ export class WaterfallCanvas {
                             this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
                         } else {
                             const rIdx = Math.round((row.y1 - topOffset - rowHeight) / rowHeight);
-                            this.ctx.fillStyle = rIdx % 2 === 1 ? "#f0f0f0" : "#ffffff";
+                            this.ctx.fillStyle = rIdx % 2 === 1 ? themeRowStripe : themeBackground;
                             this.ctx.fillRect(labelX - 1, row.y1, labelWidth + 2, rectHeight);
                         }
                         
@@ -1277,8 +1307,8 @@ export class WaterfallCanvas {
                     const jsY2 = jsY1 + jsHeight - 1;
 
                     row.jsTiming.forEach(times => {
-                        const startX = xScaler(times[0]);
-                        const endX = xScaler(times[1]);
+                        const startX = xScaler(toVisibleMs(times[0]));
+                        const endX = xScaler(toVisibleMs(times[1]));
                         this.drawBar(startX, endX, jsY1, jsY2, row.colors.js, false);
                     });
                 }
@@ -1436,11 +1466,7 @@ export class WaterfallCanvas {
                             const val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
                             if (ts === null || val === null) return;
                             
-                            let internalTs = ts;
-                            if (internalTs > 1000000000000000) internalTs = internalTs / 1000;
-                            if (internalTs > 1000000000 && internalTs < 1000000000000) internalTs = internalTs * 1000;
-                            if (internalTs > 1000000000000) internalTs -= baseStartMs;
-                            if (internalTs > dimensions.maxTime * 50) internalTs = internalTs / 1000; 
+                            const internalTs = normalizeSeriesTime(ts);
                             
                             const x = xScaler(internalTs);
                             const y = chartYOffset + blockHeight - ((val || 0) * blockHeight / 100);
@@ -1494,10 +1520,7 @@ export class WaterfallCanvas {
                             const val = point.value !== undefined ? point.value : (point.v !== undefined ? point.v : (Array.isArray(point) ? point[1] : null));
                             if (ts === null || val === null) return;
 
-                            if (ts > 1000000000000000) ts = ts / 1000;
-                            if (ts > 1000000000 && ts < 1000000000000) ts = ts * 1000;
-                            if (ts > 1000000000000) ts -= baseStartMs;
-                            if (ts > dimensions.maxTime * 50) ts = ts / 1000; 
+                            ts = normalizeSeriesTime(ts);
                             
                             const x = xScaler(ts);
                             const y = chartYOffset + blockHeight - ((val || 0) * blockHeight / 100);
@@ -1678,6 +1701,7 @@ export class WaterfallCanvas {
                             let ts = evt.time;
                             // Auto normalize format
                             if (ts > 1000000000000) ts -= baseStartMs;
+                            else ts -= viewOffsetMs;
                             if (ts < 0 || ts > dimensions.maxTime) return;
 
                             const duration = evt.duration || 0;
@@ -1714,7 +1738,8 @@ export class WaterfallCanvas {
                     if (page._firstContentfulPaint > 0) startEventTs = page._firstContentfulPaint;
                     else if (page._render > 0) startEventTs = page._render;
                     
-                    const startEventX = Math.floor(xScaler(startEventTs));
+                    const visibleStartEventTs = toVisibleMs(startEventTs);
+                    const startEventX = Math.floor(xScaler(visibleStartEventTs));
                     
                     if (startEventX < dimensions.canvasWidth) {
                         // Draw Interactive Background (Green) from FCP onwards
@@ -1726,8 +1751,8 @@ export class WaterfallCanvas {
                     const longTasks = page._longTasks || [];
                     if (longTasks.length > 0) {
                         longTasks.forEach(period => {
-                            const sx = Math.floor(xScaler(period[0]));
-                            const ex = Math.floor(Math.max(sx + 1, xScaler(period[1])));
+                            const sx = Math.floor(xScaler(toVisibleMs(period[0])));
+                            const ex = Math.floor(Math.max(sx + 1, xScaler(toVisibleMs(period[1]))));
                             
                             if (ex > dimensions.labelsWidth) {
                                 const drawSx = Math.max(dimensions.labelsWidth + 1, startEventX, sx);
@@ -1746,6 +1771,7 @@ export class WaterfallCanvas {
                             if (duration >= 50) {
                                 let ts = evt.time;
                                 if (ts > 1000000000000) ts -= baseStartMs;
+                                else ts -= viewOffsetMs;
                                 if (ts < 0 || ts > dimensions.maxTime) return;
                                 
                                 const sx = Math.floor(xScaler(ts));
@@ -1811,7 +1837,7 @@ export class WaterfallCanvas {
                     }
 
                     // URL Text Label
-                    let textColor = '#000';
+                    let textColor = themeText;
                     if (row.documentURL) {
                         const reqDocUrl = row.documentURL.split('?')[0].split('#')[0];
                         if (reqDocUrl && mainDocUrl && reqDocUrl !== mainDocUrl) {

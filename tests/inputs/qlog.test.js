@@ -201,7 +201,12 @@ describe('qlog decoder utilities', () => {
         expect(traces.length).toBe(1);
         expect(traces[0].commonFields.group_id).toBe('abcd1234');
         expect(traces[0].vantagePoint.type).toBe('client');
-        expect(traces[0].events.length).toBe(2);
+        expect(traces[0].events.length).toBe(3);
+        expect(traces[0].events[2]).toMatchObject({
+            time: 3,
+            name: 'qlog:skipped_corrupt_record',
+            data: { skipped: true }
+        });
     });
 
     it('stream-parses plain-JSON traces and skips event-less TraceError objects', async () => {

@@ -82,6 +82,22 @@ describe('WaterfallTools.loadBuffers', () => {
         }
     });
 
+    it('loadBuffer retains only the supplied typed-array view bytes', async () => {
+        const harBytes = syntheticHarBuffer();
+        const backing = new Uint8Array(harBytes.byteLength + 20);
+        backing.fill(0x7b);
+        backing.set(harBytes, 10);
+        const view = backing.subarray(10, 10 + harBytes.byteLength);
+        const wt = new WaterfallTools();
+        try {
+            await wt.loadBuffer(view, { debug: true });
+            expect(wt._rawBuffer.byteLength).toBe(harBytes.byteLength);
+            expect(new Uint8Array(wt._rawBuffer)).toEqual(harBytes);
+        } finally {
+            await wt.destroy();
+        }
+    });
+
     it('rejects mixed-format arrays with a clear error naming the detected formats', async () => {
         const wt = new WaterfallTools();
         try {

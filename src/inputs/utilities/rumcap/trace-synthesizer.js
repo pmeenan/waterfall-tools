@@ -84,11 +84,18 @@ const textEncoder = new TextEncoder();
 
 /** RelMs → non-negative integer µs on the zero-based trace clock. */
 function us(relMs) {
+    // A corrupted/hand-built capture can carry a non-finite timeline value that
+    // slips past the `!== undefined` stream filters. Clamp to 0 rather than emit
+    // `ts: NaN` (serializes to null and corrupts DevTools sort/pairing).
+    if (!Number.isFinite(relMs)) return 0;
     return Math.max(0, Math.round(relMs * 1000));
 }
 
 /** µs → ns for TracePacket.timestamp (default Perfetto packet timestamp unit). */
 function packetNs(timestampUs) {
+    // Guard against non-finite input: `BigInt(NaN)` throws RangeError and would
+    // abort the whole Perfetto synthesis instead of dropping one bad event.
+    if (!Number.isFinite(timestampUs)) return 0n;
     return BigInt(Math.max(0, Math.trunc(timestampUs))) * 1000n;
 }
 
@@ -1791,29 +1798,28 @@ function synthesizeTrace(capture) {
             ph: 'I', pid: PID_NETWORK_EVENTS, s: 't', tid: TID_NETWORK, ts: us(sendMs)
         });
 
-        if (r.responseStart !== undefined) {
-            const status = responseStatusData(r);
-            const responseData = {
-                frame: FRAME_ID,
-                requestId,
-                statusCode: status.statusCode,
-                statusAssumed: status.statusAssumed,
-                mimeType: r.contentType || '',
-                encodedDataLength: r.transferSize !== undefined ? r.transferSize : 0,
-                fromCache: false,
-                fromServiceWorker: false,
-                connectionId: 0,
-                connectionReused: false,
-                protocol: r.nextHopProtocol || '',
-                timing
-            };
-            setDefined(responseData, 'rawResponseStatus', status.rawResponseStatus);
-            events.push({
-                args: { data: responseData },
-                cat: 'devtools.timeline', name: 'ResourceReceiveResponse',
-                ph: 'I', pid: PID_NETWORK_EVENTS, s: 't', tid: TID_NETWORK, ts: us(r.responseStart)
-            });
-        }
+        const responseMs = finiteNumber(r.responseStart) ? r.responseStart : finishMs;
+        const status = responseStatusData(r);
+        const responseData = {
+            frame: FRAME_ID,
+            requestId,
+            statusCode: status.statusCode,
+            statusAssumed: status.statusAssumed,
+            mimeType: r.contentType || '',
+            encodedDataLength: r.transferSize !== undefined ? r.transferSize : 0,
+            fromCache: false,
+            fromServiceWorker: false,
+            connectionId: 0,
+            connectionReused: false,
+            protocol: r.nextHopProtocol || '',
+            timing
+        };
+        setDefined(responseData, 'rawResponseStatus', status.rawResponseStatus);
+        events.push({
+            args: { data: responseData },
+            cat: 'devtools.timeline', name: 'ResourceReceiveResponse',
+            ph: 'I', pid: PID_NETWORK_EVENTS, s: 't', tid: TID_NETWORK, ts: us(Math.max(sendMs, responseMs))
+        });
 
         events.push({
             args: {
@@ -2205,14 +2211,15 @@ export function synthesizePerfettoProto(capture, _options = {}) {
         let trackSeq = 0;
         for (const track of streams.customEvents.tracks || []) {
             if (!track || !track.namespace) continue;
+            const validEvents = (track.events || []).filter(ev => ev && ev.name !== undefined && ev.start !== undefined);
+            if (validEvents.length === 0) continue;
             const uuid = 700000n + BigInt(++trackSeq);
             builder.trackDescriptor({
                 uuid,
                 name: track.namespace,
                 parentUuid: PERFETTO_TRACKS.CUSTOM_EVENTS
             });
-            for (const ev of track.events || []) {
-                if (!ev || ev.name === undefined || ev.start === undefined) continue;
+            for (const ev of validEvents) {
                 const args = { namespace: track.namespace };
                 setDefined(args, 'depth', ev.depth);
                 if (ev.details !== undefined) args.details = ev.details;

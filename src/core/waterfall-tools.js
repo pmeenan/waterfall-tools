@@ -56,6 +56,13 @@ export class WaterfallTools {
      * Cleans up staged archive resources and associated file handles.
      */
     async destroy() {
+        await this._destroyCurrentData();
+        this.data = null;
+        this._rawBuffer = null;
+        this._rumcapTraceCache = null;
+    }
+
+    async _destroyCurrentData() {
         if (this.data && this.data._opfsStorage && typeof this.data._opfsStorage.destroy === 'function') {
             await this.data._opfsStorage.destroy();
         }
@@ -81,6 +88,9 @@ export class WaterfallTools {
         if (!parser) {
             throw new Error(`No parser registered for format: ${format}`);
         }
+
+        await this._destroyCurrentData();
+        this.data = null;
 
         // Format-gated resource routes (getPageResource 'trace'/'netlog') key on this — it must
         // be set on every load path, not just loadBuffer(). Reused-instance guard: the raw
@@ -110,6 +120,9 @@ export class WaterfallTools {
         if (!parser) {
             throw new Error(`No parser registered for format: ${format}`);
         }
+
+        await this._destroyCurrentData();
+        this.data = null;
 
         // Same assignment as loadBuffer()/loadFile() — loadBuffer() delegates here, so the
         // double-assign of the identical resolved format is harmless. The stale-state clears
@@ -164,7 +177,7 @@ export class WaterfallTools {
         const result = await this.loadStream(stream, streamOptions);
         // AFTER loadStream() — it clears the raw-buffer state as its reused-instance guard;
         // re-attach the bytes backing THIS load so trace/netlog passthrough works.
-        this._rawBuffer = buf.buffer; // Store ArrayBuffer
+        this._rawBuffer = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength); // Store exact ArrayBuffer view
         return result;
     }
 
@@ -212,6 +225,9 @@ export class WaterfallTools {
 
         // Same reused-instance guards as loadFile()/loadStream(). A merged load has no
         // single backing buffer, so the raw-buffer resource passthrough stays cleared.
+        await this._destroyCurrentData();
+        this.data = null;
+
         this._sourceFormat = format;
         this._rawBuffer = null;
         this._rumcapTraceCache = null;

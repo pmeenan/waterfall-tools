@@ -83,18 +83,40 @@ export async function processTcpdumpNode(input, options = {}) {
         let keyLogContents = null;
         let keyLogInput = options.keyLogInput;
         if (!keyLogInput && typeof input === 'string') {
-            keyLogInput = input.replace('.cap.gz', '.key_log.txt.gz');
-            keyLogInput = keyLogInput.replace('.pcapng', '.key_log.txt');
-            keyLogInput = keyLogInput.replace('.pcap', '.key_log.txt');
+            // Derive the conventional adjacent keylog name by matching a capture
+            // suffix at the END of the path (so a '.cap' inside a directory name
+            // can't match) and swapping in the keylog suffix. Compressed captures
+            // pair with a compressed keylog. Longest/most-specific suffixes first.
+            // If the input carries no recognized capture suffix (notably a bare
+            // '.cap'), keyLogInput stays unset — we must NOT fall back to the
+            // capture path itself, which would read the entire binary capture
+            // through TextDecoder looking for CLIENT_RANDOM (wasted memory) and
+            // skip auto-discovery of a real adjacent '<name>.key_log.txt'.
+            const keyLogSuffixMap = [
+                ['.pcapng.gz', '.key_log.txt.gz'],
+                ['.pcap.gz', '.key_log.txt.gz'],
+                ['.cap.gz', '.key_log.txt.gz'],
+                ['.pcapng', '.key_log.txt'],
+                ['.pcap', '.key_log.txt'],
+                ['.cap', '.key_log.txt'],
+            ];
+            for (const [suffix, replacement] of keyLogSuffixMap) {
+                if (input.endsWith(suffix)) {
+                    keyLogInput = input.slice(0, -suffix.length) + replacement;
+                    break;
+                }
+            }
         }
         
         if (keyLogInput) {
+            let nodeKeyLogStream = null;
             try {
                 let klStream = keyLogInput;
                 if (typeof keyLogInput === 'string') {
                     const fs = await import(/* @vite-ignore */ 'node:fs');
                     const { Readable } = await import(/* @vite-ignore */ 'node:stream');
-                    klStream = Readable.toWeb(fs.createReadStream(keyLogInput));
+                    nodeKeyLogStream = fs.createReadStream(keyLogInput);
+                    klStream = Readable.toWeb(nodeKeyLogStream);
                 }
                 
                 let klIsGz = false;
@@ -144,6 +166,8 @@ export async function processTcpdumpNode(input, options = {}) {
             } catch (e) {
                 if (options.debug || globalThis.waterfallDebug) console.error("KeyLog Stream Processing Error:", e);
                 // It is completely valid for a keylog to not exist.
+            } finally {
+                if (nodeKeyLogStream) nodeKeyLogStream.destroy();
             }
         }
 

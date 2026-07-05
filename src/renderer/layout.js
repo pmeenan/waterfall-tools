@@ -358,15 +358,16 @@ export class Layout {
 
 
 
+        const startOffsetMs = (options.startTime !== undefined && options.startTime !== null) ? options.startTime * 1000 : 0;
         if (endTimeOverride !== null && endTimeOverride > 0) {
             let spanMs = endTimeOverride;
             if (options.startTime !== undefined && options.startTime !== null) {
-                spanMs -= (options.startTime * 1000);
+                spanMs -= startOffsetMs;
             }
-            absoluteMaxTime = maxTime;
+            absoluteMaxTime = maxTime + startOffsetMs;
             maxTime = Math.max(0, spanMs);
         } else {
-            absoluteMaxTime = maxTime;
+            absoluteMaxTime = maxTime + startOffsetMs;
         }
 
         // Leave room for labels
@@ -488,7 +489,8 @@ export class Layout {
                 labelsWidth,
                 widthPerMs,
                 maxBw,
-                totalRows: options._totalRows
+                totalRows: options._totalRows,
+                yOffset
             },
             pageEvents
         };

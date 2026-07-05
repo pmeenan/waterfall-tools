@@ -66,7 +66,9 @@ const ui = {
 let waterfallTool = null;
 let rendererCanvas = null;
 const activeBlobUrls = [];
+const tileRenderers = [];
 let pendingTabLoads = {};
+let activePerfettoLoad = null;
 const PERFETTO_ORIGIN = 'https://ui.perfetto.dev';
 const PERFETTO_RUMCAP_STARTUP_COMMANDS = [
     { id: 'dev.perfetto.CollapseTracksByRegex', args: ['.*'] },
@@ -81,7 +83,30 @@ function getPerfettoUrl(startupCommands = null) {
     return `${PERFETTO_ORIGIN}/#!/?startupCommands=${encodeURIComponent(JSON.stringify(startupCommands))}`;
 }
 
+function escapeHtml(value) {
+    return String(value === undefined || value === null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function escapeAttribute(value) {
+    return escapeHtml(value).replace(/`/g, '&#96;');
+}
+
+function cleanupPerfettoLoad() {
+    if (!activePerfettoLoad) return;
+    clearInterval(activePerfettoLoad.pingInterval);
+    clearTimeout(activePerfettoLoad.timeoutId);
+    window.removeEventListener('message', activePerfettoLoad.onMessage);
+    if (ui.traceFrame) ui.traceFrame.removeEventListener('load', activePerfettoLoad.onLoad);
+    activePerfettoLoad = null;
+}
+
 function loadTracePerfetto(traceBuffer, startupCommands = null) {
+    cleanupPerfettoLoad();
     ui.traceOverlay.style.display = 'flex';
     ui.traceOverlayContent.innerText = 'Loading Trace Viewer...';
 
@@ -103,7 +128,7 @@ function loadTracePerfetto(traceBuffer, startupCommands = null) {
         if (e.data === 'PONG') {
             if (!loaded) {
                 loaded = true;
-                clearInterval(pingInterval);
+                cleanupPerfettoLoad();
                 ui.traceOverlayContent.innerText = 'Loading Trace Data...';
                 ui.traceFrame.contentWindow.postMessage({
                     perfetto: {
@@ -114,7 +139,6 @@ function loadTracePerfetto(traceBuffer, startupCommands = null) {
 
                 setTimeout(() => {
                     ui.traceOverlay.style.display = 'none';
-                    window.removeEventListener('message', onMessage);
                 }, 1500);
             }
         }
@@ -128,6 +152,15 @@ function loadTracePerfetto(traceBuffer, startupCommands = null) {
         }
     };
     ui.traceFrame.addEventListener('load', onLoad, { once: true });
+
+    const timeoutId = setTimeout(() => {
+        if (!loaded) {
+            cleanupPerfettoLoad();
+            ui.traceOverlayContent.innerText = 'Timed out waiting for Perfetto.';
+        }
+    }, 30000);
+
+    activePerfettoLoad = { pingInterval, timeoutId, onMessage, onLoad };
 }
 
 function getDevtoolsPath() {
@@ -408,7 +441,7 @@ function hideLoading() {
 
 function showError(msg) {
     ui.loading.classList.remove('hidden');
-    ui.loading.innerHTML = `<div class="upload-content"><h2 style="color:#d32f2f">Error</h2><p>${msg}</p></div>`;
+    ui.loading.innerHTML = `<div class="upload-content"><h2 style="color:#d32f2f">Error</h2><p>${escapeHtml(msg)}</p></div>`;
 }
 
 async function fileToReadable(file) {
@@ -695,8 +728,8 @@ function getMetricItemHtml(label, value) {
     if (!value || value === 'N/A') return '';
     return `
         <div class="metric-item">
-            <span class="metric-label">${label}</span>
-            <span class="metric-value">${value}</span>
+            <span class="metric-label">${escapeHtml(label)}</span>
+            <span class="metric-value">${escapeHtml(value)}</span>
         </div>
     `;
 }
@@ -796,10 +829,12 @@ function renderSummary(pageData) {
     for (const m of metricsGroup) {
         if (m.value !== null && m.value !== undefined && m.value !== 'N/A') {
             const ratingClass = m.rating ? ` metric-bg-${m.rating}` : '';
+            // m.value can be a raw HAR field (e.g. _requestsFull / _requestsDoc)
+            // that a crafted capture could set to an HTML string; escape both.
             gridHtml += `
                 <div class="summary-metric${ratingClass}">
-                    <span class="summary-metric-label">${m.label}</span>
-                    <span class="summary-metric-value">${m.value}</span>
+                    <span class="summary-metric-label">${escapeHtml(m.label)}</span>
+                    <span class="summary-metric-value">${escapeHtml(m.value)}</span>
                 </div>
             `;
         }
@@ -839,7 +874,7 @@ function renderSummary(pageData) {
         if (customKeys.length > 0) {
             let customHtml = '<div class="custom-metrics-grid">';
             
-            for (const key of customKeys) {
+            for (const [index, key] of customKeys.entries()) {
                 let val;
                 if (Array.isArray(pageData._custom)) {
                     val = pageData['_' + key];
@@ -879,12 +914,12 @@ function renderSummary(pageData) {
                     }
 
                     const highlighted = highlightSyntax(formatted, lang);
-                    const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+                    const safeKey = `${key.replace(/[^a-zA-Z0-9]/g, '_')}_${index}`;
 
                     customHtml += `
                         <div class="custom-metric-card">
                             <div class="custom-metric-header">
-                                <span>${key}</span>
+                                <span>${escapeHtml(key)}</span>
                                 <div class="cm-actions">
                                     <button class="expand-indicator hidden" id="cm-${safeKey}-expand" onclick="
                                         const c = document.getElementById('cm-${safeKey}-container');
@@ -900,7 +935,7 @@ function renderSummary(pageData) {
                                     " title="Expand">
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                     </button>
-                                    <button class="copy-btn" data-copy-id="cm-${safeKey}" title="Copy">📋 Copy</button>
+                                    <button class="copy-btn" data-copy-id="cm-${safeKey}" title="Copy">Copy</button>
                                 </div>
                             </div>
                             <div class="custom-metric-content clipped" id="cm-${safeKey}-container">
@@ -935,8 +970,8 @@ function renderSummary(pageData) {
 
             // Display expand indicators dynamically
             requestAnimationFrame(() => {
-                for (const key of customKeys) {
-                    const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+                for (const [index, key] of customKeys.entries()) {
+                    const safeKey = `${key.replace(/[^a-zA-Z0-9]/g, '_')}_${index}`;
                     const preEl = document.getElementById('cm-' + safeKey + '-val');
                     const containerEl = document.getElementById('cm-' + safeKey + '-container');
                     const btnEl = document.getElementById('cm-' + safeKey + '-expand');
@@ -1056,7 +1091,7 @@ async function renderTiles(pushHistory = true) {
         
         const titleContainer = document.createElement('div');
         titleContainer.className = 'tile-title';
-        titleContainer.innerHTML = `<h3>${pageData.title || pageData._URL || pageId}</h3>`;
+        titleContainer.innerHTML = `<h3>${escapeHtml(pageData.title || pageData._URL || pageId)}</h3>`;
         topContainer.appendChild(titleContainer);
 
         const splitBody = document.createElement('div');
@@ -1106,7 +1141,9 @@ async function renderTiles(pushHistory = true) {
 
         // Wait to process microtask explicitly to allow DOM bounds to calc smoothly
         setTimeout(async () => {
-             await waterfallTool.renderTo(thumbContainer, opts);
+             if (!waterfallTool || !thumbContainer.isConnected) return;
+             const renderer = await waterfallTool.renderTo(thumbContainer, opts);
+             tileRenderers.push(renderer);
         }, 0);
 
         tile.addEventListener('click', () => {
@@ -1331,11 +1368,13 @@ function renderRequestTab(request, reqNum) {
         if (isImg && isBase64) {
             // Render image bodies as actual images from base64 data using a data URI
             const imgMime = mimeLower.includes('/') ? mimeLower : 'image/png';
+            const safeImgMime = escapeAttribute(imgMime);
+            const safeBody = escapeAttribute(request.body);
             previewHtml = `
                 <div class="req-section">
                     ${createSectionHeader('Preview', false, false)}
                     <div class="req-section-body req-preview-container" style="display:flex; justify-content:center; background:#f0f0f0;">
-                        <img src="data:${imgMime};base64,${request.body}" style="max-width:100%; max-height:400px; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYV2NkYGAwYkADjDA+A0Q5aJICAMCkAho2q2q/AAAAAElFTkSuQmCC');">
+                        <img src="data:${safeImgMime};base64,${safeBody}" style="max-width:100%; max-height:400px; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYV2NkYGAwYkADjDA+A0Q5aJICAMCkAho2q2q/AAAAAElFTkSuQmCC');">
                     </div>
                 </div>
             `;
@@ -1425,11 +1464,12 @@ function renderRequestTab(request, reqNum) {
         }
     } else if (isImg && parsedUrl) {
         // Fallback: no embedded body but we have a URL for the image
+        const safeParsedUrl = escapeAttribute(parsedUrl);
         previewHtml = `
             <div class="req-section">
                 ${createSectionHeader('Preview', false, false)}
                 <div class="req-section-body req-preview-container" style="display:flex; justify-content:center; background:#f0f0f0;">
-                    <img src="${parsedUrl}" style="max-width:100%; max-height:400px; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYV2NkYGAwYkADjDA+A0Q5aJICAMCkAho2q2q/AAAAAElFTkSuQmCC');">
+                    <img src="${safeParsedUrl}" style="max-width:100%; max-height:400px; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYV2NkYGAwYkADjDA+A0Q5aJICAMCkAho2q2q/AAAAAElFTkSuQmCC');">
                 </div>
             </div>
         `;
@@ -1572,6 +1612,9 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         const traceResource = await waterfallTool.getPageResource(pageId, 'trace');
         const rumcapPerfettoResource = await waterfallTool.getPageResource(pageId, 'perfetto-trace');
         const perfettoTraceResource = rumcapPerfettoResource || traceResource;
+        for (const resource of [traceResource, rumcapPerfettoResource]) {
+            if (resource && resource.url) activeBlobUrls.push(resource.url);
+        }
         if (perfettoTraceResource && perfettoTraceResource.buffer && ui.tabTrace) {
             ui.tabTrace.classList.remove('hidden');
             pendingTabLoads.trace = () => {
@@ -1594,6 +1637,7 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
 
     try {
         const netlogResource = await waterfallTool.getPageResource(pageId, 'netlog');
+        if (netlogResource && netlogResource.url) activeBlobUrls.push(netlogResource.url);
         if (netlogResource && netlogResource.buffer && ui.tabNetlog) {
             ui.tabNetlog.classList.remove('hidden');
             pendingTabLoads.netlog = () => {
@@ -1769,8 +1813,15 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
 }
 
 function resetWaterfallUI() {
+    cleanupPerfettoLoad();
+
     if (typeof pendingTabLoads !== 'undefined') {
         pendingTabLoads = {};
+    }
+
+    while (tileRenderers.length > 0) {
+        const renderer = tileRenderers.pop();
+        if (renderer && typeof renderer.destroy === 'function') renderer.destroy();
     }
 
     if (rendererCanvas) {

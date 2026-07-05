@@ -87,10 +87,16 @@ Constants at the top of `worker.js`:
 | Constant                       | Default  | Purpose                                               |
 | ------------------------------ | -------- | ----------------------------------------------------- |
 | `SNIFF_SIZE`                   | 65536    | Max bytes buffered before the format decision.        |
-| `UPSTREAM_TIMEOUT_MS`          | 30 000   | Hard timeout on the upstream fetch.                   |
-| `RATE_LIMIT_WINDOW_SECONDS`    | 600      | Rolling window for the per-IP failure counter.        |
-| `RATE_LIMIT_MAX_FAILURES`      | 10       | Failures in the window before the IP is 429'd.        |
-| `MAX_CONTENT_LENGTH_BYTES`     | 2 GiB    | Upstream Content-Length cap.                          |
+| `FULL_REQUEST_TIMEOUT_MS`      | 120 000  | Hard timeout on the whole upstream request.           |
+| `DOH_TIMEOUT_MS`               | 5 000    | Timeout on each SSRF DNS-over-HTTPS resolution.       |
+| `RATE_LIMIT_WINDOW_SECONDS`    | 600      | Rolling window for the per-IP counters.               |
+| `RATE_LIMIT_MAX_FAILURES`     | 10       | Failures in the window before the IP is 429'd.        |
+| `RATE_LIMIT_MAX_REQUESTS`      | 100      | Total requests in the window before the IP is 429'd.  |
+| `RATE_LIMIT_MAP_CAP`           | 100      | Tracked-IP cap; fail-closed (429) when full of live entries. |
+| `MAX_CONTENT_LENGTH_BYTES`     | 100 MiB  | Upstream Content-Length / delivered-bytes cap.        |
+| `MAX_TARGET_URL_LENGTH`        | 2048     | Max length of the `url` query parameter.              |
+| `MAX_REDIRECTS`                | 5        | Redirect hops followed, each re-checked for SSRF.     |
+| `DOH_ENDPOINT`                 | `cloudflare-dns.com/dns-query` | Resolver used for the SSRF pre-check. |
 
 ## Threat model notes
 
@@ -99,8 +105,10 @@ Constants at the top of `worker.js`:
   could see moderately higher effective limits in aggregate; per-isolate
   enforcement is considered sufficient given that the format-sniff step
   already blocks the vast majority of open-proxy abuse.
-- The SSRF check is a best-effort hostname / IP-literal block — it does
-  **not** resolve hostnames, so an attacker-controlled DNS record that
-  resolves to a private address still technically bypasses it. If you deploy
-  on a network that exposes private services behind public-looking DNS,
-  combine this Worker with a network-level allow-list.
+- The SSRF check blocks private IP literals AND resolves the hostname via
+  DNS-over-HTTPS (`DOH_ENDPOINT`), rejecting the request when any resolved
+  address is private; every redirect hop is re-validated. This closes the
+  DNS-rebinding gap of a pure hostname block, but resolution is best-effort
+  (a TOCTOU window remains between the pre-check resolve and the actual
+  fetch's own resolve). If you deploy on a network that exposes private
+  services, still combine this Worker with a network-level allow-list.

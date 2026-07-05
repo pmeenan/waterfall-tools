@@ -45,6 +45,8 @@ function isGzip(buf) {
     return buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
 }
 
+const SNIFF_SIZE = 65536;
+
 /**
  * Converts any input (ArrayBuffer, Uint8Array, or Node Buffer) to a plain Uint8Array.
  * This ensures all downstream logic works isomorphically without Node-specific Buffer methods.
@@ -142,11 +144,11 @@ function finishSniffing(text, resolve) {
     if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) return resolve({ format: 'netlog' });
     if (minText.includes('CLIENT_RANDOM') || minText.includes('CLIENT_HANDSHAKE_TRAFFIC_SECRET') || minText.includes('CLIENT_TRAFFIC_SECRET_0')) return resolve({ format: 'keylog' });
     if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":') || minText.includes('"testRuns":') || minText.includes('"average":'))) return resolve({ format: 'wpt' });
+    if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) return resolve({ format: 'har' });
     // qlog plain JSON (.qlog): the qlog_version token (draft era) and the
-    // urn:ietf:params:qlog schema URNs (spec-final, e.g. quiche) are unambiguous
-    // across all supported formats (also catches JSON-SEQ files whose 0x1E byte
-    // check was bypassed). Placed before the chrome-trace/HAR patterns to document
-    // the precedence explicitly — qlog events can't satisfy those patterns anyway.
+    // urn:ietf:params:qlog schema URNs (spec-final, e.g. quiche) identify qlog
+    // payloads. HAR is checked first because qlog-derived Extended HAR exports
+    // legitimately preserve qlog URNs in page._qlogTraces metadata.
     if (minText.includes('"qlog_version"') || minText.includes('urn:ietf:params:qlog')) return resolve({ format: 'qlog' });
     // Chrome trace JSON wrapper form. Plain captures are `{"traceEvents":[...]}`, but
     // DevTools-saved traces put `metadata` first (`{"metadata":{...},"traceEvents":[...]}`)
@@ -158,67 +160,83 @@ function finishSniffing(text, resolve) {
     }
     if (minText.startsWith('[{"pid":') || minText.startsWith('[{"cat":') || minText.startsWith('[{"name":') || minText.startsWith('[{"args":')) return resolve({ format: 'chrome-trace', hasTraceEventsWrapper: false });
     if (minText.startsWith('[{"method":"') || minText.includes('{"method":"Network.')) return resolve({ format: 'cdp' });
-    if (minText.includes('{"log":{"version":') || minText.includes('{"log":{"creator":') || minText.includes('{"log":{"pages":')) return resolve({ format: 'har' });
 
     resolve({ format: 'unknown' });
 }
 
-export async function identifyFormat(filePath, options = {}) {
-    if (typeof filePath !== 'string') {
-        throw new Error('identifyFormat currently only supports file paths. For streams, pass the format explicitly via options.format.');
+async function gunzipPrefixFromBuffer(buf) {
+    // `chunks`/`totalLen` live OUTSIDE the try so a mid-stream decode error still
+    // returns what was already decoded. When `buf` is only the first SNIFF_SIZE
+    // compressed bytes of a large, incompressible payload (e.g. a user-gzipped
+    // .rcap.gz whose inner body is already gzipped, or a .cap.gz of encrypted
+    // traffic), the truncated gzip errors before a clean end — but the format
+    // magic sits at the very start of the decoded output, so the partial prefix
+    // is exactly what the sniffer needs. Returning raw `buf` here would hide it.
+    const chunks = [];
+    let totalLen = 0;
+    try {
+        const ds = new DecompressionStream('gzip');
+        const writer = ds.writable.getWriter();
+        writer.write(buf).catch(() => {});
+        writer.close().catch(() => {});
+
+        const reader = ds.readable.getReader();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = new Uint8Array(value);
+            chunks.push(chunk);
+            totalLen += chunk.length;
+            if (totalLen >= SNIFF_SIZE) {
+                try { await reader.cancel(); } catch {}
+                break;
+            }
+        }
+    } catch {
+        // Truncated/corrupt stream — fall through and keep whatever decoded.
     }
-
-    // Dynamically import node modules so browser bundle doesn't crash if explicitly bypassing node paths
-    const fs = await import(/* @vite-ignore */ 'node:fs');
-
-    // Read up to 64KB for format sniffing using a Uint8Array (not Node Buffer)
-    const sniffBuf = new Uint8Array(65536);
-    const fd = fs.openSync(filePath, 'r');
-    // fs.readSync accepts Uint8Array natively in modern Node
-    const bytesRead = fs.readSync(fd, sniffBuf, 0, 65536, 0);
-    fs.closeSync(fd);
-
-    const buf = sniffBuf.subarray(0, bytesRead);
-    const result = await identifyFormatFromBuffer(buf, options);
-    if (options.debug) console.log(`[orchestrator.js] Identified format '${result.format}' from ${filePath}`);
-    return result.format;
+    return totalLen > 0 ? concatUint8Arrays(chunks).subarray(0, SNIFF_SIZE) : buf;
 }
 
-export async function identifyFormatFromBuffer(buffer, options = {}) {
-    const buf = toUint8Array(buffer);
-    const isGz = isGzip(buf);
+async function gunzipPrefixFromFile(filePath) {
+    const fs = await import(/* @vite-ignore */ 'node:fs');
+    const zlib = await import(/* @vite-ignore */ 'node:zlib');
+    return new Promise((resolve) => {
+        const input = fs.createReadStream(filePath);
+        const gunzip = zlib.createGunzip();
+        const chunks = [];
+        let totalLen = 0;
+        let settled = false;
 
-    let textBuf = buf;
-    if (isGz) {
-        try {
-            const ds = new DecompressionStream('gzip');
-            const writer = ds.writable.getWriter();
-            writer.write(buf.subarray(0, Math.min(buf.length, 65536))).catch(() => {});
-            writer.close().catch(() => {});
+        const finish = (result) => {
+            if (settled) return;
+            settled = true;
+            input.destroy();
+            gunzip.destroy();
+            resolve(result);
+        };
 
-            const reader = ds.readable.getReader();
-            const chunks = [];
-            let totalLen = 0;
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                const chunk = new Uint8Array(value);
-                chunks.push(chunk);
-                totalLen += chunk.length;
-                if (totalLen >= 65536) {
-                    try { await reader.cancel(); } catch {}
-                    break;
-                }
+        gunzip.on('data', chunk => {
+            const arr = new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength);
+            chunks.push(new Uint8Array(arr));
+            totalLen += arr.length;
+            if (totalLen >= SNIFF_SIZE) {
+                finish(concatUint8Arrays(chunks).subarray(0, SNIFF_SIZE));
             }
-            const sniffed = concatUint8Arrays(chunks);
-            textBuf = sniffed.length > 0 ? sniffed : buf;
-        } catch {
-            // Return gracefully if stream aborts randomly
-            textBuf = buf;
-        }
-    }
+        });
+        gunzip.on('end', () => {
+            finish(totalLen > 0 ? concatUint8Arrays(chunks).subarray(0, SNIFF_SIZE) : new Uint8Array());
+        });
+        // On a truncated/corrupt stream keep whatever already decoded — the format
+        // magic lives at the start of the payload (mirrors gunzipPrefixFromBuffer).
+        gunzip.on('error', () => finish(totalLen > 0 ? concatUint8Arrays(chunks).subarray(0, SNIFF_SIZE) : new Uint8Array()));
+        input.on('error', () => finish(totalLen > 0 ? concatUint8Arrays(chunks).subarray(0, SNIFF_SIZE) : new Uint8Array()));
+        input.pipe(gunzip);
+    });
+}
 
+function sniffFormatBytes(textBuf, isGz, options = {}) {
     // Check for ZIP magic bytes (PK\x03\x04). Require at least one
     // distinctive wptagent member filename in the first 64KB so we don't
     // claim arbitrary zips as wptagent archives. The central directory lives
@@ -241,27 +259,16 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
     }
 
     // rumcap (.rcap) cleartext magic: 0xF5 then ASCII "RUM" (0x52 0x55 0x4D).
-    // 0xF5 is deliberately invalid UTF-8, so 4 bytes are unambiguous. The
-    // file's internal payload is gzip-compressed AFTER this header, so a plain
-    // .rcap doesn't start with 1f 8b — but a user-gzipped .rcap.gz does, and
-    // the gzip pre-pass above already exposed the inner magic in textBuf.
-    // Compare bytes individually (don't compose a uint32 constant).
     if (textBuf.length >= 4 &&
         textBuf[0] === 0xf5 && textBuf[1] === 0x52 && textBuf[2] === 0x55 && textBuf[3] === 0x4d) {
         return { format: 'rumcap', isGz };
     }
 
-    // qlog JSON-SEQ (.sqlog, RFC 7464): the very first byte is the 0x1E record
-    // separator; each record is 0x1E + JSON + LF. A lone 0x1E could be any
-    // RFC 7464 stream, so also require a qlog identity token within the sniff
-    // window — draft-era producers carry "qlog_version", spec-final producers
-    // (quiche) drop it and self-identify via urn:ietf:params:qlog schema URNs.
-    // No other supported format carries either token. Deliberately placed before
-    // the perfetto varint heuristic (0x1E is not a valid TracePacket tag, so
-    // there's no conflict, but keep the ordering explicit).
+    // qlog JSON-SEQ (.sqlog, RFC 7464): require a leading 0x1E record separator
+    // and a qlog identity token within the decompressed sniff window.
     if (textBuf.length >= 1 && textBuf[0] === 0x1e) {
         const seqDecoder = new TextDecoder('utf-8', { fatal: false });
-        const seqText = seqDecoder.decode(textBuf.subarray(0, 65536));
+        const seqText = seqDecoder.decode(textBuf.subarray(0, SNIFF_SIZE));
         if (seqText.includes('"qlog_version"') || seqText.includes('urn:ietf:params:qlog')) {
             return { format: 'qlog', isGz };
         }
@@ -269,8 +276,6 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
 
     // Heuristically detect Perfetto by checking first TracePacket tag bytes safely
     if (textBuf.length >= 4 && textBuf[0] === 0x0a) {
-        // Tag 0x0a is Field 1 (TracePacket), WireType 2 (length-delimited).
-        // Let's decode the length varint.
         let len = 0; let shift = 0; let o = 1;
         while(o < textBuf.length && o < 5) {
             const b = textBuf[o++];
@@ -278,22 +283,49 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
             shift += 7;
             if (!(b & 0x80)) break;
         }
-        // If length fits reasonably or if we see another TracePacket soon, it is highly likely Perfetto.
-        if (textBuf.length > o + len) {
-            if (textBuf[o + len] === 0x0a) {
-                 return { format: 'perfetto', isGz };
-            }
+        if (textBuf.length > o + len && textBuf[o + len] === 0x0a) {
+            return { format: 'perfetto', isGz };
         }
     }
 
-    return new Promise((resolve) => {
-        // Decode the sniffed bytes to a UTF-8 string using the isomorphic TextDecoder API
-        const decoder = new TextDecoder('utf-8', { fatal: false });
-        const textToSniff = decoder.decode(textBuf.subarray(0, 65536));
-        finishSniffing(textToSniff, (result) => {
-            if (options.debug) console.log(`[orchestrator.js] Sniffed buffer and determined format: '${result.format}'`);
-            result.isGz = isGz;
-            resolve(result);
-        });
+    const decoder = new TextDecoder('utf-8', { fatal: false });
+    const textToSniff = decoder.decode(textBuf.subarray(0, SNIFF_SIZE));
+    let result;
+    finishSniffing(textToSniff, (sniffed) => {
+        result = sniffed;
     });
+    if (options.debug) console.log(`[orchestrator.js] Sniffed buffer and determined format: '${result.format}'`);
+    result.isGz = isGz;
+    return result;
+}
+
+export async function identifyFormat(filePath, options = {}) {
+    if (typeof filePath !== 'string') {
+        throw new Error('identifyFormat currently only supports file paths. For streams, pass the format explicitly via options.format.');
+    }
+
+    // Dynamically import node modules so browser bundle doesn't crash if explicitly bypassing node paths
+    const fs = await import(/* @vite-ignore */ 'node:fs');
+
+    // Read up to 64KB for format sniffing using a Uint8Array (not Node Buffer)
+    const sniffBuf = new Uint8Array(SNIFF_SIZE);
+    const fd = fs.openSync(filePath, 'r');
+    // fs.readSync accepts Uint8Array natively in modern Node
+    const bytesRead = fs.readSync(fd, sniffBuf, 0, SNIFF_SIZE, 0);
+    fs.closeSync(fd);
+
+    const buf = sniffBuf.subarray(0, bytesRead);
+    const isGz = isGzip(buf);
+    const textBuf = isGz ? await gunzipPrefixFromFile(filePath) : buf;
+    const result = sniffFormatBytes(textBuf.length > 0 ? textBuf : buf, isGz, options);
+    if (options.debug) console.log(`[orchestrator.js] Identified format '${result.format}' from ${filePath}`);
+    return result.format;
+}
+
+export async function identifyFormatFromBuffer(buffer, options = {}) {
+    const buf = toUint8Array(buffer);
+    const isGz = isGzip(buf);
+
+    const textBuf = isGz ? await gunzipPrefixFromBuffer(buf) : buf;
+    return sniffFormatBytes(textBuf, isGz, options);
 }

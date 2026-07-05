@@ -18,7 +18,10 @@ export function sniffMimeType(bodyText, encoding) {
     if (encoding === 'base64') {
         // Decode a small portion — 1024 base64 chars yields ~768 decoded bytes
         try {
-            sample = atob(bodyText.substring(0, 1024));
+            let b64Sample = bodyText.substring(0, 1024);
+            const remainder = b64Sample.length % 4;
+            if (remainder) b64Sample += '='.repeat(4 - remainder);
+            sample = atob(b64Sample);
         } catch {
             return '';
         }

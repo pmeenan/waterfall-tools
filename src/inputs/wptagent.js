@@ -149,21 +149,30 @@ export async function processWptagentZip(input, options = {}) {
     const storage = await createStorage(hashName);
     
     // Safely write isomorphic input streams into generic storage abstraction
-    if (typeof input === 'string') {
-        const fs = await import(/* @vite-ignore */ 'node:fs');
-        const readStream = fs.createReadStream(input);
-        const { Readable } = await import(/* @vite-ignore */ 'node:stream');
-        await storage.writeStream(Readable.toWeb(readStream));
-    } else if (input instanceof Uint8Array || input instanceof ArrayBuffer || (input && input.buffer instanceof ArrayBuffer)) {
-        await storage.writeBuffer(toUint8Array(input));
-    } else if (input && typeof input.getReader === 'function') {
-        await storage.writeStream(input);
-    } else {
-        throw new Error("Unsupported input type for wptagent processor");
-    }
+    let readStream = null;
+    let zip;
+    try {
+        if (typeof input === 'string') {
+            const fs = await import(/* @vite-ignore */ 'node:fs');
+            readStream = fs.createReadStream(input);
+            const { Readable } = await import(/* @vite-ignore */ 'node:stream');
+            await storage.writeStream(Readable.toWeb(readStream));
+        } else if (input instanceof Uint8Array || input instanceof ArrayBuffer || (input && input.buffer instanceof ArrayBuffer)) {
+            await storage.writeBuffer(toUint8Array(input));
+        } else if (input && typeof input.getReader === 'function') {
+            await storage.writeStream(input);
+        } else {
+            throw new Error("Unsupported input type for wptagent processor");
+        }
 
-    const zip = new ZipReader(storage);
-    await zip.init();
+        zip = new ZipReader(storage);
+        await zip.init();
+    } catch (e) {
+        await storage.destroy().catch(() => {});
+        throw e;
+    } finally {
+        if (readStream) readStream.destroy();
+    }
 
     const outputHar = getBaseWptHar();
     const fileList = zip.getFileList();

@@ -492,6 +492,32 @@ function structuralChecks(trace) {
 
 describe('rumcap trace synthesizer', () => {
 
+    it('does not throw when a timeline value is non-finite (NaN hardening)', async () => {
+        // A corrupted or hand-built .rcap can carry a non-finite timeline value
+        // that slips past the `!== undefined` stream filters. us()/packetNs() must
+        // clamp it: packetNs(NaN) would otherwise throw RangeError and abort the
+        // whole Perfetto synthesis, and synthesizeChromeTrace would emit ts: NaN
+        // (which serializes to null and corrupts DevTools sort/pairing).
+        const capture = await loadCapture('chrome-www-google-com.rcap');
+        // An interaction start of NaN reaches packetNs() (Perfetto packet
+        // timestamp) — unguarded, BigInt(NaN) throws RangeError and aborts the
+        // whole synthesis. A user-timing mark start of NaN reaches us() — unguarded
+        // it emits ts: NaN into the Chrome trace. Exercise both paths.
+        const events = capture.streams.interactions && capture.streams.interactions.events;
+        expect(Array.isArray(events) && events.length > 0).toBe(true);
+        events[0].startTime = NaN;
+        const marks = capture.streams.userTiming && capture.streams.userTiming.marks;
+        if (Array.isArray(marks) && marks[0]) marks[0].startTime = NaN;
+
+        expect(() => synthesizePerfettoProto(capture)).not.toThrow();
+
+        const trace = synthesizeChromeTrace(capture);
+        expect(Array.isArray(trace.traceEvents)).toBe(true);
+        for (const e of trace.traceEvents) {
+            if ('ts' in e) expect(Number.isFinite(e.ts)).toBe(true);
+        }
+    });
+
     it('synthesizes a structurally valid trace from the cnn cpu6x capture', async () => {
         const capture = await loadCapture('chrome-www-cnn-com-cpu6x.rcap');
         const trace = synthesizeChromeTrace(capture);
