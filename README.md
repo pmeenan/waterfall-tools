@@ -84,7 +84,7 @@ const har = wt.getHar();   // one page, all connections merged
 
 ### qlog captures (beta)
 
-[qlog](https://quicwg.org/) is the IETF structured logging format for QUIC/HTTP-3 (still an Internet-Draft; support here is **beta** — validated against curl/ngtcp2 and aioquic client captures, with server-vantage captures implemented but awaiting real-world samples). Both serializations are auto-detected from content: plain JSON `.qlog` and JSON-SEQ `.sqlog` (RFC 7464), plain or gzipped.
+[qlog](https://quicwg.org/) is the IETF structured logging format for QUIC/HTTP-3 (still an Internet-Draft; support here is **beta** — validated against curl/ngtcp2 and aioquic client captures plus Cloudflare quiche spec-final captures from both the client and server vantage points). Both serializations are auto-detected from content: plain JSON `.qlog` and JSON-SEQ `.sqlog` (RFC 7464), plain or gzipped, across both the draft-0.3 and final-spec dialects.
 
 One qlog file describes one QUIC connection, so a full page load usually produces several files (one per origin). Drop them all on the standalone viewer at once, pass them together to `loadBuffers()`, or list them all on the CLI, and they merge into a single page-wide waterfall. Fidelity depends on the producer: logs that include HTTP/3 events (e.g. aioquic) get real URLs, methods, statuses, and headers; transport-only logs (e.g. curl/ngtcp2, where headers stay QPACK-encoded on the wire) still render every request stream with synthetic per-stream URLs and assumed statuses.
 
@@ -96,6 +96,12 @@ QLOGDIR=/tmp/qlogs curl --http3-only https://cloudflare-quic.com/
 
 # aioquic: pass --quic-log to the example HTTP/3 client
 python3 examples/http3_client.py --quic-log /tmp/qlogs https://example.com/
+
+# quiche (spec-final qlog; QLOGDIR works on both example apps, so a local
+# server + client run logs the same exchange from BOTH vantage points)
+QLOGDIR=/tmp/qlogs ./quiche-server --listen 127.0.0.1:4433 --root ./htdocs \
+  --cert cert.crt --key cert.key
+QLOGDIR=/tmp/qlogs ./quiche-client --no-verify https://127.0.0.1:4433/
 ```
 
 See `Sample/Data/qlog/README.md` for sample provenance and full regeneration recipes.

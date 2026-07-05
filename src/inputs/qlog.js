@@ -188,7 +188,12 @@ function handlePacket(model, dir, t, data) {
         if (frame.frame_type === 'stream') {
             const sid = Number(frame.stream_id);
             if (!Number.isFinite(sid)) continue;
-            const len = Number(frame.length) || 0;
+            // Draft-0.3 producers put the stream data length directly on the frame
+            // (`length`); spec-final producers (quiche) nest a RawInfo where
+            // `payload_length` is the stream data and `length` is the full frame
+            // including headers — prefer the payload semantics in that order.
+            const raw = frame.raw || {};
+            const len = Number(frame.length) || Number(raw.payload_length) || Number(raw.length) || 0;
             if (!perStream) perStream = new Map();
             const acc = perStream.get(sid) || { bytes: 0, fin: false };
             acc.bytes += len;
@@ -346,6 +351,10 @@ async function buildTraceModel(trace, traceIndex) {
                     model.handshakeDone = t;
                 }
                 break;
+            // The current drafts folded the recovery namespace into quic:
+            // (`quic:recovery_metrics_updated`, emitted by quiche); draft-0.3 producers
+            // use `recovery:metrics_updated`. Same payload either way.
+            case 'quic:recovery_metrics_updated':
             case 'recovery:metrics_updated': {
                 const rtt = typeof data.latest_rtt === 'number' ? data.latest_rtt
                     : (typeof data.smoothed_rtt === 'number' ? data.smoothed_rtt : null);

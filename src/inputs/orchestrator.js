@@ -142,11 +142,12 @@ function finishSniffing(text, resolve) {
     if (minText.includes('{"constants":') && minText.includes('"logEventTypes":')) return resolve({ format: 'netlog' });
     if (minText.includes('CLIENT_RANDOM') || minText.includes('CLIENT_HANDSHAKE_TRAFFIC_SECRET') || minText.includes('CLIENT_TRAFFIC_SECRET_0')) return resolve({ format: 'keylog' });
     if ((minText.startsWith('{"data":{') || minText.includes('"data":{')) && (minText.includes('"median":') || minText.includes('"runs":') || minText.includes('"testRuns":') || minText.includes('"average":'))) return resolve({ format: 'wpt' });
-    // qlog plain JSON (.qlog): the qlog_version token is unambiguous across all
-    // supported formats (also catches JSON-SEQ files whose 0x1E byte check was
-    // bypassed). Placed before the chrome-trace/HAR patterns to document the
-    // precedence explicitly — qlog events can't satisfy those patterns anyway.
-    if (minText.includes('"qlog_version"')) return resolve({ format: 'qlog' });
+    // qlog plain JSON (.qlog): the qlog_version token (draft era) and the
+    // urn:ietf:params:qlog schema URNs (spec-final, e.g. quiche) are unambiguous
+    // across all supported formats (also catches JSON-SEQ files whose 0x1E byte
+    // check was bypassed). Placed before the chrome-trace/HAR patterns to document
+    // the precedence explicitly — qlog events can't satisfy those patterns anyway.
+    if (minText.includes('"qlog_version"') || minText.includes('urn:ietf:params:qlog')) return resolve({ format: 'qlog' });
     // Chrome trace JSON wrapper form. Plain captures are `{"traceEvents":[...]}`, but
     // DevTools-saved traces put `metadata` first (`{"metadata":{...},"traceEvents":[...]}`)
     // and individual events may lead with any key (e.g. `{"args":..., "cat":..., "pid":...}`),
@@ -252,14 +253,16 @@ export async function identifyFormatFromBuffer(buffer, options = {}) {
 
     // qlog JSON-SEQ (.sqlog, RFC 7464): the very first byte is the 0x1E record
     // separator; each record is 0x1E + JSON + LF. A lone 0x1E could be any
-    // RFC 7464 stream, so also require the qlog_version token within the sniff
-    // window — no other supported format carries it. Deliberately placed before
+    // RFC 7464 stream, so also require a qlog identity token within the sniff
+    // window — draft-era producers carry "qlog_version", spec-final producers
+    // (quiche) drop it and self-identify via urn:ietf:params:qlog schema URNs.
+    // No other supported format carries either token. Deliberately placed before
     // the perfetto varint heuristic (0x1E is not a valid TracePacket tag, so
     // there's no conflict, but keep the ordering explicit).
     if (textBuf.length >= 1 && textBuf[0] === 0x1e) {
         const seqDecoder = new TextDecoder('utf-8', { fatal: false });
         const seqText = seqDecoder.decode(textBuf.subarray(0, 65536));
-        if (seqText.includes('"qlog_version"')) {
+        if (seqText.includes('"qlog_version"') || seqText.includes('urn:ietf:params:qlog')) {
             return { format: 'qlog', isGz };
         }
     }

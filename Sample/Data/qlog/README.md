@@ -8,10 +8,12 @@ One qlog file describes one QUIC connection. Two serializations exist:
 plain JSON (`.qlog`, top-level `{qlog_version, traces: [...]}`) and
 JSON-SEQ / RFC 7464 (`.sqlog`, one JSON record per `0x1E` separator).
 
-All samples here are qlog draft version 0.3 with the pre-rename event
-namespaces (`transport:*`, `http:*`, `recovery:*`, `connectivity:*`,
-`security:*`). Current spec drafts rename `transport:` → `quic:` and
-`http:` → `http3:` — importer must accept both.
+The `aioquic/` and `curl/` samples are qlog draft version 0.3 with the
+pre-rename event namespaces (`transport:*`, `http:*`, `recovery:*`,
+`connectivity:*`, `security:*`); the `quiche/` samples are spec-final output
+with the current `quic:` / `http3:` namespaces and no `qlog_version` field at
+all — the importer must accept every generation (see each section for the
+per-producer quirks).
 
 ## `aioquic/` — full quic+http3 events, plain JSON
 
@@ -41,6 +43,42 @@ pip install aioquic wsproto
 curl -O https://raw.githubusercontent.com/aiortc/aioquic/main/examples/http3_client.py
 python3 replay_har_qlog.py www.google.com.har.gz <output-dir>
 ```
+
+## `quiche/` — spec-final qlog, both vantage points, JSON-SEQ
+
+Captured 2026-07-05 by running Cloudflare quiche's example client against
+quiche's example server on localhost with `QLOGDIR` set on **both** sides —
+the same 5-request exchange observed from both ends:
+
+- `quiche-localhost-client.sqlog.gz` — `vantage_point.type: client`
+- `quiche-localhost-server.sqlog.gz` — `vantage_point.type: server`
+
+These are the only samples using **spec-final** qlog output (the aioquic/curl
+samples are draft-0.3): no `qlog_version` (the header self-identifies via
+`"file_schema": "urn:ietf:params:qlog:file:sequential"` and
+`event_schemas: ["urn:ietf:params:qlog:events:quic-12", ...]`), current
+`quic:` / `http3:` event namespaces, object-form `reference_time`
+(`{clock_type: "monotonic", epoch: "unknown", wall_clock_time: <RFC3339>}` —
+anchored via `wall_clock_time`), RawInfo frame lengths
+(`frame.raw.payload_length` instead of draft `frame.length`), and
+`quic:recovery_metrics_updated` (the recovery namespace folded into `quic:`).
+
+Regenerate (needs Rust + cmake; BoringSSL bindgen may need
+`BINDGEN_EXTRA_CLANG_ARGS="-I/usr/lib/gcc/x86_64-linux-gnu/<ver>/include"`
+when only libclang without its resource headers is installed):
+
+```
+git clone --depth 1 --recurse-submodules https://github.com/cloudflare/quiche.git
+cd quiche && cargo build --release --bin quiche-client --bin quiche-server
+QLOGDIR=server-qlogs ./target/release/quiche-server --listen 127.0.0.1:4433 \
+  --cert quiche/examples/cert.crt --key quiche/examples/cert.key --root <htdocs> &
+QLOGDIR=client-qlogs ./target/release/quiche-client --no-verify \
+  https://127.0.0.1:4433/index.html https://127.0.0.1:4433/style.css ...
+```
+
+Files are named `{role}-{qlog id}.sqlog`; pair client/server logs for the same
+connection by matching the server's `scid` in the client's `packet_received`
+headers (or just by wall_clock_time proximity).
 
 ## `curl/` — transport-only events, JSON-SEQ
 

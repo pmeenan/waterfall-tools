@@ -200,8 +200,10 @@ export function parseJsonSeqTraces(bytes, options = {}) {
         // A header record carries the trace metadata under `trace` (single-trace form).
         const trace = (header && header.trace) || {};
         current = {
-            qlogFormat: (header && header.qlog_format) || 'JSON-SEQ',
-            qlogVersion: (header && header.qlog_version) || '',
+            qlogFormat: (header && (header.qlog_format || header.serialization_format)) || 'JSON-SEQ',
+            // Spec-final files (quiche) drop qlog_version entirely and self-identify via
+            // the file-schema URN — surface that so `_qlogTraces` stays informative.
+            qlogVersion: (header && (header.qlog_version || header.file_schema)) || '',
             vantagePoint: trace.vantage_point || null,
             commonFields: trace.common_fields || {},
             title: trace.title,
@@ -257,13 +259,18 @@ export async function parseJsonTraces(bytes, options = {}) {
     let qlogVersion = '';
 
     const parser = new JSONParser({
-        paths: ['$.qlog_version', '$.qlog_format', '$.traces.*'],
+        paths: ['$.qlog_version', '$.qlog_format', '$.file_schema', '$.serialization_format', '$.traces.*'],
         keepStack: false
     });
 
     parser.onValue = ({ value, key }) => {
+        // Spec-final files self-identify via file_schema/serialization_format instead of
+        // qlog_version/qlog_format — treat either pair as the version/format source
+        // (qlog_version/qlog_format win when both appear).
         if (key === 'qlog_version' && typeof value === 'string') qlogVersion = value;
         else if (key === 'qlog_format' && typeof value === 'string') qlogFormat = value;
+        else if (key === 'file_schema' && typeof value === 'string' && !qlogVersion) qlogVersion = value;
+        else if (key === 'serialization_format' && typeof value === 'string' && qlogFormat === 'JSON') qlogFormat = value;
         else if (typeof key === 'number' && value && typeof value === 'object') {
             // A traces[] element. TraceError objects (no events) are listed but skipped.
             if (Array.isArray(value.events)) {

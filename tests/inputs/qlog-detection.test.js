@@ -53,6 +53,31 @@ describe('qlog format detection (orchestrator)', () => {
     });
 });
 
+describe('qlog format detection (spec-final quiche: no qlog_version token)', () => {
+    // quiche emits spec-final qlog whose header has NO qlog_version — it
+    // self-identifies via urn:ietf:params:qlog file/event-schema URNs. Detection
+    // must accept either token.
+    const QUICHE_GZ = path.join(SAMPLE_DIR, 'quiche', 'quiche-localhost-server.sqlog.gz');
+
+    it('identifies plain quiche .sqlog bytes as qlog (orchestrator)', async () => {
+        const buf = zlib.gunzipSync(fs.readFileSync(QUICHE_GZ));
+        expect(buf.includes(Buffer.from('"qlog_version"'))).toBe(false); // the point of this suite
+        const detected = await identifyFormatFromBuffer(buf, { debug: true });
+        expect(detected.format).toBe('qlog');
+    });
+
+    it('identifies a gzipped quiche .sqlog.gz as qlog (orchestrator)', async () => {
+        const detected = await identifyFormatFromBuffer(fs.readFileSync(QUICHE_GZ), { debug: true });
+        expect(detected.format).toBe('qlog');
+        expect(detected.isGz).toBe(true);
+    });
+
+    it('identifies quiche .sqlog bytes as qlog (Worker parity)', async () => {
+        expect(await workerIdentifyFormat(new Uint8Array(zlib.gunzipSync(fs.readFileSync(QUICHE_GZ))))).toBe('qlog');
+        expect(await workerIdentifyFormat(new Uint8Array(fs.readFileSync(QUICHE_GZ)))).toBe('qlog');
+    });
+});
+
 describe('qlog format detection (Cloudflare Worker sniff parity)', () => {
     // The Worker's identifyFormatFromBuffer is a deliberately self-contained
     // mirror of the orchestrator's — these assertions lock the two in step.
