@@ -7,7 +7,7 @@
 // Canonical WebPageTest flame-chart categories. Every trace-event name that Chrome emits is
 // folded into one of these five buckets so the renderer only has to manage five colors. The
 // mapping mirrors the reference PHP implementation at
-// Sample/Implementations/webpagetest/www/waterfall.inc (lines 437-491) — keep them in sync.
+// https://github.com/catchpoint/WebPageTest/blob/a7c585a/www/waterfall.inc (lines 437-491) — keep them in sync.
 export const MAIN_THREAD_CATEGORY_MAP = (() => {
     const map = new Map();
     const add = (category, names) => { for (const n of names) map.set(n, category); };
@@ -19,7 +19,7 @@ export const MAIN_THREAD_CATEGORY_MAP = (() => {
 })();
 
 // Script-timing event names the renderer cares about. Mirrors `$script_events` in
-// Sample/Implementations/webpagetest/www/waterfall.inc#L1976-L1993 — each matching
+// https://github.com/catchpoint/WebPageTest/blob/a7c585a/www/waterfall.inc#L1976-L1993 — each matching
 // [start_ms, end_ms] pair becomes a JS-execution overlay on the request's row.
 export const SCRIPT_TIMING_EVENTS = new Set([
     'EvaluateScript',

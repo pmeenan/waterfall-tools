@@ -28,6 +28,7 @@ export default [
             'dist/**',
             'bin/demo/**',
             'Sample/**',
+            'third_party/**',
             'src/viewer/public/netlog-viewer/**',
             'coverage/**',
             '**/*.min.js'

@@ -24,7 +24,7 @@ function isGzip(buffer) {
 
 /**
  * Port of wptagent's `Trace.ProcessTimelineEvents` / `WriteCPUSlices` / `WriteScriptTimings`
- * (Sample/Implementations/wptagent/internal/support/trace_parser.py L492-L890). Replays the
+ * (https://github.com/catchpoint/WebPageTest.agent/blob/f118af8/internal/support/trace_parser.py L492-L890). Replays the
  * raw devtools.timeline / blink.resource events into a per-thread B/E stack, selects the
  * primary main thread, aggregates CPU time into fixed-size slices, and extracts per-URL JS
  * execution intervals.
@@ -1068,7 +1068,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
             if (mt.scripts) {
                 // Walk script timings, flatten allowlisted event names per URL, attach to
                 // the first matching HAR entry by URL. Mirrors the `$used` de-dup in
-                // Sample/Implementations/webpagetest/www/waterfall.inc#L2004-L2011.
+                // https://github.com/catchpoint/WebPageTest/blob/a7c585a/www/waterfall.inc#L2004-L2011.
                 const mainKey = mt.scripts.main_thread;
                 const mainThreadScripts = mainKey && mt.scripts[mainKey];
                 if (mainThreadScripts) {

@@ -1564,7 +1564,7 @@ export class WaterfallCanvas {
                         // Stack order must stay stable so categories render in consistent bands:
                         // Parse (bottom) → Layout → Paint → EvaluateScript → other (top).
                         // Colors mirror the WebPageTest GD reference palette
-                        // (Sample/Implementations/webpagetest/www/waterfall.inc L441-490).
+                        // (https://github.com/catchpoint/WebPageTest/blob/a7c585a/www/waterfall.inc L441-490).
                         const CATEGORY_COLORS = [
                             ['ParseHTML',      'rgb(112,162,227)'],
                             ['Layout',         'rgb(154,126,230)'],
