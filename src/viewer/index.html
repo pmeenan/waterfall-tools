@@ -12,6 +12,7 @@
     <title>Waterfall Viewer</title>
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <meta name="waterfall-devtools-path" content="">
+    <meta name="waterfall-qvis-path" content="">
     <script type="importmap">
     {
       "imports": {
@@ -19,7 +20,7 @@
       }
     }
     </script>
-    <link rel="stylesheet" href="./style.css?v=6">
+    <link rel="stylesheet" href="./style.css?v=9">
 </head>
 
 <body>
@@ -49,7 +50,7 @@
                     <h3>Format Agnostic</h3>
                     <p>Supports <strong>HAR, WPT json, Chrome traces, Chrome netlogs, tcpdump (.cap.gz), rumcap
                             (.rcap), and qlog</strong> files. Chrome traces and <code>.rcap</code> sources also open in
-                        the embedded Perfetto and DevTools viewers.</p>
+                        the embedded Perfetto and DevTools viewers; qlog inputs can open in qvis when installed.</p>
                 </div>
                 <div class="featureCard">
                     <h3>Embeddable Everywhere</h3>
@@ -70,7 +71,7 @@
                 <button id="upload-btn">Select File(s)</button>
                 <p class="sub-hint">For tcpdump with TLS Decryption, select or drop both the <code>.cap.gz</code> and
                     your SSL keylog file together. For qlog, drop all of a page load's per-connection
-                    <code>.qlog</code>/<code>.sqlog</code> files together to see one merged waterfall.
+                    <code>.qlog</code>/<code>.sqlog</code> files together to see one merged waterfall and qvis session.
                 </p>
             </div>
 
@@ -176,6 +177,9 @@
                     <div class="viewer-tab hidden" data-tab-id="netlog" id="tab-netlog" draggable="true">
                         <span class="tab-title">NetLog</span>
                     </div>
+                    <div class="viewer-tab hidden" data-tab-id="qvis" id="tab-qvis" draggable="true">
+                        <span class="tab-title">qvis</span>
+                    </div>
                 </div>
                 <button id="tab-scroll-right" class="tab-scroll-btn hidden">▶</button>
             </div>
@@ -220,6 +224,14 @@
                     </div>
                 </div>
                 <iframe id="netlog-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+            <div id="qvis-view" class="tab-content" style="background: #fff;">
+                <div id="qvis-overlay">
+                    <div id="qvis-overlay-content">
+                        Loading qvis...
+                    </div>
+                </div>
+                <iframe id="qvis-frame" style="width: 100%; height: 100%; border: none;"></iframe>
             </div>
         </div>
     </div>
@@ -286,7 +298,7 @@
             });
         }
     </script>
-    <script type="module" src="./viewer.js?v=6"></script>
+    <script type="module" src="./viewer.js?v=9"></script>
 </body>
 
 </html>

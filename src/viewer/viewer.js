@@ -44,6 +44,11 @@ const ui = {
     netlogFrame: document.getElementById('netlog-frame'),
     netlogOverlay: document.getElementById('netlog-overlay'),
     netlogOverlayContent: document.getElementById('netlog-overlay-content'),
+    tabQvis: document.getElementById('tab-qvis'),
+    qvisView: document.getElementById('qvis-view'),
+    qvisFrame: document.getElementById('qvis-frame'),
+    qvisOverlay: document.getElementById('qvis-overlay'),
+    qvisOverlayContent: document.getElementById('qvis-overlay-content'),
     viewerTabs: document.getElementById('viewer-tabs'),
     tabsScrollWrapper: document.getElementById('tabs-scroll-wrapper'),
     hamburgerBtn: document.getElementById('hamburger-btn'),
@@ -69,6 +74,8 @@ const activeBlobUrls = [];
 const tileRenderers = [];
 let pendingTabLoads = {};
 let activePerfettoLoad = null;
+let activeQvisLoad = null;
+const qvisProbeCache = new Map();
 const PERFETTO_ORIGIN = 'https://ui.perfetto.dev';
 const PERFETTO_RUMCAP_STARTUP_COMMANDS = [
     { id: 'dev.perfetto.CollapseTracksByRegex', args: ['.*'] },
@@ -103,6 +110,13 @@ function cleanupPerfettoLoad() {
     window.removeEventListener('message', activePerfettoLoad.onMessage);
     if (ui.traceFrame) ui.traceFrame.removeEventListener('load', activePerfettoLoad.onLoad);
     activePerfettoLoad = null;
+}
+
+function cleanupQvisLoad() {
+    if (!activeQvisLoad) return;
+    clearTimeout(activeQvisLoad.timeoutId);
+    window.removeEventListener('message', activeQvisLoad.onMessage);
+    activeQvisLoad = null;
 }
 
 function loadTracePerfetto(traceBuffer, startupCommands = null) {
@@ -169,6 +183,136 @@ function getDevtoolsPath() {
     const meta = document.querySelector('meta[name="waterfall-devtools-path"]');
     const val = meta && meta.getAttribute('content');
     return val ? val : null;
+}
+
+function getQvisPath() {
+    const meta = document.querySelector('meta[name="waterfall-qvis-path"]');
+    const val = meta && meta.getAttribute('content');
+    return val ? val : null;
+}
+
+async function hasFetchableQvis(path) {
+    if (!path) return false;
+    if (!qvisProbeCache.has(path)) {
+        qvisProbeCache.set(path, fetch(`${path}index.html`, { cache: 'force-cache' })
+            .then(response => response.ok)
+            .catch(() => false));
+    }
+    return await qvisProbeCache.get(path);
+}
+
+function asUint8Array(buffer) {
+    if (buffer instanceof Uint8Array) return buffer;
+    if (buffer instanceof ArrayBuffer) return new Uint8Array(buffer);
+    if (buffer && buffer.buffer instanceof ArrayBuffer) {
+        return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    }
+    return new Uint8Array(buffer);
+}
+
+async function decompressQlogForQvis(view, name) {
+    const isGzip = view.length >= 2 && view[0] === 0x1f && view[1] === 0x8b;
+    if (!isGzip) return view;
+    if (typeof DecompressionStream === 'undefined') {
+        throw new Error(`Cannot decompress gzip qlog member for qvis: ${name}`);
+    }
+    const stream = new Blob([view]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+function stripCompressionSuffixes(name) {
+    let stripped = name || '';
+    while (/\.(gz|gzip|br|brotli|zip)$/i.test(stripped)) {
+        stripped = stripped.replace(/\.(gz|gzip|br|brotli|zip)$/i, '');
+    }
+    return stripped;
+}
+
+function qvisQlogExtension(view) {
+    let i = 0;
+    if (view.length >= 3 && view[0] === 0xef && view[1] === 0xbb && view[2] === 0xbf) i = 3;
+    while (i < view.length && (view[i] === 0x20 || view[i] === 0x09 || view[i] === 0x0a || view[i] === 0x0d)) i++;
+    return i < view.length && view[i] === 0x1e ? '.sqlog' : '.qlog';
+}
+
+function normalizeQvisFileName(name, index, view) {
+    const stripped = stripCompressionSuffixes(name || '');
+    if (/\.(qlog|sqlog|json)$/i.test(stripped)) return stripped;
+    return `connection-${index + 1}${qvisQlogExtension(view)}`;
+}
+
+async function prepareQvisFiles(files) {
+    const prepared = [];
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const originalView = asUint8Array(file.buffer);
+        const view = await decompressQlogForQvis(originalView, file.name || `connection-${i + 1}`);
+        const name = normalizeQvisFileName(file.name, i, view);
+        prepared.push({
+            name,
+            data: view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength)
+        });
+    }
+    return prepared;
+}
+
+function qvisTargetOrigin() {
+    if (window.location.protocol === 'file:') return '*';
+    return window.location.origin;
+}
+
+function qvisMessageIsSameOrigin(event) {
+    if (event.origin === window.location.origin) return true;
+    return window.location.protocol === 'file:' && event.origin === 'null';
+}
+
+function loadQvis(files) {
+    cleanupQvisLoad();
+    if (!ui.qvisFrame || !ui.qvisOverlay || !ui.qvisOverlayContent) return;
+    const path = getQvisPath();
+    if (!path) return;
+
+    const loadId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const preparedFiles = prepareQvisFiles(files)
+        .then(qvisFiles => ({ qvisFiles }))
+        .catch(error => ({ error }));
+
+    const onMessage = (event) => {
+        if (event.source !== ui.qvisFrame.contentWindow) return;
+        if (!qvisMessageIsSameOrigin(event)) return;
+        const data = event.data || {};
+        if (data.type !== 'qvis-ready' || data.loadId !== loadId) return;
+
+        ui.qvisOverlayContent.innerText = 'Loading qlog files into qvis...';
+        preparedFiles.then(({ qvisFiles, error }) => {
+            if (error) throw error;
+            if (!ui.qvisFrame || !ui.qvisFrame.contentWindow) return;
+            ui.qvisFrame.contentWindow.postMessage({
+                type: 'qvis-load-files',
+                loadId,
+                files: qvisFiles
+            }, qvisTargetOrigin());
+            ui.qvisOverlay.style.display = 'none';
+            cleanupQvisLoad();
+        }).catch(e => {
+            console.warn('[viewer.js] Failed to prepare qlog files for qvis:', e);
+            ui.qvisOverlayContent.innerText = 'Failed to prepare qlog files for qvis.';
+            cleanupQvisLoad();
+        });
+    };
+
+    window.addEventListener('message', onMessage);
+    const timeoutId = setTimeout(() => {
+        console.warn('[viewer.js] Timed out waiting for qvis embed handshake.');
+        ui.qvisOverlayContent.innerText = 'Timed out waiting for qvis.';
+        ui.qvisOverlay.style.display = 'none';
+        cleanupQvisLoad();
+    }, 30000);
+    activeQvisLoad = { onMessage, timeoutId };
+
+    ui.qvisOverlay.style.display = 'flex';
+    ui.qvisOverlayContent.innerText = 'Loading qvis...';
+    ui.qvisFrame.src = `${path}index.html?embedded=1&loadId=${encodeURIComponent(loadId)}#/events`;
 }
 
 // Returns one of: 'json', 'gzipped-json', 'perfetto', 'gzipped-perfetto'.
@@ -1585,6 +1729,7 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         renderSummary(pageData);
     }
 
+    cleanupQvisLoad();
     pendingTabLoads = {};
     if (ui.tabLighthouse) ui.tabLighthouse.classList.add('hidden');
     if (ui.lighthouseFrame) ui.lighthouseFrame.src = 'about:blank';
@@ -1594,6 +1739,8 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     if (ui.devtoolsFrame) ui.devtoolsFrame.src = 'about:blank';
     if (ui.tabNetlog) ui.tabNetlog.classList.add('hidden');
     if (ui.netlogFrame) ui.netlogFrame.src = 'about:blank';
+    if (ui.tabQvis) ui.tabQvis.classList.add('hidden');
+    if (ui.qvisFrame) ui.qvisFrame.src = 'about:blank';
 
     try {
         const lhResource = await waterfallTool.getPageResource(pageId, 'lighthouse');
@@ -1646,6 +1793,20 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         }
     } catch (e) {
         console.warn(`[viewer.js] Failed to fetch netlog data for ${pageId}:`, e);
+    }
+
+    try {
+        const qlogResource = await waterfallTool.getPageResource(pageId, 'qlog');
+        const qvisPath = getQvisPath();
+        if (qlogResource && Array.isArray(qlogResource.files) && qlogResource.files.length > 0
+            && qvisPath && await hasFetchableQvis(qvisPath) && ui.tabQvis) {
+            ui.tabQvis.classList.remove('hidden');
+            pendingTabLoads.qvis = () => {
+                loadQvis(qlogResource.files);
+            };
+        }
+    } catch (e) {
+        console.warn(`[viewer.js] Failed to prepare qvis data for ${pageId}:`, e);
     }
 
     renderOptions.onHover = (data, metrics) => {
@@ -1814,6 +1975,7 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
 
 function resetWaterfallUI() {
     cleanupPerfettoLoad();
+    cleanupQvisLoad();
 
     if (typeof pendingTabLoads !== 'undefined') {
         pendingTabLoads = {};
@@ -1841,6 +2003,7 @@ function resetWaterfallUI() {
         if (ui.traceFrame) ui.traceFrame.src = 'about:blank';
         if (ui.devtoolsFrame) ui.devtoolsFrame.src = 'about:blank';
         if (ui.netlogFrame) ui.netlogFrame.src = 'about:blank';
+        if (ui.qvisFrame) ui.qvisFrame.src = 'about:blank';
     }
     
     const tooltip = document.getElementById('waterfall-tooltip');
@@ -1937,6 +2100,9 @@ async function processData(arrayBuffer, options = {}, keylogArrayBuffer = null) 
             debug: false,
             onProgress: (phase, percent) => updateProgress(phase, percent)
         };
+        if (Array.isArray(options.bufferNames)) {
+            loadOptions.bufferNames = options.bufferNames;
+        }
         if (keylogArrayBuffer) {
              const blob = new Blob([keylogArrayBuffer]);
              loadOptions.keyLogInput = await fileToReadable(blob);
@@ -2010,7 +2176,7 @@ async function processFiles(files) {
                 for (const file of files) {
                     buffers.push(new Uint8Array(await file.arrayBuffer()));
                 }
-                await processData(buffers, {});
+                await processData(buffers, { bufferNames: Array.from(files, file => file.name) });
                 return;
             }
 
@@ -2031,7 +2197,8 @@ async function processFiles(files) {
             keylogBuffer = await keylogFile.arrayBuffer();
         }
 
-        await processData(arrayBuffer, {}, keylogBuffer);
+        const processOptions = mainFile && mainFile.name ? { bufferNames: [mainFile.name] } : {};
+        await processData(arrayBuffer, processOptions, keylogBuffer);
 
     } catch(e) {
         console.error(e);
@@ -2146,7 +2313,11 @@ window.WaterfallViewer = {
         showLoading('Loading Programmatically...');
         if (bufferOrFile instanceof File || bufferOrFile instanceof Blob) {
             const buf = await bufferOrFile.arrayBuffer();
-            return processData(buf, Object.assign({}, options, { historyMode: 'replace' }));
+            const fileOptions = Object.assign({}, options, { historyMode: 'replace' });
+            if (bufferOrFile instanceof File && bufferOrFile.name && !Array.isArray(fileOptions.bufferNames)) {
+                fileOptions.bufferNames = [bufferOrFile.name];
+            }
+            return processData(buf, fileOptions);
         } else if (bufferOrFile instanceof ArrayBuffer) {
             return processData(bufferOrFile, Object.assign({}, options, { historyMode: 'replace' }));
         }
@@ -2502,6 +2673,12 @@ async function initViewer() {
                 if (pendingTabLoads.netlog) {
                     pendingTabLoads.netlog();
                     delete pendingTabLoads.netlog;
+                }
+            } else if (tabId === 'qvis') {
+                if (ui.qvisView) ui.qvisView.classList.add('active');
+                if (pendingTabLoads.qvis) {
+                    pendingTabLoads.qvis();
+                    delete pendingTabLoads.qvis;
                 }
             } else {
                 // Handle dynamic tabs like req-1, req-2

@@ -7,6 +7,8 @@ waterfall-tools-viewer-*.zip
 
 # Test coverage
 coverage/
+test-results/
+playwright-report/
 
 # Logs
 logs

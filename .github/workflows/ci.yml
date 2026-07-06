@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          # The qvis fork submodule must be present: until the qvis npm package is
+          # published, package.json resolves it from a tarball inside the submodule
+          # tree, and npm ci fails if the path is missing.
+          submodules: true
 
       - uses: actions/setup-node@v6
         with:
@@ -17,9 +22,13 @@ jobs:
 
       - run: npm ci
 
+      - run: npx playwright install --with-deps chromium
+
       - run: npm run lint
 
       - run: npm test -- --run
+
+      - run: npm run test:browser
 
       - run: npm run build
 

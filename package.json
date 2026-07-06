@@ -38,6 +38,8 @@
   },
   "scripts": {
     "test": "vitest",
+    "test:browser": "npm --prefix third_party/qvis/visualizations run build && playwright test",
+    "test:browser:all": "npm --prefix third_party/qvis/visualizations run build && PLAYWRIGHT_ALL_BROWSERS=1 playwright test",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "build": "npm run lint && node scripts/build.js",
@@ -74,12 +76,14 @@
   "devDependencies": {
     "@chrome-devtools/index": "^1.20260628.0",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "eslint": "^10.2.1",
     "globals": "^17.5.0",
+    "@pmeenan/qvis": "^0.1.0",
     "rollup": "^4.60.1",
     "sharp": "^0.34.5",
     "vite": "^8.0.3",
@@ -92,10 +96,14 @@
     "rumcap": "^0.0.1"
   },
   "peerDependencies": {
-    "@chrome-devtools/index": "^1.20260628.0"
+    "@chrome-devtools/index": "^1.20260628.0",
+    "@pmeenan/qvis": "^0.1.0"
   },
   "peerDependenciesMeta": {
     "@chrome-devtools/index": {
+      "optional": true
+    },
+    "@pmeenan/qvis": {
       "optional": true
     }
   },

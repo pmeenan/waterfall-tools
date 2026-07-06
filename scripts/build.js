@@ -27,6 +27,8 @@ const browserAlias = {
 
 import { patchDevtoolsBundle } from './patch-devtools.js';
 
+const QVIS_PACKAGE_NAME = '@pmeenan/qvis';
+
 const externalDepsCore = [
   'fs', 'path', 'os', 'child_process', 'crypto', 'stream', 'zlib', 'util', 'url', 'https', 'http',
   'node:fs', 'node:path', 'node:stream', 'node:os', 'node:child_process', 'node:crypto', 'node:fs/promises',
@@ -67,6 +69,59 @@ async function runRollup(entryName, aliasMap, outDir, externalDeps, stubName, is
     }
     
     return mainEntry ? mainEntry.fileName : null;
+}
+
+async function patchJsFiles(dir, patcher) {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+        const fullPath = resolve(dir, entry.name);
+        if (entry.isDirectory()) {
+            await patchJsFiles(fullPath, patcher);
+        } else if (entry.isFile() && entry.name.endsWith('.js')) {
+            const raw = await fs.readFile(fullPath, 'utf-8');
+            const patched = patcher(raw);
+            if (patched !== raw) await fs.writeFile(fullPath, patched);
+        }
+    }
+}
+
+async function copyStaticDir(src, dest, { skipMaps = false } = {}) {
+    await fs.rm(dest, { recursive: true, force: true });
+    await fs.cp(src, dest, {
+        recursive: true,
+        filter: (source) => !(skipMaps && source.endsWith('.map'))
+    });
+}
+
+async function resolveQvisPackage() {
+    const candidates = [
+        {
+            source: 'fork dist',
+            packagePath: resolve(__dirname, '../third_party/qvis/visualizations/package.json'),
+            dist: resolve(__dirname, '../third_party/qvis/visualizations/dist')
+        },
+        {
+            source: 'installed package',
+            packagePath: resolve(__dirname, `../node_modules/${QVIS_PACKAGE_NAME}/package.json`)
+        }
+    ];
+    const errors = [];
+
+    for (const candidate of candidates) {
+        try {
+            const qvisPkg = JSON.parse(await fs.readFile(candidate.packagePath, 'utf-8'));
+            const qvisRoot = resolve(candidate.packagePath, '..');
+            const qvisDist = candidate.dist || resolve(qvisRoot, 'dist');
+            const stat = await fs.stat(qvisDist);
+            if (!stat.isDirectory()) throw new Error('dist is not a directory');
+            return { version: qvisPkg.version, dist: qvisDist, source: candidate.source };
+        } catch (e) {
+            errors.push(`${candidate.source}: ${e.message}`);
+        }
+    }
+
+    console.warn(`Optional ${QVIS_PACKAGE_NAME} package not available for viewer embed (${errors.join('; ')}). The qvis tab will be hidden.`);
+    return null;
 }
 
 async function runBuilds() {
@@ -115,20 +170,16 @@ async function runBuilds() {
     //     versioned subdir when resolved against the chunk's import.meta.url → assets 404
     //     at the document root. Flatten the prefix to `./` since the prebuilt bundle
     //     co-locates every asset.
-    async function patchDevtoolsJs(dir) {
-        const entries = await fs.readdir(dir, { withFileTypes: true });
-        for (const entry of entries) {
-            const fullPath = resolve(dir, entry.name);
-            if (entry.isDirectory()) {
-                await patchDevtoolsJs(fullPath);
-            } else if (entry.isFile() && entry.name.endsWith('.js')) {
-                const raw = await fs.readFile(fullPath, 'utf-8');
-                const patched = patchDevtoolsBundle(raw);
-                if (patched !== raw) await fs.writeFile(fullPath, patched);
-            }
-        }
+    await patchJsFiles(devtoolsDest, patchDevtoolsBundle);
+
+    const qvisPackage = await resolveQvisPackage();
+    let qvisDirName = '';
+    if (qvisPackage) {
+        qvisDirName = `qvis-${qvisPackage.version}`;
+        const qvisDest = resolve(__dirname, `../dist/browser/${qvisDirName}`);
+        console.log(`Copying ${QVIS_PACKAGE_NAME}@${qvisPackage.version} (${qvisPackage.source}) -> dist/browser/${qvisDirName}/ ...`);
+        await copyStaticDir(qvisPackage.dist, qvisDest, { skipMaps: true });
     }
-    await patchDevtoolsJs(devtoolsDest);
 
     if (browserFileName) {
         const indexPath = resolve(__dirname, '../dist/browser/index.html');
@@ -152,6 +203,16 @@ async function runBuilds() {
             );
         } else {
             indexHtml = indexHtml.replace('</head>', `  ${devtoolsMeta}\n</head>`);
+        }
+
+        const qvisMeta = `<meta name="waterfall-qvis-path" content="${qvisDirName ? `./${qvisDirName}/` : ''}">`;
+        if (indexHtml.includes('name="waterfall-qvis-path"')) {
+            indexHtml = indexHtml.replace(
+                /<meta name="waterfall-qvis-path"[^>]*>/,
+                qvisMeta
+            );
+        } else {
+            indexHtml = indexHtml.replace('</head>', `  ${qvisMeta}\n</head>`);
         }
 
         await fs.writeFile(indexPath, indexHtml);

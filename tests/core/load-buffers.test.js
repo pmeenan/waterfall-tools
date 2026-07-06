@@ -27,6 +27,13 @@ function readSample(rel) {
     return new Uint8Array(fs.readFileSync(path.join(SAMPLE_DIR, rel)));
 }
 
+function paddedView(bytes, prefixLength = 7, suffixLength = 11) {
+    const backing = new Uint8Array(prefixLength + bytes.byteLength + suffixLength);
+    backing.fill(0x7b);
+    backing.set(bytes, prefixLength);
+    return backing.subarray(prefixLength, prefixLength + bytes.byteLength);
+}
+
 // Minimal buffer that identifyFormatFromBuffer sniffs as 'har' (matches the
 // orchestrator's `{"log":{"version":` token check). Never parsed — every
 // mixed/multi-format test must throw before any parser runs.
@@ -77,6 +84,76 @@ describe('WaterfallTools.loadBuffers', () => {
             const har = wt.getHar();
             expect(har.log.pages.length).toBe(1);
             expect(har.log.entries.length).toBeGreaterThan(0);
+        } finally {
+            await wt.destroy();
+        }
+    });
+
+    it('exposes a single qlog raw-buffer resource without creating an object URL', async () => {
+        const buf = readSample(AIOQUIC_FILES[0]);
+        const wt = new WaterfallTools();
+        try {
+            await wt.loadBuffer(buf, { debug: true, bufferNames: ['www.google.com.qlog.gz'] });
+            const pageId = wt.getHar().log.pages[0].id;
+            const resource = await wt.getPageResource(pageId, 'qlog');
+
+            expect(resource).toBeTruthy();
+            expect(resource.url).toBeUndefined();
+            expect(resource.files).toHaveLength(1);
+            expect(resource.files[0].name).toBe('www.google.com.qlog.gz');
+            expect(resource.files[0].mimeType).toBe('application/qlog');
+            expect(resource.files[0].buffer).toBe(wt._rawBuffer);
+            expect(new Uint8Array(resource.files[0].buffer)).toEqual(buf);
+        } finally {
+            await wt.destroy();
+        }
+    });
+
+    it('exposes multi-qlog raw-buffer resources with names and exact view slicing', async () => {
+        const originals = AIOQUIC_FILES.slice(0, 2).map(readSample);
+        const buffers = originals.map((bytes, index) => paddedView(bytes, 5 + index, 13 + index));
+        const names = ['www.google.com.qlog.gz', 'fonts.gstatic.com.qlog.gz'];
+        const wt = new WaterfallTools();
+        try {
+            await wt.loadBuffers(buffers, { debug: true, bufferNames: names });
+
+            expect(wt._rawBuffer).toBeNull();
+            expect(wt._rawBuffers).toHaveLength(2);
+            const pageId = wt.getHar().log.pages[0].id;
+            const resource = await wt.getPageResource(pageId, 'qlog');
+
+            expect(resource).toBeTruthy();
+            expect(resource.url).toBeUndefined();
+            expect(resource.files).toHaveLength(2);
+            for (let i = 0; i < resource.files.length; i++) {
+                expect(resource.files[i].name).toBe(names[i]);
+                expect(resource.files[i].mimeType).toBe('application/qlog');
+                expect(resource.files[i].buffer).toBe(wt._rawBuffers[i].buffer);
+                expect(resource.files[i].buffer.byteLength).toBe(originals[i].byteLength);
+                expect(new Uint8Array(resource.files[i].buffer)).toEqual(originals[i]);
+            }
+        } finally {
+            await wt.destroy();
+        }
+    });
+
+    it('clears retained multi-qlog raw buffers on reload and destroy', async () => {
+        const buffers = AIOQUIC_FILES.slice(0, 2).map(readSample);
+        const wt = new WaterfallTools();
+        try {
+            await wt.loadBuffers(buffers, { debug: true, bufferNames: ['first.qlog.gz', 'second.qlog.gz'] });
+            expect(wt._rawBuffers).toHaveLength(2);
+
+            await wt.loadBuffer(syntheticHarBuffer(), { debug: true });
+            expect(wt._sourceFormat).toBe('har');
+            expect(wt._rawBuffers).toBeNull();
+
+            await wt.loadBuffers(buffers, { debug: true, bufferNames: ['first.qlog.gz', 'second.qlog.gz'] });
+            expect(wt._rawBuffers).toHaveLength(2);
+
+            await wt.destroy();
+            expect(wt._rawBuffer).toBeNull();
+            expect(wt._rawBuffers).toBeNull();
         } finally {
             await wt.destroy();
         }

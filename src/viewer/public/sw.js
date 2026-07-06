@@ -31,7 +31,9 @@ self.addEventListener('fetch', (event) => {
     if (!event.request.url.startsWith('http')) return;
 
     const url = new URL(event.request.url);
-    const isVersionedAsset = url.pathname.includes('/assets/') || url.pathname.includes('/waterfall-tools/');
+    const isVersionedAsset = url.pathname.includes('/assets/')
+        || url.pathname.includes('/waterfall-tools/')
+        || url.pathname.includes('/qvis-');
 
     if (isVersionedAsset) {
         // Cache-First Strategy strictly for definitively versioned blobs

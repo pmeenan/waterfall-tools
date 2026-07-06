@@ -17,6 +17,7 @@ export { PerfettoDecoder } from '../inputs/utilities/perfetto/decoder.js';
 // Formats whose parser accepts an ARRAY of inputs merged into a single page. Today that is
 // only qlog (one file per QUIC connection — a page load over HTTP/3 produces several).
 const MULTI_BUFFER_FORMATS = ['qlog'];
+const QLOG_MIME_TYPE = 'application/qlog';
 
 /**
  * Normalize ArrayBuffer / Uint8Array / Node Buffer / other TypedArray views to Uint8Array
@@ -34,6 +35,19 @@ function toUint8Array(buffer) {
         return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
     }
     return new Uint8Array(buffer);
+}
+
+function copyExactBuffer(buf) {
+    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+}
+
+function getBufferName(options, index) {
+    const names = Array.isArray(options.bufferNames) ? options.bufferNames : null;
+    const name = names && names[index];
+    if (typeof name === 'string' && name.trim()) {
+        return name;
+    }
+    return `connection-${index + 1}.qlog`;
 }
 
 export class WaterfallTools {
@@ -58,7 +72,10 @@ export class WaterfallTools {
     async destroy() {
         await this._destroyCurrentData();
         this.data = null;
+        this._sourceFormat = null;
         this._rawBuffer = null;
+        this._rawBufferName = null;
+        this._rawBuffers = null;
         this._rumcapTraceCache = null;
     }
 
@@ -66,6 +83,10 @@ export class WaterfallTools {
         if (this.data && this.data._opfsStorage && typeof this.data._opfsStorage.destroy === 'function') {
             await this.data._opfsStorage.destroy();
         }
+        this._rawBuffer = null;
+        this._rawBufferName = null;
+        this._rawBuffers = null;
+        this._rumcapTraceCache = null;
     }
 
     /**
@@ -98,6 +119,8 @@ export class WaterfallTools {
         // backing buffer, so both must drop or the resource routes serve stale bytes.
         this._sourceFormat = format;
         this._rawBuffer = null;
+        this._rawBufferName = null;
+        this._rawBuffers = null;
         this._rumcapTraceCache = null;
         options.instanceId = this.instanceId;
         this.data = await parser(filePath, options);
@@ -129,6 +152,8 @@ export class WaterfallTools {
         // mirror loadFile(); loadBuffer() re-attaches its own buffer AFTER this returns.
         this._sourceFormat = format;
         this._rawBuffer = null;
+        this._rawBufferName = null;
+        this._rawBuffers = null;
         this._rumcapTraceCache = null;
         options.instanceId = this.instanceId;
         this.data = await parser(stream, options);
@@ -177,7 +202,8 @@ export class WaterfallTools {
         const result = await this.loadStream(stream, streamOptions);
         // AFTER loadStream() — it clears the raw-buffer state as its reused-instance guard;
         // re-attach the bytes backing THIS load so trace/netlog passthrough works.
-        this._rawBuffer = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength); // Store exact ArrayBuffer view
+        this._rawBuffer = copyExactBuffer(buf); // Store exact ArrayBuffer view
+        this._rawBufferName = format === 'qlog' ? getBufferName(options, 0) : null;
         return result;
     }
 
@@ -230,6 +256,8 @@ export class WaterfallTools {
 
         this._sourceFormat = format;
         this._rawBuffer = null;
+        this._rawBufferName = null;
+        this._rawBuffers = null;
         this._rumcapTraceCache = null;
 
         const parseOptions = {
@@ -239,6 +267,12 @@ export class WaterfallTools {
             totalBytes: bufs.reduce((sum, b) => sum + b.byteLength, 0)
         };
         this.data = await parser(bufs, parseOptions);
+        if (format === 'qlog') {
+            this._rawBuffers = bufs.map((buf, index) => ({
+                name: getBufferName(options, index),
+                buffer: copyExactBuffer(buf)
+            }));
+        }
         return this;
     }
 
@@ -264,7 +298,7 @@ export class WaterfallTools {
 
     /**
      * Get an individual page with associated timings mapped dynamically.
-     * @param {string} pageId 
+     * @param {string} pageId
      * @param {Object} options - { includeRequests: boolean }
      * @returns {Object} The flattened page object
      */
@@ -293,11 +327,11 @@ export class WaterfallTools {
     }
 
     /**
-     * Gets an Object URL or raw buffer for a specific raw asset dynamically (e.g., screenshot, trace).
+     * Gets an Object URL, raw buffer, or qlog file list for a specific raw asset dynamically.
      * Automatically retrieves assets securely natively from HAR mapping or generic OPFS extraction instances securely.
      * @param {string} pageId 
-     * @param {string} resourceType - 'screenshot', 'trace', 'netlog', 'tcpdump', 'lighthouse'
-     * @returns {Promise<{ url?: string, buffer?: Uint8Array, mimeType: string } | null>} 
+     * @param {string} resourceType - 'screenshot', 'trace', 'netlog', 'tcpdump', 'lighthouse', 'qlog'
+     * @returns {Promise<{ url?: string, buffer?: Uint8Array|ArrayBuffer, files?: Array<{name: string, mimeType: string, buffer: ArrayBuffer}>, mimeType?: string } | null>}
      */
     async getPageResource(pageId, resourceType = 'screenshot') {
         const pageData = this.getPage(pageId);
@@ -319,6 +353,26 @@ export class WaterfallTools {
             const str = pageData._lighthouse;
             const url = `data:text/html;charset=utf-8,${encodeURIComponent(str)}`;
             return { url, mimeType: 'text/html' };
+        }
+
+        if (resourceType === 'qlog' && this._sourceFormat === 'qlog') {
+            let files = [];
+            if (Array.isArray(this._rawBuffers) && this._rawBuffers.length > 0) {
+                files = this._rawBuffers
+                    .filter(raw => raw && raw.buffer)
+                    .map((raw, index) => ({
+                        name: raw.name || `connection-${index + 1}.qlog`,
+                        mimeType: QLOG_MIME_TYPE,
+                        buffer: raw.buffer
+                    }));
+            } else if (this._rawBuffer) {
+                files = [{
+                    name: this._rawBufferName || 'connection-1.qlog',
+                    mimeType: QLOG_MIME_TYPE,
+                    buffer: this._rawBuffer
+                }];
+            }
+            return files.length > 0 ? { files } : null;
         }
 
         if (resourceType === 'trace' && (this._sourceFormat === 'chrome-trace' || this._sourceFormat === 'perfetto') && this._rawBuffer) {

@@ -31,6 +31,8 @@ export default [
             'third_party/**',
             'src/viewer/public/netlog-viewer/**',
             'coverage/**',
+            'test-results/**',
+            'playwright-report/**',
             '**/*.min.js'
         ]
     },
@@ -77,6 +79,7 @@ export default [
             'scripts/**/*.js',
             'vite.*.config.js',
             'vitest.config.js',
+            'playwright.config.js',
             'eslint.config.js'
         ],
         languageOptions: {

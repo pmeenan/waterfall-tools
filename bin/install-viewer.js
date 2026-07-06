@@ -14,8 +14,9 @@
  * Copies the viewer static assets shipped in this package into `<target-dir>`,
  * then copies the embedder's own `@chrome-devtools/index` install into
  * `<target-dir>/devtools-<version>/`, patches the DevTools bundle for browser
- * hosting, and rewrites the viewer's `<meta name="waterfall-devtools-path">`
- * to point at the versioned directory. Serve `<target-dir>` as static files.
+ * hosting, optionally copies an installed `qvis` bundle into
+ * `<target-dir>/qvis-<version>/`, and rewrites the viewer meta tags to point
+ * at the versioned directories. Serve `<target-dir>` as static files.
  *
  * The DevTools bundle is ~80 MB of third-party code and is deliberately NOT
  * shipped inside the published waterfall-tools tarball — embedders install
@@ -29,6 +30,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { patchDevtoolsBundle } from '../scripts/patch-devtools.js';
 
+const QVIS_PACKAGE_NAME = '@pmeenan/qvis';
+
 async function patchDevtoolsJs(dir) {
     const entries = await fs.readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
@@ -39,6 +42,42 @@ async function patchDevtoolsJs(dir) {
             const raw = await fs.readFile(fullPath, 'utf-8');
             const patched = patchDevtoolsBundle(raw);
             if (patched !== raw) await fs.writeFile(fullPath, patched);
+        }
+    }
+}
+
+async function copyStaticDir(src, dest, { skipMaps = false } = {}) {
+    await fs.rm(dest, { recursive: true, force: true });
+    await fs.cp(src, dest, {
+        recursive: true,
+        filter: (source) => !(skipMaps && source.endsWith('.map'))
+    });
+}
+
+async function resolveOptionalQvisPackage() {
+    try {
+        const pkgPath = fileURLToPath(import.meta.resolve(`${QVIS_PACKAGE_NAME}/package.json`));
+        const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf-8'));
+        const dist = path.join(path.dirname(pkgPath), 'dist');
+        if (!existsSync(dist)) {
+            return null;
+        }
+        return {
+            version: pkg.version,
+            dist,
+            dirName: `qvis-${pkg.version}`
+        };
+    } catch {
+        return null;
+    }
+}
+
+async function sweepVersionedDirs(outDir, prefix, keepName = null) {
+    const existingEntries = await fs.readdir(outDir, { withFileTypes: true });
+    for (const entry of existingEntries) {
+        if (entry.isDirectory() && entry.name.startsWith(prefix) && entry.name !== keepName) {
+            await fs.rm(path.join(outDir, entry.name), { recursive: true, force: true });
+            console.log(`Removed stale ${entry.name}/`);
         }
     }
 }
@@ -87,20 +126,17 @@ export async function runInstallViewer(argv) {
     const devtoolsVersion = devtoolsPkg.version;
     const devtoolsSrc = path.dirname(devtoolsPkgPath);
     const devtoolsDirName = `devtools-${devtoolsVersion}`;
+    const qvisPackage = await resolveOptionalQvisPackage();
+    const qvisDirName = qvisPackage ? qvisPackage.dirName : null;
 
     const outDir = path.resolve(process.cwd(), target);
     await fs.mkdir(outDir, { recursive: true });
 
-    // Sweep previous devtools-* directories left over from older installs.
+    // Sweep previous optional-asset directories left over from older installs.
     // Anything else in the target directory is left untouched — this command
     // is designed to be rerun into an existing web root.
-    const existingEntries = await fs.readdir(outDir, { withFileTypes: true });
-    for (const entry of existingEntries) {
-        if (entry.isDirectory() && entry.name.startsWith('devtools-') && entry.name !== devtoolsDirName) {
-            await fs.rm(path.join(outDir, entry.name), { recursive: true, force: true });
-            console.log(`Removed stale ${entry.name}/`);
-        }
-    }
+    await sweepVersionedDirs(outDir, 'devtools-', devtoolsDirName);
+    await sweepVersionedDirs(outDir, 'qvis-', qvisDirName);
 
     console.log(`Copying viewer assets -> ${outDir}`);
     await fs.cp(selfDistBrowser, outDir, {
@@ -111,7 +147,7 @@ export async function runInstallViewer(argv) {
             const top = rel.split(path.sep, 1)[0];
             // Published tarball doesn't include a devtools-* directory, but
             // guard against source checkouts where `npm run build` produced one.
-            return !top.startsWith('devtools-');
+            return !top.startsWith('devtools-') && !top.startsWith('qvis-');
         }
     });
 
@@ -124,6 +160,13 @@ export async function runInstallViewer(argv) {
     console.log('Patching DevTools bundle for browser hosting');
     await patchDevtoolsJs(devtoolsDest);
 
+    if (qvisPackage) {
+        console.log(`Copying ${QVIS_PACKAGE_NAME}@${qvisPackage.version} -> ${qvisDirName}/`);
+        await copyStaticDir(qvisPackage.dist, path.join(outDir, qvisDirName), { skipMaps: true });
+    } else {
+        console.log(`Optional ${QVIS_PACKAGE_NAME} package not found; qvis tab will stay hidden.`);
+    }
+
     const indexPath = path.join(outDir, 'index.html');
     if (existsSync(indexPath)) {
         let indexHtml = await fs.readFile(indexPath, 'utf-8');
@@ -135,6 +178,15 @@ export async function runInstallViewer(argv) {
             );
         } else {
             indexHtml = indexHtml.replace('</head>', `  ${devtoolsMeta}\n</head>`);
+        }
+        const qvisMeta = `<meta name="waterfall-qvis-path" content="${qvisDirName ? `./${qvisDirName}/` : ''}">`;
+        if (indexHtml.includes('name="waterfall-qvis-path"')) {
+            indexHtml = indexHtml.replace(
+                /<meta name="waterfall-qvis-path"[^>]*>/,
+                qvisMeta
+            );
+        } else {
+            indexHtml = indexHtml.replace('</head>', `  ${qvisMeta}\n</head>`);
         }
         await fs.writeFile(indexPath, indexHtml);
     }

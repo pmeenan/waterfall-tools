@@ -490,7 +490,17 @@ body, html {
     z-index: 2;
 }
 
-#trace-overlay, #netlog-overlay, #devtools-overlay {
+/* Embed iframes (qvis / DevTools / Perfetto / netlog / Lighthouse) are height:100%
+   children of .tab-content, but <iframe> is inline-level by default: it sits on the
+   text baseline, so the line box reserves ~4px of descender space below it and the
+   container scrolls by that amount even though the iframe's computed height matches
+   the container exactly (permanently visible scrollbar with Windows-style classic
+   scrollbars). display:block removes the line box entirely. */
+.tab-content > iframe {
+    display: block;
+}
+
+#trace-overlay, #netlog-overlay, #devtools-overlay, #qvis-overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(255,255,255,0.9);
@@ -500,7 +510,7 @@ body, html {
     z-index: 10;
 }
 
-#trace-overlay-content, #netlog-overlay-content, #devtools-overlay-content {
+#trace-overlay-content, #netlog-overlay-content, #devtools-overlay-content, #qvis-overlay-content {
     font-size: 1.5rem;
     color: var(--text-color);
     font-family: var(--font-stack);

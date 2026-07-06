@@ -1,4 +1,4 @@
 [submodule "third_party/qvis"]
 	path = third_party/qvis
-	url = git@github.com:pmeenan/qvis.git
+	url = https://github.com/pmeenan/qvis.git
 	branch = waterfall-tools

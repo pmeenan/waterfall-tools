@@ -20,13 +20,15 @@ For the design, module layout, and conventions, see [Docs/Architecture.md](Docs/
 npm install waterfall-tools
 ```
 
-To host the bundled viewer (see [Hosting the viewer](#hosting-the-viewer)) also install the Chrome DevTools frontend as a peer dependency:
+To host the bundled viewer (see [Hosting the viewer](#hosting-the-viewer)) also install the Chrome DevTools frontend as a peer dependency. Install the optional `qvis` peer as well when you want the qlog visualization tab:
 
 ```bash
 npm install waterfall-tools @chrome-devtools/index
+# Optional, enables the qvis tab for qlog inputs once the qvis package is published:
+npm install @pmeenan/qvis
 ```
 
-The DevTools bundle is ~80 MB of prebuilt third-party code kept out of the waterfall-tools tarball on purpose — CLI-only and library-only users don't download it. The peer dependency is declared optional, so `npm install waterfall-tools` alone completes without errors or warnings.
+The DevTools bundle is ~80 MB of prebuilt third-party code kept out of the waterfall-tools tarball on purpose, and qvis is also opt-in. Both peers are declared optional, so `npm install waterfall-tools` alone completes without errors or warnings. In this source checkout, qvis is temporarily wired as a local `file:third_party/qvis/visualizations/qvis-0.1.0.tgz` placeholder until Pat publishes `@pmeenan/qvis@0.1.0`.
 
 ## API usage
 
@@ -74,11 +76,13 @@ await wt.loadBuffer(await uploadedFile.arrayBuffer());
 
 ### Merge multiple buffers into one page
 
-`loadBuffers(buffers, options)` accepts an array of in-memory buffers and merges them into a single waterfall page. Every member is format-sniffed independently — the load fails loudly if the members don't all share one format, or if the shared format doesn't support multi-input merging (today only `qlog`, where each file carries one QUIC connection and a page load produces one file per origin). A single-member array behaves exactly like `loadBuffer()`.
+`loadBuffers(buffers, options)` accepts an array of in-memory buffers and merges them into a single waterfall page. Every member is format-sniffed independently — the load fails loudly if the members don't all share one format, or if the shared format doesn't support multi-input merging (today only `qlog`, where each file carries one QUIC connection and a page load produces one file per origin). A single-member array behaves exactly like `loadBuffer()`. For qlog multi-file loads, pass `options.bufferNames` alongside `buffers` to preserve original filenames for later resource consumers.
 
 ```javascript
 const wt = new WaterfallTools();
-await wt.loadBuffers(await Promise.all(files.map(f => f.arrayBuffer())));
+await wt.loadBuffers(await Promise.all(files.map(f => f.arrayBuffer())), {
+    bufferNames: files.map(f => f.name)
+});
 const har = wt.getHar();   // one page, all connections merged
 ```
 
@@ -129,15 +133,16 @@ const wt = new WaterfallTools();
 await wt.loadUrl('https://example.com/trace.json.gz');
 ```
 
-### Retrieve extracted assets (screenshots, traces, netlogs)
+### Retrieve extracted assets (screenshots, traces, netlogs, qlog files)
 
-Returns an isomorphic handle — a Blob URL in the browser (`{url, mimeType}`), a raw byte buffer in Node (`{buffer}`). Assets are extracted on demand from the parsed OPFS-backed archive rather than inflating everything into memory up front.
+Returns an isomorphic handle — a Blob URL in the browser (`{url, mimeType}`), a raw byte buffer in Node (`{buffer}`). Assets are extracted on demand from the parsed OPFS-backed archive rather than inflating everything into memory up front. qlog is the exception: `getPageResource(pageId, 'qlog')` returns raw retained input buffers directly as `{files:[{name, mimeType, buffer}]}` on both browser and Node paths, with no object URLs.
 
 ```javascript
 const resource = await wt.getPageResource('page_1_0_1', 'screenshot');
-// resourceType: 'screenshot' | 'trace' | 'perfetto-trace' | 'netlog' | 'lighthouse' | ...
+// resourceType: 'screenshot' | 'trace' | 'perfetto-trace' | 'netlog' | 'qlog' | 'lighthouse' | ...
 if (resource?.url) document.querySelector('img').src = resource.url;
 if (resource?.buffer) fs.writeFileSync('screen.jpg', resource.buffer);
+if (resource?.files) resource.files.forEach(file => fs.writeFileSync(file.name, new Uint8Array(file.buffer)));
 ```
 
 When you are finished with a `WaterfallTools` instance, call `await wt.destroy()`. This releases staged OPFS / temporary-file storage used by archive-backed resources such as wptagent screenshots, traces, and netlogs; in Node it also closes any lazy file handles opened by `getPageResource()`.
@@ -230,12 +235,14 @@ A one-shot command materializes the viewer into a directory of your choice (typi
 
 ```bash
 npm install waterfall-tools @chrome-devtools/index
+# Optional, enables the qvis tab for qlog inputs once the qvis package is published:
+npm install @pmeenan/qvis
 npx waterfall-tools install-viewer ./public/waterfall
 ```
 
-This copies the viewer's static assets out of `node_modules/waterfall-tools/dist/browser/` into the target directory, then copies `node_modules/@chrome-devtools/index/` into `./public/waterfall/devtools-<version>/`, patches the DevTools bundle for browser hosting, and rewrites the viewer's `<meta name="waterfall-devtools-path">` to point at the versioned directory. Serve the target directory with any static file server.
+This copies the viewer's static assets out of `node_modules/waterfall-tools/dist/browser/` into the target directory, then copies `node_modules/@chrome-devtools/index/` into `./public/waterfall/devtools-<version>/`, patches the DevTools bundle for browser hosting, and rewrites the viewer's `<meta name="waterfall-devtools-path">` to point at the versioned directory. If `qvis` is installed, it also copies `node_modules/qvis/dist/` into `./public/waterfall/qvis-<version>/` and rewrites `<meta name="waterfall-qvis-path">`; if qvis is absent, that meta is emptied and the qvis tab stays hidden. Serve the target directory with any static file server.
 
-Re-running the command updates the viewer in place and removes any stale `devtools-<prev-version>/` directories left over from earlier installs.
+Re-running the command updates the viewer in place and removes any stale `devtools-<prev-version>/` and `qvis-<prev-version>/` directories left over from earlier installs.
 
 ## Standalone viewer
 
@@ -243,7 +250,7 @@ The library ships with a pre-built standalone viewer — deployable as a static 
 
 Loading a HAR with multiple runs (e.g. WebPageTest First View + Repeat View) presents an interactive **Thumbnail Grid** showing each run's paint metrics, load times, and request counts before drilling into a specific trace.
 
-The viewer integrates tab-switching to self-hosted copies of the **Perfetto Trace Viewer**, the **Chrome DevTools** frontend, and the legacy **Chrome NetLog Viewer** for deep inspection of DevTools metrics, timelines, and raw socket-level network events. The DevTools frontend is pulled in from the `@chrome-devtools/index` npm package at build time and copied under `dist/browser/devtools-<version>/` so it's served versioned alongside the viewer. For rumcap captures, Perfetto receives a native TrackEvent protobuf (`getPageResource(pageId, 'perfetto-trace')`) with spec-aligned timestamps and a top-level `Performance Profile` custom track group whose populated child tracks are explicitly ordered for review, including request tracks split into `request.*` ResourceTiming phase categories when available, single-track Long Animation Frames details, one visual User Timing track with marks and merge-laned duration measures, one visual Interactions track with merge-laned event-type slices, plus plain Long Tasks and JS Self-Profiling tracks. DevTools receives gzipped Chrome trace JSON (`'trace'`) with hidden request parser markers that feed its native Network-duration row, User Timing markers fed from a hidden parser process so they render in Timings without cluttering Main, visible LoAF script/render/style details, and JS Self-Profiling data as native `Profile` / `ProfileChunk` CPU-profile events with stable nonzero script ids for URL-backed frames plus `(anonymous)` fallback nodes for frame-less slices.
+The viewer integrates tab-switching to self-hosted copies of the **Perfetto Trace Viewer**, the **Chrome DevTools** frontend, the legacy **Chrome NetLog Viewer**, and optionally **qvis** for qlog inputs. The DevTools frontend is pulled in from the `@chrome-devtools/index` npm package at build time and copied under `dist/browser/devtools-<version>/` so it's served versioned alongside the viewer; qvis follows the same pattern into `dist/browser/qvis-<version>/`, preferring a freshly built `third_party/qvis/visualizations/dist/` in this source checkout and falling back to `node_modules/qvis/dist/` when the optional package is present. For rumcap captures, Perfetto receives a native TrackEvent protobuf (`getPageResource(pageId, 'perfetto-trace')`) with spec-aligned timestamps and a top-level `Performance Profile` custom track group whose populated child tracks are explicitly ordered for review, including request tracks split into `request.*` ResourceTiming phase categories when available, single-track Long Animation Frames details, one visual User Timing track with marks and merge-laned duration measures, one visual Interactions track with merge-laned event-type slices, plus plain Long Tasks and JS Self-Profiling tracks. DevTools receives gzipped Chrome trace JSON (`'trace'`) with hidden request parser markers that feed its native Network-duration row, User Timing markers fed from a hidden parser process so they render in Timings without cluttering Main, visible LoAF script/render/style details, and JS Self-Profiling data as native `Profile` / `ProfileChunk` CPU-profile events with stable nonzero script ids for URL-backed frames plus `(anonymous)` fallback nodes for frame-less slices. For qlog pages, the qvis tab sends the retained raw qlog buffers through an embedded postMessage loader after inflating outer gzip members and normalizing filenames, so multi-connection page drops appear as loaded qvis connections without any server backend; embedded qvis starts on the Events view (a netlog-style raw event browser with a draggable split pane) and hides standalone chrome such as the Manage files tab and upstream issue buttons.
 
 When inspecting an HTML response that has per-chunk timing and inflated byte counts (available from `tcpdump`, `netlog`, `chrome-trace`, `cdp`, and `wptagent`), the request inspector renders the **Response Body** as a hex-viewer-style table — one row per delivered wire chunk, with arrival timestamps and sizes in the left column and the syntax-highlighted HTML slice that arrived in that delivery on the right. This makes it easy to correlate "what arrived when" against the canvas waterfall.
 
@@ -258,7 +265,7 @@ The viewer tracks its state via the browser History API, so the URL updates as y
 - `src=<url>` — remote file to fetch and load.
 - `keylog=<url>` — TLS keylog to pair with `src` for raw packet captures.
 - `page=<index>` — open a specific multi-page run (aliases `pageId`); skips the thumbnail grid.
-- `tab=<name>` — jump to a tab: `summary`, `waterfall`, `trace` (Perfetto), `devtools`, `lighthouse`, `netlog`, or `RequestN` (e.g. `Request10`).
+- `tab=<name>` — jump to a tab: `summary`, `waterfall`, `trace` (Perfetto), `devtools`, `lighthouse`, `netlog`, `qvis`, or `RequestN` (e.g. `Request10`).
 - `options=<csv>` — override defaults in `key:val` pairs (e.g. `options=showCpu:false,showBw:false`).
 
 ```
@@ -317,6 +324,13 @@ Tests are vitest suites that assert parsed outputs against golden Extended HAR f
 
 ```bash
 npm test
+```
+
+Browser smoke tests use Playwright against the standalone viewer and embedded qvis UI. The default run builds the qvis fork dist, starts the viewer dev server, and uses headless Chromium/Chrome; set `PLAYWRIGHT_ALL_BROWSERS=1` or use the all-browsers script after installing the extra Playwright browsers.
+
+```bash
+npm run test:browser
+npm run test:browser:all
 ```
 
 ### Lint
