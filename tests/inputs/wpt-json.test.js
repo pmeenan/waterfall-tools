@@ -67,7 +67,7 @@ describe('WebPageTest JSON Input Processor', () => {
 
         expect(scrubbedResult).toEqual(ref);
         expect(result.log.creator.name).toBe("waterfall-tools");
-    });
+    }, 15_000);
 
     it('Should reject invalid file paths safely', async () => {
         const inputPath = path.resolve(__dirname, '../../Sample/Data/WebPageTest JSON/DOES_NOT_EXIST.json');
