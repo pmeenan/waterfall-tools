@@ -328,6 +328,8 @@ npm test
 
 Browser smoke tests use Playwright against the standalone viewer and embedded qvis UI. The default run builds the qvis fork dist, starts the viewer dev server, and uses headless Chromium/Chrome; set `PLAYWRIGHT_ALL_BROWSERS=1` or use the all-browsers script after installing the extra Playwright browsers.
 
+The large real-world Chrome Trace golden tests use a scoped 15-second per-fixture timeout so variable shared-runner performance does not trip Vitest's 5-second default; other unit tests retain the default timeout.
+
 ```bash
 npm run test:browser
 npm run test:browser:all

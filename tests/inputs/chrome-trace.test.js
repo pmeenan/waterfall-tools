@@ -11,6 +11,10 @@ import { identifyFormatFromBuffer } from '../../src/inputs/orchestrator.js';
 
 describe('Chrome Trace Input Processing', () => {
 
+    // The larger real-world traces can exceed Vitest's 5-second default on
+    // shared CI runners even though parsing is making normal progress.
+    const traceFixtureTimeoutMs = 15_000;
+
     const files = [
         'trace_theverge.com',
         'trace_www.amazon.com',
@@ -75,7 +79,7 @@ describe('Chrome Trace Input Processing', () => {
                 fs.mkdirSync(path.dirname(fixturePath), { recursive: true });
                 fs.writeFileSync(fixturePath, JSON.stringify(cleanHar, null, 2), 'utf-8');
             }
-        });
+        }, traceFixtureTimeoutMs);
     }
 
     // DevTools-saved trace: `{"metadata":{...},"traceEvents":[...]}` wrapper with

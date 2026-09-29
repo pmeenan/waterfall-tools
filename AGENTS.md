@@ -52,6 +52,7 @@ Client-side, high-performance network waterfall library (WebPageTest-style).
 - Scrub dynamically generated keys (e.g. `startedDateTime` from `Date.now()` fallbacks) from both sides before comparing.
 - Tests implicitly set `{ debug: true }`.
 - For formats with parallel sources (e.g. netlog vs HAR from the same test), match samples by filename prefix convention (e.g. `www.google.com-netlog.json.gz` ↔ `www.google.com.har.gz`).
+- Large real-world Chrome Trace golden tests in `tests/inputs/chrome-trace.test.js` use a scoped 15-second per-fixture timeout because they can legitimately exceed Vitest's 5-second default on shared CI runners. Keep the override local to those fixtures rather than raising the global timeout.
 - Browser smoke tests use Playwright (`@playwright/test`) in `tests/browser/**/*.spec.js`; `vitest.config.js` excludes `tests/browser/**` so `npm test -- --run` and `npm run test:browser` stay separate. `npm run test:browser` rebuilds `third_party/qvis/visualizations/dist`, starts `npm run dev:viewer` on a fixed local port, and runs headless Chromium/Chrome. Local runs auto-use a system `google-chrome` channel when available so SSH-only environments don't need a Playwright browser download; CI installs Playwright Chromium. `npm run test:browser:all` is opt-in and requires the extra Firefox/WebKit browser installs.
 
 ## Sample assets
