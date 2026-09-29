@@ -175,6 +175,7 @@ await wt.renderTo(document.getElementById('waterfall-container'), options);
     startTime: null,         // clip the view; seconds
     endTime: null,           // clip the view; seconds
     reqFilter: '',           // filter by request id substring
+    urlFilter: '',           // filter requests by hostname glob or regex (see below)
     showPageMetrics: true,   // vertical page metric lines (LCP, TTI, etc.)
     showMarks: false,        // user timing marks
     showCpu: true,           // CPU utilization graph
@@ -192,6 +193,16 @@ await wt.renderTo(document.getElementById('waterfall-container'), options);
     palette: {}              // chrome color overrides; see "Theming" below
 }
 ```
+
+`urlFilter` accepts a comma-separated list of domain patterns matched against each request's **hostname only** (never the path or query string), unanchored (substring match), case-insensitive:
+
+- Glob syntax by default — only `*` is a wildcard (e.g. `*.example.com`).
+- Regex syntax when wrapped in slashes (e.g. `/^cdn\d+\.example\.com$/`).
+- Prefix a pattern with `-` to exclude matches instead of including them (e.g. `-ads.example.com`).
+- A request is shown when it matches no exclude pattern AND (matches at least one include pattern OR no include patterns were given).
+- Invalid regex patterns are silently ignored.
+- Only applies in the standard waterfall view — has no effect when `connectionView: true`.
+- Combines with `reqFilter` via AND (a request must pass both filters to be shown).
 
 #### Theming
 

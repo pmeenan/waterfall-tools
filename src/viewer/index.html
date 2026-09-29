@@ -20,7 +20,7 @@
       }
     }
     </script>
-    <link rel="stylesheet" href="./style.css?v=9">
+    <link rel="stylesheet" href="./style.css?v=11">
 </head>
 
 <body>
@@ -261,10 +261,26 @@
                 </div>
 
                 <div class="settings-separator"></div>
-                <h4>Request Filtering</h4>
-                <div style="margin-bottom: 20px;">
+                <h4>Filtering</h4>
+                <div style="margin-bottom: 12px;">
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Request numbers</label>
                     <input type="text" id="ui-req-filter" placeholder="e.g. 1, 5-10, 15"
                         style="width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                        <label style="font-size:0.85rem; font-weight:600;">Domain pattern</label>
+                        <span class="filter-help" tabindex="0" role="button" aria-describedby="url-filter-tooltip">?</span>
+                    </div>
+                    <input type="text" id="ui-url-filter" placeholder="e.g. *.google.com, -ads.example.com, /cdn\d+\.example\.com/"
+                        style="width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid var(--border-color, #ccc); border-radius: 4px;">
+                    <div id="url-filter-tooltip" class="filter-tooltip">
+                        <div>Matches the request's hostname only (not path or query string)</div>
+                        <div><code>*.google.com</code> &mdash; wildcard glob match</div>
+                        <div><code>/^cdn\d+\.example\.com$/</code> &mdash; regex (slash-delimited)</div>
+                        <div><code>-ads.example.com</code> &mdash; exclude matches (leading <code>-</code>)</div>
+                        <div>Comma-separate multiple patterns &mdash; combined with OR</div>
+                    </div>
                 </div>
                 <div class="settings-separator"></div>
                 <h4>Rendering Features</h4>
@@ -298,7 +314,7 @@
             });
         }
     </script>
-    <script type="module" src="./viewer.js?v=9"></script>
+    <script type="module" src="./viewer.js?v=11"></script>
 </body>
 
 </html>

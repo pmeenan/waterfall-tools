@@ -693,6 +693,7 @@ body, html {
     border-radius: 8px;
     width: 90%;
     max-width: 500px;
+    max-height: 90vh;
     box-shadow: 0 4px 24px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
@@ -720,6 +721,9 @@ body, html {
 
 .settings-body {
     padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 .settings-separator {
@@ -745,6 +749,38 @@ body, html {
     gap: 0.5rem;
     font-size: 0.9rem;
     cursor: pointer;
+}
+
+.filter-help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--border-color, #ccc);
+    color: #333;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: help;
+    user-select: none;
+}
+
+.filter-tooltip {
+    margin-top: 6px;
+    padding: 8px 10px;
+    background: var(--bg-color, #f9f9f9);
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text-color, #333);
+}
+
+.filter-tooltip code {
+    background: rgba(0, 0, 0, 0.06);
+    padding: 1px 4px;
+    border-radius: 3px;
 }
 
 /* Summary Tab Styles */

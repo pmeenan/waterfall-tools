@@ -604,6 +604,7 @@ function getOptionsFromUrl() {
     if (params.has('startTime')) options.startTime = parseFloat(params.get('startTime'));
     if (params.has('endTime')) options.endTime = parseFloat(params.get('endTime'));
     if (params.has('reqFilter')) options.reqFilter = params.get('reqFilter');
+    if (params.has('urlFilter')) options.urlFilter = params.get('urlFilter');
     if (params.has('showPageMetrics')) options.showPageMetrics = params.get('showPageMetrics') !== 'false' && params.get('showPageMetrics') !== '0';
     if (params.has('showMarks')) options.showMarks = params.get('showMarks') !== 'false' && params.get('showMarks') !== '0';
     if (params.has('showCpu')) options.showCpu = params.get('showCpu') !== 'false' && params.get('showCpu') !== '0';
@@ -1932,7 +1933,9 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     if (etEl) etEl.value = (renderOptions.endTime !== undefined) ? renderOptions.endTime : '';
     const rfEl = document.getElementById('ui-req-filter');
     if (rfEl) rfEl.value = (renderOptions.reqFilter !== undefined) ? renderOptions.reqFilter : '';
-    
+    const ufEl = document.getElementById('ui-url-filter');
+    if (ufEl) ufEl.value = (renderOptions.urlFilter !== undefined) ? renderOptions.urlFilter : '';
+
     // Check for explicit tab auto-loading without flashing
     const params = new URLSearchParams(window.location.search);
     if (!rendererCanvas._tabHandled && params.has('tab')) {
@@ -2581,7 +2584,7 @@ async function initViewer() {
         });
     });
 
-    ['ui-start-time', 'ui-end-time', 'ui-req-filter'].forEach(id => {
+    ['ui-start-time', 'ui-end-time', 'ui-req-filter', 'ui-url-filter'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('input', (e) => {
@@ -2595,6 +2598,9 @@ async function initViewer() {
                     optVal = optVal !== '' ? parseFloat(optVal) : undefined;
                 } else if (id === 'ui-req-filter') {
                     optKey = 'reqFilter';
+                    optVal = optVal !== '' ? optVal : undefined;
+                } else if (id === 'ui-url-filter') {
+                    optKey = 'urlFilter';
                     optVal = optVal !== '' ? optVal : undefined;
                 }
                 window.WaterfallViewer.updateOptions({ [optKey]: optVal });

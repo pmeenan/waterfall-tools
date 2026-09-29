@@ -125,13 +125,120 @@ export class Layout {
             const u = new URL(fullUrl);
             const combined = `${u.hostname} - ${u.pathname}`;
             if (combined.length <= maxLength) return combined;
-            
+
             const half = Math.floor((maxLength - 3) / 2);
             return combined.substring(0, half) + '...' + combined.substring(combined.length - half);
         } catch {
             if (fullUrl.length <= maxLength) return fullUrl;
             const half = Math.floor((maxLength - 3) / 2);
             return fullUrl.substring(0, half) + '...' + fullUrl.substring(fullUrl.length - half);
+        }
+    }
+
+    /**
+     * Splits a urlFilter string on top-level commas only — commas inside an
+     * open `/regex/` literal (e.g. the quantifier in `/^cdn\d{1,3}\./`) don't
+     * count as separators. Tracks an `inRegex` toggle that flips on every
+     * unescaped `/`; a `\` always consumes the following character verbatim
+     * so an escaped slash (`\/`) inside a pattern can't prematurely close it.
+     * @param {string} filterStr
+     * @returns {string[]}
+     */
+    static splitFilterTokens(filterStr) {
+        const tokens = [];
+        let current = '';
+        let inRegex = false;
+        for (let i = 0; i < filterStr.length; i++) {
+            const ch = filterStr[i];
+            if (ch === '\\' && i + 1 < filterStr.length) {
+                current += ch + filterStr[i + 1];
+                i++;
+                continue;
+            }
+            if (ch === '/') {
+                inRegex = !inRegex;
+                current += ch;
+                continue;
+            }
+            if (ch === ',' && !inRegex) {
+                tokens.push(current);
+                current = '';
+                continue;
+            }
+            current += ch;
+        }
+        tokens.push(current);
+        return tokens;
+    }
+
+    /**
+     * Compiles a comma-separated urlFilter string into include/exclude RegExp arrays.
+     * Patterns are matched against the request's **hostname only** (see
+     * `Layout.getFilterHost()`), never the full URL/path — this keeps domain
+     * filtering reliable regardless of what appears in a request's path or
+     * query string. Each token: optional leading '-' (routes to excludes),
+     * then either a /regex/ (interior used as raw source) or a glob (only '*'
+     * is a wildcard; all other regex metacharacters are escaped literally).
+     * All patterns are unanchored (substring match) and case-insensitive.
+     * Malformed regex tokens are dropped silently — this mirrors reqFilter's
+     * forgiving parse behavior and avoids error UI flicker while a regex is
+     * mid-edit. Commas are only treated as token separators outside an open
+     * `/regex/` literal (see `Layout.splitFilterTokens()`), so quantifiers
+     * like `/^cdn\d{1,3}\./` survive intact.
+     * @param {string} filterStr
+     * @returns {{includes: RegExp[], excludes: RegExp[]}}
+     */
+    static parseUrlFilter(filterStr) {
+        const includes = [];
+        const excludes = [];
+        if (!filterStr) return { includes, excludes };
+
+        const tokens = Layout.splitFilterTokens(String(filterStr));
+        tokens.forEach(rawToken => {
+            let token = rawToken.trim();
+            if (token === '') return;
+
+            let isExclude = false;
+            if (token.startsWith('-')) {
+                isExclude = true;
+                token = token.slice(1);
+            }
+            if (token === '') return;
+
+            let source;
+            if (token.length > 1 && token.startsWith('/') && token.endsWith('/')) {
+                source = token.slice(1, -1);
+            } else {
+                // Escape regex metacharacters except '*', then turn '*' into '.*'.
+                const escaped = token.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+                source = escaped.replace(/\*/g, '.*');
+            }
+
+            try {
+                const re = new RegExp(source, 'i');
+                (isExclude ? excludes : includes).push(re);
+            } catch {
+                // Malformed regex — drop the token entirely.
+            }
+        });
+
+        return { includes, excludes };
+    }
+
+    /**
+     * Extracts the hostname to match urlFilter patterns against. Falls back to
+     * the raw url string when `new URL()` throws (opaque/unparseable URLs) so
+     * a malformed entry still participates in filtering rather than always
+     * matching or always failing.
+     * @param {string} url
+     * @returns {string}
+     */
+    static getFilterHost(url) {
+        if (!url) return '';
+        try {
+            return new URL(url).hostname;
+        } catch {
+            return url;
         }
     }
 
@@ -176,6 +283,18 @@ export class Layout {
                 // Keep only requests whose native 1-based index is in the set
                 entries = entries.filter((_, idx) => allowedIndices.has(idx + 1));
             }
+            }
+        }
+
+        if (!options.connectionView && options.urlFilter) {
+            const { includes, excludes } = Layout.parseUrlFilter(options.urlFilter);
+            if (includes.length > 0 || excludes.length > 0) {
+                entries = entries.filter(entry => {
+                    const host = Layout.getFilterHost(entry.url);
+                    if (excludes.some(re => re.test(host))) return false;
+                    if (includes.length > 0 && !includes.some(re => re.test(host))) return false;
+                    return true;
+                });
             }
         }
 

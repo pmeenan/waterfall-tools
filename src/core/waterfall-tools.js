@@ -545,6 +545,7 @@ export class WaterfallTools {
             startTime: null,
             endTime: null,
             reqFilter: '',
+            urlFilter: '',
             showPageMetrics: true,
             showMarks: false,
             showCpu: true,
