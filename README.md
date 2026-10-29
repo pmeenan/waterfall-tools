@@ -257,7 +257,7 @@ Re-running the command updates the viewer in place and removes any stale `devtoo
 
 ## Standalone viewer
 
-The library ships with a pre-built standalone viewer — deployable as a static page, embeddable in an iframe, or usable as a full-page tool without writing your own UI.
+The library ships with a pre-built standalone viewer — deployable as a static page, embeddable in an iframe, or usable as a full-page tool without writing your own UI. Full-viewport overlays (landing page, loading overlay, options modal), mobile tab menus, history tables, and the narrow-viewport split labels drawer all scroll cleanly when the viewport is smaller than the content.
 
 Loading a HAR with multiple runs (e.g. WebPageTest First View + Repeat View) presents an interactive **Thumbnail Grid** showing each run's paint metrics, load times, and request counts before drilling into a specific trace.
 

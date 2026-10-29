@@ -1622,3 +1622,9 @@ body, html {
         word-break: break-all;
     }
 }
+
+@media (max-width: 480px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+}
