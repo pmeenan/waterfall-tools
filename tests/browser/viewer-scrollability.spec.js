@@ -49,11 +49,9 @@ test('landing page scrolls vertically without clipping on small viewports', asyn
         dz.scrollTop = dz.scrollHeight;
         const dzRect = dz.getBoundingClientRect();
         const linkRect = document.querySelector('.github-link').getBoundingClientRect();
-        const uploadRect = document.getElementById('upload-btn').getBoundingClientRect();
         return {
             scrollTop: dz.scrollTop,
-            linkBottomRelative: linkRect.bottom - dzRect.bottom,
-            uploadVisible: uploadRect.bottom <= dzRect.bottom && uploadRect.top >= dzRect.top - uploadRect.height
+            linkBottomRelative: linkRect.bottom - dzRect.bottom
         };
     });
 
@@ -101,6 +99,23 @@ test('split labels drawer syncs vertical scroll with waterfall view on narrow vi
     await expect.poll(async () => {
         return page.evaluate(() => document.getElementById('waterfall-view').scrollTop);
     }).toBe(95);
+
+    // Scrolling the waterfall to the very bottom must stick: the mirrored write into the labels
+    // pane must not echo back and drag the waterfall view away from its maximum.
+    await page.evaluate(() => {
+        const wf = document.getElementById('waterfall-view');
+        wf.scrollTop = wf.scrollHeight;
+    });
+    // Give the async scroll events (and any echo) a couple of frames to settle.
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const bottom = await page.evaluate(() => {
+        const wf = document.getElementById('waterfall-view');
+        const lc = document.getElementById('labels-slider-content');
+        return { wfTop: wf.scrollTop, wfMax: wf.scrollHeight - wf.clientHeight, lcTop: lc.scrollTop };
+    });
+    expect(bottom.wfMax).toBeGreaterThan(0);
+    expect(Math.abs(bottom.wfTop - bottom.wfMax)).toBeLessThan(1);
+    expect(Math.abs(bottom.lcTop - bottom.wfTop)).toBeLessThan(1);
 
     // Resizing above 1200px deactivates the split labels slider when labels move inline.
     await page.setViewportSize({ width: 1300, height: 600 });

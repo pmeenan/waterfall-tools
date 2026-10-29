@@ -38,11 +38,14 @@ body, html {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
+    box-sizing: border-box;
+    padding: 1.5rem;
+    overflow: auto;
     background: rgba(255, 255, 255, 0.9);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: safe center;
+    align-items: safe center;
     z-index: 1000;
 }
 
@@ -55,11 +58,13 @@ body, html {
 
 #progress-container {
     width: 300px;
+    max-width: 100%;
     height: 8px;
     background: var(--border-color);
     border-radius: 4px;
     margin-top: 0.75rem;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 #progress-bar {
@@ -94,17 +99,23 @@ body, html {
 #drop-zone {
     width: 100%;
     height: 100%;
+    box-sizing: border-box;
+    padding: 1.5rem;
+    overflow: auto;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: safe center;
+    align-items: safe center;
     transition: all 0.2s ease;
     background-color: #f5f5f5;
 }
 
 .landing-content {
     position: relative;
-    width: 90%;
-    max-width: 900px;
+    box-sizing: border-box;
+    margin: auto;
+    width: 100%;
+    /* border-box: 900px content area + 2 x 3rem padding (matches the old content-box width) */
+    max-width: calc(900px + 6rem);
     padding: 3rem;
     text-align: center;
     border-radius: 16px;
@@ -136,6 +147,14 @@ body, html {
 }
 
 @media (max-width: 768px) {
+    #drop-zone {
+        padding: 1rem;
+    }
+
+    .landing-content {
+        padding: 1.5rem;
+    }
+
     .landing-logo {
         position: relative;
         left: 0;
@@ -193,6 +212,7 @@ body, html {
 .url-section {
     margin: 0 auto 2rem auto;
     width: fit-content;
+    max-width: 100%;
     display: flex;
     justify-content: center;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
@@ -201,7 +221,10 @@ body, html {
 
 #url-input {
     padding: 14px 20px;
-    min-width: 400px;
+    width: 400px;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
     border: 1px solid var(--border-color);
     border-radius: 8px 0 0 8px;
     font-size: 1rem;
@@ -467,6 +490,7 @@ body, html {
 
 .tabs-body {
     flex: 1;
+    min-height: 0;
     position: relative;
     width: 100%;
 }
@@ -681,19 +705,23 @@ body, html {
 #settings-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
+    box-sizing: border-box;
+    padding: 1rem;
+    overflow: auto;
     background: rgba(0,0,0,0.5);
     z-index: 2000;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: safe center;
+    align-items: safe center;
 }
 
 .settings-modal {
     background: #fff;
     border-radius: 8px;
-    width: 90%;
+    width: 100%;
     max-width: 500px;
     max-height: 90vh;
+    margin: auto;
     box-shadow: 0 4px 24px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
@@ -705,6 +733,7 @@ body, html {
     align-items: center;
     padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
 }
 
 .settings-header h2 {
@@ -724,6 +753,10 @@ body, html {
     overflow-y: auto;
     flex: 1 1 auto;
     min-height: 0;
+}
+
+.settings-body input[type="number"] {
+    min-width: 0;
 }
 
 .settings-separator {
@@ -888,7 +921,7 @@ body, html {
 
 .custom-metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
     gap: 20px;
 }
 
@@ -1326,7 +1359,15 @@ body, html {
 #labels-slider-content {
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Scrollable (synced with #waterfall-view) but scrollbar hidden so it
+       doesn't cover the 250px labels canvas. */
+    scrollbar-width: none;
+}
+
+#labels-slider-content::-webkit-scrollbar {
+    display: none;
 }
 
 #labels-slider-toggle {
@@ -1411,12 +1452,14 @@ body, html {
 
 #history-table-wrapper {
     flex: 1;
+    min-height: 0;
     overflow: auto;
     padding: 20px;
 }
 
 #history-table {
     width: 100%;
+    min-width: 760px;
     border-collapse: collapse;
     background: #fff;
     border-radius: 8px;
@@ -1532,11 +1575,16 @@ body, html {
     
     #viewer-tabs {
         width: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
         flex-direction: column;
         padding: 0;
     }
     
     .viewer-tab {
+        flex-shrink: 0;
         border-radius: 0;
         border-bottom: 1px solid #eee;
         padding: 15px 20px;

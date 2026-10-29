@@ -1657,6 +1657,55 @@ function renderRequestTab(request, reqNum) {
     tab.click();
 }
 
+// Split-labels drawer (#labels-slider) state + vertical scroll link with #waterfall-view.
+//
+// `labelsScrollEcho` names the element whose next `scroll` event was caused by our own
+// programmatic `scrollTop` write and must not be mirrored back. Scroll events are dispatched
+// asynchronously (next rendering update), so a synchronous "syncing" flag can't catch the echo.
+// Without this, if the two panes' scroll ranges ever differ, the clamped pane would drag the
+// other one back and the last rows would become unreachable.
+let labelsScrollEcho = null;
+
+function mirrorScrollTop(src, dst) {
+    if (!src || !dst || Math.abs(dst.scrollTop - src.scrollTop) < 1) return;
+    const before = dst.scrollTop;
+    dst.scrollTop = src.scrollTop;
+    // Only expect an echo if the write actually moved dst (no event fires otherwise).
+    if (dst.scrollTop !== before) {
+        labelsScrollEcho = dst;
+        // Scroll steps run before rAF callbacks in the same frame, so this clears any echo
+        // that never arrived without swallowing a later genuine user scroll.
+        requestAnimationFrame(() => {
+            if (labelsScrollEcho === dst) labelsScrollEcho = null;
+        });
+    }
+}
+
+function linkLabelsScroll() {
+    const pair = [[ui.waterfallView, ui.labelsSliderContent], [ui.labelsSliderContent, ui.waterfallView]];
+    for (const [src, dst] of pair) {
+        if (!src || !dst) return;
+        src.addEventListener('scroll', () => {
+            if (labelsScrollEcho === src) {
+                labelsScrollEcho = null;
+                return;
+            }
+            mirrorScrollTop(src, dst);
+        }, { passive: true });
+    }
+}
+
+// Single source of truth for whether the drawer is shown: the live renderer's `overlapLabels`
+// option (kept in step with the <= 1200px breakpoint by the resize handler) AND the waterfall tab
+// being active. Re-syncs the drawer's scroll position whenever it is (re)shown.
+function syncLabelsSlider() {
+    if (!ui.labelsSlider) return;
+    const active = Boolean(rendererCanvas?.options?.overlapLabels)
+        && Boolean(ui.waterfallView?.classList.contains('active'));
+    ui.labelsSlider.classList.toggle('active', active);
+    if (active) mirrorScrollTop(ui.waterfallView, ui.labelsSliderContent);
+}
+
 async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = true) {
     if (pushHistory) history.pushState({ view: 'waterfall', pageId }, '');
     if (ui.historyView) ui.historyView.classList.add('hidden');
@@ -1720,7 +1769,9 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     if (ui.waterfallView) ui.waterfallView.classList.add('active');
-    if (ui.labelsSlider) ui.labelsSlider.classList.add('active');
+    // rendererCanvas was destroyed above, so this hides the drawer until renderTo() below
+    // re-creates the renderer (and re-syncs it).
+    syncLabelsSlider();
     ui.btnSettings.style.display = 'block';
     
     if (rendererCanvas) window.dispatchEvent(new Event('resize'));
@@ -1908,6 +1959,7 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     };
 
     rendererCanvas = await waterfallTool.renderTo(ui.waterfallView, renderOptions);
+    syncLabelsSlider();
     
     // Sync Settings form securely
     const viewTypeRadios = document.querySelectorAll('input[name="ui-view-type"]');
@@ -2515,9 +2567,12 @@ async function initViewer() {
             if (ui.labelsSlider) {
                 ui.labelsSlider.classList.toggle('open');
                 ui.labelsSliderToggle.textContent = ui.labelsSlider.classList.contains('open') ? '◀' : '▶';
+                syncLabelsSlider();
             }
         });
     }
+
+    linkLabelsScroll();
     
     // Responsive Canvas Resize Observer
     let lastLabelsOverlap = typeof window !== 'undefined' ? window.innerWidth <= 1200 : false;
@@ -2542,6 +2597,7 @@ async function initViewer() {
             }
             rendererCanvas.updateOptions(options);
         }
+        syncLabelsSlider();
     });
 
 
@@ -2639,12 +2695,12 @@ async function initViewer() {
             if (tabId === 'waterfall') {
                 ui.btnSettings.style.display = 'block';
                 ui.waterfallView.classList.add('active');
-                if (ui.labelsSlider) ui.labelsSlider.classList.add('active');
+                syncLabelsSlider();
                 // Ensure canvas resizes properly if needed
                 if (rendererCanvas) window.dispatchEvent(new Event('resize'));
             } else {
                 ui.btnSettings.style.display = 'none';
-                if (ui.labelsSlider) ui.labelsSlider.classList.remove('active');
+                syncLabelsSlider();
             }
             updateResetZoomButton();
             
