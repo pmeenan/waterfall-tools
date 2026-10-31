@@ -34,7 +34,7 @@ function isGzip(buf) {
  * @param {number} totalBytes - 0 when unknown
  * @returns {Promise<Uint8Array>}
  */
-async function collectStream(stream, onProgress, totalBytes) {
+async function collectStream(stream, onProgress, totalBytes, debug = false) {
     const reader = stream.getReader();
     const chunks = [];
     let bytesRead = 0;
@@ -48,6 +48,9 @@ async function collectStream(stream, onProgress, totalBytes) {
                 onProgress('Reading rumcap capture...', Math.min(60, Math.round((bytesRead / totalBytes) * 60)));
             }
         }
+    } catch (err) {
+        if (chunks.length === 0) throw err;
+        if (debug) console.warn('[rumcap.js] Stream truncated; continuing with partial prefix:', err.message);
     } finally {
         try { reader.releaseLock(); } catch { /* already released */ }
     }
@@ -634,7 +637,7 @@ export async function processRumcapNode(input, options = {}) {
         if (isGzip(bytes)) {
             onProgress('Decompressing rumcap capture...', 62);
             const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-            bytes = await collectStream(stream, () => {}, 0);
+            bytes = await collectStream(stream, () => {}, 0, options.debug);
         }
 
         onProgress('Decoding rumcap capture...', 70);

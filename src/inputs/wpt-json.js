@@ -6,6 +6,7 @@
 import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 import { VERSION } from '../core/version.js';
+import { countRawBytes, scaledProgress } from './utilities/progress.js';
 
 // WebPageTest JSON Input Processor
 // Processes natively without node polyfills using purely Web Streams mapping seamlessly
@@ -89,66 +90,10 @@ function processWPTView(viewData, runStr, cachedNum, har) {
     for (const key of Object.keys(viewData)) {
         if (key !== 'requests' && !bloatNames.has(key)) {
             if (key === 'utilization') {
-                const stdUtil = {};
-                for (const uKey of Object.keys(viewData.utilization)) {
-                    const uVal = viewData.utilization[uKey];
-                    let dataDict = null;
-                    let maxVal = 1;
-                    
-                    // WPT JSON format natively bundles [ {dataDict}, maxVal, avgVal ] OR { data: {dataDict}, max: maxVal, count: avgVal }
-                    if (Array.isArray(uVal) && uVal.length >= 2 && typeof uVal[0] === 'object' && !Array.isArray(uVal[0])) {
-                        dataDict = uVal[0];
-                        maxVal = Math.max(1, parseFloat(uVal[1]) || 1);
-                    } else if (uVal && typeof uVal === 'object' && uVal.data && typeof uVal.data === 'object') {
-                        dataDict = uVal.data;
-                        maxVal = Math.max(1, parseFloat(uVal.max) || 1);
-                    }
-                    
-                    if (dataDict) {
-                        const arr = [];
-                        const rawPts = Object.entries(dataDict).map(([k, v]) => ({ ts: parseFloat(k), val: parseFloat(v) }));
-                        rawPts.sort((a, b) => a.ts - b.ts);
-                        
-                        if (uKey === 'bw') {
-                            const wireBps = (har.log._bwDown || viewData.bwDown || 0) * 1000.0;
-                            const limit = wireBps > 0 ? wireBps : maxVal;
-                            
-                            let intervalMs = 100;
-                            if (rawPts.length > 1) {
-                                intervalMs = rawPts[1].ts - rawPts[0].ts;
-                                if (intervalMs <= 0) intervalMs = 100;
-                            }
-                            
-                            if (wireBps > 0) {
-                                for (let i = rawPts.length - 1; i >= 0; i--) {
-                                    if (rawPts[i].val > limit) {
-                                        const excess = rawPts[i].val - limit;
-                                        rawPts[i].val = limit;
-                                        if (i > 0) {
-                                            rawPts[i-1].val += excess;
-                                        } else {
-                                            rawPts.unshift({ ts: rawPts[0].ts - intervalMs, val: excess });
-                                            i++;
-                                        }
-                                    }
-                                }
-                                maxVal = limit;
-                            }
-                        }
-                        
-                        for (const pt of rawPts) {
-                            const pct = (pt.val / maxVal) * 100.0;
-                            arr.push([pt.ts, pct]);
-                        }
-                        
-                        arr.max = maxVal; // Preserve the original absolute max bounding cleanly (for Node)
-                        stdUtil[uKey] = arr;
-                        stdUtil[uKey + 'Max'] = maxVal; // Safe property for Web Worker / structured cloning (for Browser)
-                    } else {
-                        stdUtil[uKey] = uVal;
-                    }
-                }
-                page['_utilization'] = stdUtil;
+                page['_utilization'] = formatWptUtilization(
+                    viewData.utilization,
+                    har.log._bwDown || viewData.bwDown || 0
+                );
             } else if (key === 'chromeUserTiming' && Array.isArray(viewData[key])) {
                 viewData[key].forEach(event => {
                     if (event.name && event.time !== undefined) {
@@ -316,9 +261,13 @@ export async function processWPTFileNode(input, options = {}) {
             stream = Readable.toWeb(nodeFsStream);
         }
 
-    if (isGz) {
-        stream = stream.pipeThrough(new DecompressionStream('gzip'));
-    }
+        // Count raw (pre-gunzip) bytes so progress tracks `totalBytes` honestly.
+        const rawCounter = { bytes: 0 };
+        stream = countRawBytes(stream, rawCounter);
+
+        if (isGz) {
+            stream = stream.pipeThrough(new DecompressionStream('gzip'));
+        }
 
     output = normalizeWPT({ data: { runs: {}, median: {} } }); // Safe fallback shell
 
@@ -384,7 +333,6 @@ export async function processWPTFileNode(input, options = {}) {
 
     onProgress('Parsing WPT data...', 0);
     let chunkCount = 0;
-    let bytesRead = 0;
     while (true) {
         const { done, value } = await reader.read();
         chunkCount++;
@@ -393,9 +341,8 @@ export async function processWPTFileNode(input, options = {}) {
             if (options.debug) console.log("Stream Done!");
             break;
         }
-        bytesRead += value.length;
         parser.write(value);
-        if (totalBytes > 0) onProgress('Parsing WPT data...', Math.round((bytesRead / totalBytes) * 90));
+        if (totalBytes > 0) onProgress('Parsing WPT data...', scaledProgress(rawCounter.bytes, totalBytes, 90));
     }
     onProgress('Building waterfall...', 90);
     if (options.debug) console.log("Finished WPT loop.");
@@ -467,6 +414,7 @@ export async function processWPTFlatStreamNode(input, runStr, cachedNum, outputH
 
 export function formatWptUtilization(rawUtilization, bwDown = 0) {
     const stdUtil = {};
+    if (!rawUtilization || typeof rawUtilization !== 'object') return stdUtil;
     for (const uKey of Object.keys(rawUtilization)) {
         const uVal = rawUtilization[uKey];
         let dataDict = null;
@@ -482,28 +430,40 @@ export function formatWptUtilization(rawUtilization, bwDown = 0) {
         
         if (dataDict) {
             const arr = [];
-            const rawPts = Object.entries(dataDict).map(([k, v]) => ({ ts: parseFloat(k), val: parseFloat(v) }));
+            const rawPts = Object.entries(dataDict)
+                .map(([k, v]) => ({ ts: parseFloat(k), val: parseFloat(v) }))
+                .filter(pt => Number.isFinite(pt.ts));
+            for (const pt of rawPts) {
+                if (!Number.isFinite(pt.val)) pt.val = 0;
+            }
             rawPts.sort((a, b) => a.ts - b.ts);
             
             if (uKey === 'bw') {
-                const wireBps = bwDown * 1000.0;
+                const wireBps = Number.isFinite(bwDown) && bwDown > 0 ? bwDown * 1000.0 : 0;
                 const limit = wireBps > 0 ? wireBps : maxVal;
                 
                 let intervalMs = 100;
                 if (rawPts.length > 1) {
                     intervalMs = rawPts[1].ts - rawPts[0].ts;
-                    if (intervalMs <= 0) intervalMs = 100;
+                    if (!Number.isFinite(intervalMs) || intervalMs <= 0) intervalMs = 100;
                 }
                 
-                if (wireBps > 0) {
+                if (wireBps > 0 && Number.isFinite(limit) && limit > 0) {
+                    const MAX_PREPEND = 100;
+                    let prepended = 0;
                     for (let i = rawPts.length - 1; i >= 0; i--) {
+                        if (!Number.isFinite(rawPts[i].val)) {
+                            rawPts[i].val = 0;
+                            continue;
+                        }
                         if (rawPts[i].val > limit) {
                             const excess = rawPts[i].val - limit;
                             rawPts[i].val = limit;
                             if (i > 0) {
-                                rawPts[i-1].val += excess;
-                            } else {
+                                rawPts[i - 1].val = (Number.isFinite(rawPts[i - 1].val) ? rawPts[i - 1].val : 0) + excess;
+                            } else if (prepended < MAX_PREPEND) {
                                 rawPts.unshift({ ts: rawPts[0].ts - intervalMs, val: excess });
+                                prepended++;
                                 i++;
                             }
                         }

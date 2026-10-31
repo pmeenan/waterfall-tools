@@ -189,21 +189,29 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
             const timeMs = new Date(entry.startedDateTime).getTime();
             if (timeMs > 0 && timeMs < globalEarliestMs) globalEarliestMs = timeMs;
             
+            const timings = entry.timings || {};
+
             // Infer DNS
             let dnsId = null;
-            if (entry.timings && entry.timings.dns > 0) {
+            if (timings.dns > 0) {
                 dnsId = `dns_${reqId}`;
-                const domain = (entry.request && entry.request.url) ? new URL(entry.request.url).hostname : '';
+                let domain = '';
+                try {
+                    if (entry.request && entry.request.url) domain = new URL(entry.request.url).hostname;
+                } catch {}
                 data.dns[dnsId] = {
                     query: domain,
                     type: "A",
                     ip_addresses: [entry.serverIPAddress].filter(Boolean),
                     start_time: timeMs,
-                    end_time: timeMs + entry.timings.dns
+                    end_time: timeMs + timings.dns
                 };
             } else if (entry._dnsTimeMs > 0 && entry._dnsEndTimeMs > 0) {
                 dnsId = `dns_${reqId}`;
-                const domain = (entry.request && entry.request.url) ? new URL(entry.request.url).hostname : '';
+                let domain = '';
+                try {
+                    if (entry.request && entry.request.url) domain = new URL(entry.request.url).hostname;
+                } catch {}
                 data.dns[dnsId] = {
                     query: domain, type: "A", ip_addresses: [entry.serverIPAddress].filter(Boolean),
                     start_time: entry._dnsTimeMs, end_time: entry._dnsEndTimeMs
@@ -217,15 +225,15 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
             if (!connId && entry._connectionId !== undefined && entry._connectionId !== -1 && entry._connectionId !== "-1") connId = entry._connectionId.toString();
             if (!connId && entry._connectionIdentifier !== undefined && entry._connectionIdentifier !== -1 && entry._connectionIdentifier !== "-1") connId = entry._connectionIdentifier.toString();
             
-            if (entry.timings && entry.timings.connect > 0 || (entry._connectTimeMs > 0 && entry._connectEndTimeMs > 0)) {
+            if (timings.connect > 0 || (entry._connectTimeMs > 0 && entry._connectEndTimeMs > 0)) {
                 if (!connId) connId = `conn_${reqId}`;
                 
-                const connectStart = entry._connectTimeMs > 0 ? entry._connectTimeMs : timeMs + Math.max(0, entry.timings.dns);
-                const connectEnd = entry._connectEndTimeMs > 0 ? entry._connectEndTimeMs : connectStart + entry.timings.connect;
+                const connectStart = entry._connectTimeMs > 0 ? entry._connectTimeMs : timeMs + Math.max(0, timings.dns || 0);
+                const connectEnd = entry._connectEndTimeMs > 0 ? entry._connectEndTimeMs : connectStart + (timings.connect || 0);
                 
                 let sslStart = null;
                 if (entry._sslStartTimeMs > 0) sslStart = entry._sslStartTimeMs;
-                else if (entry.timings.ssl > 0) sslStart = connectEnd - entry.timings.ssl;
+                else if (timings.ssl > 0) sslStart = connectEnd - timings.ssl;
 
                 if (connectStart > 0 && connectStart < globalEarliestMs) globalEarliestMs = connectStart;
 
@@ -260,8 +268,8 @@ export function buildWaterfallDataFromHar(harLog, format = 'har') {
                 }
             }
             
-            const firstDataTimeMs = entry._firstDataTimeMs > 0 ? entry._firstDataTimeMs : (timeMs + Math.max(0, entry.timings.blocked || 0) + Math.max(0, entry.timings.dns || 0) + Math.max(0, entry.timings.connect || 0) + Math.max(0, entry.timings.send || 0) + Math.max(0, entry.timings.wait || 0));
-            const lastDataTimeMs = entry._lastDataTimeMs > 0 ? entry._lastDataTimeMs : firstDataTimeMs + Math.max(0, entry.timings.receive || 0);
+            const firstDataTimeMs = entry._firstDataTimeMs > 0 ? entry._firstDataTimeMs : (timeMs + Math.max(0, timings.blocked || 0) + Math.max(0, timings.dns || 0) + Math.max(0, timings.connect || 0) + Math.max(0, timings.send || 0) + Math.max(0, timings.wait || 0));
+            const lastDataTimeMs = entry._lastDataTimeMs > 0 ? entry._lastDataTimeMs : firstDataTimeMs + Math.max(0, timings.receive || 0);
 
             const bytesIn = entry._bytesIn !== undefined ? entry._bytesIn : (entry.response && entry.response.content ? entry.response.content.size : 0);
             

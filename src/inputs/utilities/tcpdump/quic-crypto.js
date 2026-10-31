@@ -55,15 +55,60 @@ export async function deriveInitialSecrets(dcid) {
     };
 }
 
+const ZERO_IV = new Uint8Array(16);
+const hpKeyCache = new WeakMap();
+const aeadKeyCache = new WeakMap();
+
+/**
+ * Reconstructs the full 62-bit packet number from a truncated packet number
+ * header field per RFC 9000 Appendix A.3.
+ *
+ * @param {number} largestPn - Largest packet number successfully processed in
+ *   this packet number space (-1 if none yet).
+ * @param {number} truncatedPn - The truncated packet number read from the header.
+ * @param {number} pnNBits - Width of the truncated packet number in bits (8, 16, 24, or 32).
+ * @returns {number} Full reconstructed packet number.
+ */
+export function decodePacketNumber(largestPn, truncatedPn, pnNBits) {
+    if (largestPn === null || largestPn === undefined || largestPn < 0) {
+        return truncatedPn;
+    }
+    const expectedBig = BigInt(largestPn) + 1n;
+    const winBig = 1n << BigInt(pnNBits);
+    const hwinBig = winBig >> 1n;
+    const maskBig = winBig - 1n;
+    const truncBig = BigInt(truncatedPn);
+
+    const candidatePn = (expectedBig & ~maskBig) | truncBig;
+    if (candidatePn <= expectedBig - hwinBig && candidatePn < (1n << 62n) - winBig) {
+        return Number(candidatePn + winBig);
+    }
+    if (candidatePn > expectedBig + hwinBig && candidatePn >= winBig) {
+        return Number(candidatePn - winBig);
+    }
+    return Number(candidatePn);
+}
+
 /**
  * Given a Traffic Secret (Initial or 1-RTT), derive the AEAD Key, IV, and Header Protection (HP) Key.
+ * Supports both TLS_AES_128_GCM_SHA256 (32-byte secret → SHA-256, 16-byte key)
+ * and TLS_AES_256_GCM_SHA384 (48-byte secret → SHA-384, 32-byte key).
  */
-export async function deriveTrafficKeys(secret, hashAlg = 'sha256') {
-    const key = await hkdfExpandLabel(secret, 'quic key', new Uint8Array(0), hashAlg, 16);
-    const iv = await hkdfExpandLabel(secret, 'quic iv', new Uint8Array(0), hashAlg, 12);
-    const hp = await hkdfExpandLabel(secret, 'quic hp', new Uint8Array(0), hashAlg, 16);
-    
-    return { key, iv, hp };
+export async function deriveTrafficKeys(secret, hashAlg = null) {
+    const useSha384 = (hashAlg && hashAlg.toLowerCase().replace('-', '') === 'sha384') || (!hashAlg && secret && secret.length === 48);
+    const resolvedHash = useSha384 ? 'sha384' : (hashAlg || 'sha256');
+    const keyLen = useSha384 ? 32 : 16;
+
+    const key = await hkdfExpandLabel(secret, 'quic key', new Uint8Array(0), resolvedHash, keyLen);
+    const iv = await hkdfExpandLabel(secret, 'quic iv', new Uint8Array(0), resolvedHash, 12);
+    const hp = await hkdfExpandLabel(secret, 'quic hp', new Uint8Array(0), resolvedHash, keyLen);
+
+    const hpCryptoKey = await globalThis.crypto.subtle.importKey('raw', hp, { name: 'AES-CBC' }, false, ['encrypt']);
+    const aeadCryptoKey = await globalThis.crypto.subtle.importKey('raw', key, { name: 'AES-GCM' }, false, ['decrypt']);
+    hpKeyCache.set(hp, hpCryptoKey);
+    aeadKeyCache.set(key, aeadCryptoKey);
+
+    return { key, iv, hp, hpCryptoKey, aeadCryptoKey };
 }
 
 /**
@@ -72,17 +117,18 @@ export async function deriveTrafficKeys(secret, hashAlg = 'sha256') {
 export async function generateHeaderProtectionMask(hpKey, sample) {
     // WebCrypto does not expose AES-ECB. Since the QUIC sample is precisely 16 bytes (1 block),
     // AES-CBC with a zeroed validation IV provides identical single-block ciphertext natively!
-    const key = await globalThis.crypto.subtle.importKey('raw', hpKey, { name: 'AES-CBC' }, false, ['encrypt']);
-    
-    // Zeroed 16-byte initialization vector natively maps ECB
-    const iv = new Uint8Array(16); 
-    
+    let key = (hpKey && hpKey.type === 'secret') ? hpKey : hpKeyCache.get(hpKey);
+    if (!key) {
+        key = await globalThis.crypto.subtle.importKey('raw', hpKey, { name: 'AES-CBC' }, false, ['encrypt']);
+        if (hpKey && typeof hpKey === 'object') hpKeyCache.set(hpKey, key);
+    }
+
     const ciphertextBuffer = await globalThis.crypto.subtle.encrypt(
-        { name: "AES-CBC", iv: iv },
+        { name: "AES-CBC", iv: ZERO_IV },
         key,
         sample
     );
-    
+
     // Slice only the first 16 bytes natively excluding standard AES PKCS#7 padding seamlessly!
     return new Uint8Array(ciphertextBuffer).subarray(0, 16);
 }
@@ -101,13 +147,17 @@ export async function decryptQuicPayload(keyBytes, ivBytes, packetNumber, header
     }
 
     try {
-        const key = await globalThis.crypto.subtle.importKey(
-            'raw', 
-            keyBytes, 
-            { name: 'AES-GCM' }, 
-            false, 
-            ['decrypt']
-        );
+        let key = (keyBytes && keyBytes.type === 'secret') ? keyBytes : aeadKeyCache.get(keyBytes);
+        if (!key) {
+            key = await globalThis.crypto.subtle.importKey(
+                'raw', 
+                keyBytes, 
+                { name: 'AES-GCM' }, 
+                false, 
+                ['decrypt']
+            );
+            if (keyBytes && typeof keyBytes === 'object') aeadKeyCache.set(keyBytes, key);
+        }
         
         // In native WebCrypto AES-GCM, the ciphertext properly contains the auth tag securely implicitly at the end!
         const decryptedBuffer = await globalThis.crypto.subtle.decrypt(

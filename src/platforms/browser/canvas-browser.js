@@ -20,3 +20,15 @@ export class NativeCanvas {
         return this.canvas;
     }
 }
+
+/**
+ * Create a browser canvas (OffscreenCanvas when available, else a detached <canvas>).
+ * Async to share the platform-canvas-impl signature with the Node implementation,
+ * which must lazily import its optional native dependency.
+ * @param {number} width
+ * @param {number} height
+ * @returns {Promise<OffscreenCanvas|HTMLCanvasElement>}
+ */
+export async function createNativeCanvas(width, height) {
+    return new NativeCanvas(width, height).getCanvas();
+}

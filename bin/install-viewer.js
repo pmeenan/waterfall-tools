@@ -28,6 +28,10 @@ import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
+import zlib from 'node:zlib';
+
+const brotliCompressAsync = promisify(zlib.brotliCompress);
 import { patchDevtoolsBundle } from '../scripts/patch-devtools.js';
 
 const QVIS_PACKAGE_NAME = '@pmeenan/qvis';
@@ -189,6 +193,13 @@ export async function runInstallViewer(argv) {
             indexHtml = indexHtml.replace('</head>', `  ${qvisMeta}\n</head>`);
         }
         await fs.writeFile(indexPath, indexHtml);
+        // The shipped index.html.br was precompressed from the PRE-rewrite HTML; servers that
+        // prefer precompressed siblings would otherwise serve stale (empty) meta tags.
+        // Regenerate it from the rewritten file at the build's Brotli level 11.
+        const compressed = await brotliCompressAsync(Buffer.from(indexHtml, 'utf-8'), {
+            params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 11 }
+        });
+        await fs.writeFile(`${indexPath}.br`, compressed);
     }
 
     console.log(`\nViewer installed. Serve ${outDir} as static files.`);

@@ -27,8 +27,8 @@ const concatUint8Arrays = (arrays) => {
     return res;
 };
 
-function decodeBase64Url(base64UrlStr) {
-    let base64 = base64UrlStr.replace(/-/g, '+').replace(/_/, '/');
+export function decodeBase64Url(base64UrlStr) {
+    let base64 = base64UrlStr.replace(/-/g, '+').replace(/_/g, '/');
     while (base64.length % 4) {
         base64 += '=';
     }
@@ -141,8 +141,12 @@ function processHttp2(http2Data, dnsRegistry) {
                 if (parsedRes) answers = parsedRes.answers;
             }
             
-            const reqTime = stream.data.client.length > 0 ? stream.data.client[0].time : 0;
-            const resTime = stream.data.server.length > 0 ? stream.data.server[0].time : reqTime;
+            const reqTime = stream.data.client.length > 0
+                ? stream.data.client[0].time
+                : (stream.headers?.clientTime || stream.clientTime || stream.reqTime || 0);
+            const resTime = stream.data.server.length > 0
+                ? stream.data.server[0].time
+                : (stream.headers?.serverTime || stream.serverTime || reqTime);
             
             const domain = queries.length > 0 ? queries[0].name : 'unknown';
             const ips = answers.map(a => a.address).filter(Boolean);

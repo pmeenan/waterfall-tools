@@ -70,6 +70,9 @@ export class ZipReader {
 
         // Read Local File Header to find exact data offset
         const lfhBuf = await this.storage.read(fileInfo.localHeaderOffset, 30);
+        if (lfhBuf.byteLength < 30) {
+            throw new Error(`Invalid Zip: truncated LFH for ${filename}`);
+        }
         const lfhView = new DataView(lfhBuf.buffer, lfhBuf.byteOffset, lfhBuf.byteLength);
         
         if (lfhView.getUint32(0, true) !== 0x04034b50) {

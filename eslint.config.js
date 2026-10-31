@@ -61,8 +61,7 @@ export default [
             'src/renderer/**/*.js',
             'src/platforms/browser/**/*.js',
             'src/viewer/**/*.js',
-            'src/demo/**/*.js',
-            'src/embed/**/*.js'
+            'src/demo/**/*.js'
         ],
         languageOptions: {
             ecmaVersion: 'latest',

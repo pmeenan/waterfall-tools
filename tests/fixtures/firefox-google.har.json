@@ -6785,7 +6785,7 @@
           "bodySize": -1
         },
         "response": {
-          "status": 200,
+          "status": 0,
           "statusText": "",
           "httpVersion": "HTTP/1.1",
           "cookies": [],

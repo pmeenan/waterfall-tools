@@ -3,8 +3,10 @@
  * Licensed under the Apache License, Version 2.0.
  * See the LICENSE file for details.
  */
-import { deriveTrafficKeys, generateHeaderProtectionMask, decryptQuicPayload } from './quic-crypto.js';
+import { deriveTrafficKeys, generateHeaderProtectionMask, decryptQuicPayload, decodePacketNumber } from './quic-crypto.js';
 import { QuicBuffer } from './quic-buffer.js';
+
+export { decodePacketNumber };
 
 export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
     let clientCidLength = 0;
@@ -51,20 +53,23 @@ export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
     let reverseKeys = null;
     let baselineIsClient = null;
     let forwardIsClient = null;
+    // Largest decrypted packet number per direction (Application Data PN space)
+    const largestPn = { client: -1, server: -1 };
 
-    async function attemptUnmask(keys, firstByte, sample, protectedOffset, fullBuffer) {
+    async function attemptUnmask(keys, firstByte, sample, protectedOffset, fullBuffer, dirLargestPn = -1) {
         if (!keys) return null;
         try {
-            const mask = await generateHeaderProtectionMask(keys.hp, sample);
+            const mask = await generateHeaderProtectionMask(keys.hpCryptoKey || keys.hp, sample);
             const isLongHeader = (firstByte & 0x80) !== 0;
             const unmaskedHeaderByte = firstByte ^ (mask[0] & (isLongHeader ? 0x0F : 0x1F));
             const pnLength = (unmaskedHeaderByte & 0x03) + 1;
             
-            let packetNumber = 0;
+            let truncatedPn = 0;
             for (let i = 0; i < pnLength; i++) {
                 const pnByte = fullBuffer[protectedOffset + i] ^ mask[1 + i];
-                packetNumber = (packetNumber << 8) | pnByte;
+                truncatedPn = (truncatedPn * 256) + pnByte;
             }
+            const packetNumber = decodePacketNumber(dirLargestPn, truncatedPn, pnLength * 8);
             const headerLength = protectedOffset + pnLength;
             const aadHeader = new Uint8Array(headerLength);
             aadHeader.set(fullBuffer.subarray(0, headerLength));
@@ -73,7 +78,7 @@ export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
                 aadHeader[protectedOffset + i] ^= mask[1 + i];
             }
             const payloadBuf = fullBuffer.slice(headerLength);
-            return { packetNumber, aadHeader, payloadBuf };
+            return { packetNumber, truncatedPn, pnLength, aadHeader, payloadBuf };
         } catch (e) {
             if (globalThis.waterfallDebug) console.error("DECODE ERROR", e);
             return null;
@@ -184,14 +189,16 @@ export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
                             let decrypted = null;
                             
                             if (globalThis.waterfallDebug) console.log(`[QUIC Decoder] Found 0-RTT Packet! Length: ${qb.buffer.length}, Sample Offset: ${sampleOffset}`);
+                            let decryptedPn = -1;
                             for (const kp of derivedKeyPairs) {
                                 if (!kp.earlyKeys) {
                                      continue;
                                 }
-                                const unmasked = await attemptUnmask(kp.earlyKeys, firstByte, sample, protectedOffset, qb.buffer);
+                                const unmasked = await attemptUnmask(kp.earlyKeys, firstByte, sample, protectedOffset, qb.buffer, largestPn.client);
                                 if (unmasked) {
-                                    decrypted = await decryptQuicPayload(kp.earlyKeys.key, kp.earlyKeys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
+                                    decrypted = await decryptQuicPayload(kp.earlyKeys.aeadCryptoKey || kp.earlyKeys.key, kp.earlyKeys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
                                     if (decrypted) {
+                                         decryptedPn = unmasked.packetNumber;
                                          if (globalThis.waterfallDebug) console.log(`[QUIC Decoder] DECRYPTED 0-RTT SUCCESSFULLY with earlyKeys!`);
                                          break;
                                     } else {
@@ -201,12 +208,16 @@ export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
                             }
                             
                             if (decrypted) {
+                                if (decryptedPn > largestPn.client) largestPn.client = decryptedPn;
                                 const decQb = new QuicBuffer(decrypted);
                                 while (decQb.remaining > 0) {
                                     const frameType = decQb.readVarInt();
                                     if (frameType === null) break;
                                     
-                                    if (frameType >= 0x08 && frameType <= 0x0f) {
+                                    if (frameType === 0x00 || frameType === 0x01) {
+                                        // PADDING or PING
+                                        continue;
+                                    } else if (frameType >= 0x08 && frameType <= 0x0f) {
                                         const offBit = (frameType & 0x04) !== 0;
                                         const lenBit = (frameType & 0x02) !== 0;
                                         const finBit = (frameType & 0x01) !== 0;
@@ -249,6 +260,7 @@ export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
                         : [0, 8, 4, 16, 20, 1, 2, 3, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19];
 
                 let decrypted = null;
+                let decryptedPn = -1;
 
                 for (const tryDcidLen of candidateDcidLens) {
                     qb.offset = 1;
@@ -262,22 +274,27 @@ export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
                     const sample = qb.buffer.slice(sampleOffset, sampleOffset + 16);
 
                     if (forwardKeys) {
-                        const keys = (chunk.isClient === baselineIsClient) ? forwardKeys : reverseKeys;
-                        const unmasked = await attemptUnmask(keys, firstByte, sample, protectedOffset, qb.buffer);
+                        const usedForward = (chunk.isClient === baselineIsClient);
+                        const keys = usedForward ? forwardKeys : reverseKeys;
+                        const isClientDir = usedForward ? forwardIsClient : !forwardIsClient;
+                        const dirKey = isClientDir ? 'client' : 'server';
+                        const unmasked = await attemptUnmask(keys, firstByte, sample, protectedOffset, qb.buffer, largestPn[dirKey]);
                         if (unmasked) {
-                            decrypted = await decryptQuicPayload(keys.key, keys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
+                            decrypted = await decryptQuicPayload(keys.aeadCryptoKey || keys.key, keys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
+                            if (decrypted) decryptedPn = unmasked.packetNumber;
                         }
                     } else {
                         for (const kp of derivedKeyPairs) {
                             // Try clientKeys mapping forward
-                            let unmasked = await attemptUnmask(kp.clientKeys, firstByte, sample, protectedOffset, qb.buffer);
+                            let unmasked = await attemptUnmask(kp.clientKeys, firstByte, sample, protectedOffset, qb.buffer, largestPn.client);
                             if (unmasked) {
-                                decrypted = await decryptQuicPayload(kp.clientKeys.key, kp.clientKeys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
+                                decrypted = await decryptQuicPayload(kp.clientKeys.aeadCryptoKey || kp.clientKeys.key, kp.clientKeys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
                                 if (decrypted) {
                                     forwardKeys = kp.clientKeys;
                                     reverseKeys = kp.serverKeys;
                                     baselineIsClient = chunk.isClient;
                                     forwardIsClient = true;
+                                    decryptedPn = unmasked.packetNumber;
                                     break;
                                 } else {
                                     const keyPhase = (firstByte & 0x04) !== 0;
@@ -286,14 +303,15 @@ export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
                             }
 
                             // Try serverKeys mapping forward
-                            unmasked = await attemptUnmask(kp.serverKeys, firstByte, sample, protectedOffset, qb.buffer);
+                            unmasked = await attemptUnmask(kp.serverKeys, firstByte, sample, protectedOffset, qb.buffer, largestPn.server);
                             if (unmasked) {
-                                decrypted = await decryptQuicPayload(kp.serverKeys.key, kp.serverKeys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
+                                decrypted = await decryptQuicPayload(kp.serverKeys.aeadCryptoKey || kp.serverKeys.key, kp.serverKeys.iv, unmasked.packetNumber, unmasked.aadHeader, unmasked.payloadBuf);
                                 if (decrypted) {
                                     forwardKeys = kp.serverKeys;
                                     reverseKeys = kp.clientKeys;
                                     baselineIsClient = chunk.isClient;
                                     forwardIsClient = false;
+                                    decryptedPn = unmasked.packetNumber;
                                     break;
                                 } else {
                                     const keyPhase = (firstByte & 0x04) !== 0;
@@ -322,6 +340,8 @@ export async function decodeQuic(chunks, clientPort, keyLog, _options = {}) {
                 if (decrypted) {
                     const usedForwardKeys = (chunk.isClient === baselineIsClient);
                     const activeIsClientAuth = usedForwardKeys ? forwardIsClient : !forwardIsClient;
+                    const dirKey = activeIsClientAuth ? 'client' : 'server';
+                    if (decryptedPn > largestPn[dirKey]) largestPn[dirKey] = decryptedPn;
                     
                     if (!activeIsClientAuth && !connQuicParams.handshakeTime) {
                         connQuicParams.handshakeTime = chunk.time;

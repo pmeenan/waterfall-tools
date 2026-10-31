@@ -117,6 +117,11 @@ export default {
             );
         }
 
+        // Count the attempt NOW, before any await. Counting only after the sniff
+        // completed let one IP open an unbounded number of concurrent in-flight
+        // requests (none of them had been counted yet when the next arrived).
+        recordAttempt(rlKey);
+
         return handleFetch(request, url, clientIp, rlKey);
     },
 };
@@ -252,6 +257,8 @@ async function handleFetch(request, url, clientIp, rlKey) {
     }
 
     if (!upstream.ok) {
+        // Release the unread upstream body so the connection isn't held open.
+        try { await upstream.body?.cancel(); } catch (_e) { }
         clearRequestTimeout();
         recordFailure(rlKey);
         return jsonError(
@@ -266,6 +273,7 @@ async function handleFetch(request, url, clientIp, rlKey) {
     if (contentLengthHeader) {
         const contentLength = Number(contentLengthHeader);
         if (Number.isFinite(contentLength) && contentLength > MAX_CONTENT_LENGTH_BYTES) {
+            try { await upstream.body?.cancel(); } catch (_e) { }
             clearRequestTimeout();
             recordFailure(rlKey);
             return jsonError(413, 'payload_too_large', `Upstream payload exceeds ${MAX_CONTENT_LENGTH_BYTES} bytes.`);
@@ -338,9 +346,8 @@ async function handleFetch(request, url, clientIp, rlKey) {
     // and clean up the request-deadline timer when the stream ends.
     const body = buildReplayStream(sniffedChunks, reader, upstreamDone, clearRequestTimeout);
 
-    // At this point the response is being handed off to the runtime. Count
-    // it as a successful attempt against the per-IP total cap.
-    recordSuccess(rlKey);
+    // The attempt was already counted against the per-IP total cap at request
+    // start (recordAttempt); successes add nothing further.
 
     const headers = new Headers();
     headers.set('Access-Control-Allow-Origin', '*');
@@ -695,7 +702,8 @@ async function dohLookup(hostname, type, parentSignal) {
 // this is enough to stop a single attacker hammering a single Worker instance.
 // No KV / D1 / Durable Object binding required.
 //
-// Each record tracks two counts — totalCount (all /fetch attempts) and
+// Each record tracks two counts — totalCount (all /fetch attempts, counted at
+// request start so concurrent in-flight requests are limited too) and
 // failureCount (subset that returned an error). Either crossing its cap
 // within the window triggers 429. The separate caps let us shape behavior:
 // a rare but useful caller can spend all 100 on successes, while a broken
@@ -737,20 +745,27 @@ function isRateLimited(key) {
         record.totalCount >= RATE_LIMIT_MAX_REQUESTS;
 }
 
-function bumpCounter(key, isFailure) {
+function bumpCounter(key, totalDelta, failureDelta) {
     if (!key) return;
     const now = Date.now();
     const windowMs = RATE_LIMIT_WINDOW_SECONDS * 1000;
 
     const record = rateLimitMap.get(key);
     if (record && now - record.firstMs <= windowMs) {
-        record.totalCount += 1;
-        if (isFailure) record.failureCount += 1;
+        record.totalCount += totalDelta;
+        record.failureCount += failureDelta;
         return;
     }
 
-    // New entry (or window rolled over). At cap, only evict the oldest if it
-    // has itself aged out — never evict an active entry (see block comment).
+    // New entry (or window rolled over). A rolled-over key must be DELETED before
+    // re-insertion: Map.set() on an existing key keeps its original insertion slot,
+    // which would put a fresh window at the FIFO head and make the cap check below
+    // (and isRateLimited's oldest-entry check) see an active entry first while
+    // genuinely expired entries sit behind it — prolonging fail-closed lockouts.
+    if (record) rateLimitMap.delete(key);
+
+    // At cap, only evict the oldest if it has itself aged out — never evict an
+    // active entry (see block comment).
     if (rateLimitMap.size >= RATE_LIMIT_MAP_CAP) {
         const oldestKey = rateLimitMap.keys().next().value;
         if (oldestKey === undefined) return;
@@ -762,14 +777,14 @@ function bumpCounter(key, isFailure) {
         }
     }
     rateLimitMap.set(key, {
-        totalCount: 1,
-        failureCount: isFailure ? 1 : 0,
+        totalCount: totalDelta,
+        failureCount: failureDelta,
         firstMs: now,
     });
 }
 
-function recordFailure(key) { bumpCounter(key, true); }
-function recordSuccess(key) { bumpCounter(key, false); }
+function recordAttempt(key) { bumpCounter(key, 1, 0); }
+function recordFailure(key) { bumpCounter(key, 0, 1); }
 
 // -----------------------------------------------------------------------------
 // Utilities
@@ -812,9 +827,12 @@ function rateLimitKeyFor(ip) {
 // Hostname-string SSRF guard. Blocks naive attacks (localhost, 127.0.0.1,
 // 169.254.169.254, etc). NOT a substitute for DoH-based resolution checks —
 // see resolveAndCheckHostname.
-function isPrivateHost(hostname) {
+export function isPrivateHost(hostname) {
     if (!hostname) return true;
-    const h = hostname.toLowerCase();
+    // Strip the DNS root dot(s): `localhost.` / `foo.internal.` resolve exactly like
+    // their dotless forms and must not slip past the suffix checks below.
+    const h = hostname.toLowerCase().replace(/\.+$/, '');
+    if (!h) return true;
 
     if (h === 'localhost' || h === 'localhost.localdomain') return true;
     if (h.endsWith('.localhost') || h.endsWith('.internal') || h.endsWith('.local')) return true;
@@ -930,6 +948,16 @@ export function isPrivateIPv6(ip) {
     // deployment, so treat them as suspicious.
     if (groups[0] === 0x0064 && groups[1] === 0xff9b && groups.slice(2, 6).every(g => g === 0)) return true;
     if (groups[0] === 0x0100 && groups.slice(1, 4).every(g => g === 0)) return true;
+
+    // 6to4 2002::/16 embeds an IPv4 address in groups 1-2 (2002:AABB:CCDD::);
+    // relays deliver to that IPv4, so apply the IPv4 blocklist to it.
+    if (groups[0] === 0x2002) {
+        return isPrivateIPv4(ipv4FromGroups(groups[1], groups[2]));
+    }
+
+    // Teredo 2001:0000::/32 tunnels to an obfuscated client IPv4 + server; there's
+    // no safe way to vet the eventual destination, so fail closed.
+    if (groups[0] === 0x2001 && groups[1] === 0x0000) return true;
 
     return false;
 }

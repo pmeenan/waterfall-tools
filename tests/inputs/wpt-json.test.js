@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WaterfallTools } from '../../src/core/waterfall-tools.js';
+import { formatWptUtilization } from '../../src/inputs/wpt-json.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -21,12 +22,12 @@ describe('WebPageTest JSON Input Processor', () => {
         await tool.loadFile(inputPath, { debug: true, format: 'wpt' });
         const result = tool.getHar({ debug: true });
 
-        // Auto-generate golden reference file if absent
-        if (!fs.existsSync(refPath)) {
-            console.log("Generating golden fixture for wpt-google.har.json...");
+        if (process.env.UPDATE_FIXTURES) {
+            console.log("Updating golden fixture for wpt-google.har.json...");
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
         }
+        expect(fs.existsSync(refPath), `Missing golden fixture: ${refPath}`).toBe(true);
 
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
@@ -51,11 +52,12 @@ describe('WebPageTest JSON Input Processor', () => {
         await tool.loadFile(inputPath, { debug: true, format: 'wpt' });
         const result = tool.getHar({ debug: true });
 
-        if (!fs.existsSync(refPath)) {
-            console.log("Generating golden fixture for wpt-cnn.har.json...");
+        if (process.env.UPDATE_FIXTURES) {
+            console.log("Updating golden fixture for wpt-cnn.har.json...");
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
         }
+        expect(fs.existsSync(refPath), `Missing golden fixture: ${refPath}`).toBe(true);
 
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
@@ -75,5 +77,33 @@ describe('WebPageTest JSON Input Processor', () => {
             const tool = new WaterfallTools();
             await tool.loadFile(inputPath, { debug: true, format: 'wpt' });
         }).rejects.toThrow();
+    });
+
+    it('Should bound bandwidth redistribution for pathological val/limit ratios and non-finite samples', () => {
+        const rawUtil = {
+            bw: {
+                data: {
+                    0: 1e15,
+                    100: 'NaN',
+                    200: 500000
+                },
+                max: 1e15,
+                count: 3
+            }
+        };
+        const t0 = performance.now();
+        const formatted = formatWptUtilization(rawUtil, 1); // limit = 1000 bps -> 1e12x ratio
+        const elapsedMs = performance.now() - t0;
+
+        expect(elapsedMs).toBeLessThan(100);
+        expect(Array.isArray(formatted.bw)).toBe(true);
+        // 3 original points + at most 100 prepended points
+        expect(formatted.bw.length).toBeLessThanOrEqual(103);
+        for (const [ts, pct] of formatted.bw) {
+            expect(Number.isFinite(ts)).toBe(true);
+            expect(Number.isFinite(pct)).toBe(true);
+            expect(pct).toBeGreaterThanOrEqual(0);
+            expect(pct).toBeLessThanOrEqual(100);
+        }
     });
 });

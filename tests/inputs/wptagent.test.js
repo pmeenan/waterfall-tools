@@ -3,10 +3,12 @@
  * Licensed under the Apache License, Version 2.0.
  * See the LICENSE file for details.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import path from 'node:path';
+import fsp from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { WaterfallTools } from '../../src/core/waterfall-tools.js';
+import { NativeStorage } from '../../src/platforms/node/storage-node.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -171,4 +173,29 @@ describe('WPTagent ZIP Input Processor', () => {
             await tool.destroy();
         }
     }, 30000);
+
+    it('Should deduplicate concurrent fsp.open calls in Node NativeStorage.read()', async () => {
+        const storage = new NativeStorage(`test_concurrent_${Date.now()}_${Math.random()}`);
+        try {
+            await storage.init();
+            await storage.writeBuffer(new Uint8Array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120]));
+
+            const openSpy = vi.spyOn(fsp, 'open');
+            try {
+                const [a, b, c] = await Promise.all([
+                    storage.read(0, 4),
+                    storage.read(4, 4),
+                    storage.read(8, 4)
+                ]);
+                expect(Array.from(a)).toEqual([10, 20, 30, 40]);
+                expect(Array.from(b)).toEqual([50, 60, 70, 80]);
+                expect(Array.from(c)).toEqual([90, 100, 110, 120]);
+                expect(openSpy).toHaveBeenCalledTimes(1);
+            } finally {
+                openSpy.mockRestore();
+            }
+        } finally {
+            await storage.destroy();
+        }
+    });
 });

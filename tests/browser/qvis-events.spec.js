@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
@@ -7,7 +7,21 @@ import { expect, test } from '@playwright/test';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
-const qvisPackage = JSON.parse(readFileSync(path.join(ROOT, 'third_party/qvis/visualizations/package.json'), 'utf-8'));
+
+function loadQvisPackage() {
+    const candidates = [
+        path.join(ROOT, 'third_party/qvis/visualizations/package.json'),
+        path.join(ROOT, 'node_modules/@pmeenan/qvis/package.json'),
+    ];
+    for (const candidate of candidates) {
+        if (existsSync(candidate)) {
+            return JSON.parse(readFileSync(candidate, 'utf-8'));
+        }
+    }
+    throw new Error('Could not locate qvis package.json in third_party/qvis/visualizations or node_modules/@pmeenan/qvis');
+}
+
+const qvisPackage = loadQvisPackage();
 
 function readMaybeGzip(relativePath) {
     const bytes = readFileSync(path.join(ROOT, relativePath));

@@ -46389,17 +46389,17 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 87486,
+            "ts": 87.486,
             "bytes": 367,
             "inflated": 523
           },
           {
-            "ts": 87805,
+            "ts": 87.805,
             "bytes": 472,
             "inflated": 1973
           },
           {
-            "ts": 90819,
+            "ts": 90.819,
             "bytes": 1
           }
         ],
@@ -46410,7 +46410,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=&oit=0&gs_rn=42&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3.770000001,
+        "_start": 3.770001,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -46682,12 +46682,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 823060,
+            "ts": 823.06,
             "bytes": 841,
             "inflated": 2513
           },
           {
-            "ts": 827463,
+            "ts": 827.463,
             "bytes": 1
           }
         ],
@@ -46698,7 +46698,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=w&oit=1&cp=1&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 760.290000003,
+        "_start": 760.2900030000001,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -46970,12 +46970,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 823871,
+            "ts": 823.871,
             "bytes": 841,
             "inflated": 2512
           },
           {
-            "ts": 827423,
+            "ts": 827.423,
             "bytes": 1
           }
         ],
@@ -46986,7 +46986,7 @@
         "_method": "GET",
         "_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLz9uudvgTYjl03HdGMzGor4Qv42nWMp-10KI5-0o&s=10",
         "_quic_session": 442,
-        "_start": 760.6000000050001,
+        "_start": 760.600005,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -47258,12 +47258,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 1785527,
+            "ts": 1785.527,
             "bytes": 2065,
             "inflated": 3519
           },
           {
-            "ts": 1787852,
+            "ts": 1787.852,
             "bytes": 1
           }
         ],
@@ -47274,7 +47274,7 @@
         "_method": "GET",
         "_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRD551w7SI0J9310L7RTYkmj9U4_w8SL-z9nNBuwOA&s=10",
         "_quic_session": 442,
-        "_start": 1741.186000007,
+        "_start": 1741.186007,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -47546,12 +47546,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 1946242,
+            "ts": 1946.242,
             "bytes": 549,
             "inflated": 1005
           },
           {
-            "ts": 1948620,
+            "ts": 1948.62,
             "bytes": 1
           }
         ],
@@ -47562,7 +47562,7 @@
         "_method": "GET",
         "_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTn01uwyB2EMTj-Cv_V7BNgK9LxbIc2J8Fxs1Wl_AwJzTNpXy30fLzZUAo&s",
         "_quic_session": 442,
-        "_start": 1905.4760000150002,
+        "_start": 1905.476015,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -47834,12 +47834,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2080830,
+            "ts": 2080.83,
             "bytes": 289,
             "inflated": 658
           },
           {
-            "ts": 2083934,
+            "ts": 2083.934,
             "bytes": 1
           }
         ],
@@ -47850,7 +47850,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.&oit=1&cp=4&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 2043.3070000189998,
+        "_start": 2043.307019,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -48122,12 +48122,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2391313,
+            "ts": 2391.313,
             "bytes": 290,
             "inflated": 659
           },
           {
-            "ts": 2393315,
+            "ts": 2393.315,
             "bytes": 1
           }
         ],
@@ -48138,7 +48138,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.g&oit=1&cp=5&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 2358.755000021,
+        "_start": 2358.7550210000004,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -48410,12 +48410,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2601788,
+            "ts": 2601.788,
             "bytes": 290,
             "inflated": 654
           },
           {
-            "ts": 2603568,
+            "ts": 2603.568,
             "bytes": 1
           }
         ],
@@ -48426,7 +48426,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.go&oit=1&cp=6&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 2566.898000023,
+        "_start": 2566.898023,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -48492,7 +48492,7 @@
         "_all_end": 2600
       },
       {
-        "time": 42.180908203125,
+        "time": 42.18115234375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -48691,19 +48691,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 36.0498046875,
+          "wait": 36.050048828125,
           "receive": 6.131103515625
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2751673,
+            "ts": 2751.673,
             "bytes": 282,
             "inflated": 656
           },
           {
-            "ts": 2757115,
+            "ts": 2757.115,
             "bytes": 1
           }
         ],
@@ -48714,7 +48714,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.goo&oit=3&cp=7&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 2715.387000025,
+        "_start": 2715.387025,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -48780,7 +48780,7 @@
         "_all_end": 2754
       },
       {
-        "time": 45.02685546875,
+        "time": 45.027099609375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -48979,19 +48979,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 41.244873046875,
+          "wait": 41.2451171875,
           "receive": 3.781982421875
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2899048,
+            "ts": 2899.048,
             "bytes": 284,
             "inflated": 661
           },
           {
-            "ts": 2901944,
+            "ts": 2901.944,
             "bytes": 1
           }
         ],
@@ -49002,7 +49002,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.goog&oit=3&cp=8&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 2857.953000027,
+        "_start": 2857.9530269999996,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -49274,12 +49274,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3025199,
+            "ts": 3025.199,
             "bytes": 294,
             "inflated": 669
           },
           {
-            "ts": 3027480,
+            "ts": 3027.48,
             "bytes": 1
           }
         ],
@@ -49290,7 +49290,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.googl&oit=1&cp=9&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 2986.1410000289998,
+        "_start": 2986.141029,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -49356,7 +49356,7 @@
         "_all_end": 3025
       },
       {
-        "time": 36.731201171875,
+        "time": 36.73095703125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -49555,19 +49555,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 34.13623046875,
+          "wait": 34.135986328125,
           "receive": 2.594970703125
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3189453,
+            "ts": 3189.453,
             "bytes": 297,
             "inflated": 679
           },
           {
-            "ts": 3191250,
+            "ts": 3191.25,
             "bytes": 1
           }
         ],
@@ -49578,7 +49578,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.google&oit=3&cp=10&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3155.462000031,
+        "_start": 3155.462031,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -49644,7 +49644,7 @@
         "_all_end": 3188
       },
       {
-        "time": 35.51513671875,
+        "time": 35.514892578125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -49843,19 +49843,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 33.998046875,
+          "wait": 33.997802734375,
           "receive": 1.51708984375
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3292437,
+            "ts": 3292.437,
             "bytes": 297,
             "inflated": 681
           },
           {
-            "ts": 3293131,
+            "ts": 3293.131,
             "bytes": 1
           }
         ],
@@ -49866,7 +49866,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.google.&oit=3&cp=11&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3258.097000033,
+        "_start": 3258.097033,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -50138,12 +50138,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3509436,
+            "ts": 3509.436,
             "bytes": 299,
             "inflated": 731
           },
           {
-            "ts": 3510921,
+            "ts": 3510.921,
             "bytes": 1
           }
         ],
@@ -50154,7 +50154,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.google.c&oit=1&cp=12&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3474.635000035,
+        "_start": 3474.6350350000002,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -50426,12 +50426,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3648324,
+            "ts": 3648.324,
             "bytes": 301,
             "inflated": 750
           },
           {
-            "ts": 3649839,
+            "ts": 3649.839,
             "bytes": 1
           }
         ],
@@ -50442,7 +50442,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.google.co&oit=3&cp=13&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3615.940000037,
+        "_start": 3615.940037,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -50714,12 +50714,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3821707,
+            "ts": 3821.707,
             "bytes": 302,
             "inflated": 751
           },
           {
-            "ts": 3824581,
+            "ts": 3824.581,
             "bytes": 1
           }
         ],
@@ -50730,7 +50730,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.google.com&oit=3&cp=14&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3785.9810000390003,
+        "_start": 3785.981039,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -50974,12 +50974,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4002746,
+            "ts": 4002.746,
             "bytes": 302,
             "inflated": 753
           },
           {
-            "ts": 4004634,
+            "ts": 4004.634,
             "bytes": 1
           }
         ],
@@ -50990,7 +50990,7 @@
         "_method": "GET",
         "_url": "https://optimizationguide-pa.googleapis.com/v1:GetHints?",
         "_quic_session": 442,
-        "_start": 3963.820000041,
+        "_start": 3963.8200410000004,
         "_request_headers": [
           "X-Goog-Api-Key: AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
           "Content-Type: application/x-protobuf"
@@ -52106,19 +52106,19 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4350500,
+            "ts": 4350.5,
             "bytes": 65536
           },
           {
-            "ts": 4350776,
+            "ts": 4350.776,
             "bytes": 65536
           },
           {
-            "ts": 4350843,
+            "ts": 4350.843,
             "bytes": 65536
           },
           {
-            "ts": 4351024,
+            "ts": 4351.024,
             "bytes": 8787
           }
         ],
@@ -52129,7 +52129,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/gen_204?s=webhp&t=aft&atyp=csi&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&rt=wsrt.101,hst.9,prt.45,aft.45&folr=_mRnHaZ6QMtLQ5NoPzfiYiQc_7&imn=12&dtc=188&stc=37&ima=0&imad=0&imac=1&wh=940&wih=940&dch=940&nt=navigate&dt=&ts=300&nhp=h3&ant=push&opi=89978449",
         "_quic_session": 442,
-        "_start": 4251.0600000449995,
+        "_start": 4251.060045,
         "_request_headers": [
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
           "sec-ch-ua-platform: \"Linux\"",
@@ -52322,7 +52322,7 @@
         "connection": "19613",
         "_chunks": [
           {
-            "ts": 4383475,
+            "ts": 4383.475,
             "bytes": 4334,
             "inflated": 8346
           }
@@ -52334,7 +52334,7 @@
         "_method": "POST",
         "_url": "https://www.gstatic.com/og/_/js/k=og.asy.en_US.fh17Jb9Is2A.2019.O/rt=j/m=_ac,_awd,adrc,ada,lldp,rlldb,qads,abld/exm=/d=1/ed=1/rs=AA2YrTuSzwr9n3ULMyPU3yXllcHG7SQxjA",
         "_quic_session": 19613,
-        "_start": 4270.395000043,
+        "_start": 4270.3950429999995,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -52837,12 +52837,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4381126,
+            "ts": 4381.126,
             "bytes": 812,
             "inflated": 1631
           },
           {
-            "ts": 4381463,
+            "ts": 4381.463,
             "bytes": 518,
             "inflated": 1291
           }
@@ -52854,7 +52854,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/verify/ACNhmN5PkMcqc1hBqYyi43T31XuH4jD2Umnx36Fq8LcBmIDTHlcvJKZJ3X01uN86phTGYv2kHBVa5CKgKDEDCytLUuYKfIvH9nyFUZtfblwI4dVRBGdK4OJ2cfO0CaJyTe8sQGbp53u03pJs27m5ja9o",
         "_quic_session": 442,
-        "_start": 4364.462000047,
+        "_start": 4364.462047,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -53558,7 +53558,7 @@
         "_all_end": 4416
       },
       {
-        "time": 52.7138671875,
+        "time": 52.714111328125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -53729,146 +53729,146 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 17.29296875,
+          "wait": 17.293212890625,
           "receive": 35.4208984375
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4384926,
+            "ts": 4384.926,
             "bytes": 18285,
             "inflated": 50159
           },
           {
-            "ts": 4385793,
+            "ts": 4385.793,
             "bytes": 1224,
             "inflated": 3604
           },
           {
-            "ts": 4386803,
+            "ts": 4386.803,
             "bytes": 21814,
             "inflated": 64517
           },
           {
-            "ts": 4388022,
+            "ts": 4388.022,
             "bytes": 2448,
             "inflated": 7219
           },
           {
-            "ts": 4388437,
+            "ts": 4388.437,
             "bytes": 19584,
             "inflated": 56528
           },
           {
-            "ts": 4389656,
+            "ts": 4389.656,
             "bytes": 14683,
             "inflated": 50861
           },
           {
-            "ts": 4392752,
+            "ts": 4392.752,
             "bytes": 23925,
-            "inflated": 13801
+            "inflated": 79337
           },
           {
-            "ts": 4393801,
+            "ts": 4393.801,
             "bytes": 14679,
             "inflated": 41193
           },
           {
-            "ts": 4394966,
+            "ts": 4394.966,
             "bytes": 12240,
             "inflated": 37263
           },
           {
-            "ts": 4395350,
+            "ts": 4395.35,
             "bytes": 9781,
             "inflated": 29972
           },
           {
-            "ts": 4397779,
+            "ts": 4397.779,
             "bytes": 14681,
             "inflated": 42903
           },
           {
-            "ts": 4399889,
+            "ts": 4399.889,
             "bytes": 10496,
             "inflated": 28371
           },
           {
-            "ts": 4400229,
+            "ts": 4400.229,
             "bytes": 1211,
             "inflated": 3306
           },
           {
-            "ts": 4401023,
+            "ts": 4401.023,
             "bytes": 11016,
             "inflated": 31156
           },
           {
-            "ts": 4401819,
+            "ts": 4401.819,
             "bytes": 1224,
             "inflated": 3533
           },
           {
-            "ts": 4402233,
+            "ts": 4402.233,
             "bytes": 12240,
             "inflated": 34979
           },
           {
-            "ts": 4402561,
+            "ts": 4402.561,
             "bytes": 2448,
             "inflated": 3653
           },
           {
-            "ts": 4403581,
+            "ts": 4403.581,
             "bytes": 14683,
             "inflated": 21430
           },
           {
-            "ts": 4405472,
+            "ts": 4405.472,
             "bytes": 19584,
             "inflated": 36214
           },
           {
-            "ts": 4405957,
+            "ts": 4405.957,
             "bytes": 4885,
             "inflated": 7712
           },
           {
-            "ts": 4407015,
+            "ts": 4407.015,
             "bytes": 12240,
             "inflated": 19766
           },
           {
-            "ts": 4414441,
+            "ts": 4414.441,
             "bytes": 1204,
             "inflated": 1684
           },
           {
-            "ts": 4415110,
+            "ts": 4415.11,
             "bytes": 32768,
-            "inflated": 29054
+            "inflated": 94590
           },
           {
-            "ts": 4415528,
+            "ts": 4415.528,
             "bytes": 1924,
             "inflated": 6281
           },
           {
-            "ts": 4418119,
+            "ts": 4418.119,
             "bytes": 32768,
-            "inflated": 42382
+            "inflated": 107918
           },
           {
-            "ts": 4419014,
+            "ts": 4419.014,
             "bytes": 32768,
-            "inflated": 34900
+            "inflated": 100436
           },
           {
-            "ts": 4419594,
+            "ts": 4419.594,
             "bytes": 21156,
-            "inflated": 2106
+            "inflated": 67642
           }
         ],
         "_chunks_in": [],
@@ -53878,7 +53878,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/gen_204?atyp=i&ct=psnt&cad=&nt=navigate&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&zx=1774655898026&opi=89978449",
         "_quic_session": 442,
-        "_start": 4368.207000048999,
+        "_start": 4368.207049,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -54105,7 +54105,7 @@
         "_all_end": 4442
       },
       {
-        "time": 54.779052734375,
+        "time": 54.779296875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -54332,19 +54332,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 48.458984375,
+          "wait": 48.459228515625,
           "receive": 6.320068359375
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4441006,
+            "ts": 4441.006,
             "bytes": 111,
             "inflated": 102
           },
           {
-            "ts": 4446407,
+            "ts": 4446.407,
             "bytes": 1
           }
         ],
@@ -54355,7 +54355,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/gen_204?atyp=csi&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&s=webhp&t=all&folr=_mRnHaZ6QMtLQ5NoPzfiYiQc_7&imn=12&dtc=188&stc=37&ima=0&imad=0&imac=1&wh=940&wih=940&dch=940&nt=navigate&dt=&ts=300&nhp=h3&ant=push&tbdba=0&tbdaa=0&thdba=0&thdaa=0&ime=0&imeh=0&imeha=0&imehb=0&imea=0&imeb=0&imel=0&imed=0&imeeb=0&imexb=0&scp=0&cb=15172&ucb=205395&lts=15472&adh=&mem=ujhs.10,tjhs.13,jhsl.4295,dm.8&nv=ne.1,feid.1900b3ed-e6ca-4b5c-97d3-fb09527d3a87&net=dl.10000,ect.4g,rtt.0,sd.0&hp=&p=bs.true&rt=hst.9,prt.45,aft.45,xjses.87,xjsee.115,xjs.115,fcp.67,lcp.67,wsrt.101,cst.0,dnst.0,rqst.144,rspt.46,rqstt.3,unt.1,cstt.1,dit.153&zx=1774655898019&opi=89978449",
         "_quic_session": 442,
-        "_start": 4392.433000063001,
+        "_start": 4392.433063,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -54435,7 +54435,7 @@
         "_all_end": 4443
       },
       {
-        "time": 27.169189453125,
+        "time": 27.1689453125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -54562,7 +54562,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 27.169189453125,
+          "wait": 27.1689453125,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -54575,7 +54575,7 @@
         "_method": "GET",
         "_url": "https://accounts.google.com/RotateCookiesPage?og_pid=538&rot=3&origin=https%3A%2F%2Fwww.google.com&exp_id=0",
         "_quic_session": 442,
-        "_start": 4394.026000065,
+        "_start": 4394.026065,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -54738,7 +54738,7 @@
         "_method": "POST",
         "_url": "https://content-autofill.googleapis.com/v1/pages/ChVDaHJvbWUvMTQ2LjAuNzY4MC4xNjQSGQn11VQ7sgCk8RIFDWlIR0chrbMLunyG1js=?alt=proto",
         "_quic_session": 442,
-        "_start": 4398.412000069,
+        "_start": 4398.412069,
         "_request_headers": [
           "X-Goog-Encode-Response-If-Executable: base64",
           "X-Goog-Api-Key: AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM"
@@ -54930,7 +54930,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 4425669,
+            "ts": 4425.669,
             "bytes": 2749
           }
         ],
@@ -54942,7 +54942,7 @@
         "_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.2U8VzmOKlq4.2019.O/ck=xjs.hd.eVK7UvJiRkY.L.B1.O/am=AIAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAACEAAAAIACbAGEQCAAAAAAAAOIABQAQAAAAAAAAACAAAAAgEBBAAABAAAAAAAAAIAAAAAAQAAAAEAAAADAAEAAURAAAAGBQAAAAAAAAEAAAAAAAAAAECEAAAAIAAA_zAwBgAAAACAIQkDgAAAAAAAYcACAAAoAAAAQIAAAAAAAACIIAECAAgYAAIAABAAAAAAAAgAEEIQEKCAAAABAAgAAAAAAAAAgYAAAAAAAAQEAAICIYAAAAAABBQIAAIAgQAECAAAGoEMAACQCBAAAEQHAAAgAACAAAAAAAAAAAAAAAA4AQAIBAAAWAB8EGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIoCIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY/d=0/dg=0/br=1/ujg=1/rs=ACT90oEP-fj1Rw1kLsDnzV5XrohSPOVTiA/m=sy16a,sy11h,syrt,synf,syru,Mbif2,ipWLfe,sy16c,QVaUhf,sy8o,sy8n,syh6,syh5,syh2,syh3,syh1,syhf,syhc,syha,syh0,syd3,syd4,sycy,sycx,syd2,sybm,sybo,syc8,syc7,syc0,syc6,syc5,sybt,syc3,syc4,sycz,sycs,sycm,sycc,sycd,sycl,syck,sycb,sycn,sybv,sybw,sybx,syby,sybu,syce,syc2,sybz,syd7,sybp,sybl,sybi,syb9,sybc,sybk,sybd,sybf,sybj,sybs,syco,sygs,sygz,sygx,sygw,sygv,sy94,sy90,sy93,sygu,syf5,sygy,sygt,sygr,sygo,sygm,sygl,sygk,sygj,sy98,uxMpU,sygf,sydh,sydc,sydb,sycu,syct,syde,syd9,sydf,sybr,sycj,syda,sydi,sy9r,sy9o,sy9n,sy9m,sy9l,sy9k,Mlhmy,QGR0gd,PoEs9b,Pjplud,OTA3Ae,sy9h,sy9c,A1yn5d,YIZmRd,sy8w,sy8u,sy8t,sy8s,sy8q,byfTOb,lsjVmc,LEikZe,sy8p,kWgXee,ovKuLd,sgY6Zb,qafBPd,ebZ3mb,dowIGb,sy16f,sy16e,sy16d,sy106,SJpD2c,sy1o1,syht,sys6,VtMfj,sy1ip,sy1io,sy1a6,sy19y,sy1i6,gllL8,GnLh6e,sy1m8,sy1m7,Kqhykb,CIZTGb,sy1iq,sy1i7,sy1i3,sy1i1,sy1i8,x927f,sy1if,sy1id,bFudd,sy1ib,qj9t6b,sy1i4,sy1ia,sy1i5,sy1hz,sy1hy,sy1hv,sy1hu,sy1hx,sy1i2,sy1i0,sy1hg,sy1ht,WlOj5b,sy1is,sy1ir,y4xy3,sy1ik,sy1il,sy1ii,sy1ij,sy1iw,sy1iv,sy1iu,qVQl0c,Ko78Df,zOsCQe,sy1j8,sy1ac,sy1m6,syyi,sy1jb,sy1ja,sy1j6,sy1ig,sy1j5,sy1j7,sy1jx,sy1jw,sy1ju,sy1jr,sy1gt,sy1jp?cb=121509377&xjs=s3",
         "_priority": "MEDIUM",
         "_initial_priority": "MEDIUM",
-        "_start": 4398.838000051001,
+        "_start": 4398.838051,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -55155,11 +55155,11 @@
         "_connect_end": 4398.301,
         "_ssl_start": 4385.515,
         "_ssl_end": 4398.294,
-        "_dnsTimeMs": 1685299539569,
-        "_dnsEndTimeMs": 1685299539575.116,
-        "_connectTimeMs": 1685299539575.116,
-        "_connectEndTimeMs": 1685299539598.281,
-        "_sslStartTimeMs": 1685299539585.502,
+        "_dnsTimeMs": 1774655897280,
+        "_dnsEndTimeMs": 1774655897286.116,
+        "_connectTimeMs": 1774655897286.116,
+        "_connectEndTimeMs": 1774655897309.281,
+        "_sslStartTimeMs": 1774655897296.502,
         "_load_start": 4364,
         "_ttfb_start": 4364,
         "_ttfb_end": 4450,
@@ -55323,7 +55323,7 @@
         "_created": 4410.192,
         "_method": "OPTIONS",
         "_url": "https://ogads-pa.clients6.google.com/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/GetAsyncData",
-        "_start": 4452.526000071,
+        "_start": 4452.526071,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: ogads-pa.clients6.google.com",
@@ -55547,7 +55547,7 @@
         "_created": 4410.799,
         "_method": "OPTIONS",
         "_url": "https://waa-pa.clients6.google.com/$rpc/google.internal.waa.v1.Waa/Create",
-        "_start": 4465.0080000729995,
+        "_start": 4465.008073,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: waa-pa.clients6.google.com",
@@ -55622,7 +55622,7 @@
         "_all_end": 4528
       },
       {
-        "time": 22.180908203125,
+        "time": 22.18115234375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -55769,7 +55769,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 22.180908203125,
+          "wait": 22.18115234375,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -55782,7 +55782,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/complete/search?q&cp=0&client=gws-wiz&xssi=t&gs_pcrt=2&hl=en&authuser=0&psi=mRnHaZ6QMtLQ5NoPzfiYiQc.1774655898050&dpr=1.109375&nolsbt=1",
         "_quic_session": 442,
-        "_start": 4468.499000075,
+        "_start": 4468.499075000001,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -55971,7 +55971,7 @@
         "_all_end": 4495
       },
       {
-        "time": 27.744873046875,
+        "time": 27.7451171875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -56118,7 +56118,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 27.744873046875,
+          "wait": 27.7451171875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -56131,7 +56131,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.2U8VzmOKlq4.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAARAAAAAAAAAAAAAIIAAQAAAAAAAAAAAAAAAAAgEABAAABAAAAAAAAAIAAAAAAQAAAAAAAAADAAEAAQRAAAAGAAAAAAAAAAAAAAAAAAAAAECEAAAAIAAA_zAwAgAAAAAAIAEAAAAAAAAAAMACAAAoAAAAQIAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAKAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABBQAAAIAgAAAAAAAAAAAAAAAAAAAAEAHAAAAAAAAAAAAAAAAAAAAAAA4AAAIBAAAAABwAGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIICIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY/d=0/dg=0/br=1/rs=ACT90oHOTy9eynRtK6hTVOLrgN_Rgotfaw/m=sy2ca,ifl?cb=121509377&xjs=s4",
         "_quic_session": 442,
-        "_start": 4471.001000079001,
+        "_start": 4471.001079,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -56360,7 +56360,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/gen_204?atyp=csi&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&s=promo&rt=hpbas.174&zx=1774655898076&opi=89978449",
         "_quic_session": 442,
-        "_start": 4478.457000085,
+        "_start": 4478.457085,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -56602,7 +56602,7 @@
         "_all_end": 4510
       },
       {
-        "time": 24.2138671875,
+        "time": 24.214111328125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -56773,26 +56773,26 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 15.298828125,
+          "wait": 15.299072265625,
           "receive": 8.9150390625
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4495791,
+            "ts": 4495.791,
             "bytes": 32768,
-            "inflated": 44132
+            "inflated": 109668
           },
           {
-            "ts": 4498051,
+            "ts": 4498.051,
             "bytes": 32768,
-            "inflated": 25686
+            "inflated": 91222
           },
           {
-            "ts": 4500282,
+            "ts": 4500.282,
             "bytes": 31609,
-            "inflated": 12746
+            "inflated": 78282
           }
         ],
         "_chunks_in": [],
@@ -56802,7 +56802,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/gen_204?atyp=csi&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&s=promo&rt=hpbas.174,hpbarr.0&zx=1774655898076&opi=89978449",
         "_quic_session": 442,
-        "_start": 4481.135000089,
+        "_start": 4481.135088999999,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -57002,24 +57002,24 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4502581,
+            "ts": 4502.581,
             "bytes": 32768,
-            "inflated": 65536
+            "inflated": 131072
           },
           {
-            "ts": 4509595,
+            "ts": 4509.595,
             "bytes": 32768,
-            "inflated": 53472
+            "inflated": 119008
           },
           {
-            "ts": 4511271,
+            "ts": 4511.271,
             "bytes": 32768,
-            "inflated": 29193
+            "inflated": 94729
           },
           {
-            "ts": 4512599,
+            "ts": 4512.599,
             "bytes": 25806,
-            "inflated": 13306
+            "inflated": 78842
           }
         ],
         "_chunks_in": [],
@@ -57029,7 +57029,7 @@
         "_method": "GET",
         "_url": "https://www.gstatic.com/_/mss/boq-identity/_/js/k=boq-identity.IdentityRotateCookiesHttp.en_US.-4tmG-7W09o.2018.O/am=AAAG/d=1/rs=AOaEmlGNrVU-DsFtERi9nkNqHcaqN1occQ/m=hfcr",
         "_quic_session": 442,
-        "_start": 4481.882000091,
+        "_start": 4481.882091,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -57322,7 +57322,7 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4506913,
+            "ts": 4506.913,
             "bytes": 1356,
             "inflated": 12337
           }
@@ -57334,7 +57334,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/xjs/_/js/md=2/k=xjs.hd.en.2U8VzmOKlq4.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAARAAAAAAAAAAAAAIIAAQAAAAAAAAAAAAAAAAAgEBBAAABAAAAAAAAAIAAAAAAQAAAAAAAAADAAEAAURAAAAGAQAAAAAAAAAAAAAAAAAAAECEAAAAIAAA_zAwAgAAAAAAIAEAAAAAAAAAAMACAAAoAAAAQIAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAKAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABBQAAAIAgAAAAAAAAAAAAAAAAAAAAEAHAAAAAAAAAAAAAAAAAAAAAAA4AAAIBAAAAABwEGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIoCIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY/rs=ACT90oHi8WL_-XBcSxNYA07GwUwfOW9tHg?cb=121509377",
         "_quic_session": 442,
-        "_start": 4482.167000093,
+        "_start": 4482.167093,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -57417,7 +57417,7 @@
         "_all_end": 4505
       },
       {
-        "time": 30.202880859375,
+        "time": 30.203125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -57624,7 +57624,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 30.202880859375,
+          "wait": 30.203125,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -57637,7 +57637,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/client_204?atyp=i&biw=2308&bih=940&dpr=1.109375&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&opi=89978449",
         "_quic_session": 442,
-        "_start": 4482.401000094999,
+        "_start": 4482.401095,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -57931,7 +57931,7 @@
         "connection": "19789",
         "_chunks": [
           {
-            "ts": 4526629,
+            "ts": 4526.629,
             "bytes": 291,
             "inflated": 374
           }
@@ -57943,7 +57943,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/async/hpba?vet=10ahUKEwjewI2zpMGTAxVSKFkFHU08JnEQj-0KCCw..i&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&opi=89978449&yv=3&sp_imghp=false&sp_hpte=1&sp_hpep=1&stick=&cs=0&async=_basejs:%2Fxjs%2F_%2Fjs%2Fk%3Dxjs.hd.en.2U8VzmOKlq4.2019.O%2Fam%3DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAARAAAAAAAAAAAAAIIAAQAAAAAAAAAAAAAAAAAgEABAAABAAAAAAAAAIAAAAAAQAAAAAAAAADAAEAAQRAAAAGAAAAAAAAAAAAAAAAAAAAAECEAAAAIAAA_zAwAgAAAAAAIAEAAAAAAAAAAMACAAAoAAAAQIAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAKAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABBQAAAIAgAAAAAAAAAAAAAAAAAAAAEAHAAAAAAAAAAAAAAAAAAAAAAA4AAAIBAAAAABwAGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIICIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY%2Fdg%3D0%2Fbr%3D1%2Frs%3DACT90oHOTy9eynRtK6hTVOLrgN_Rgotfaw%3Fcb%3D121509377,_basecss:%2Fxjs%2F_%2Fss%2Fk%3Dxjs.hd.eVK7UvJiRkY.L.B1.O%2Fam%3DAIAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAIACKAGEQCAAAAAAAAOAABQAQAAAAAAAAACAAAAAAABAAAABAAAAAAAAAIAAAAAAAAAAAEAAAAAAAEAAUQAAAAABQAAAAAAAAEAAAAAAAAAAACEAAAAAAAAAAAABAAAAACAAQgDgAAAAAAAYQAAAAAAAAAAAAAAAAAAAACIIAECAAgYAAAAABAAAAAAAAgAEEIQEKCAAAAAAAgAAAAAAAAAgYAAAAAAAAAEAAICIYAAAAAABAAIAAIAAQAECAAAGoEMAACQCBAAAEQHAAAgAACAAAAAAAAAAAAAAAAYAQAAAAAAWAB8EGEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAo%2Fbr%3D1%2Frs%3DACT90oFZw3XxItKGTxxyrvlb1ztX73KVaQ%3Fcb%3D121509377,_basecomb:%2Fxjs%2F_%2Fjs%2Fk%3Dxjs.hd.en.2U8VzmOKlq4.2019.O%2Fck%3Dxjs.hd.eVK7UvJiRkY.L.B1.O%2Fam%3DAIAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAACEAAAAIACbAGEQCAAAAAAAAOIABQAQAAAAAAAAACAAAAAgEBBAAABAAAAAAAAAIAAAAAAQAAAAEAAAADAAEAAURAAAAGBQAAAAAAAAEAAAAAAAAAAECEAAAAIAAA_zAwBgAAAACAIQkDgAAAAAAAYcACAAAoAAAAQIAAAAAAAACIIAECAAgYAAIAABAAAAAAAAgAEEIQEKCAAAABAAgAAAAAAAAAgYAAAAAAAAQEAAICIYAAAAAABBQIAAIAgQAECAAAGoEMAACQCBAAAEQHAAAgAACAAAAAAAAAAAAAAAA4AQAIBAAAWAB8EGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIoCIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY%2Fd%3D1%2Fed%3D1%2Fdg%3D0%2Fbr%3D1%2Fujg%3D1%2Frs%3DACT90oEP-fj1Rw1kLsDnzV5XrohSPOVTiA%3Fcb%3D121509377,_fmt:prog,_id:_mRnHaZ6QMtLQ5NoPzfiYiQc_8",
         "_quic_session": 19789,
-        "_start": 4489.070000083,
+        "_start": 4489.070083,
         "_request_headers": [
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
           "sec-ch-ua-platform: \"Linux\"",
@@ -58233,12 +58233,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4657819,
+            "ts": 4657.819,
             "bytes": 668,
             "inflated": 2097
           },
           {
-            "ts": 4659549,
+            "ts": 4659.549,
             "bytes": 1
           }
         ],
@@ -58249,7 +58249,7 @@
         "_method": "GET",
         "_url": "https://waa-pa.clients6.google.com/$rpc/google.internal.waa.v1.Waa/Ping",
         "_quic_session": 442,
-        "_start": 4504.162000097,
+        "_start": 4504.162097,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "Authorization: [195 bytes were stripped]",
@@ -58528,7 +58528,7 @@
         "connection": "19734",
         "_chunks": [
           {
-            "ts": 4547199,
+            "ts": 4547.199,
             "bytes": 30,
             "inflated": 53
           }
@@ -58540,7 +58540,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/gen_204?atyp=i&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&vet=10ahUKEwjewI2zpMGTAxVSKFkFHU08JnEQuqMJCDs..s&bl=1Kij&s=webhp&lpl=CAUYATADOANiBhDg8ailAQ&zx=1774655898150&opi=89978449",
         "_quic_session": 19734,
-        "_start": 4507.482000081,
+        "_start": 4507.482081,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -58848,17 +58848,17 @@
         "connection": "19762",
         "_chunks": [
           {
-            "ts": 4545550,
+            "ts": 4545.55,
             "bytes": 6175,
             "inflated": 8147
           },
           {
-            "ts": 4546467,
+            "ts": 4546.467,
             "bytes": 9821,
             "inflated": 12940
           },
           {
-            "ts": 4548353,
+            "ts": 4548.353,
             "bytes": 7410,
             "inflated": 9818
           }
@@ -58870,7 +58870,7 @@
         "_method": "POST",
         "_url": "https://waa-pa.clients6.google.com/$rpc/google.internal.waa.v1.Waa/Create",
         "_quic_session": 19762,
-        "_start": 4510.751000087001,
+        "_start": 4510.751087000001,
         "_request_headers": [
           ":method: POST",
           ":authority: waa-pa.clients6.google.com",
@@ -59142,7 +59142,7 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4538014,
+            "ts": 4538.014,
             "bytes": 2130,
             "inflated": 4872
           }
@@ -59154,7 +59154,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/xjs/_/ss/k=xjs.hd.eVK7UvJiRkY.L.B1.O/am=AIAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAIACKAGEQCAAAAAAAAOAABQAQAAAAAAAAACAAAAAAABAAAABAAAAAAAAAIAAAAAAAAAAAEAAAAAAAEAAUQAAAAABQAAAAAAAAEAAAAAAAAAAACEAAAAAAAAAAAABAAAAACAAQgDgAAAAAAAYQAAAAAAAAAAAAAAAAAAAACIIAECAAgYAAAAABAAAAAAAAgAEEIQEKCAAAAAAAgAAAAAAAAAgYAAAAAAAAAEAAICIYAAAAAABAAIAAIAAQAECAAAGoEMAACQCBAAAEQHAAAgAACAAAAAAAAAAAAAAAAYAQAAAAAAWAB8EGEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAo/d=0/br=1/rs=ACT90oFZw3XxItKGTxxyrvlb1ztX73KVaQ/m=syqq,sysz,syqy,syny,sy13d,syp1?cb=121509377&xjs=s4",
         "_quic_session": 442,
-        "_start": 4523.296000099,
+        "_start": 4523.296099,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -59220,7 +59220,7 @@
         "_all_end": 4535
       },
       {
-        "time": 19.901123046875,
+        "time": 19.90087890625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -59367,7 +59367,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 19.901123046875,
+          "wait": 19.90087890625,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -59380,7 +59380,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/js/bg/43k5QSVY4DB5YjniNHv-nQW2OqZgTbhKjwKnVHc42os.js",
         "_quic_session": 442,
-        "_start": 4524.511000101,
+        "_start": 4524.511101,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -59449,7 +59449,7 @@
         "_all_end": 4540
       },
       {
-        "time": 23.06494140625,
+        "time": 23.065185546875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -59596,7 +59596,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 23.06494140625,
+          "wait": 23.065185546875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -59609,7 +59609,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/gen_204?atyp=i&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&dt19=2&prm23=0&zx=1774655898138&opi=89978449",
         "_quic_session": 442,
-        "_start": 4524.924000102999,
+        "_start": 4524.924103,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -59901,12 +59901,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4604796,
+            "ts": 4604.796,
             "bytes": 111,
             "inflated": 102
           },
           {
-            "ts": 4610104,
+            "ts": 4610.104,
             "bytes": 1
           }
         ],
@@ -59917,7 +59917,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/generate_204?XoXUjA",
         "_quic_session": 442,
-        "_start": 4528.837000105,
+        "_start": 4528.8371050000005,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -59997,7 +59997,7 @@
         "_all_end": 4606
       },
       {
-        "time": 17.033203125,
+        "time": 17.032958984375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -60168,14 +60168,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 16.085205078125,
+          "wait": 16.0849609375,
           "receive": 0.947998046875
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4558371,
+            "ts": 4558.371,
             "bytes": 483,
             "inflated": 1144
           }
@@ -60187,7 +60187,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/xjs/_/ss/k=xjs.hd.eVK7UvJiRkY.L.B1.O/am=AIAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAIACKAGEQCAAAAAAAAOAABQAQAAAAAAAAACAAAAAAABAAAABAAAAAAAAAIAAAAAAAAAAAEAAAAAAAEAAUQAAAAABQAAAAAAAAEAAAAAAAAAAACEAAAAAAAAAAAABAAAAACAAQgDgAAAAAAAYQAAAAAAAAAAAAAAAAAAAACIIAECAAgYAAAAABAAAAAAAAgAEEIQEKCAAAAAAAgAAAAAAAAAgYAAAAAAAAAEAAICIYAAAAAABAAIAAIAAQAECAAAGoEMAACQCBAAAEQHAAAgAACAAAAAAAAAAAAAAAAYAQAAAAAAWAB8EGEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAo/d=0/br=1/rs=ACT90oFZw3XxItKGTxxyrvlb1ztX73KVaQ/m=y05UD,PPhKqf,vECdaf,sy1a9,sy1a3,sy1bm,sy1bi,sy1an,sy1gk,sy1gl,sy1ae,sy1gm,syow,sy1gn,sy1gc,sy1gb,sy1gd,epYOx?cb=121509377&xjs=s4",
         "_quic_session": 442,
-        "_start": 4542.3540001090005,
+        "_start": 4542.354109,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -60487,22 +60487,22 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4560165,
+            "ts": 4560.165,
             "bytes": 32768,
-            "inflated": 36170
+            "inflated": 101706
           },
           {
-            "ts": 4561571,
+            "ts": 4561.571,
             "bytes": 32768,
-            "inflated": 53558
+            "inflated": 119094
           },
           {
-            "ts": 4561987,
+            "ts": 4561.987,
             "bytes": 32768,
-            "inflated": 41722
+            "inflated": 107258
           },
           {
-            "ts": 4562300,
+            "ts": 4562.3,
             "bytes": 396,
             "inflated": 1016
           }
@@ -60514,7 +60514,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.2U8VzmOKlq4.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAARAAAAAAAAAAAAAIIAAQAAAAAAAAAAAAAAAAAgEABAAABAAAAAAAAAIAAAAAAQAAAAAAAAADAAEAAQRAAAAGAAAAAAAAAAAAAAAAAAAAAECEAAAAIAAA_zAwAgAAAAAAIAEAAAAAAAAAAMACAAAoAAAAQIAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAKAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABBQAAAIAgAAAAAAAAAAAAAAAAAAAAEAHAAAAAAAAAAAAAAAAAAAAAAA4AAAIBAAAAABwAGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIICIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY/d=0/dg=0/br=1/rs=ACT90oHOTy9eynRtK6hTVOLrgN_Rgotfaw/m=sy15b,sy15a,rtH1bd,SMquOb,sy15l,sy15j,sy15i,sy15f,syf6,d5EhJe,sy1mo,fCxEDd,sy1mn,sy1ml,sy1mk,sy1mh,sy15t,sy1mj,sy1mi,sy1mg,sy1ab,sy1aa,sy15u,sy13f,sy139,T1HOxc,LFk59d,sy15z,sy15r,sy15o,sy15p,sy15m,syqq,zx30Y,sy1mq,sy1mp,sy162,syy9,Wo3n8,ZgGg9b,dIoSBb,sy1wd,sy1wn,sy2ek,sy2ej,b6knsb,sy2eg,sy2ef,syy3,sy1sa,sysz,syqy,syny,sy13d,sy1wm,sy1n9,sy13b,syfl,sydu,syds,syai,sydw,JKoKVe,pXdRYb,sy3lc,syaj,syag,sy96,O1Gjze,TtcOte,wR5FRb,kQvlef,syfj,syfg,syfc,syfb,sycp,syfa,sydn,syf9,syf8,syf7,syf4,syf2,syf0,syey,sybb,syb0,syb2,syb1,syb7,syaq,syao,syez,syex,syev,sydj,syeu,syet,syei,syer,sye8,sydz,sye0,syeq,syci,syeg,syep,sye3,sye4,syen,sye2,syem,sydk,sydl,sye5,sydx,syef,syek,syee,syej,syed,syec,sye1,syea,sye9,sye7,sye6,syeh,sydy,sydr,sydm,syan,sy8j,zbML3c,gskBEc,sy1e9,s980lf,sy1nj,EbPKJf,sy13n,sy13l,syp1,CnSW2d,sy1nm,sy1nl,pFsdhd,sy169,sy167,zGLm3b,sy1ra,sy1r9,sy1r8,sy1r7,sy1el,sy1em,DhPYme,sy439,sy3tj,sy3th,syhg,sy3to,sy3ti,sy3tq,sy3te,sy438,KHourd,sy445,sy1tw,syyr,oQfbDd,sy44c,sy1pc,sy1ge,sy1ga,sy44a,sy44b,sy448,sy1p3,sy449,qmjr3?cb=121509377&xjs=s4",
         "_quic_session": 442,
-        "_start": 4542.723000110999,
+        "_start": 4542.723110999999,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -60947,12 +60947,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4602471,
+            "ts": 4602.471,
             "bytes": 1160,
             "inflated": 4192
           },
           {
-            "ts": 4603120,
+            "ts": 4603.12,
             "bytes": 729,
             "inflated": 3143
           }
@@ -60964,7 +60964,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.2U8VzmOKlq4.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAARAAAAAAAAAAAAAIIAAQAAAAAAAAAAAAAAAAAgEABAAABAAAAAAAAAIAAAAAAQAAAAAAAAADAAEAAQRAAAAGAAAAAAAAAAAAAAAAAAAAAECEAAAAIAAA_zAwAgAAAAAAIAEAAAAAAAAAAMACAAAoAAAAQIAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAKAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABBQAAAIAgAAAAAAAAAAAAAAAAAAAAEAHAAAAAAAAAAAAAAAAAAAAAAA4AAAIBAAAAABwAGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIICIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY/d=0/dg=0/br=1/rs=ACT90oHOTy9eynRtK6hTVOLrgN_Rgotfaw/m=sy1o0,P10Owf,sy164,gSZvdb,sy13h,sy13e,sy13g,nRwWne,sy13k,fXO0xe?cb=121509377&xjs=s4",
         "_quic_session": 442,
-        "_start": 4584.366000115,
+        "_start": 4584.366115,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -61191,7 +61191,7 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4603773,
+            "ts": 4603.773,
             "bytes": 9286,
             "inflated": 29442
           }
@@ -61203,7 +61203,7 @@
         "_method": "GET",
         "_url": "https://play.google.com/log?format=json&hasfast=true&authuser=0",
         "_quic_session": 442,
-        "_start": 4584.739000117001,
+        "_start": 4584.739116999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "Authorization: [162 bytes were stripped]",
@@ -61274,7 +61274,7 @@
         "_all_end": 4600
       },
       {
-        "time": 23.576904296875,
+        "time": 23.5771484375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -61485,7 +61485,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 23.576904296875,
+          "wait": 23.5771484375,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -61498,7 +61498,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/gen_204?atyp=i&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&dt19=2&prm23=0&zx=1774655898138&opi=89978449",
         "_quic_session": 442,
-        "_start": 4585.750000119,
+        "_start": 4585.750119,
         "_request_headers": [
           ":method: POST",
           ":authority: www.google.com",
@@ -61575,7 +61575,7 @@
         "_all_end": 4605
       },
       {
-        "time": 17.932861328125,
+        "time": 17.93310546875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -61786,7 +61786,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 17.932861328125,
+          "wait": 17.93310546875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -61799,7 +61799,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/gen_204?atyp=i&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&vet=10ahUKEwjewI2zpMGTAxVSKFkFHU08JnEQuqMJCDs..s&bl=1Kij&s=webhp&lpl=CAUYATADOANiBhDg8ailAQ&zx=1774655898150&opi=89978449",
         "_quic_session": 442,
-        "_start": 4598.293000121001,
+        "_start": 4598.293121000001,
         "_request_headers": [
           ":method: POST",
           ":authority: www.google.com",
@@ -62054,12 +62054,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4626127,
+            "ts": 4626.127,
             "bytes": 2402,
             "inflated": 5574
           },
           {
-            "ts": 4626359,
+            "ts": 4626.359,
             "bytes": 1783,
             "inflated": 4820
           }
@@ -62071,7 +62071,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/xjs/_/js/k=xjs.hd.en.2U8VzmOKlq4.2019.O/am=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAAAAAAARAAAAAAAAAAAAAIIAAQAAAAAAAAAAAAAAAAAgEABAAABAAAAAAAAAIAAAAAAQAAAAAAAAADAAEAAQRAAAAGAAAAAAAAAAAAAAAAAAAAAECEAAAAIAAA_zAwAgAAAAAAIAEAAAAAAAAAAMACAAAoAAAAQIAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAKAAAAABAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABBQAAAIAgAAAAAAAAAAAAAAAAAAAAEAHAAAAAAAAAAAAAAAAAAAAAAA4AAAIBAAAAABwAGEEAAABAAAAAHQACDxgSEEBAAAAAAAAAAAAAAAAAAAAAABAAAIwFxIICIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIbQoAAAAAALAY/d=0/dg=0/br=1/rs=ACT90oHOTy9eynRtK6hTVOLrgN_Rgotfaw/m=lOO0Vd,sy9i,P6sQOc?cb=121509377&xjs=s4",
         "_quic_session": 442,
-        "_start": 4613.2560001229995,
+        "_start": 4613.256123,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -62236,7 +62236,7 @@
         "_method": "GET",
         "_url": "https://play.google.com/log?hasfast=true&auth=SAPISIDHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID1PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID3PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb&authuser=0&format=json",
         "_quic_session": 442,
-        "_start": 4620.351000125001,
+        "_start": 4620.351125,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -62426,7 +62426,7 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4656720,
+            "ts": 4656.72,
             "bytes": 1047,
             "inflated": 2020
           }
@@ -62438,7 +62438,7 @@
         "_method": "GET",
         "_url": "https://play.google.com/log?hasfast=true&auth=SAPISIDHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID1PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID3PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb&authuser=0&format=json",
         "_quic_session": 442,
-        "_start": 4642.449000127,
+        "_start": 4642.449127000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -62666,7 +62666,7 @@
         "_method": "OPTIONS",
         "_url": "https://waa-pa.clients6.google.com/$rpc/google.internal.waa.v1.Waa/Ping",
         "_quic_session": 19899,
-        "_start": 4683.275000129001,
+        "_start": 4683.275129,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: waa-pa.clients6.google.com",
@@ -62737,7 +62737,7 @@
         "_all_end": 4699
       },
       {
-        "time": 21.00390625,
+        "time": 21.004150390625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -62896,14 +62896,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 20.0048828125,
+          "wait": 20.005126953125,
           "receive": 0.9990234375
         },
         "serverIPAddress": "",
         "connection": "19762",
         "_chunks": [
           {
-            "ts": 4722680,
+            "ts": 4722.68,
             "bytes": 22,
             "inflated": 2
           }
@@ -62915,7 +62915,7 @@
         "_method": "POST",
         "_url": "https://accounts.google.com/RotateCookies",
         "_quic_session": 19762,
-        "_start": 4702.433000137,
+        "_start": 4702.433137,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -63174,11 +63174,11 @@
         "connection": "800",
         "_chunks": [
           {
-            "ts": 4746615,
+            "ts": 4746.615,
             "bytes": 221
           },
           {
-            "ts": 4746633,
+            "ts": 4746.633,
             "bytes": 0
           }
         ],
@@ -63188,7 +63188,7 @@
         "_created": 4682.384,
         "_method": "POST",
         "_url": "https://play.google.com/log?hasfast=true&auth=SAPISIDHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID1PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID3PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb&authuser=0&format=json",
-        "_start": 4715.506000130999,
+        "_start": 4715.506131,
         "_request_headers": [
           ":method: POST",
           ":authority: play.google.com",
@@ -63277,7 +63277,7 @@
         "_all_end": 4776
       },
       {
-        "time": 62.77001953125,
+        "time": 62.769775390625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -63456,18 +63456,18 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 61.9130859375,
+          "wait": 61.912841796875,
           "receive": 0.85693359375
         },
         "serverIPAddress": "",
         "connection": "800",
         "_chunks": [
           {
-            "ts": 4745548,
+            "ts": 4745.548,
             "bytes": 366
           },
           {
-            "ts": 4745647,
+            "ts": 4745.647,
             "bytes": 0
           }
         ],
@@ -63477,7 +63477,7 @@
         "_created": 4682.938,
         "_method": "POST",
         "_url": "https://play.google.com/log?hasfast=true&auth=SAPISIDHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID1PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb+SAPISID3PHASH+1a60c101a3a459a8ef24968aa52513ad17bf88bb&authuser=0&format=json",
-        "_start": 4715.5920001330005,
+        "_start": 4715.592133,
         "_request_headers": [
           ":method: POST",
           ":authority: play.google.com",
@@ -63566,7 +63566,7 @@
         "_all_end": 4774
       },
       {
-        "time": 57.930908203125,
+        "time": 57.93115234375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
@@ -63697,7 +63697,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 57.930908203125,
+          "wait": 57.93115234375,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -63709,7 +63709,7 @@
         "_created": 4683.639,
         "_method": "OPTIONS",
         "_url": "https://play.google.com/log?format=json&hasfast=true&authuser=0",
-        "_start": 4720.2030001349995,
+        "_start": 4720.203135,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: play.google.com",
@@ -63982,11 +63982,11 @@
         "connection": "800",
         "_chunks": [
           {
-            "ts": 4770362,
+            "ts": 4770.362,
             "bytes": 191
           },
           {
-            "ts": 4770380,
+            "ts": 4770.38,
             "bytes": 0
           }
         ],
@@ -63996,7 +63996,7 @@
         "_created": 4742.487,
         "_method": "POST",
         "_url": "https://play.google.com/log?format=json&hasfast=true&authuser=0",
-        "_start": 4743.678000139,
+        "_start": 4743.678139000001,
         "_request_headers": [
           ":method: POST",
           ":authority: play.google.com",
@@ -64088,7 +64088,7 @@
         "_all_end": 4767
       },
       {
-        "time": 72.400146484375,
+        "time": 72.39990234375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -64255,19 +64255,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 70.567138671875,
+          "wait": 70.56689453125,
           "receive": 1.8330078125
         },
         "serverIPAddress": "",
         "connection": "19789",
         "_chunks": [
           {
-            "ts": 5362550,
+            "ts": 5362.55,
             "bytes": 55,
             "inflated": 39
           },
           {
-            "ts": 5362999,
+            "ts": 5362.999,
             "bytes": 10
           }
         ],
@@ -64278,7 +64278,7 @@
         "_method": "POST",
         "_url": "https://play.google.com/log?format=json&hasfast=true&authuser=0",
         "_quic_session": 19789,
-        "_start": 5291.389000141,
+        "_start": 5291.389141,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "Authorization: [162 bytes were stripped]",
@@ -64529,7 +64529,7 @@
         "connection": "19942",
         "_chunks": [
           {
-            "ts": 5434782,
+            "ts": 5434.782,
             "bytes": 131,
             "inflated": 131
           }
@@ -64541,7 +64541,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/gen_204?atyp=i&ei=mRnHaZ6QMtLQ5NoPzfiYiQc&ct=slh&v=t1&m=V&pv=0.7127325250381197&me=1:1774655897947,V,0,0,2308,940:0,B,940:0,N,1,mRnHaZ6QMtLQ5NoPzfiYiQc:0,R,1,1,0,0,2308,940:192,x:2114,e,B&zx=1774655900253&opi=89978449",
         "_quic_session": 19942,
-        "_start": 5408.436000143,
+        "_start": 5408.436143,
         "_request_headers": [
           "downlink: 10",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -64718,7 +64718,7 @@
         "_method": "POST",
         "_url": "https://clients4.google.com/chrome-sync/command/?client=Google+Chrome&client_id=jFadKHLnYtW5e9XBdrH0SA%3D%3D",
         "_quic_session": 442,
-        "_start": 6709.355000145,
+        "_start": 6709.3551449999995,
         "_request_headers": [
           "Authorization: [360 bytes were stripped]",
           "Content-Encoding: gzip",
@@ -64908,7 +64908,7 @@
         "connection": "14684",
         "_chunks": [
           {
-            "ts": 8033508,
+            "ts": 8033.508,
             "bytes": 377,
             "inflated": 390
           }
@@ -64920,7 +64920,7 @@
         "_method": "POST",
         "_url": "https://clients4.google.com/chrome-sync/command/?client=Google+Chrome&client_id=jFadKHLnYtW5e9XBdrH0SA%3D%3D",
         "_quic_session": 14684,
-        "_start": 7952.314000147,
+        "_start": 7952.314147,
         "_request_headers": [
           ":method: POST",
           ":authority: clients4.google.com",

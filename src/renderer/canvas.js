@@ -18,6 +18,8 @@ export class WaterfallCanvas {
         this.rawEntries = [];
         this.pageObj = null;
         this.pendingRender = null;
+        this._pendingRenderIsRaf = false;
+        this._destroyed = false;
         this.drawnRows = null;
         this.lastHoverKey = '';
         this.dragZoom = null;
@@ -53,6 +55,8 @@ export class WaterfallCanvas {
     }
     
     destroy() {
+        this._destroyed = true;
+        this._cancelPendingRender();
         this._endDragZoom();
         if (this._zoomOverlay && this._zoomOverlay.parentNode) {
             this._zoomOverlay.parentNode.removeChild(this._zoomOverlay);
@@ -153,24 +157,47 @@ export class WaterfallCanvas {
     }
 
     _bindTouch() {
-        if (!this.canvas) return;
+        // Headless callers (src/outputs/image.js) hand us a @napi-rs/canvas or
+        // OffscreenCanvas via `options.canvas`; those aren't EventTargets with
+        // touch semantics (napi canvases have no addEventListener at all), so
+        // only wire gestures onto real DOM-style canvases.
+        if (!this.canvas || typeof this.canvas.addEventListener !== 'function') return;
         this.canvas.addEventListener('touchstart', this._onTouchStart.bind(this), {passive: false});
         this.canvas.addEventListener('touchmove', this._onTouchMove.bind(this), {passive: false});
         this.canvas.addEventListener('touchend', this._onTouchEnd.bind(this));
         this.canvas.addEventListener('touchcancel', this._onTouchEnd.bind(this));
     }
 
+    /**
+     * The currently visible time window in seconds, as absolute offsets from
+     * page zero. `options.startTime` / `endTime` may legitimately be `0` or
+     * `null` (reset), so use nullish checks rather than `||`. When no explicit
+     * end is set, layout reports `dimensions.maxTime` as the span *relative to
+     * startTime*, so the absolute end is `start + maxTime`.
+     * @returns {{start: number, end: number}}
+     */
+    _getVisibleWindowSec() {
+        const start = (typeof this.options.startTime === 'number' && isFinite(this.options.startTime)) ? this.options.startTime : 0;
+        const explicitEnd = this.options.endTime;
+        if (typeof explicitEnd === 'number' && isFinite(explicitEnd) && explicitEnd > 0) {
+            return { start, end: explicitEnd };
+        }
+        const spanMs = (this.drawnRows && this.drawnRows.dimensions) ? (this.drawnRows.dimensions.maxTime || 0) : 0;
+        return { start, end: start + spanMs / 1000 };
+    }
+
     _onTouchStart(e) {
         if (!e.touches || e.touches.length === 0) return;
+        const win = this._getVisibleWindowSec();
         this.touchState = {
             startX1: e.touches[0].clientX,
             startY1: e.touches[0].clientY,
             startX2: e.touches.length > 1 ? e.touches[1].clientX : null,
-            baseStartMs: this.options.startTime || 0,
-            baseEndMs: this.options.endTime || (this.drawnRows && this.drawnRows.dimensions ? this.drawnRows.dimensions.maxTime / 1000 : 0),
+            baseStartMs: win.start,
+            baseEndMs: win.end,
             isPanning: false,
             isZooming: e.touches.length > 1,
-            initialWidthMs: 0
+            initialWidthMs: win.end - win.start
         };
         if (!this.drawnRows || !this.drawnRows.dimensions || !this.drawnRows.dimensions.absoluteMaxTime) return;
 
@@ -202,8 +229,9 @@ export class WaterfallCanvas {
                 this.touchState.isZooming = true;
                 const dx = Math.abs(touch1.clientX - e.touches[1].clientX);
                 this.touchState.initialPinchDist = dx;
-                this.touchState.baseStartMs = this.options.startTime || 0;
-                this.touchState.baseEndMs = this.options.endTime || (this.drawnRows ? this.drawnRows.dimensions.maxTime / 1000 : 0);
+                const win = this._getVisibleWindowSec();
+                this.touchState.baseStartMs = win.start;
+                this.touchState.baseEndMs = win.end;
                 this.touchState.initialWidthMs = this.touchState.baseEndMs - this.touchState.baseStartMs;
                 const centerClientX = Math.min(touch1.clientX, e.touches[1].clientX) + (dx / 2);
                 const rect = this.canvas.getBoundingClientRect();
@@ -257,7 +285,9 @@ export class WaterfallCanvas {
                 if (this.options.showLabels === false || this.options.overlapLabels) labelsWidth = 0;
                 
                 const dataWidth = Math.max(1, rect.width - labelsWidth - 5);
-                const currentWidthMs = (this.options.endTime || this.touchState.baseEndMs) - (this.options.startTime || this.touchState.baseStartMs);
+                // A pan never changes the window width, so measure it once from
+                // the gesture's base window (both absolute seconds).
+                const currentWidthMs = this.touchState.baseEndMs - this.touchState.baseStartMs;
                 
                 const msPerPixel = currentWidthMs / dataWidth;
                 const shiftMs = -deltaX * msPerPixel;
@@ -437,8 +467,10 @@ export class WaterfallCanvas {
              this.touchState.startX1 = e.touches[0].clientX;
              this.touchState.startY1 = e.touches[0].clientY;
              this.touchState.startX2 = e.touches.length > 1 ? e.touches[1].clientX : null;
-             this.touchState.baseStartMs = this.options.startTime || 0;
-             this.touchState.baseEndMs = this.options.endTime || ((this.options.startTime || 0) + (this.touchState.initialWidthMs || 0));
+             const win = this._getVisibleWindowSec();
+             this.touchState.baseStartMs = win.start;
+             this.touchState.baseEndMs = win.end;
+             this.touchState.initialWidthMs = win.end - win.start;
              this.touchState.isPanning = false;
              this.touchState.isZooming = e.touches.length > 1;
         }
@@ -464,6 +496,8 @@ export class WaterfallCanvas {
         // Iterate backwards to hit the topmost visual layer securely natively resolving overlapping coordinates
         for (let i = this.drawnRows.rows.length - 1; i >= 0; i--) {
             const row = this.drawnRows.rows[i];
+            // The thumbnail "torn edge" gap row has no backing request.
+            if (row.isTornEdge) continue;
             
             if (y >= row.y1 && y <= row.y2) {
                 if (!this.options.connectionView) {
@@ -652,16 +686,24 @@ export class WaterfallCanvas {
         this._requestRender();
     }
     
-    _requestRender() {
-        if (this.pendingRender) {
-            if (typeof cancelAnimationFrame !== 'undefined') {
-                cancelAnimationFrame(this.pendingRender);
-            } else {
-                clearTimeout(this.pendingRender);
-            }
+    _cancelPendingRender() {
+        if (!this.pendingRender) return;
+        if (this._pendingRenderIsRaf && typeof cancelAnimationFrame !== 'undefined') {
+            cancelAnimationFrame(this.pendingRender);
+        } else if (typeof clearTimeout !== 'undefined') {
+            clearTimeout(this.pendingRender);
         }
+        this.pendingRender = null;
+    }
+
+    _requestRender() {
+        this._cancelPendingRender();
+        // A destroyed renderer must never repaint (late ResizeObserver /
+        // updateOptions calls after the viewer navigated away).
+        if (this._destroyed) return;
         
         const renderLogic = () => {
+            this.pendingRender = null;
             if (!this.rawEntries || this.rawEntries.length === 0) return;
             
             const clientWidth = this.container ? this.container.clientWidth : (this.options.width || 800);
@@ -675,8 +717,10 @@ export class WaterfallCanvas {
         };
         
         if (typeof requestAnimationFrame !== 'undefined') {
+            this._pendingRenderIsRaf = true;
             this.pendingRender = requestAnimationFrame(renderLogic);
         } else if (typeof setTimeout !== 'undefined') {
+            this._pendingRenderIsRaf = false;
             this.pendingRender = setTimeout(renderLogic, 0);
         } else {
             // Synchronous fallback natively if env supports neither completely
@@ -1830,7 +1874,9 @@ export class WaterfallCanvas {
                 const renderedConnectionRows = new Set();
                 let connectionDisplayIndex = 1;
                 
-                rows.forEach((row, index) => {
+                rows.forEach((row) => {
+                    // The thumbnail torn-edge gap row has no URL / request number.
+                    if (row.isTornEdge) return;
                     if (this.options.connectionView) {
                         if (renderedConnectionRows.has(row.y1)) return;
                         renderedConnectionRows.add(row.y1);
@@ -1874,7 +1920,11 @@ export class WaterfallCanvas {
                     }
 
                     labelCtx.fillStyle = textColor;
-                    const prefix = this.options.connectionView ? `${connectionDisplayIndex++}. ` : `${index + 1}. `;
+                    // Waterfall view numbers rows by the request's original
+                    // (unfiltered) position so labels match the click payload's
+                    // `index + 1` and the viewer's "Request N" tabs even when
+                    // reqFilter / urlFilter hide earlier requests.
+                    const prefix = this.options.connectionView ? `${connectionDisplayIndex++}. ` : `${row.index + 1}. `;
                     let urlText = row.url || '';
                     if (this.options.connectionView) {
                         urlText = urlText.split(' - ')[0];

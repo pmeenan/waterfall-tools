@@ -18,19 +18,33 @@ export class NativeStorage {
         if (!navigator.storage || !navigator.storage.getDirectory) {
             throw new Error("OPFS is not supported in this browser.");
         }
-        this.dirHandle = await navigator.storage.getDirectory();
-        this.fileHandle = await this.dirHandle.getFileHandle(this.hash, { create: true });
-        
-        // Hold a shared lock for the lifetime of this object using Web Locks API
-        // This natively solves the multi-tab cleanup coordination.
+        // Acquire the shared Web Lock BEFORE creating the OPFS file and wait until the
+        // lock callback has actually started (assigning `_lockResolver`) before returning.
+        // This prevents both:
+        //   (1) `cleanupOrphans()` racing to delete a newly created file before its shared
+        //       lock is granted; and
+        //   (2) `destroy()` running before `_lockResolver` is assigned and leaking the lock.
         if (navigator.locks) {
-            this._lockPromise = navigator.locks.request(`waterfall_opfs_${this.hash}`, { mode: 'shared' }, () => {
-                return new Promise(resolve => {
-                    this._lockResolver = resolve;
+            await new Promise((resolveLockAcquired, rejectLockAcquired) => {
+                this._lockPromise = navigator.locks.request(`waterfall_opfs_${this.hash}`, { mode: 'shared' }, () => {
+                    return new Promise(resolveRelease => {
+                        this._lockResolver = resolveRelease;
+                        resolveLockAcquired();
+                    });
                 });
+                this._lockPromise.catch(rejectLockAcquired);
             });
-            // Don't await the lock cleanly locking in background
-            this._lockPromise.catch(() => {});
+        }
+        try {
+            this.dirHandle = await navigator.storage.getDirectory();
+            this.fileHandle = await this.dirHandle.getFileHandle(this.hash, { create: true });
+        } catch (err) {
+            if (this._lockResolver) {
+                const release = this._lockResolver;
+                this._lockResolver = null;
+                release();
+            }
+            throw err;
         }
     }
 
@@ -58,9 +72,22 @@ export class NativeStorage {
     }
 
     async destroy() {
+        if (this.dirHandle && this.hash) {
+            try {
+                await this.dirHandle.removeEntry(this.hash);
+            } catch {
+                // Entry may already have been removed or never created
+            }
+        }
+        this.fileHandle = null;
         if (this._lockResolver) {
-            this._lockResolver(); // Release lock
+            const release = this._lockResolver;
             this._lockResolver = null;
+            release(); // Release lock
+        }
+        if (this._lockPromise) {
+            await this._lockPromise.catch(() => {});
+            this._lockPromise = null;
         }
     }
 

@@ -99,7 +99,7 @@ export const QPACK_STATIC_TABLE = [
     { name: 'purpose', value: 'prefetch' },
     { name: 'server', value: '' },
     { name: 'timing-allow-origin', value: '*' },
-    { name: 'upgradi-insecure-requests', value: '1' },
+    { name: 'upgrade-insecure-requests', value: '1' },
     { name: 'user-agent', value: '' },
     { name: 'x-forwarded-for', value: '' },
     { name: 'x-frame-options', value: 'deny' },
@@ -150,11 +150,47 @@ function decodeHuffman(buffer) {
     return new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(decoded));
 }
 
+// Integers beyond this can only come from corrupt/misaligned input
+const MAX_QPACK_INT = 0xFFFFFFFF;
+
+/**
+ * Stateful QPACK (RFC 9204) decoder for one direction of an HTTP/3 connection.
+ *
+ * The dynamic table is kept append-only and indexed by ABSOLUTE index
+ * (RFC 9204 §3.2.4): entry N is the N-th insertion ever made by the peer's
+ * encoder. Because a valid encoder only references entries that are still
+ * live, an append-only table resolves every reference correctly regardless of
+ * eviction and regardless of whether encoder-stream instructions are applied
+ * before or after the header block that references them. That lets the
+ * HTTP/3 decoder apply the whole encoder stream up front and then decode
+ * request/response header blocks in any order.
+ */
 export class QpackDecoder {
     constructor() {
+        // Append-only: index = absolute index - absoluteOffset
         this.dynamicTable = [];
+        // Capture time of each insertion (parallel to dynamicTable), used to
+        // reconstruct TotalNumberOfInserts as of a header block's arrival.
+        this.insertTimes = [];
         this.dynamicTableCapacity = 0;
-        this.insertsCount = 0;
+        this.maxCapacitySeen = 0;
+        // SETTINGS_QPACK_MAX_TABLE_CAPACITY advertised by this decoder's side
+        // (0 = unknown). Needed to decode the Required Insert Count.
+        this.maxTableCapacity = 0;
+        // Absolute index of dynamicTable[0]. 0 when the encoder stream was
+        // captured from its start; anchored from the first Required Insert
+        // Count on mid-stream captures.
+        this.absoluteOffset = 0;
+        this.midstream = false;
+        this.offsetAnchored = false;
+    }
+
+    get insertsCount() {
+        return this.absoluteOffset + this.dynamicTable.length;
+    }
+
+    setMaxTableCapacity(value) {
+        if (Number.isFinite(value) && value >= 0) this.maxTableCapacity = value;
     }
 
     readInt(buffer, offset, prefixBits, firstByteMask) {
@@ -166,13 +202,16 @@ export class QpackDecoder {
             return { value: v, newOffset: offset + 1 };
         }
         
-        let m = 0;
+        // Multiplication (not `<<`) so large values can't wrap negative;
+        // reject absurd values outright.
+        let multiplier = 1;
         let p = offset + 1;
         
         while (p < buffer.length) {
             const b = buffer[p++];
-            v += (b & 0x7F) << m;
-            m += 7;
+            v += (b & 0x7F) * multiplier;
+            if (v > MAX_QPACK_INT) return null;
+            multiplier *= 128;
             if ((b & 0x80) === 0) {
                 return { value: v, newOffset: p };
             }
@@ -209,29 +248,39 @@ export class QpackDecoder {
         return { value: stringVal, newOffset: strOffset + len };
     }
 
-    processEncoder(buffer, midstream = false) {
-        // Parses QPACK Encoder Stream (Stream Type 0x02)
-        let offset = 0;
+    /** Returns the dynamic entry at an absolute index, or null if unknown. */
+    _getAbsolute(absIndex) {
+        const idx = absIndex - this.absoluteOffset;
+        if (!Number.isInteger(idx) || idx < 0 || idx >= this.dynamicTable.length) return null;
+        return this.dynamicTable[idx];
+    }
 
-        // When the capture started mid-connection, the buffer may begin either:
-        // (a) At a clean instruction boundary (if the missing data was self-contained), or
-        // (b) In the middle of a "Set Dynamic Table Capacity" varint instruction.
-        // Try starting at offset 0 first. If that doesn't work (first byte looks like
-        // a varint continuation), scan past the continuation bytes.
-        if (midstream && buffer.length > 0) {
-            // Check if offset 0 could be a valid instruction start (bit 7 alone is ambiguous,
-            // but we can try both and the caller picks the better result).
-            // Just start at offset 0 — this handles the common case where the missing bytes
-            // were the stream type + a small capacity instruction.
-            offset = 0;
-        }
+    _insert(entry, time) {
+        this.dynamicTable.push(entry);
+        this.insertTimes.push(time);
+    }
+
+    /**
+     * Parses QPACK Encoder Stream instructions (stream type 0x02).
+     * @param {Uint8Array} buffer - encoder stream bytes (after the stream type)
+     * @param {boolean} [midstream] - capture started after the stream began
+     * @param {(offset:number)=>number|null} [timeAt] - maps a buffer offset to
+     *   the capture time of the packet carrying it
+     */
+    processEncoder(buffer, midstream = false, timeAt = null) {
+        // When the capture started mid-connection the buffer may begin at a
+        // clean instruction boundary or mid-instruction; we simply start at 0
+        // and rely on the no-progress guard below.
+        let offset = 0;
+        if (midstream) this.midstream = true;
 
         while (offset < buffer.length) {
             const prevOffset = offset;
             const b = buffer[offset];
+            let entry = null;
 
             if ((b & 0x80) === 0x80) {
-                // Insert with Name Reference (T=1, Static=0/1)
+                // Insert with Name Reference: 1 T index(6)
                 const isStatic = (b & 0x40) !== 0;
                 const nameRes = this.readInt(buffer, offset, 6, 0x3F);
                 if (!nameRes) break;
@@ -239,35 +288,45 @@ export class QpackDecoder {
                 const valRes = this.readString(buffer, nameRes.newOffset, 7, 0x7F);
                 if (!valRes) break;
 
-                const nameStr = isStatic ? QPACK_STATIC_TABLE[nameRes.value]?.name : (this.dynamicTable[nameRes.value] ? this.dynamicTable[nameRes.value].name : 'unknown');
-                if (nameStr) {
-                    this.dynamicTable.push({ name: nameStr, value: valRes.value });
+                let nameStr;
+                if (isStatic) {
+                    nameStr = QPACK_STATIC_TABLE[nameRes.value]?.name;
+                } else {
+                    // Encoder-stream dynamic references are RELATIVE: 0 = most recent insert
+                    const ref = this._getAbsolute(this.insertsCount - 1 - nameRes.value);
+                    nameStr = ref ? ref.name : 'unknown';
                 }
+                entry = { name: nameStr || 'unknown', value: valRes.value };
                 offset = valRes.newOffset;
             } else if ((b & 0x40) === 0x40) {
-                // Insert with Literal Name (T=0, NameLength)
+                // Insert with Literal Name: 01 H nameLen(5)
                 const nameRes = this.readString(buffer, offset, 5, 0x1F);
                 if (!nameRes) break;
 
                 const valRes = this.readString(buffer, nameRes.newOffset, 7, 0x7F);
                 if (!valRes) break;
 
-                this.dynamicTable.push({ name: nameRes.value, value: valRes.value });
+                entry = { name: nameRes.value, value: valRes.value };
                 offset = valRes.newOffset;
             } else if ((b & 0x20) === 0x20) {
-                // Set Dynamic Table Capacity
+                // Set Dynamic Table Capacity: 001 capacity(5)
                 const capRes = this.readInt(buffer, offset, 5, 0x1F);
                 if (!capRes) break;
                 this.dynamicTableCapacity = capRes.value;
+                if (capRes.value > this.maxCapacitySeen) this.maxCapacitySeen = capRes.value;
                 offset = capRes.newOffset;
             } else {
-                // Duplicate
+                // Duplicate: 000 index(5), relative to the current insert count
                 const dupRes = this.readInt(buffer, offset, 5, 0x1F);
                 if (!dupRes) break;
-                if (this.dynamicTable[dupRes.value]) {
-                    this.dynamicTable.push({ ...this.dynamicTable[dupRes.value] });
-                }
+                const ref = this._getAbsolute(this.insertsCount - 1 - dupRes.value);
+                entry = ref ? { name: ref.name, value: ref.value } : { name: 'unknown', value: '' };
                 offset = dupRes.newOffset;
+            }
+
+            if (entry) {
+                const time = timeAt ? timeAt(Math.max(prevOffset, offset - 1)) : null;
+                this._insert(entry, time);
             }
 
             // Safety: if no progress was made, skip one byte to avoid infinite loop
@@ -277,33 +336,106 @@ export class QpackDecoder {
         }
     }
 
-    decodeHeaders(buffer) {
+    /** Number of insertions whose packet arrived at or before `time`. */
+    _insertsAt(time) {
+        if (time === null || time === undefined) return this.insertsCount;
+        let n = 0;
+        for (let i = 0; i < this.insertTimes.length; i++) {
+            const t = this.insertTimes[i];
+            if (t === null || t === undefined || t <= time) n = i + 1;
+        }
+        return this.absoluteOffset + n;
+    }
+
+    /**
+     * RFC 9204 §4.5.1.1 Required Insert Count decoding.
+     * Returns null for invalid encodings.
+     */
+    _decodeRequiredInsertCount(encoded, time) {
+        if (encoded === 0) return 0;
+        const maxCapacity = this.maxTableCapacity || this.maxCapacitySeen;
+        const maxEntries = Math.floor(maxCapacity / 32);
+        if (maxEntries === 0) {
+            // Capacity unknown — best effort assuming no wrap-around
+            return encoded - 1;
+        }
+        const fullRange = 2 * maxEntries;
+        if (encoded > fullRange) return null;
+        const totalNumberOfInserts = this._insertsAt(time);
+        const maxValue = totalNumberOfInserts + maxEntries;
+        const maxWrapped = Math.floor(maxValue / fullRange) * fullRange;
+        let ric = maxWrapped + encoded - 1;
+        if (ric > maxValue) {
+            if (ric <= fullRange) return null;
+            ric -= fullRange;
+        }
+        if (ric === 0) return null;
+        return ric;
+    }
+
+    _dynamicEntry(absIndex) {
+        const ref = this._getAbsolute(absIndex);
+        return ref ? { name: ref.name, value: ref.value } : null;
+    }
+
+    /**
+     * Decodes one HEADERS frame payload (field section).
+     * @param {Uint8Array} buffer
+     * @param {number|null} [time] - capture time of the HEADERS frame
+     * @returns {Array<{name:string, value:string}>} fresh objects (safe to mutate);
+     *   unresolvable dynamic references yield name 'unknown'.
+     */
+    decodeHeaders(buffer, time = null) {
         let offset = 0;
         const headers = [];
         
-        // Decode Header Block Prefix
+        // Field Section Prefix: Encoded Required Insert Count (8-bit prefix),
+        // then S bit + Delta Base (7-bit prefix).
         const reqInsertRes = this.readInt(buffer, offset, 8, 0xFF);
         if (!reqInsertRes) return headers;
         offset = reqInsertRes.newOffset;
+        if (offset >= buffer.length) return headers;
         
-        const baseRes = this.readInt(buffer, offset, 7, 0x7F); // s bit is highest
+        const sign = (buffer[offset] & 0x80) !== 0;
+        const baseRes = this.readInt(buffer, offset, 7, 0x7F);
         if (!baseRes) return headers;
         offset = baseRes.newOffset;
+
+        if (this.midstream && !this.offsetAnchored && reqInsertRes.value > 0) {
+            const capturedAtTime = this._insertsAt(time) - this.absoluteOffset;
+            const rawRic = reqInsertRes.value - 1;
+            if (rawRic >= capturedAtTime) {
+                this.absoluteOffset = rawRic - capturedAtTime;
+                this.offsetAnchored = true;
+            }
+        }
+
+        let requiredInsertCount = this._decodeRequiredInsertCount(reqInsertRes.value, time);
+        if (requiredInsertCount === null) requiredInsertCount = reqInsertRes.value > 0 ? reqInsertRes.value - 1 : 0;
+        const base = sign ? requiredInsertCount - baseRes.value - 1 : requiredInsertCount + baseRes.value;
+
+        const unknown = () => ({ name: 'unknown', value: 'unknown' });
 
         while (offset < buffer.length) {
             const b = buffer[offset];
             
             if ((b & 0x80) === 0x80) {
-                // Indexed Field Line
+                // Indexed Field Line: 1 T index(6)
                 const isStatic = (b & 0x40) !== 0;
                 const idxRes = this.readInt(buffer, offset, 6, 0x3F);
                 if (!idxRes) break;
                 
-                const entry = isStatic ? QPACK_STATIC_TABLE[idxRes.value] : this.dynamicTable[this.dynamicTable.length - 1 - idxRes.value]; // dynamic is relative to base
+                let entry;
+                if (isStatic) {
+                    const st = QPACK_STATIC_TABLE[idxRes.value];
+                    entry = st ? { name: st.name, value: st.value } : null;
+                } else {
+                    entry = this._dynamicEntry(base - 1 - idxRes.value) || unknown();
+                }
                 if (entry) headers.push(entry);
                 offset = idxRes.newOffset;
             } else if ((b & 0xC0) === 0x40) {
-                // Literal Field Line with Name Reference
+                // Literal Field Line with Name Reference: 01 N T index(4)
                 const isStatic = (b & 0x10) !== 0;
                 const nameRes = this.readInt(buffer, offset, 4, 0x0F);
                 if (!nameRes) break;
@@ -311,11 +443,17 @@ export class QpackDecoder {
                 const valRes = this.readString(buffer, nameRes.newOffset, 7, 0x7F);
                 if (!valRes) break;
 
-                const nameStr = isStatic ? (QPACK_STATIC_TABLE[nameRes.value] ? QPACK_STATIC_TABLE[nameRes.value].name : 'unknown') : (this.dynamicTable[this.dynamicTable.length - 1 - nameRes.value] ? this.dynamicTable[this.dynamicTable.length - 1 - nameRes.value].name : 'unknown');
+                let nameStr;
+                if (isStatic) {
+                    nameStr = QPACK_STATIC_TABLE[nameRes.value] ? QPACK_STATIC_TABLE[nameRes.value].name : 'unknown';
+                } else {
+                    const ref = this._getAbsolute(base - 1 - nameRes.value);
+                    nameStr = ref ? ref.name : 'unknown';
+                }
                 headers.push({ name: nameStr, value: valRes.value });
                 offset = valRes.newOffset;
             } else if ((b & 0xE0) === 0x20) {
-                // Literal Field Line with Literal Name
+                // Literal Field Line with Literal Name: 001 N H nameLen(3)
                 const nameRes = this.readString(buffer, offset, 3, 0x07);
                 if (!nameRes) break;
                 
@@ -325,23 +463,20 @@ export class QpackDecoder {
                 headers.push({ name: nameRes.value, value: valRes.value });
                 offset = valRes.newOffset;
             } else if ((b & 0xF0) === 0x10) {
-                // Indexed Field Line With Post-Base Index
+                // Indexed Field Line with Post-Base Index: 0001 index(4)
                 const idxRes = this.readInt(buffer, offset, 4, 0x0F);
                 if (!idxRes) break;
-                
-                // Approximate post-base mapping
-                const entry = this.dynamicTable[this.dynamicTable.length - 1 - idxRes.value] || { name: 'unknown', value: 'unknown' };
-                headers.push(entry);
+                headers.push(this._dynamicEntry(base + idxRes.value) || unknown());
                 offset = idxRes.newOffset;
             } else {
-                // Literal Field Line With Name Reference / Post-Base
+                // Literal Field Line with Post-Base Name Reference: 0000 N index(3)
                 const idxRes = this.readInt(buffer, offset, 3, 0x07);
                 if (!idxRes) break;
                 const valRes = this.readString(buffer, idxRes.newOffset, 7, 0x7F);
                 if (!valRes) break;
                 
-                const nameStr = this.dynamicTable[this.dynamicTable.length - 1 - idxRes.value] ? this.dynamicTable[this.dynamicTable.length - 1 - idxRes.value].name : 'unknown';
-                headers.push({ name: nameStr, value: valRes.value });
+                const ref = this._getAbsolute(base + idxRes.value);
+                headers.push({ name: ref ? ref.name : 'unknown', value: valRes.value });
                 offset = valRes.newOffset;
             }
         }

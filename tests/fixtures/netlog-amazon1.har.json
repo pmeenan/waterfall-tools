@@ -1035,9 +1035,6 @@
             "connect_start": 3546,
             "connect_end": 3546,
             "source_address": "[2600:1900:4090:1d:0:1::]:51228"
-          },
-          {
-            "_id": "h2_session"
           }
         ],
         "_unlinked_dns_lookups": []
@@ -3726,7 +3723,7 @@
           {
             "ts": 2315,
             "bytes": 18915,
-            "inflated": 37633
+            "inflated": 168705
           }
         ],
         "_chunks_in": [],

@@ -8,9 +8,11 @@
 /**
  * Test script for headless image generation.
  * Run using: node bin/generate-image.js <input-file> <output-file.png|jpg> [--width 1200] [--thumbnail]
+ * Requires `npm run build` first (imports the built dist/node bundle — the raw source tree
+ * depends on bundler-only `platform-*-impl` aliases) and the optional `@napi-rs/canvas`.
  */
 
-import { WaterfallTools } from '../src/core/waterfall-tools.js';
+import { WaterfallTools } from '../dist/node/waterfall-tools.es.js';
 import fs from 'fs';
 
 async function main() {

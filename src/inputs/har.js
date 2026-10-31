@@ -12,6 +12,7 @@
 import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 import { VERSION } from '../core/version.js';
+import { countRawBytes, scaledProgress } from './utilities/progress.js';
 
 /**
  * Normalizes a parsed HAR object into the Extended HAR format.
@@ -115,9 +116,13 @@ export async function processHARFileNode(input, options = {}) {
             stream = Readable.toWeb(nodeFsStream);
         }
 
-    if (isGz) {
-        stream = stream.pipeThrough(new DecompressionStream('gzip'));
-    }
+        // Count raw (pre-gunzip) bytes so progress tracks `totalBytes` honestly.
+        const rawCounter = { bytes: 0 };
+        stream = countRawBytes(stream, rawCounter);
+
+        if (isGz) {
+            stream = stream.pipeThrough(new DecompressionStream('gzip'));
+        }
 
     output = normalizeHAR(); // Provides generic fallback shell
 
@@ -126,28 +131,30 @@ export async function processHARFileNode(input, options = {}) {
         keepStack: false 
     });
 
-    parser.onValue = ({ value }) => {
-        if (value && typeof value === 'object') {
-            if ('request' in value || 'response' in value || 'time' in value) {
-                output.log.entries.push(value);
-            } else if ('pageTimings' in value || 'title' in value || 'id' in value) {
-                liftPageTimingsExtensions(value);
-                output.log.pages.push(value);
-            }
+    // Route by JSON path (`$.log.pages.*` vs `$.log.entries.*`), not by sniffing
+    // keys: a minimal page (`{startedDateTime}` only) has none of the old
+    // `pageTimings`/`title`/`id` markers, and an entry need not carry `time`.
+    parser.onValue = ({ value, stack }) => {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+        const container = Array.isArray(stack) && stack.length > 0 ? stack[stack.length - 1].key : undefined;
+        if (container === 'entries') {
+            output.log.entries.push(value);
+        } else if (container === 'pages') {
+            liftPageTimingsExtensions(value);
+            output.log.pages.push(value);
         }
     };
     
+    // Count raw (pre-gunzip) bytes so progress tracks `totalBytes` honestly.
     const pipeline = stream.pipeThrough(new TextDecoderStream());
     reader = pipeline.getReader();
 
     onProgress('Parsing HAR...', 0);
-    let bytesRead = 0;
     while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        bytesRead += value.length;
         parser.write(value);
-        if (totalBytes > 0) onProgress('Parsing HAR...', Math.round((bytesRead / totalBytes) * 90));
+        if (totalBytes > 0) onProgress('Parsing HAR...', scaledProgress(rawCounter.bytes, totalBytes, 90));
     }
     onProgress('Building waterfall...', 90);
 

@@ -198,10 +198,28 @@ export class TcpConnection {
     }
 }
 
+/**
+ * Guesses which side of a TCP 4-tuple is the server when the capture missed
+ * the SYN. Well-known service ports win; otherwise the lower port (ephemeral
+ * client ports are allocated high) is assumed to be the server.
+ * Returns true when endpoint A (the packet's source) looks like the server.
+ */
+const WELL_KNOWN_SERVER_PORTS = new Set([80, 443, 8080, 8443, 53, 853, 3128, 8000, 8888]);
+export function isLikelyServerPort(portA, portB) {
+    const aKnown = WELL_KNOWN_SERVER_PORTS.has(portA);
+    const bKnown = WELL_KNOWN_SERVER_PORTS.has(portB);
+    if (aKnown !== bKnown) return aKnown;
+    return portA < portB;
+}
+
 export class TcpReconstructor {
     constructor() {
         this.connections = new Map();
         this.closedConnections = [];
+        // Number of connections ever created per 4-tuple key, so a reused
+        // 4-tuple gets a distinct connection id instead of overwriting the
+        // earlier connection's record in data.tcp_connections.
+        this.keyUseCount = new Map();
     }
 
     push(packet) {
@@ -214,6 +232,7 @@ export class TcpReconstructor {
         const portA = packet.transport.srcPort;
         const ipB = packet.ip.dstIP;
         const portB = packet.transport.dstPort;
+        const flags = packet.transport.flags;
 
         let connectionKey;
 
@@ -226,29 +245,42 @@ export class TcpReconstructor {
 
         let connection = this.connections.get(connectionKey);
 
-        // Check port reuse logic
-        if (packet.transport.flags.SYN && connection && connection.isClosed()) {
+        // Port reuse: a fresh client SYN on a 4-tuple whose previous connection
+        // was closed (FIN/FIN or RST) starts a brand new connection.
+        if (flags.SYN && !flags.ACK && connection && connection.isClosed()) {
             this.closedConnections.push(connection);
+            this.connections.delete(connectionKey);
             connection = null; // Forces creation of a new connection state
         }
 
         if (!connection) {
             let trueClientIp, trueClientPort, trueServerIp, trueServerPort;
-            if (packet.transport.flags.SYN) {
-                // The source of the SYN is always the true client
+            let sourceIsClient;
+            if (flags.SYN) {
+                // A bare SYN comes from the client; a SYN-ACK comes from the
+                // server (we missed the client's SYN).
+                sourceIsClient = !flags.ACK;
+            } else {
+                // Mid-stream pickup: use port heuristics to pick the server side.
+                sourceIsClient = !isLikelyServerPort(portA, portB);
+            }
+            if (sourceIsClient) {
                 trueClientIp = ipA;
                 trueClientPort = portA;
                 trueServerIp = ipB;
                 trueServerPort = portB;
             } else {
-                // If we hop in mid-stream, fallback symmetrically to canonical order
-                trueClientIp = ipA;
-                trueClientPort = portA;
-                trueServerIp = ipB;
-                trueServerPort = portB;
+                trueClientIp = ipB;
+                trueClientPort = portB;
+                trueServerIp = ipA;
+                trueServerPort = portA;
             }
 
-            connection = new TcpConnection(connectionKey, trueClientIp, trueClientPort, trueServerIp, trueServerPort);
+            const useCount = this.keyUseCount.get(connectionKey) || 0;
+            this.keyUseCount.set(connectionKey, useCount + 1);
+            const connectionId = useCount === 0 ? connectionKey : `${connectionKey}#${useCount}`;
+
+            connection = new TcpConnection(connectionId, trueClientIp, trueClientPort, trueServerIp, trueServerPort);
             this.connections.set(connectionKey, connection);
         }
 

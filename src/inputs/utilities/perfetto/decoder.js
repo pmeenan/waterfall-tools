@@ -91,7 +91,7 @@ const SCHEMA_BROWSING_CONTEXT_STATE = {
     3: { name: 'coop_related_group_token', type: 'string' },
 };
 // RenderFrameHost is recursive (parent / outer_document / embedder fields). Defined as
-// a `let` placeholder so child schemas can reference it before its full body is built.
+// a placeholder object so child schemas can reference it before its full body is built.
 const SCHEMA_RENDER_FRAME_HOST = {
     1: { name: 'process', type: 'message', schema: SCHEMA_RENDER_PROCESS_HOST },
     2: { name: 'render_frame_host_id', type: 'message', schema: SCHEMA_GLOBAL_RFH_ID },
@@ -115,13 +115,29 @@ const TRACK_EVENT_EXTENSION_SCHEMAS = {
     1028: { name: 'render_frame_host', schema: SCHEMA_RENDER_FRAME_HOST },
 };
 
+// Sentinel thrown by the bounded readers below when a varint/length/fixed-width
+// field would run past the end of its enclosing message. Caught per TracePacket
+// in _parseTracePacket so one corrupt packet is skipped instead of aborting the
+// whole stream.
+const MALFORMED = new Error('Malformed Perfetto protobuf');
+
+// Perfetto builtin clock ids (protos/perfetto/common/builtin_clock.proto).
+const CLOCK_MONOTONIC = 3;
+const CLOCK_BOOTTIME = 6;
+// Clock ids 64..127 are sequence-scoped (only meaningful together with the
+// trusted_packet_sequence_id they were defined on); ≥128 are global user clocks.
+const SEQ_SCOPED_CLOCK_MIN = 64;
+const SEQ_SCOPED_CLOCK_MAX = 127;
+
 // A fast BigInt Varint decoder reading continuously from a Uint8Array.
-// Returns an array [value (BigInt), bytesRead (Number)] or null if buffer ends prematurely.
-function readVarint(buf, offset) {
+// Returns an array [value (BigInt), bytesRead (Number)] or null if the varint
+// doesn't terminate before `end` (or within the 10-byte varint maximum).
+function readVarint(buf, offset, end = buf.length) {
+    const limit = Math.min(end, buf.length, offset + 10);
     let val = 0n;
     let shift = 0n;
     let i = offset;
-    while (i < buf.length) {
+    while (i < limit) {
         const b = BigInt(buf[i++]);
         val |= (b & 0x7Fn) << shift;
         shift += 7n;
@@ -130,6 +146,28 @@ function readVarint(buf, offset) {
         }
     }
     return null;
+}
+
+// Bounded varint read: throws MALFORMED instead of returning null.
+function rv(buf, offset, end) {
+    const r = readVarint(buf, offset, end);
+    if (!r) throw MALFORMED;
+    return r;
+}
+
+// Bounded length-delimited header read: returns [payloadLen, headerBytes] and
+// guarantees offset + headerBytes + payloadLen <= end.
+function readLen(buf, offset, end) {
+    const r = rv(buf, offset, end);
+    const len = Number(r[0]);
+    if (!Number.isSafeInteger(len) || len < 0 || offset + r[1] + len > end) throw MALFORMED;
+    return [len, r[1]];
+}
+
+// Little-endian float64 at `offset`, bounded by `end`.
+function readDouble(buf, offset, end) {
+    if (offset + 8 > end || offset + 8 > buf.length) throw MALFORMED;
+    return new DataView(buf.buffer, buf.byteOffset + offset, 8).getFloat64(0, true);
 }
 
 export class PerfettoDecoder {
@@ -142,7 +180,6 @@ export class PerfettoDecoder {
         this.names = new Map();
         this.debugNames = new Map();
         this.tracks = new Map(); // uuid -> {pid, tid, name}
-        this.seqTimestamps = new Map();
         // Per-sequence default track_uuid from TracePacketDefaults.track_event_defaults.
         // TrackEvents typically omit track_uuid and inherit this default — without it,
         // every event collapses to pid:0/tid:0 and downstream B/E pairing in Chrome
@@ -157,7 +194,34 @@ export class PerfettoDecoder {
         // and propagate name+cat onto E events that arrived empty.
         this.trackStacks = new Map();
 
-        this.leftover = null;
+        // ---- Clock model (https://perfetto.dev/docs/concepts/clock-sync) ----
+        // Output timestamps are on the trace clock (BOOTTIME unless a ClockSnapshot
+        // names a different primary_trace_clock), converted ns → integer µs. This
+        // matches what Perfetto's own JSON exporter (traceconv) produces.
+        this.traceClockId = CLOCK_BOOTTIME;
+        // clockKey -> Map<clockKey, BigInt ns offset> (value_B = value_A + offset),
+        // populated from the most recent ClockSnapshot containing both clocks.
+        this.clockEdges = new Map();
+        // clockKey -> BigInt offset to the trace clock (or null when unreachable).
+        // Invalidated on every ClockSnapshot.
+        this.clockOffsetCache = new Map();
+        // clockKey -> { incremental, mult (BigInt ns per unit), last (BigInt raw | null) }
+        this.clockInfo = new Map();
+        // Per-sequence TracePacketDefaults.timestamp_clock_id.
+        this.seqDefaultClock = new Map();
+        // Per-sequence last resolved packet timestamp (µs, trace clock) — used for
+        // packets that omit TracePacket.timestamp entirely.
+        this.seqLastTsUs = new Map();
+        // Per-sequence TrackEvent legacy timestamp_delta_us reference (raw µs in
+        // the legacy MONOTONIC domain), seeded from ThreadDescriptor
+        // .reference_timestamp_us and advanced by each delta.
+        this.seqTrackEventRefUs = new Map();
+        this.malformedPackets = 0;
+
+        // Streaming reassembly state for TracePackets that span input chunks.
+        this.pendingChunks = [];
+        this.pendingBytes = 0;
+        this.pendingNeeded = 0; // total bytes needed for the spanning packet (0 = header incomplete)
         this.firstEvent = true;
         this.debug = options.debug;
         // emitCompleteEvents: buffer Begins per-track and emit a single Complete (X)
@@ -180,6 +244,11 @@ export class PerfettoDecoder {
                 this._processChunk(chunk, controller);
             },
             flush: (controller) => {
+                if (this.debug && (this.pendingBytes > 0 || this.malformedPackets > 0)) {
+                    console.log(`[perfetto decoder] ${this.malformedPackets} malformed packet(s) skipped, ${this.pendingBytes} trailing byte(s) discarded`);
+                }
+                this.pendingChunks = [];
+                this.pendingBytes = 0;
                 controller.enqueue(']}\n');
             }
         });
@@ -189,34 +258,56 @@ export class PerfettoDecoder {
     }
     
     _processChunk(chunk, controller) {
+        if (!(chunk instanceof Uint8Array)) chunk = new Uint8Array(chunk);
         let data;
-        if (this.leftover) {
-            data = new Uint8Array(this.leftover.length + chunk.length);
-            data.set(this.leftover);
-            data.set(chunk, this.leftover.length);
-            this.leftover = null;
+        if (this.pendingChunks.length > 0) {
+            // A TracePacket spans chunks. Accumulate without copying until enough
+            // bytes have arrived to complete it, then concatenate once — re-copying
+            // the leftover on every chunk is O(N²) for multi-MB packets.
+            this.pendingChunks.push(chunk);
+            this.pendingBytes += chunk.length;
+            if (this.pendingNeeded > 0 && this.pendingBytes < this.pendingNeeded) return;
+            data = new Uint8Array(this.pendingBytes);
+            let off = 0;
+            for (const c of this.pendingChunks) { data.set(c, off); off += c.length; }
+            this.pendingChunks = [];
+            this.pendingBytes = 0;
+            this.pendingNeeded = 0;
         } else {
             data = chunk;
         }
         
         let o = 0;
+        let needed = 0;
         while (o < data.length) {
             // Check for TracePacket (field 1, wireType 2 => 0x0A)
             const tagR = readVarint(data, o);
-            if (!tagR) break;
+            if (!tagR) {
+                // A varint can be at most 10 bytes; anything longer is corruption.
+                if (data.length - o >= 10) { o += 1; continue; }
+                break;
+            }
             
             const field = Number(tagR[0] >> 3n);
             const wire = Number(tagR[0] & 7n);
             
             if (field === 1 && wire === 2) {
                 const lenR = readVarint(data, o + tagR[1]);
-                if (!lenR) break; // Not enough buffer for length
+                if (!lenR) {
+                    if (data.length - o - tagR[1] >= 10) { o += 1; continue; }
+                    break; // Not enough buffer for length
+                }
                 
                 const packetLen = Number(lenR[0]);
                 const headerLen = tagR[1] + lenR[1];
+                if (!Number.isSafeInteger(packetLen) || packetLen < 0) {
+                    o += 1;
+                    continue;
+                }
                 
                 if (o + headerLen + packetLen > data.length) {
                     // Packet incomplete, break and store leftover
+                    needed = headerLen + packetLen;
                     break;
                 }
                 
@@ -238,8 +329,23 @@ export class PerfettoDecoder {
                     o += 4;
                 } else if (wire === 2) {
                     const lV = readVarint(data, o);
-                    if (!lV || o + lV[1] + Number(lV[0]) > data.length) { o -= tagR[1]; break; }
-                    o += lV[1] + Number(lV[0]);
+                    if (!lV) {
+                        if (data.length - o >= 10) { o -= tagR[1]; o += 1; continue; }
+                        o -= tagR[1];
+                        break;
+                    }
+                    const skipLen = Number(lV[0]);
+                    if (!Number.isSafeInteger(skipLen) || skipLen < 0) {
+                        o -= tagR[1];
+                        o += 1;
+                        continue;
+                    }
+                    if (o + lV[1] + skipLen > data.length) {
+                        needed = tagR[1] + lV[1] + skipLen;
+                        o -= tagR[1];
+                        break;
+                    }
+                    o += lV[1] + skipLen;
                 } else {
                     // Unknown wire type, fatal for streaming sync. Advance 1 byte and pray, or bail.
                     o -= tagR[1];
@@ -249,52 +355,86 @@ export class PerfettoDecoder {
         }
         
         if (o < data.length) {
-            this.leftover = data.subarray(o);
+            const rest = data.subarray(o);
+            this.pendingChunks = [rest];
+            this.pendingBytes = rest.length;
+            this.pendingNeeded = needed;
         }
     }
-    
-    _parseTracePacket(data, startOffset, packetLen, controller) {
-        const endOffset = startOffset + packetLen;
-        let o = startOffset;
-        let ts = 0;
-        let trackEvent = null;
-        let seqId = 0n; // Default ID if trusted_packet_sequence_id is missing
 
-        let peekO = o;
-        while (peekO < endOffset) {
-            const vR = readVarint(data, peekO);
-            if (!vR) break;
-            const wR = Number(vR[0] & 7n);
-            const fR = Number(vR[0] >> 3n);
-            peekO += vR[1];
-            
-            if (fR === 10 && wR === 0) {
-                const sR = readVarint(data, peekO);
-                seqId = sR[0];
-            } else if (fR === 41 && wR === 0) { // incremental_state_cleared
-                const clR = readVarint(data, peekO);
-                if (clR[0] !== 0n) {
-                    this.names.set(seqId, new Map());
-                    this.categories.set(seqId, new Map());
-                    this.debugNames.set(seqId, new Map());
-                    this.seqTimestamps.set(seqId, 0);
-                    this.seqDefaultTracks.delete(seqId);
-                }
-            } else if (fR === 13 && wR === 0) { // sequence_flags
-                const flR = readVarint(data, peekO);
-                if ((Number(flR[0]) & 1) === 1) { // SEQ_INCREMENTAL_STATE_CLEARED
-                    this.names.set(seqId, new Map());
-                    this.categories.set(seqId, new Map());
-                    this.debugNames.set(seqId, new Map());
-                    this.seqTimestamps.set(seqId, 0);
-                    this.seqDefaultTracks.delete(seqId);
-                }
-            } else if (fR === 8 && wR === 0) { // timestamp
-                const tR = readVarint(data, peekO);
-                ts = Number(tR[0]);
-            }
-            peekO += this._skip(data, peekO, wR);
+    _parseTracePacket(data, startOffset, packetLen, controller) {
+        try {
+            this._parseTracePacketInner(data, startOffset, startOffset + packetLen, controller);
+        } catch (e) {
+            // Fail-soft: a corrupt inner length/varint skips this packet only.
+            if (e !== MALFORMED && !(e instanceof RangeError)) throw e;
+            this.malformedPackets++;
+            if (this.debug) console.log(`[perfetto decoder] skipping malformed TracePacket at offset ${startOffset}: ${e.message}`);
         }
+    }
+
+    _resetSequence(seqId) {
+        this.names.set(seqId, new Map());
+        this.categories.set(seqId, new Map());
+        this.debugNames.set(seqId, new Map());
+        this.seqDefaultTracks.delete(seqId);
+        this.seqDefaultClock.delete(seqId);
+        this.seqTrackEventRefUs.delete(seqId);
+        const prefix = `${seqId}:`;
+        for (const [key, info] of this.clockInfo) {
+            if (key.startsWith(prefix)) info.last = null;
+        }
+    }
+
+    _parseTracePacketInner(data, startOffset, endOffset, controller) {
+        // Pass 1: collect scalar fields and sub-message ranges. Field order inside a
+        // TracePacket is not guaranteed (Chrome writes trusted_packet_sequence_id
+        // after sequence_flags / trace_packet_defaults), so nothing is interpreted
+        // until the whole packet has been scanned.
+        let seqId = 0n; // Default ID if trusted_packet_sequence_id is missing
+        let rawTs = null;
+        let clockId = null;
+        let cleared = false;
+        let defaults = null;
+        let snapshot = null;
+        let threadDescriptor = null;
+        let trackEventRange = null;
+        const interned = [];
+        const descriptors = [];
+
+        let o = startOffset;
+        while (o < endOffset) {
+            const [tag, tagLen] = rv(data, o, endOffset);
+            o += tagLen;
+            const field = Number(tag >> 3n);
+            const wire = Number(tag & 7n);
+
+            if (wire === 0 && (field === 10 || field === 13 || field === 41 || field === 8 || field === 58)) {
+                const [v, vLen] = rv(data, o, endOffset);
+                o += vLen;
+                if (field === 10) seqId = v;                                   // trusted_packet_sequence_id
+                else if (field === 13) { if (v & 1n) cleared = true; }         // sequence_flags: SEQ_INCREMENTAL_STATE_CLEARED
+                else if (field === 41) { if (v !== 0n) cleared = true; }       // incremental_state_cleared
+                else if (field === 8) rawTs = v;                               // timestamp
+                else clockId = Number(v);                                      // timestamp_clock_id
+                continue;
+            }
+            if (wire === 2 && (field === 6 || field === 11 || field === 12 || field === 44 || field === 59 || field === 60)) {
+                const [len, hLen] = readLen(data, o, endOffset);
+                const range = { s: o + hLen, e: o + hLen + len };
+                o = range.e;
+                if (field === 12) interned.push(range);              // interned_data
+                else if (field === 60) descriptors.push(range);      // track_descriptor
+                else if (field === 59) defaults = range;             // trace_packet_defaults
+                else if (field === 6) snapshot = range;              // clock_snapshot
+                else if (field === 44) threadDescriptor = range;     // thread_descriptor (legacy)
+                else trackEventRange = range;                        // track_event
+                continue;
+            }
+            o += this._skip(data, o, wire, endOffset);
+        }
+
+        if (cleared) this._resetSequence(seqId);
 
         // Initialize maps for this sequence ID
         if (!this.names.has(seqId)) this.names.set(seqId, new Map());
@@ -304,91 +444,223 @@ export class PerfettoDecoder {
         const seqNames = this.names.get(seqId);
         const seqCats = this.categories.get(seqId);
         const seqDebugNames = this.debugNames.get(seqId);
-        
-        // Pass 2: Extract all interned data and descriptors beforehand protecting against serialization inversions
-        peekO = o;
-        while (peekO < endOffset) {
-            const vR = readVarint(data, peekO);
-            if (!vR) break;
-            const wR = Number(vR[0] & 7n);
-            const fR = Number(vR[0] >> 3n);
-            peekO += vR[1];
-            
-            if (fR === 12 && wR === 2) { // interned_data
-                const idLenR = readVarint(data, peekO);
-                peekO += idLenR[1];
-                this._parseInternedData(data, peekO, Number(idLenR[0]), seqNames, seqCats, seqDebugNames);
-                peekO += Number(idLenR[0]);
-            } else if (fR === 60 && wR === 2) { // track_descriptor
-                const tdLenR = readVarint(data, peekO);
-                peekO += tdLenR[1];
-                this._parseTrackDescriptor(data, peekO, Number(tdLenR[0]), seqNames);
-                peekO += Number(tdLenR[0]);
-            } else if (fR === 59 && wR === 2) { // trace_packet_defaults
-                const dLenR = readVarint(data, peekO);
-                peekO += dLenR[1];
-                this._parseTracePacketDefaults(data, peekO, Number(dLenR[0]), seqId);
-                peekO += Number(dLenR[0]);
-            } else {
-                peekO += this._skip(data, peekO, wR);
-            }
+
+        // Pass 2: sequence state (defaults, interned data, descriptors, clocks)
+        // before any timestamp or TrackEvent on this packet is interpreted.
+        if (defaults) this._parseTracePacketDefaults(data, defaults.s, defaults.e, seqId);
+        for (const r of interned) this._parseInternedData(data, r.s, r.e, seqNames, seqCats, seqDebugNames);
+        for (const r of descriptors) this._parseTrackDescriptor(data, r.s, r.e, seqId);
+        if (threadDescriptor) this._parseThreadDescriptor(data, threadDescriptor.s, threadDescriptor.e, seqId);
+
+        if (snapshot) {
+            // Mirrors trace_processor: a ClockSnapshot packet only (re)defines the
+            // clock domains; its own timestamp does not advance incremental clocks.
+            this._parseClockSnapshot(data, snapshot.s, snapshot.e, seqId);
+            if (!trackEventRange) return;
         }
-        
-        // Pass 3: Finally extract track events natively utilizing updated internal maps exclusively
-        while (o < endOffset) {
-            const vR = readVarint(data, o);
-            if (!vR) break;
-            o += vR[1];
-            const wire = Number(vR[0] & 7n);
-            const field = Number(vR[0] >> 3n);
-            
-            if (field === 11 && wire === 2) { // track_event
-                const teLenR = readVarint(data, o);
-                o += teLenR[1];
-                trackEvent = this._parseTrackEvent(data, o, Number(teLenR[0]), seqNames, seqDebugNames, seqId, ts);
-                o += Number(teLenR[0]);
-            } else {
-                o += this._skip(data, o, wire);
-            }
+
+        // Every timestamped packet advances incremental clocks, even if it carries
+        // no TrackEvent (descriptors, interned-data-only packets, ...).
+        let packetUs;
+        if (rawTs !== null) {
+            packetUs = this._nsToUs(this._resolvePacketTimestampNs(seqId, rawTs, clockId));
+            this.seqLastTsUs.set(seqId, packetUs);
+        } else if (this.seqLastTsUs.has(seqId)) {
+            packetUs = this.seqLastTsUs.get(seqId);
+        } else if (this.seqTrackEventRefUs.has(seqId)) {
+            packetUs = this._legacyUsToTraceUs(this.seqTrackEventRefUs.get(seqId));
+        } else {
+            packetUs = 0;
         }
-        
-        if (trackEvent) {
-            if (trackEvent.ts === undefined) trackEvent.ts = ts;
+
+        // Pass 3: the TrackEvent itself, using the updated sequence state.
+        if (trackEventRange) {
+            const trackEvent = this._parseTrackEvent(data, trackEventRange.s, trackEventRange.e - trackEventRange.s, seqNames, seqDebugNames, seqId, packetUs);
             this._emitTraceEvent(trackEvent, controller, seqNames, seqCats);
         }
     }
+
+    // ---- Clock handling ----
+
+    _clockKey(clockId, seqId) {
+        if (clockId >= SEQ_SCOPED_CLOCK_MIN && clockId <= SEQ_SCOPED_CLOCK_MAX) return `${seqId}:${clockId}`;
+        return `${clockId}`;
+    }
+
+    _nsToUs(ns) {
+        // Integer µs (truncating), matching traceconv's JSON export.
+        return Number(ns / 1000n);
+    }
+
+    // ClockSnapshot (TracePacket field 6):
+    //   repeated Clock clocks = 1 { clock_id = 1, timestamp = 2, is_incremental = 3, unit_multiplier_ns = 4 }
+    //   BuiltinClock primary_trace_clock = 2
+    _parseClockSnapshot(data, start, end, seqId) {
+        const clocks = [];
+        let o = start;
+        while (o < end) {
+            const [tag, tagLen] = rv(data, o, end); o += tagLen;
+            const field = Number(tag >> 3n);
+            const wire = Number(tag & 7n);
+            if (field === 1 && wire === 2) {
+                const [len, hLen] = readLen(data, o, end);
+                const cEnd = o + hLen + len;
+                o += hLen;
+                const clock = { id: 0, ts: 0n, incremental: false, mult: 1n };
+                while (o < cEnd) {
+                    const [ct, ctLen] = rv(data, o, cEnd); o += ctLen;
+                    const cf = Number(ct >> 3n);
+                    const cw = Number(ct & 7n);
+                    if (cw === 0 && cf >= 1 && cf <= 4) {
+                        const [v, vLen] = rv(data, o, cEnd); o += vLen;
+                        if (cf === 1) clock.id = Number(v);
+                        else if (cf === 2) clock.ts = v;
+                        else if (cf === 3) clock.incremental = v !== 0n;
+                        else if (v > 0n) clock.mult = v;
+                    } else {
+                        o += this._skip(data, o, cw, cEnd);
+                    }
+                }
+                clocks.push(clock);
+            } else if (field === 2 && wire === 0) {
+                const [v, vLen] = rv(data, o, end); o += vLen;
+                if (v !== 0n) this.traceClockId = Number(v);
+            } else {
+                o += this._skip(data, o, wire, end);
+            }
+        }
+
+        const points = [];
+        for (const c of clocks) {
+            const key = this._clockKey(c.id, seqId);
+            let info = this.clockInfo.get(key);
+            if (!info) { info = { incremental: false, mult: 1n, last: null }; this.clockInfo.set(key, info); }
+            info.incremental = c.incremental || (c.id >= SEQ_SCOPED_CLOCK_MIN && c.id <= SEQ_SCOPED_CLOCK_MAX);
+            info.mult = c.mult;
+            // The first packet after a snapshot is relative to the snapshot value.
+            if (info.incremental) info.last = c.ts;
+            points.push({ key, ns: c.ts * c.mult });
+        }
+        for (const a of points) {
+            let edges = this.clockEdges.get(a.key);
+            if (!edges) { edges = new Map(); this.clockEdges.set(a.key, edges); }
+            for (const b of points) {
+                if (a.key !== b.key) edges.set(b.key, b.ns - a.ns);
+            }
+        }
+        this.clockOffsetCache.clear();
+    }
+
+    // BigInt ns offset converting a value on `key` to the trace clock, or null
+    // when no chain of snapshots links the two domains. Uses the most recent
+    // snapshot seen for each pair (streaming can't look ahead for a closer one).
+    _clockOffset(key) {
+        const target = `${this.traceClockId}`;
+        if (key === target) return 0n;
+        if (this.clockOffsetCache.has(key)) return this.clockOffsetCache.get(key);
+        let result = null;
+        const seen = new Set([key]);
+        let frontier = [[key, 0n]];
+        while (frontier.length > 0 && result === null) {
+            const next = [];
+            for (const [k, off] of frontier) {
+                const edges = this.clockEdges.get(k);
+                if (!edges) continue;
+                for (const [k2, delta] of edges) {
+                    if (seen.has(k2)) continue;
+                    seen.add(k2);
+                    if (k2 === target) { result = off + delta; break; }
+                    next.push([k2, off + delta]);
+                }
+                if (result !== null) break;
+            }
+            frontier = next;
+        }
+        this.clockOffsetCache.set(key, result);
+        return result;
+    }
+
+    // TracePacket.timestamp → BigInt ns on the trace clock. Clock selection:
+    // packet timestamp_clock_id → sequence TracePacketDefaults.timestamp_clock_id
+    // → trace clock. Incremental clocks accumulate per sequence.
+    _resolvePacketTimestampNs(seqId, rawTs, clockId) {
+        let cid = clockId;
+        if (cid === null || cid === 0) cid = this.seqDefaultClock.has(seqId) ? this.seqDefaultClock.get(seqId) : this.traceClockId;
+        const key = this._clockKey(cid, seqId);
+        let info = this.clockInfo.get(key);
+        if (!info && cid >= SEQ_SCOPED_CLOCK_MIN && cid <= SEQ_SCOPED_CLOCK_MAX) {
+            const fallbackKey = `0:${cid}`;
+            const fallback = seqId !== 0n ? this.clockInfo.get(fallbackKey) : null;
+            if (fallback) {
+                info = { incremental: fallback.incremental, mult: fallback.mult, last: fallback.last };
+                this.clockInfo.set(key, info);
+                const fbEdges = this.clockEdges.get(fallbackKey);
+                if (fbEdges) {
+                    this.clockEdges.set(key, new Map(fbEdges));
+                    this.clockOffsetCache.clear();
+                }
+            } else {
+                info = { incremental: true, mult: 1n, last: 0n };
+                this.clockInfo.set(key, info);
+            }
+        }
+        let valueNs;
+        if (info && info.incremental) {
+            const raw = (info.last === null ? 0n : info.last) + rawTs;
+            info.last = raw;
+            valueNs = raw * info.mult;
+        } else {
+            valueNs = rawTs * (info ? info.mult : 1n);
+        }
+        const off = this._clockOffset(key);
+        return off === null ? valueNs : valueNs + off;
+    }
+
+    // Legacy TrackEvent µs timestamps (timestamp_delta_us / timestamp_absolute_us)
+    // are in the MONOTONIC domain (Chrome's base::TimeTicks); trace_processor
+    // converts them to trace time when a snapshot makes that possible.
+    _legacyUsToTraceUs(us) {
+        const off = this._clockOffset(`${CLOCK_MONOTONIC}`);
+        if (off === null || off === 0n) return us;
+        return this._nsToUs(BigInt(us) * 1000n + off);
+    }
+
+    _traceUsToLegacyUs(us) {
+        const off = this._clockOffset(`${CLOCK_MONOTONIC}`);
+        if (off === null || off === 0n) return us;
+        return this._nsToUs(BigInt(us) * 1000n - off);
+    }
     
-    _parseInternedData(data, startOffset, len, seqNames, seqCats, seqDebugNames) {
-        const endOffset = startOffset + len;
+    _parseInternedData(data, startOffset, endOffset, seqNames, seqCats, seqDebugNames) {
         let o = startOffset;
         while (o < endOffset) {
-            const vR = readVarint(data, o);
+            const vR = rv(data, o, endOffset);
             o += vR[1];
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
             
             if (wire === 2 && (field === 1 || field === 2 || field === 3 || field === 6)) {
-                const innerLenR = readVarint(data, o);
-                o += innerLenR[1];
-                const innerEnd = o + Number(innerLenR[0]);
+                const [innerLen, innerHdr] = readLen(data, o, endOffset);
+                o += innerHdr;
+                const innerEnd = o + innerLen;
                 
                 let iid = 0;
                 let name = '';
                 while (o < innerEnd) {
-                    const eV = readVarint(data, o); o += eV[1];
+                    const eV = rv(data, o, innerEnd); o += eV[1];
                     const ef = Number(eV[0] >> 3n);
-                    if (ef === 1) {
-                        const iidV = readVarint(data, o);
+                    const ew = Number(eV[0] & 7n);
+                    if (ef === 1 && ew === 0) {
+                        const iidV = rv(data, o, innerEnd);
                         iid = Number(iidV[0]);
                         o += iidV[1];
-                    } else if (ef === 2 || (field === 6 && ef === 2)) {
-                        const nLenV = readVarint(data, o);
-                        const nlen = Number(nLenV[0]);
-                        o += nLenV[1];
+                    } else if (ef === 2 && ew === 2) {
+                        const [nlen, nHdr] = readLen(data, o, innerEnd);
+                        o += nHdr;
                         name = this.decodeString(data, o, nlen);
                         o += nlen;
                     } else {
-                        o += this._skip(data, o, Number(eV[0] & 7n));
+                        o += this._skip(data, o, ew, innerEnd);
                     }
                 }
                 
@@ -396,45 +668,70 @@ export class PerfettoDecoder {
                 else if (field === 3 || field === 6) seqDebugNames.set(iid, name);
                 else if (field === 1) seqCats.set(iid, name);
             } else {
-                o += this._skip(data, o, wire);
+                o += this._skip(data, o, wire, endOffset);
             }
         }
     }
     
-    // TracePacket field 59 → TracePacketDefaults. The only field we care about is
-    // track_event_defaults.track_uuid (field 11 inside field 11), which sets the
-    // implicit track that every TrackEvent on this sequence inherits when it omits
-    // its own track_uuid — Chromium emits it on the first packet after each
-    // incremental_state_cleared boundary.
-    _parseTracePacketDefaults(data, startOffset, len, seqId) {
-        const endOffset = startOffset + len;
+    // TracePacket field 59 → TracePacketDefaults:
+    //   timestamp_clock_id = 58 (or 1) — clock for every packet on this sequence that
+    //     omits its own TracePacket.timestamp_clock_id (Chrome: incremental clock 64).
+    //   track_event_defaults = 11 → track_uuid = 11 — implicit track that every
+    //     TrackEvent on this sequence inherits when it omits its own track_uuid.
+    // Chromium emits both on the first packet after each incremental-state reset.
+    _parseTracePacketDefaults(data, startOffset, endOffset, seqId) {
         let o = startOffset;
         while (o < endOffset) {
-            const vR = readVarint(data, o); o += vR[1];
+            const vR = rv(data, o, endOffset); o += vR[1];
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
-            if (field === 11 && wire === 2) { // track_event_defaults
-                const tedLenR = readVarint(data, o); o += tedLenR[1];
-                const tedEnd = o + Number(tedLenR[0]);
+            if ((field === 58 || field === 1) && wire === 0) { // timestamp_clock_id
+                const cV = rv(data, o, endOffset); o += cV[1];
+                this.seqDefaultClock.set(seqId, Number(cV[0]));
+            } else if (field === 11 && wire === 2) { // track_event_defaults
+                const [tedLen, tedHdr] = readLen(data, o, endOffset); o += tedHdr;
+                const tedEnd = o + tedLen;
                 while (o < tedEnd) {
-                    const tV = readVarint(data, o); o += tV[1];
+                    const tV = rv(data, o, tedEnd); o += tV[1];
                     const tw = Number(tV[0] & 7n);
                     const tf = Number(tV[0] >> 3n);
                     if (tf === 11 && tw === 0) { // track_uuid
-                        const uV = readVarint(data, o); o += uV[1];
+                        const uV = rv(data, o, tedEnd); o += uV[1];
                         this.seqDefaultTracks.set(seqId, uV[0]);
                     } else {
-                        o += this._skip(data, o, tw);
+                        o += this._skip(data, o, tw, tedEnd);
                     }
                 }
             } else {
-                o += this._skip(data, o, wire);
+                o += this._skip(data, o, wire, endOffset);
             }
         }
     }
 
-    _parseTrackDescriptor(data, startOffset, len, _seqNames) {
-        const endOffset = startOffset + len;
+    // ThreadDescriptor (TracePacket field 44, or TrackDescriptor field 4):
+    //   pid = 1, tid = 2, reference_timestamp_us = 6. Returns { pid, tid } and
+    //   records reference_timestamp_us as the sequence's delta_us reference.
+    _parseThreadDescriptor(data, startOffset, endOffset, seqId) {
+        let o = startOffset;
+        let pid = 0;
+        let tid = 0;
+        while (o < endOffset) {
+            const eV = rv(data, o, endOffset); o += eV[1];
+            const ef = Number(eV[0] >> 3n);
+            const ew = Number(eV[0] & 7n);
+            if (ew === 0 && (ef === 1 || ef === 2 || ef === 6)) {
+                const v = rv(data, o, endOffset); o += v[1];
+                if (ef === 1) pid = Number(BigInt.asIntN(32, v[0]));
+                else if (ef === 2) tid = Number(BigInt.asIntN(32, v[0]));
+                else this.seqTrackEventRefUs.set(seqId, Number(BigInt.asIntN(64, v[0])));
+            } else {
+                o += this._skip(data, o, ew, endOffset);
+            }
+        }
+        return { pid, tid };
+    }
+
+    _parseTrackDescriptor(data, startOffset, endOffset, seqId) {
         let o = startOffset;
 
         let uuid = 0n;
@@ -445,57 +742,46 @@ export class PerfettoDecoder {
         let parentUuid = 0n;       // for async/named tracks that delegate pid resolution upward
 
         while (o < endOffset) {
-            const vR = readVarint(data, o); o += vR[1];
+            const vR = rv(data, o, endOffset); o += vR[1];
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
 
             if (field === 1 && wire === 0) { // uuid
-                const uV = readVarint(data, o);
+                const uV = rv(data, o, endOffset);
                 uuid = uV[0];
                 o += uV[1];
             } else if (field === 2 && wire === 2) { // name
-                const nLen = readVarint(data, o);
-                o += nLen[1];
-                trackName = this.decodeString(data, o, Number(nLen[0]));
-                o += Number(nLen[0]);
+                const [nLen, nHdr] = readLen(data, o, endOffset);
+                o += nHdr;
+                trackName = this.decodeString(data, o, nLen);
+                o += nLen;
             } else if (field === 3 && wire === 2) { // process (pid)
-                const pLen = readVarint(data, o); o += pLen[1];
-                const pEnd = o + Number(pLen[0]);
+                const [pLen, pHdr] = readLen(data, o, endOffset); o += pHdr;
+                const pEnd = o + pLen;
                 while (o < pEnd) {
-                    const eV = readVarint(data, o); o += eV[1];
-                    if (Number(eV[0] >> 3n) === 1) {
-                        const pidV = readVarint(data, o);
+                    const eV = rv(data, o, pEnd); o += eV[1];
+                    if (Number(eV[0] >> 3n) === 1 && Number(eV[0] & 7n) === 0) {
+                        const pidV = rv(data, o, pEnd);
                         pid = Number(pidV[0]);
                         o += pidV[1];
                     } else {
-                        o += this._skip(data, o, Number(eV[0] & 7n));
+                        o += this._skip(data, o, Number(eV[0] & 7n), pEnd);
                     }
                 }
-            } else if (field === 4 && wire === 2) { // thread (pid/tid)
-                const tLen = readVarint(data, o); o += tLen[1];
-                const tEnd = o + Number(tLen[0]);
+            } else if (field === 4 && wire === 2) { // thread (pid/tid, reference_timestamp_us)
+                const [tLen, tHdr] = readLen(data, o, endOffset); o += tHdr;
+                const tEnd = o + tLen;
                 hasThread = true;
-                while (o < tEnd) {
-                    const eV = readVarint(data, o); o += eV[1];
-                    const ef = Number(eV[0] >> 3n);
-                    if (ef === 1) { // pid
-                        const pidV = readVarint(data, o);
-                        pid = Number(pidV[0]);
-                        o += pidV[1];
-                    } else if (ef === 2) { // tid
-                        const tidV = readVarint(data, o);
-                        tid = Number(tidV[0]);
-                        o += tidV[1];
-                    } else {
-                        o += this._skip(data, o, Number(eV[0] & 7n));
-                    }
-                }
+                const t = this._parseThreadDescriptor(data, o, tEnd, seqId);
+                pid = t.pid;
+                tid = t.tid;
+                o = tEnd;
             } else if (field === 5 && wire === 0) { // parent_uuid
-                const pV = readVarint(data, o);
+                const pV = rv(data, o, endOffset);
                 parentUuid = pV[0];
                 o += pV[1];
             } else {
-                o += this._skip(data, o, wire);
+                o += this._skip(data, o, wire, endOffset);
             }
         }
 
@@ -534,53 +820,53 @@ export class PerfettoDecoder {
         let absTs = null;
         
         while (o < endOffset) {
-            const vR = readVarint(data, o); o += vR[1];
+            const vR = rv(data, o, endOffset); o += vR[1];
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
             
             if (field === 1 && wire === 0) { // timestamp_delta_us
-                const tV = readVarint(data, o);
+                const tV = rv(data, o, endOffset);
                 o += tV[1];
                 delta = Number(BigInt.asIntN(64, tV[0]));
             } else if (field === 16 && wire === 0) { // timestamp_absolute_us
-                const tV = readVarint(data, o);
+                const tV = rv(data, o, endOffset);
                 o += tV[1];
                 absTs = Number(BigInt.asIntN(64, tV[0]));
             } else if (field === 3 && wire === 0) { // category_iid
-                const cV = readVarint(data, o);
+                const cV = rv(data, o, endOffset);
                 trackEvent._categories.push(Number(cV[0]));
                 o += cV[1];
             } else if (field === 3 && wire === 2) { // packed category_iids
-                const pLen = readVarint(data, o); o += pLen[1];
-                const pEnd = o + Number(pLen[0]);
-                while(o < pEnd) {
-                    const cV = readVarint(data, o);
+                const [pLen, pHdr] = readLen(data, o, endOffset); o += pHdr;
+                const pEnd = o + pLen;
+                while (o < pEnd) {
+                    const cV = rv(data, o, pEnd);
                     trackEvent._categories.push(Number(cV[0]));
                     o += cV[1];
                 }
             } else if (field === 22 && wire === 2) { // categories (string)
-                const cLen = readVarint(data, o); o += cLen[1];
-                trackEvent._categories_str.push(this.decodeString(data, o, Number(cLen[0])));
-                o += Number(cLen[0]);
+                const [cLen, cHdr] = readLen(data, o, endOffset); o += cHdr;
+                trackEvent._categories_str.push(this.decodeString(data, o, cLen));
+                o += cLen;
             } else if (field === 10 && wire === 0) { // name_iid
-                const nV = readVarint(data, o);
+                const nV = rv(data, o, endOffset);
                 trackEvent._name_iid = Number(nV[0]);
                 o += nV[1];
             } else if (field === 23 && wire === 2) { // name
-                const nLen = readVarint(data, o); o += nLen[1];
-                trackEvent.name = this.decodeString(data, o, Number(nLen[0]));
-                o += Number(nLen[0]);
+                const [nLen, nHdr] = readLen(data, o, endOffset); o += nHdr;
+                trackEvent.name = this.decodeString(data, o, nLen);
+                o += nLen;
             } else if (field === 9 && wire === 0) { // type (1: B, 2: E, 3: I)
-                const tV = readVarint(data, o);
+                const tV = rv(data, o, endOffset);
                 trackEvent.type = Number(tV[0]);
                 o += tV[1];
             } else if (field === 11 && wire === 0) { // track_uuid
-                const uV = readVarint(data, o);
+                const uV = rv(data, o, endOffset);
                 trackEvent.track_uuid = uV[0];
                 o += uV[1];
             } else if (field === 4 && wire === 2) { // debug_annotations
-                const dLen = readVarint(data, o); o += dLen[1];
-                const dEnd = o + Number(dLen[0]);
+                const [dLen, dHdr] = readLen(data, o, endOffset); o += dHdr;
+                const dEnd = o + dLen;
                 const arg = this._parseDebugAnnotation(data, o, dEnd, seqDebugNames, seqNames);
                 // Drop annotations with no parseable value. Perfetto producers
                 // sometimes emit just a name (e.g. `data`) with no typed value field —
@@ -591,31 +877,31 @@ export class PerfettoDecoder {
                 if (arg.name && arg.value !== null) trackEvent.args[arg.name] = arg.value;
                 o = dEnd;
             } else if (field === 6 && wire === 2) { // legacy_event
-                const lLen = readVarint(data, o); o += lLen[1];
-                const lEnd = o + Number(lLen[0]);
+                const [lLen, lHdr] = readLen(data, o, endOffset); o += lHdr;
+                const lEnd = o + lLen;
                 while (o < lEnd) {
-                    const lV = readVarint(data, o); o += lV[1];
+                    const lV = rv(data, o, lEnd); o += lV[1];
                     const lw = Number(lV[0] & 7n); const lf = Number(lV[0] >> 3n);
                     if (lf === 2 && lw === 0) { // phase
-                        const v = readVarint(data, o); o += v[1];
+                        const v = rv(data, o, lEnd); o += v[1];
                         trackEvent.legacyPhase = Number(v[0]);
                     } else if (lf === 3 && lw === 0) { // duration_us
-                        const v = readVarint(data, o); o += v[1];
+                        const v = rv(data, o, lEnd); o += v[1];
                         trackEvent.legacyDurationUs = Number(BigInt.asIntN(64, v[0]));
                     } else if (lf === 6 && lw === 0) { // unscoped_id
-                        const v = readVarint(data, o); o += v[1];
+                        const v = rv(data, o, lEnd); o += v[1];
                         trackEvent.id = v[0].toString(16);
                     } else if ((lf === 7 || lf === 10) && lw === 0) { // local_id (7 in old protos, 10 current)
-                        const v = readVarint(data, o); o += v[1];
+                        const v = rv(data, o, lEnd); o += v[1];
                         trackEvent.id2 = { local: "0x" + v[0].toString(16) };
                     } else if (lf === 11 && lw === 0) { // global_id
-                        const v = readVarint(data, o); o += v[1];
+                        const v = rv(data, o, lEnd); o += v[1];
                         trackEvent.id2 = { global: "0x" + v[0].toString(16) };
                     } else if (lf === 8 && lw === 0) { // bind_id
-                        const v = readVarint(data, o); o += v[1];
+                        const v = rv(data, o, lEnd); o += v[1];
                         trackEvent.bind_id = "0x" + v[0].toString(16);
                     } else {
-                        o += this._skip(data, o, lw);
+                        o += this._skip(data, o, lw, lEnd);
                     }
                 }
             } else if (wire === 2 && TRACK_EVENT_EXTENSION_SCHEMAS[field] !== undefined) {
@@ -624,34 +910,31 @@ export class PerfettoDecoder {
                 // schema's named key — DevTools' MetaHandler reads args.render_frame_host
                 // etc. directly, so the args shape needs to mirror Chrome's JSON output.
                 const ext = TRACK_EVENT_EXTENSION_SCHEMAS[field];
-                const lR = readVarint(data, o); o += lR[1];
-                const innerEnd = o + Number(lR[0]);
+                const [iLen, iHdr] = readLen(data, o, endOffset); o += iHdr;
+                const innerEnd = o + iLen;
                 trackEvent.args[ext.name] = this._parseSchemaMessage(data, o, innerEnd, ext.schema);
                 o = innerEnd;
             } else {
-                o += this._skip(data, o, wire);
+                o += this._skip(data, o, wire, endOffset);
             }
         }
 
-        let currentTs = this.seqTimestamps.get(seqId) || 0;
-        
         if (absTs !== null) {
-            currentTs = absTs;
-            this.seqTimestamps.set(seqId, currentTs);
+            this.seqTrackEventRefUs.set(seqId, absTs);
+            trackEvent.ts = this._legacyUsToTraceUs(absTs);
         } else if (delta !== null) {
-            if (currentTs === 0 && packetTs > 0) {
-                currentTs = packetTs;
-            }
-            currentTs += delta;
-            this.seqTimestamps.set(seqId, currentTs);
+            const baseUs = this.seqTrackEventRefUs.has(seqId)
+                ? this.seqTrackEventRefUs.get(seqId)
+                : this._traceUsToLegacyUs(packetTs);
+            const nextUs = baseUs + delta;
+            this.seqTrackEventRefUs.set(seqId, nextUs);
+            trackEvent.ts = this._legacyUsToTraceUs(nextUs);
         } else {
-            if (packetTs > 0 && currentTs === 0) {
-                currentTs = packetTs;
+            trackEvent.ts = packetTs;
+            if (packetTs > 0) {
+                this.seqTrackEventRefUs.set(seqId, this._traceUsToLegacyUs(packetTs));
             }
-            this.seqTimestamps.set(seqId, currentTs);
         }
-        
-        trackEvent.ts = currentTs;
 
         // Inherit the sequence's default track when the event omits its own
         // track_uuid (the common case — Chromium only sets it on the rare
@@ -671,32 +954,31 @@ export class PerfettoDecoder {
         let arr = null;
         
         while (o < end) {
-            const aV = readVarint(data, o); o += aV[1];
+            const aV = rv(data, o, end); o += aV[1];
             const aw = Number(aV[0] & 7n); const af = Number(aV[0] >> 3n);
             
             if (af === 1 && aw === 0) { // name_iid
-                const nv = readVarint(data, o); o+=nv[1];
+                const nv = rv(data, o, end); o += nv[1];
                 const iid = Number(nv[0]);
                 name = seqDebugNames.get(iid) || seqNames.get(iid) || '';
             } else if (af === 10 && aw === 2) { // name
-                const nl = readVarint(data, o); o+=nl[1];
-                name = this.decodeString(data, o, Number(nl[0])); o+=Number(nl[0]);
+                const [nl, nHdr] = readLen(data, o, end); o += nHdr;
+                name = this.decodeString(data, o, nl); o += nl;
             } else if (af === 2 && aw === 0) { // bool_value
-                const bv = readVarint(data, o); o+=bv[1]; value = bv[0] !== 0n;
+                const bv = rv(data, o, end); o += bv[1]; value = bv[0] !== 0n;
             } else if (af === 3 && aw === 0) { // uint_value
-                const uv = readVarint(data, o); o+=uv[1]; value = Number(uv[0]);
+                const uv = rv(data, o, end); o += uv[1]; value = Number(uv[0]);
             } else if (af === 4 && aw === 0) { // int_value
-                const iv = readVarint(data, o); o+=iv[1]; value = Number(iv[0]);
+                const iv = rv(data, o, end); o += iv[1]; value = Number(BigInt.asIntN(64, iv[0]));
             } else if (af === 5 && aw === 1) { // double_value (64-bit float raw)
-                const view = new DataView(data.buffer, data.byteOffset + o, 8); 
-                value = view.getFloat64(0, true); 
-                o+=8;
+                value = readDouble(data, o, end);
+                o += 8;
             } else if (af === 6 && aw === 2) { // string_value
-                const sl = readVarint(data, o); o+=sl[1];
-                value = this.decodeString(data, o, Number(sl[0])); o+=Number(sl[0]);
+                const [sl, sHdr] = readLen(data, o, end); o += sHdr;
+                value = this.decodeString(data, o, sl); o += sl;
             } else if (af === 9 && aw === 2) { // legacy_json_value
-                const sl = readVarint(data, o); o+=sl[1];
-                const jsonStr = this.decodeString(data, o, Number(sl[0])); o+=Number(sl[0]);
+                const [sl, sHdr] = readLen(data, o, end); o += sHdr;
+                const jsonStr = this.decodeString(data, o, sl); o += sl;
                 try { value = JSON.parse(jsonStr); } catch { value = jsonStr; }
             } else if (af === 8 && aw === 2) { // nested_value (recursive typed-value tree)
                 // Chrome's standard mechanism for structured timeline args (frame ids,
@@ -704,26 +986,26 @@ export class PerfettoDecoder {
                 // EventTiming, NavStartToLargestContentfulPaint, ...). Distinct from
                 // dict_entries — uses a separate NestedValue message with a typed-union
                 // shape rather than recursive DebugAnnotation nesting.
-                const sl = readVarint(data, o); o+=sl[1];
-                const innerEnd = o + Number(sl[0]);
+                const [sl, sHdr] = readLen(data, o, end); o += sHdr;
+                const innerEnd = o + sl;
                 value = this._parseNestedValue(data, o, innerEnd);
                 o = innerEnd;
             } else if (af === 11 && aw === 2) { // dict_entries
                 if (!dict) dict = {};
-                const lenR = readVarint(data, o); o += lenR[1];
-                const innerEnd = o + Number(lenR[0]);
+                const [len, hLen] = readLen(data, o, end); o += hLen;
+                const innerEnd = o + len;
                 const entry = this._parseDebugAnnotation(data, o, innerEnd, seqDebugNames, seqNames);
                 if (entry.name) dict[entry.name] = entry.value;
                 o = innerEnd;
             } else if (af === 12 && aw === 2) { // array_values
                 if (!arr) arr = [];
-                const lenR = readVarint(data, o); o += lenR[1];
-                const innerEnd = o + Number(lenR[0]);
+                const [len, hLen] = readLen(data, o, end); o += hLen;
+                const innerEnd = o + len;
                 const entry = this._parseDebugAnnotation(data, o, innerEnd, seqDebugNames, seqNames);
                 arr.push(entry.value);
                 o = innerEnd;
             } else {
-                o += this._skip(data, o, aw);
+                o += this._skip(data, o, aw, end);
             }
         }
         
@@ -748,47 +1030,46 @@ export class PerfettoDecoder {
         let scalarSeen = false;
 
         while (o < end) {
-            const vR = readVarint(data, o); o += vR[1];
+            const vR = rv(data, o, end); o += vR[1];
             const wire = Number(vR[0] & 7n);
             const field = Number(vR[0] >> 3n);
 
             if (field === 1 && wire === 0) {        // nested_type
-                const v = readVarint(data, o); o += v[1];
+                const v = rv(data, o, end); o += v[1];
                 nestedType = Number(v[0]);
             } else if (field === 2 && wire === 2) { // dict_keys (string)
-                const lR = readVarint(data, o); o += lR[1];
-                dictKeys.push(this.decodeString(data, o, Number(lR[0])));
-                o += Number(lR[0]);
+                const [len, hLen] = readLen(data, o, end); o += hLen;
+                dictKeys.push(this.decodeString(data, o, len));
+                o += len;
             } else if (field === 3 && wire === 2) { // dict_values (NestedValue)
-                const lR = readVarint(data, o); o += lR[1];
-                const innerEnd = o + Number(lR[0]);
+                const [len, hLen] = readLen(data, o, end); o += hLen;
+                const innerEnd = o + len;
                 dictValues.push(this._parseNestedValue(data, o, innerEnd));
                 o = innerEnd;
             } else if (field === 4 && wire === 2) { // array_values (NestedValue)
-                const lR = readVarint(data, o); o += lR[1];
-                const innerEnd = o + Number(lR[0]);
+                const [len, hLen] = readLen(data, o, end); o += hLen;
+                const innerEnd = o + len;
                 arrayValues.push(this._parseNestedValue(data, o, innerEnd));
                 o = innerEnd;
             } else if (field === 5 && wire === 0) { // int_value
-                const v = readVarint(data, o); o += v[1];
+                const v = rv(data, o, end); o += v[1];
                 intVal = Number(BigInt.asIntN(64, v[0]));
                 scalarSeen = true;
             } else if (field === 6 && wire === 1) { // double_value
-                const view = new DataView(data.buffer, data.byteOffset + o, 8);
-                doubleVal = view.getFloat64(0, true);
+                doubleVal = readDouble(data, o, end);
                 o += 8;
                 scalarSeen = true;
             } else if (field === 7 && wire === 0) { // bool_value
-                const v = readVarint(data, o); o += v[1];
+                const v = rv(data, o, end); o += v[1];
                 boolVal = v[0] !== 0n;
                 scalarSeen = true;
             } else if (field === 8 && wire === 2) { // string_value
-                const lR = readVarint(data, o); o += lR[1];
-                stringVal = this.decodeString(data, o, Number(lR[0]));
-                o += Number(lR[0]);
+                const [len, hLen] = readLen(data, o, end); o += hLen;
+                stringVal = this.decodeString(data, o, len);
+                o += len;
                 scalarSeen = true;
             } else {
-                o += this._skip(data, o, wire);
+                o += this._skip(data, o, wire, end);
             }
         }
 
@@ -816,50 +1097,56 @@ export class PerfettoDecoder {
         const out = {};
         let o = start;
         while (o < end) {
-            const tR = readVarint(data, o); if (!tR) break;
+            const tR = rv(data, o, end);
             o += tR[1];
             const wire = Number(tR[0] & 7n);
             const field = Number(tR[0] >> 3n);
             const def = schema[field];
-            if (!def) { o += this._skip(data, o, wire); continue; }
+            if (!def) { o += this._skip(data, o, wire, end); continue; }
             if (def.type === 'message' && wire === 2) {
-                const lR = readVarint(data, o); o += lR[1];
-                const innerEnd = o + Number(lR[0]);
+                const [len, hLen] = readLen(data, o, end); o += hLen;
+                const innerEnd = o + len;
                 out[def.name] = this._parseSchemaMessage(data, o, innerEnd, def.schema);
                 o = innerEnd;
             } else if (def.type === 'string' && wire === 2) {
-                const lR = readVarint(data, o); o += lR[1];
-                out[def.name] = this.decodeString(data, o, Number(lR[0]));
-                o += Number(lR[0]);
+                const [len, hLen] = readLen(data, o, end); o += hLen;
+                out[def.name] = this.decodeString(data, o, len);
+                o += len;
             } else if (def.type === 'uint' && wire === 0) {
-                const v = readVarint(data, o); o += v[1];
+                const v = rv(data, o, end); o += v[1];
                 out[def.name] = Number(v[0]);
             } else if (def.type === 'int' && wire === 0) {
-                const v = readVarint(data, o); o += v[1];
+                const v = rv(data, o, end); o += v[1];
                 out[def.name] = Number(BigInt.asIntN(64, v[0]));
             } else if (def.type === 'bool' && wire === 0) {
-                const v = readVarint(data, o); o += v[1];
+                const v = rv(data, o, end); o += v[1];
                 out[def.name] = v[0] !== 0n;
             } else if (def.type === 'enum' && wire === 0) {
-                const v = readVarint(data, o); o += v[1];
+                const v = rv(data, o, end); o += v[1];
                 const n = Number(v[0]);
                 out[def.name] = def.enum[n] !== undefined ? def.enum[n] : n;
             } else {
-                o += this._skip(data, o, wire);
+                o += this._skip(data, o, wire, end);
             }
         }
         return out;
     }
 
-    _skip(data, offset, wire) {
-        if (wire === 0) return readVarint(data, offset)[1];
-        if (wire === 1) return 8;
-        if (wire === 5) return 4;
-        if (wire === 2) {
-            const v = readVarint(data, offset);
-            return v[1] + Number(v[0]);
+    _skip(data, offset, wire, end = data.length) {
+        if (wire === 0) return rv(data, offset, end)[1];
+        if (wire === 1) {
+            if (offset + 8 > end) throw MALFORMED;
+            return 8;
         }
-        return 0;
+        if (wire === 5) {
+            if (offset + 4 > end) throw MALFORMED;
+            return 4;
+        }
+        if (wire === 2) {
+            const [len, hLen] = readLen(data, offset, end);
+            return hLen + len;
+        }
+        throw MALFORMED;
     }
     
     _emitTraceEvent(event, controller, seqNames, seqCats) {

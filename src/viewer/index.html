@@ -20,7 +20,7 @@
       }
     }
     </script>
-    <link rel="stylesheet" href="./style.css?v=12">
+    <link rel="stylesheet" href="./style.css?v=13">
 </head>
 
 <body>
@@ -31,6 +31,11 @@
             <div id="progress-bar"></div>
         </div>
         <p id="progress-detail" class="hidden"></p>
+        <div id="load-error" class="upload-content" role="alert">
+            <h2>Error</h2>
+            <p id="load-error-message"></p>
+            <button id="load-error-dismiss" type="button">Back</button>
+        </div>
     </div>
 
     <!-- Upload fallback when no remote file is specified -->
@@ -93,6 +98,7 @@
 
     <div id="history-view" class="hidden">
         <header class="viewer-header history-header">
+            <button id="history-home-btn" type="button" class="history-home-btn">🔙 Home</button>
             <h1 id="history-view-title">Previously-viewed Waterfalls</h1>
             <div class="history-controls">
                 <input type="text" id="history-filter" placeholder="Filter history...">
@@ -134,7 +140,7 @@
                         <th data-sort="comment">Comments <span class="sort-icon"></span>
                             <div class="resizer"></div>
                         </th>
-                        <th data-sort="firstLoaded" style="width:160px" class="sort-desc">Last Viewed <span
+                        <th data-sort="lastAccessed" style="width:160px" class="sort-desc">Last Viewed <span
                                 class="sort-icon">▼</span>
                             <div class="resizer"></div>
                         </th>
@@ -199,7 +205,12 @@
             </div>
             <div id="waterfall-view" class="tab-content"></div>
             <div id="lighthouse-view" class="tab-content" style="background: #fff;">
-                <iframe id="lighthouse-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+                <!-- Lighthouse reports come from untrusted capture ZIPs and load as a
+                     same-origin blob: URL, so they MUST stay sandboxed without
+                     allow-same-origin (opaque origin → no access to viewer state). -->
+                <iframe id="lighthouse-frame" title="Lighthouse report"
+                    sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads allow-modals"
+                    style="width: 100%; height: 100%; border: none;"></iframe>
             </div>
             <div id="devtools-view" class="tab-content" style="background: #fff;">
                 <div id="devtools-overlay">
@@ -314,7 +325,7 @@
             });
         }
     </script>
-    <script type="module" src="./viewer.js?v=12"></script>
+    <script type="module" src="./viewer.js?v=13"></script>
 </body>
 
 </html>

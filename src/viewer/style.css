@@ -96,6 +96,44 @@ body, html {
     100% { transform: rotate(360deg); }
 }
 
+/* Load error panel: lives inside #loading next to the spinner/progress nodes.
+   `has-error` swaps which children are shown so the progress DOM is never
+   destroyed (viewer.js caches references to it). */
+#load-error {
+    display: none;
+    max-width: 600px;
+    margin: auto;
+    box-sizing: border-box;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+#load-error h2 {
+    color: #d32f2f;
+}
+
+#loading.has-error > * {
+    display: none;
+}
+
+#loading.has-error > #load-error {
+    display: block;
+}
+
+#load-error-dismiss {
+    margin-top: 1rem;
+    padding: 8px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+#load-error-dismiss:hover {
+    background: #f0f0f0;
+}
+
 #drop-zone {
     width: 100%;
     height: 100%;
@@ -1016,6 +1054,7 @@ body, html {
 .hl-tag { color: #22863a; }
 .hl-attr { color: #6f42c1; }
 .hl-keyword { color: #d73a49; font-weight: bold; }
+.hl-comment { color: #6a737d; font-style: italic; }
 
 /* Tooltip Styles */
 #waterfall-tooltip {
@@ -1421,6 +1460,20 @@ body, html {
     gap: 15px;
     align-items: center;
     flex-wrap: wrap;
+}
+
+.history-home-btn {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.history-home-btn:hover {
+    background: #f0f0f0;
 }
 
 #history-filter {

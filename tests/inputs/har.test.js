@@ -9,6 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
 import { WaterfallTools } from '../../src/core/waterfall-tools.js';
+import { buildWaterfallDataFromHar } from '../../src/core/har-converter.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -30,11 +31,12 @@ describe('HAR Input Processor', () => {
         await tool.loadFile(inputPath, { debug: true, format: 'har' });
         const result = JSON.parse(JSON.stringify(tool.getHar({ debug: true })));
 
-        if (!fs.existsSync(refPath)) {
-            console.log(`Generating golden fixture for amazon.har.json...`);
+        if (process.env.UPDATE_FIXTURES) {
+            console.log(`Updating golden fixture for amazon.har.json...`);
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
         }
+        expect(fs.existsSync(refPath), `Missing golden fixture: ${refPath}`).toBe(true);
 
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
@@ -55,11 +57,12 @@ describe('HAR Input Processor', () => {
         await tool.loadFile(inputPath, { debug: true, format: 'har' });
         const result = JSON.parse(JSON.stringify(tool.getHar({ debug: true })));
 
-        if (!fs.existsSync(refPath)) {
-            console.log(`Generating golden fixture for chrome-google.har.json...`);
+        if (process.env.UPDATE_FIXTURES) {
+            console.log(`Updating golden fixture for chrome-google.har.json...`);
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
         }
+        expect(fs.existsSync(refPath), `Missing golden fixture: ${refPath}`).toBe(true);
 
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
@@ -79,11 +82,12 @@ describe('HAR Input Processor', () => {
         await tool.loadFile(inputPath, { debug: true, format: 'har' });
         const result = JSON.parse(JSON.stringify(tool.getHar({ debug: true })));
 
-        if (!fs.existsSync(refPath)) {
-            console.log(`Generating golden fixture for firefox-google.har.json...`);
+        if (process.env.UPDATE_FIXTURES) {
+            console.log(`Updating golden fixture for firefox-google.har.json...`);
             fs.mkdirSync(path.dirname(refPath), { recursive: true });
             fs.writeFileSync(refPath, JSON.stringify(result, null, 2), 'utf-8');
         }
+        expect(fs.existsSync(refPath), `Missing golden fixture: ${refPath}`).toBe(true);
 
         const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
 
@@ -103,5 +107,49 @@ describe('HAR Input Processor', () => {
             const tool = new WaterfallTools();
             await tool.loadFile(inputPath, { debug: true, format: 'har' });
         }).rejects.toThrow();
+    });
+
+    it('Should retain minimal page objects without pageTimings and tolerate relative URLs or missing timings', async () => {
+        const minimalHar = {
+            log: {
+                version: '1.2',
+                creator: { name: 'test', version: '1.0' },
+                pages: [
+                    { id: 'page_minimal', startedDateTime: '2026-01-01T00:00:00.000Z' }
+                ],
+                entries: [
+                    {
+                        pageref: 'page_minimal',
+                        startedDateTime: '2026-01-01T00:00:00.010Z',
+                        time: 50,
+                        request: { method: 'GET', url: 'https://example.com/index.html', headers: [] },
+                        response: { status: 200, headers: [], content: { size: 512, mimeType: 'text/html' } }
+                        // intentionally missing `timings`
+                    },
+                    {
+                        pageref: 'page_minimal',
+                        startedDateTime: '2026-01-01T00:00:00.020Z',
+                        time: 30,
+                        request: { method: 'GET', url: '/relative/path.js', headers: [] },
+                        response: { status: 200, headers: [], content: { size: 128, mimeType: 'application/javascript' } },
+                        timings: { dns: 5, connect: 10, ssl: 5, send: 1, wait: 10, receive: 4 }
+                    }
+                ]
+            }
+        };
+
+        // Direct converter check (relative URL + missing timings resilience)
+        const relational = buildWaterfallDataFromHar(minimalHar.log, 'har');
+        expect(relational.pages.page_minimal).toBeDefined();
+        expect(Object.keys(relational.pages.page_minimal.requests).length).toBe(2);
+
+        // Full streaming parser check (JSON path routing retains minimal page)
+        const buf = Buffer.from(JSON.stringify(minimalHar), 'utf8');
+        const tool = new WaterfallTools();
+        await tool.loadBuffer(buf, { format: 'har' });
+        const exported = tool.getHar();
+        expect(exported.log.pages.length).toBe(1);
+        expect(exported.log.pages[0].id).toBe('page_minimal');
+        expect(exported.log.entries.length).toBe(1); // relative URL is filtered by har-export http(s) filter, absolute survives
     });
 });

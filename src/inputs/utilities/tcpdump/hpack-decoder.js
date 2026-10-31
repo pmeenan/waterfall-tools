@@ -148,7 +148,13 @@ for (let i = 0; i < ENCODE_TABLE.length; i++) {
  * @param {Uint8Array} buffer
  * @returns {string}
  */
-function decodeHuffman(buffer) {
+/**
+ * Huffman-decodes to raw octets. The decoded octet count is what RFC 7541
+ * §4.1 uses for dynamic-table entry sizes.
+ * @param {Uint8Array} buffer
+ * @returns {Uint8Array}
+ */
+function decodeHuffmanBytes(buffer) {
     let node = huffRoot;
     const decoded = [];
     for (let i = 0; i < buffer.length; i++) {
@@ -156,7 +162,7 @@ function decodeHuffman(buffer) {
         for (let bit = 7; bit >= 0; bit--) {
             const val = (b >>> bit) & 1;
             node = node.children[val];
-            if (!node) return new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(decoded));
+            if (!node) return new Uint8Array(decoded);
             if (node.symbol !== -1) {
                 if (node.symbol === 256) break; // EOS
                 decoded.push(node.symbol);
@@ -164,10 +170,12 @@ function decodeHuffman(buffer) {
             }
         }
     }
-    return new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(decoded));
+    return new Uint8Array(decoded);
 }
 
 // ─── HPACK Integer Decoding (RFC 7541 Section 5.1) ──────────────────────────
+const MAX_HPACK_INT = 0xFFFFFFFF;
+
 /**
  * Decodes an HPACK integer starting at `offset` in `buffer`.
  * The integer uses `prefixBits` bits of the first byte (masked by `firstByteMask`).
@@ -188,13 +196,17 @@ function readInt(buffer, offset, prefixBits, firstByteMask) {
         return { value: v, newOffset: offset + 1 };
     }
 
-    let m = 0;
+    // Use multiplication rather than `<<` so continuation bytes past bit 31
+    // can't wrap into negative values, and bail on absurd encodings (more
+    // than 2^32) that can only come from corrupt or misaligned input.
+    let multiplier = 1;
     let p = offset + 1;
 
     while (p < buffer.length) {
         const b = buffer[p++];
-        v += (b & 0x7F) << m;
-        m += 7;
+        v += (b & 0x7F) * multiplier;
+        if (v > MAX_HPACK_INT) return null;
+        multiplier *= 128;
         if ((b & 0x80) === 0) {
             return { value: v, newOffset: p };
         }
@@ -210,7 +222,7 @@ function readInt(buffer, offset, prefixBits, firstByteMask) {
  *
  * @param {Uint8Array} buffer
  * @param {number} offset
- * @returns {{ value: string, newOffset: number }|null}
+ * @returns {{ value: string, newOffset: number, octets: number }|null}
  */
 function readString(buffer, offset) {
     if (offset >= buffer.length) return null;
@@ -224,19 +236,10 @@ function readString(buffer, offset) {
 
     const raw = buffer.subarray(strStart, strStart + len);
 
-    let str;
-    if (isHuffman) {
-        try {
-            str = decodeHuffman(raw);
-        } catch {
-            // Graceful fallback for malformed Huffman data
-            str = new TextDecoder('utf-8', { fatal: false }).decode(raw);
-        }
-    } else {
-        str = new TextDecoder('utf-8', { fatal: false }).decode(raw);
-    }
+    const octets = isHuffman ? decodeHuffmanBytes(raw) : raw;
+    const str = new TextDecoder('utf-8', { fatal: false }).decode(octets);
 
-    return { value: str, newOffset: strStart + len };
+    return { value: str, newOffset: strStart + len, octets: octets.length };
 }
 
 // ─── HPACK Decoder (RFC 7541) ────────────────────────────────────────────────
@@ -264,7 +267,7 @@ export class HpackDecoder {
      * Indices 1–61 map to the static table; indices >= 62 map to the dynamic table.
      *
      * @param {number} index - 1-based HPACK index
-     * @returns {{ name: string, value: string }|null}
+     * @returns {{ name: string, value: string, nameOctets?: number }|null}
      */
     _lookup(index) {
         if (index <= 0) return null;
@@ -283,18 +286,22 @@ export class HpackDecoder {
      * Inserts a header into the dynamic table, evicting entries as needed
      * to stay within the max table size (RFC 7541 Section 4.4).
      *
-     * Each entry's size is defined as: name.length + value.length + 32
+     * Each entry's size is defined as: name octets + value octets + 32.
+     * Octet counts (not JS string lengths) matter: non-ASCII values would
+     * otherwise desynchronise eviction from the encoder's table.
      *
      * @param {string} name
      * @param {string} value
+     * @param {number} nameOctets
+     * @param {number} valueOctets
      */
-    _insert(name, value) {
-        const entrySize = name.length + value.length + 32;
+    _insert(name, value, nameOctets, valueOctets) {
+        const entrySize = nameOctets + valueOctets + 32;
 
         // Evict entries from the end (oldest) until the new entry fits
         while (this.currentTableSize + entrySize > this.maxTableSize && this.dynamicTable.length > 0) {
             const evicted = this.dynamicTable.pop();
-            this.currentTableSize -= (evicted.name.length + evicted.value.length + 32);
+            this.currentTableSize -= evicted.size;
         }
 
         // If the entry itself is larger than the table, just clear the table
@@ -305,22 +312,41 @@ export class HpackDecoder {
         }
 
         // Insert at the front (newest entry = lowest dynamic index)
-        this.dynamicTable.unshift({ name, value });
+        this.dynamicTable.unshift({ name, value, nameOctets, size: entrySize });
         this.currentTableSize += entrySize;
     }
 
     /**
-     * Decodes a complete header block fragment (Uint8Array) into an array of
-     * { name, value } header pairs.
+     * Resolves the name for a literal representation: either an indexed
+     * name reference or a literal string that follows.
+     * @returns {{ name: string, nameOctets: number, offset: number }|null}
+     */
+    _readName(buffer, offset, index) {
+        if (index === 0) {
+            const nameRes = readString(buffer, offset);
+            if (!nameRes) return null;
+            return { name: nameRes.value, nameOctets: nameRes.octets, offset: nameRes.newOffset };
+        }
+        const entry = this._lookup(index);
+        if (!entry) return { name: 'unknown', nameOctets: 7, offset };
+        const nameOctets = entry.nameOctets !== undefined ? entry.nameOctets : entry.name.length;
+        return { name: entry.name, nameOctets, offset };
+    }
+
+    /**
+     * Decodes a complete header block (Uint8Array) into an array of
+     * { name, value } header pairs. Callers must pass a complete header
+     * block (HEADERS/PUSH_PROMISE + all CONTINUATION fragments) — decoding
+     * fragments independently desynchronises the dynamic table.
      *
-     * Implements all four HPACK header field representations:
+     * Implements all HPACK header field representations:
      *   - Indexed Header Field (Section 6.1)
      *   - Literal Header Field with Incremental Indexing (Section 6.2.1)
      *   - Literal Header Field without Indexing (Section 6.2.2)
      *   - Literal Header Field Never Indexed (Section 6.2.3)
      *   - Dynamic Table Size Update (Section 6.3)
      *
-     * @param {Uint8Array} buffer - Header block fragment
+     * @param {Uint8Array} buffer - Header block
      * @returns {Array<{ name: string, value: string }>}
      */
     decode(buffer) {
@@ -347,26 +373,14 @@ export class HpackDecoder {
                 // Pattern: 01xxxxxx  — 6-bit prefix index (0 = new name)
                 const idxRes = readInt(buffer, offset, 6, 0x3F);
                 if (!idxRes) break;
-                offset = idxRes.newOffset;
-
-                let name;
-                if (idxRes.value === 0) {
-                    // New name
-                    const nameRes = readString(buffer, offset);
-                    if (!nameRes) break;
-                    name = nameRes.value;
-                    offset = nameRes.newOffset;
-                } else {
-                    const entry = this._lookup(idxRes.value);
-                    name = entry ? entry.name : 'unknown';
-                }
-
-                const valRes = readString(buffer, offset);
+                const nameRes = this._readName(buffer, idxRes.newOffset, idxRes.value);
+                if (!nameRes) break;
+                const valRes = readString(buffer, nameRes.offset);
                 if (!valRes) break;
                 offset = valRes.newOffset;
 
-                headers.push({ name, value: valRes.value });
-                this._insert(name, valRes.value);
+                headers.push({ name: nameRes.name, value: valRes.value });
+                this._insert(nameRes.name, valRes.value, nameRes.nameOctets, valRes.octets);
 
             } else if ((b & 0xF0) === 0x00 || (b & 0xF0) === 0x10) {
                 // ── Literal Header Field without Indexing (Section 6.2.2) ──
@@ -377,24 +391,13 @@ export class HpackDecoder {
                 // which are irrelevant for offline analysis.
                 const idxRes = readInt(buffer, offset, 4, 0x0F);
                 if (!idxRes) break;
-                offset = idxRes.newOffset;
-
-                let name;
-                if (idxRes.value === 0) {
-                    const nameRes = readString(buffer, offset);
-                    if (!nameRes) break;
-                    name = nameRes.value;
-                    offset = nameRes.newOffset;
-                } else {
-                    const entry = this._lookup(idxRes.value);
-                    name = entry ? entry.name : 'unknown';
-                }
-
-                const valRes = readString(buffer, offset);
+                const nameRes = this._readName(buffer, idxRes.newOffset, idxRes.value);
+                if (!nameRes) break;
+                const valRes = readString(buffer, nameRes.offset);
                 if (!valRes) break;
                 offset = valRes.newOffset;
 
-                headers.push({ name, value: valRes.value });
+                headers.push({ name: nameRes.name, value: valRes.value });
                 // Not added to dynamic table
 
             } else if ((b & 0xE0) === 0x20) {
@@ -408,7 +411,7 @@ export class HpackDecoder {
                 // Evict entries exceeding the new max
                 while (this.currentTableSize > this.maxTableSize && this.dynamicTable.length > 0) {
                     const evicted = this.dynamicTable.pop();
-                    this.currentTableSize -= (evicted.name.length + evicted.value.length + 32);
+                    this.currentTableSize -= evicted.size;
                 }
 
             } else {

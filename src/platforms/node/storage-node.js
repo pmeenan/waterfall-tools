@@ -14,26 +14,62 @@ export class NativeStorage {
         this.hash = hash;
         this.filePath = path.join(os.tmpdir(), `waterfall_opfs_${hash}`);
         this.fd = null;
+        this._openPromise = null;
     }
 
     async init() {
     }
 
     async writeStream(stream) {
-        // Pipe the Web ReadableStream to a Node WritableStream 
+        // Pipe the Web ReadableStream to a Node WritableStream
         const nodeStream = fs.createWriteStream(this.filePath);
+        let streamError = null;
+        const onError = (err) => {
+            if (!streamError) streamError = err;
+        };
+        nodeStream.on('error', onError);
         const reader = stream.getReader();
         try {
             while (true) {
+                if (streamError) throw streamError;
                 const { done, value } = await reader.read();
                 if (done) break;
+                if (streamError) throw streamError;
                 if (!nodeStream.write(value)) {
-                    await new Promise(resolve => nodeStream.once('drain', resolve));
+                    await new Promise((resolve, reject) => {
+                        if (streamError) return reject(streamError);
+                        const onDrain = () => {
+                            nodeStream.removeListener('error', onDrainErr);
+                            resolve();
+                        };
+                        const onDrainErr = (err) => {
+                            nodeStream.removeListener('drain', onDrain);
+                            reject(err);
+                        };
+                        nodeStream.once('drain', onDrain);
+                        nodeStream.once('error', onDrainErr);
+                    });
                 }
             }
+            await new Promise((resolve, reject) => {
+                if (streamError) return reject(streamError);
+                const onFinish = () => {
+                    nodeStream.removeListener('error', onFinishErr);
+                    resolve();
+                };
+                const onFinishErr = (err) => {
+                    nodeStream.removeListener('finish', onFinish);
+                    reject(err);
+                };
+                nodeStream.once('finish', onFinish);
+                nodeStream.once('error', onFinishErr);
+                nodeStream.end();
+            });
+        } catch (err) {
+            nodeStream.destroy();
+            throw err;
         } finally {
-            nodeStream.end();
-            await new Promise(resolve => nodeStream.once('finish', resolve));
+            try { reader.releaseLock(); } catch {}
         }
     }
 
@@ -43,7 +79,16 @@ export class NativeStorage {
 
     async read(offset, length) {
         if (!this.fd) {
-            this.fd = await fsp.open(this.filePath, 'r');
+            if (!this._openPromise) {
+                this._openPromise = fsp.open(this.filePath, 'r').then(handle => {
+                    this.fd = handle;
+                    return handle;
+                }).catch(err => {
+                    this._openPromise = null;
+                    throw err;
+                });
+            }
+            await this._openPromise;
         }
         // Read into Uint8Array (Node natively supports this via Buffer)
         const buf = new Uint8Array(length);
@@ -57,6 +102,12 @@ export class NativeStorage {
     }
 
     async destroy() {
+        if (this._openPromise && !this.fd) {
+            try {
+                this.fd = await this._openPromise;
+            } catch {}
+        }
+        this._openPromise = null;
         if (this.fd) {
             await this.fd.close().catch(() => {});
             this.fd = null;

@@ -179,6 +179,18 @@ export async function processTcpdumpNode(input, options = {}) {
 
         const tcpConnections = tcpReconstructor.getConnections();
 
+        // Record TLS handshake facts from the raw (still encrypted) client
+        // stream BEFORE Phase 2 replaces contiguousChunks with decrypted
+        // application data. Only connections whose first client bytes are a
+        // TLS Handshake record carrying a ClientHello are marked as TLS.
+        for (const conn of tcpConnections) {
+            const first = conn.clientFlow.contiguousChunks.find(c => c.bytes.length > 0);
+            if (first && first.bytes.length >= 6 && first.bytes[0] === 0x16 && first.bytes[1] === 0x03 && first.bytes[5] === 0x01) {
+                conn.isTls = true;
+                conn.tlsStartTime = first.time;
+            }
+        }
+
         // ── Phase 2: Decrypt TLS connections ──
         if (keyLogMap) {
             onProgress('Decrypting TLS...', 25);
@@ -385,7 +397,7 @@ async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry, option
             // proportional guess.
             const wireChunks = extractWireChunks(dataChunks);
             let streamed = null;
-            if (options.deps.decompressBodyPerChunk && wireChunks.length > 0) {
+            if (options?.deps?.decompressBodyPerChunk && wireChunks.length > 0) {
                 try {
                     streamed = await options.deps.decompressBodyPerChunk(wireChunks, ceHeader.value);
                 } catch (_) {
@@ -407,7 +419,7 @@ async function extractAndStoreBody(dataChunks, responseHeaders, reqEntry, option
                         }
                     }
                 }
-            } else {
+            } else if (options?.deps?.decompressBody) {
                 // Streaming path unavailable (e.g. pure-JS brotli fallback) or
                 // failed mid-stream. Decompress one-shot just for the body bytes.
                 // We intentionally do NOT populate `inflated` — missing data is
@@ -576,8 +588,8 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                 connectTimeMs = syn.time * 1000;
                 connectEndTimeMs = synAck.time * 1000;
             }
-            const clientHello = conn.clientFlow.contiguousChunks.find(c => c.bytes.length > 5);
-            if (clientHello) sslStartTimeMs = clientHello.time * 1000;
+            const clientHello = conn.isTls ? conn.tlsStartTime : null;
+            if (clientHello) sslStartTimeMs = clientHello * 1000;
             
             data.tcp_connections[conn.id.toString()] = {
                 ip: conn.serverIp,
@@ -591,9 +603,13 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
             };
         } else {
             if (conn.quicParams && conn.quicParams.handshakeTime) {
-                connectTimeMs = conn.clientFlow.frames[0].time * 1000;
-                connectEndTimeMs = conn.quicParams.handshakeTime * 1000;
-                sslStartTimeMs = connectTimeMs;
+                // Guard one-directional captures (e.g. only server→client datagrams seen)
+                const firstFrame = conn.clientFlow.frames[0] || conn.serverFlow.frames[0];
+                if (firstFrame) {
+                    connectTimeMs = firstFrame.time * 1000;
+                    connectEndTimeMs = conn.quicParams.handshakeTime * 1000;
+                    sslStartTimeMs = connectTimeMs;
+                }
             }
             data.quic_connections[conn.id.toString()] = {
                 ip: conn.serverIp,
@@ -767,7 +783,15 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                 statusText = parts.slice(2).join(' ');
             }
             const host = reqMsg.headers ? reqMsg.headers.find(h => h.name.toLowerCase() === 'host') : null;
-            const fullUrl = host ? `http://${host.value}${url}` : url;
+            const scheme = conn.isTls ? 'https' : 'http';
+            let fullUrl = url;
+            if (/^https?:\/\//i.test(url)) {
+                fullUrl = url; // absolute-form request target (proxy requests)
+            } else if (host) {
+                fullUrl = `${scheme}://${host.value}${url}`;
+            } else if (url) {
+                fullUrl = `${scheme}://${resolveHostname(conn.serverIp)}${url}`;
+            }
             reqs.push({
                 time: reqMsg.time, method: method, url: fullUrl,
                 headers: reqMsg.headers || [], responseHeaders: resMsg.headers || [],
@@ -795,7 +819,8 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
             reqs.push({
                 time: reqTime, method: method, url: `${scheme}://${auth}${path}`,
                 headers: stream.headers.client.filter(h => !h.name.startsWith(':')),
-                responseHeaders: stream.headers.server ? stream.headers.server.filter(h => !h.name.startsWith(':')) : [],
+                responseHeaders: (stream.headers.server ? stream.headers.server.filter(h => !h.name.startsWith(':')) : [])
+                    .concat(stream.trailers && stream.trailers.server ? stream.trailers.server.filter(h => !h.name.startsWith(':')) : []),
                 statusCode: status, data: stream.data.server || [],
                 httpVersion: "HTTP/2", streamId: id,
                 priority: stream.priority || null,
@@ -823,9 +848,16 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                  for (const res of stream.responses) {
                       if (res.headers && res.headers.length > 0) {
                            resHeaders = resHeaders.concat(res.headers);
-                           status = parseInt(resHeaders.find(h => h.name === ':status')?.value) || status;
+                           status = parseInt(res.headers.find(h => h.name === ':status')?.value) || status;
                       }
-                      if (res.data) {
+                      if (res.trailers && res.trailers.length > 0) {
+                           resHeaders = resHeaders.concat(res.trailers);
+                      }
+                      if (res.chunks && res.chunks.length > 0) {
+                           for (const chunk of res.chunks) {
+                                dataBlocks.push(chunk);
+                           }
+                      } else if (res.data) {
                            const byteLen = res.data.reduce((acc, b) => acc + (b.byteLength || b.length || 0), 0);
                            dataBlocks.push({ time: res.time || stream.time, length: byteLen, bytes: res.data });
                       }
@@ -834,7 +866,8 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
             const reqTime = stream.firstClientTime || stream.time;
             reqs.push({
                 time: reqTime, method: method, url: `${scheme}://${auth}${path}`,
-                headers: stream.headers ? stream.headers.filter(h => !h.name.startsWith(':')) : [],
+                headers: (stream.headers ? stream.headers.filter(h => !h.name.startsWith(':')) : [])
+                    .concat(stream.trailers ? stream.trailers.filter(h => !h.name.startsWith(':')) : []),
                 responseHeaders: resHeaders.filter(h => !h.name.startsWith(':')),
                 statusCode: status, data: dataBlocks, streamId: id,
                 httpVersion: "HTTP/3",
@@ -863,7 +896,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
     // Sniff MIME type from body content for requests missing Content-Type headers
     // (e.g. partially-decoded QUIC/TLS flows where headers couldn't be extracted)
     for (const req of Object.values(data.pages["page_0"].requests)) {
-        if (!req.mimeType && req.body) {
+        if (!req.mimeType && req.body && options?.deps?.sniffMimeType) {
             const sniffed = options.deps.sniffMimeType(req.body, req.bodyEncoding);
             if (sniffed) req.mimeType = sniffed;
         }
@@ -882,7 +915,7 @@ async function buildWaterfallDataFromTcpdump(tcpConnections, udpConnections, dns
                 url = req.url; start = req.time_start; break;
             }
             const ctHeader = req.responseHeaders.find(h => h.name.toLowerCase() === 'content-type');
-            if (ctHeader && ctHeader.value.includes('text/html') && req.status === 200) {
+            if (((ctHeader && ctHeader.value.includes('text/html')) || (req.mimeType && req.mimeType.includes('text/html'))) && req.status === 200) {
                 url = req.url; start = req.time_start; break;
             }
         }

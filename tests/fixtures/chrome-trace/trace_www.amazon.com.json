@@ -62569,12 +62569,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 87017,
+            "ts": 87.017,
             "bytes": 839,
             "inflated": 2496
           },
           {
-            "ts": 90603,
+            "ts": 90.603,
             "bytes": 1
           }
         ],
@@ -62585,7 +62585,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=&oit=0&gs_rn=42&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3.0600000009999997,
+        "_start": 3.060001,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -62771,7 +62771,7 @@
         "_method": "POST",
         "_url": "https://beacons.gcp.gvt2.com/domainreliability/upload",
         "_quic_session": 20292,
-        "_start": 154.95500000299998,
+        "_start": 154.955003,
         "_request_headers": [
           ":method: POST",
           ":authority: beacons.gcp.gvt2.com",
@@ -63028,12 +63028,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 787008,
+            "ts": 787.008,
             "bytes": 838,
             "inflated": 2496
           },
           {
-            "ts": 793297,
+            "ts": 793.297,
             "bytes": 1
           }
         ],
@@ -63044,7 +63044,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=w&oit=1&cp=1&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 713.3700000050001,
+        "_start": 713.370005,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -63316,12 +63316,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 776830,
+            "ts": 776.83,
             "bytes": 841,
             "inflated": 2497
           },
           {
-            "ts": 780855,
+            "ts": 780.855,
             "bytes": 1
           }
         ],
@@ -63332,7 +63332,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.amazo&oit=1&cp=9&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 713.8740000070001,
+        "_start": 713.874007,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -63604,17 +63604,17 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 1674562,
+            "ts": 1674.562,
             "bytes": 1595,
             "inflated": 2492
           },
           {
-            "ts": 1674790,
+            "ts": 1674.79,
             "bytes": 470,
             "inflated": 1027
           },
           {
-            "ts": 1679077,
+            "ts": 1679.077,
             "bytes": 1
           }
         ],
@@ -63625,7 +63625,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=ww&oit=1&cp=2&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 1631.168000009,
+        "_start": 1631.168009,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -63897,12 +63897,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 1837990,
+            "ts": 1837.99,
             "bytes": 549,
             "inflated": 1005
           },
           {
-            "ts": 1840124,
+            "ts": 1840.124,
             "bytes": 1
           }
         ],
@@ -63913,7 +63913,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www&oit=1&cp=3&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 1801.013000011,
+        "_start": 1801.013011,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -64185,12 +64185,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2011459,
+            "ts": 2011.459,
             "bytes": 289,
             "inflated": 658
           },
           {
-            "ts": 2014201,
+            "ts": 2014.201,
             "bytes": 1
           }
         ],
@@ -64201,7 +64201,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.&oit=1&cp=4&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 1978.175000013,
+        "_start": 1978.175013,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -64267,7 +64267,7 @@
         "_all_end": 2011
       },
       {
-        "time": 36.18603515625,
+        "time": 36.185791015625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -64466,19 +64466,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 33.924072265625,
+          "wait": 33.923828125,
           "receive": 2.261962890625
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2652962,
+            "ts": 2652.962,
             "bytes": 290,
             "inflated": 659
           },
           {
-            "ts": 2654499,
+            "ts": 2654.499,
             "bytes": 1
           }
         ],
@@ -64489,7 +64489,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.a&oit=1&cp=5&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 2618.877000015,
+        "_start": 2618.877015,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -64761,12 +64761,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3180091,
+            "ts": 3180.091,
             "bytes": 322,
             "inflated": 667
           },
           {
-            "ts": 3181804,
+            "ts": 3181.804,
             "bytes": 1
           }
         ],
@@ -64777,7 +64777,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.am&oit=3&cp=6&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3135.952000017,
+        "_start": 3135.952017,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -65049,12 +65049,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3412133,
+            "ts": 3412.133,
             "bytes": 307,
             "inflated": 696
           },
           {
-            "ts": 3414192,
+            "ts": 3414.192,
             "bytes": 1
           }
         ],
@@ -65065,7 +65065,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.ama&oit=1&cp=7&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3372.134000019,
+        "_start": 3372.134019,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -65337,12 +65337,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3514645,
+            "ts": 3514.645,
             "bytes": 285,
             "inflated": 669
           },
           {
-            "ts": 3516383,
+            "ts": 3516.383,
             "bytes": 1
           }
         ],
@@ -65353,7 +65353,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.amaz&oit=1&cp=8&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3473.083000021,
+        "_start": 3473.0830210000004,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -65605,12 +65605,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3882390,
+            "ts": 3882.39,
             "bytes": 279,
             "inflated": 673
           },
           {
-            "ts": 3884703,
+            "ts": 3884.703,
             "bytes": 1
           }
         ],
@@ -65621,7 +65621,7 @@
         "_method": "GET",
         "_url": "https://clients4.google.com/chrome-sync/command/?client=Google+Chrome&client_id=jFadKHLnYtW5e9XBdrH0SA%3D%3D",
         "_quic_session": 442,
-        "_start": 3849.560000023,
+        "_start": 3849.560023,
         "_request_headers": [
           "Authorization: [360 bytes were stripped]",
           "Content-Encoding: gzip",
@@ -65936,12 +65936,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4068980,
+            "ts": 4068.98,
             "bytes": 280,
             "inflated": 674
           },
           {
-            "ts": 4071496,
+            "ts": 4071.496,
             "bytes": 1
           }
         ],
@@ -65952,7 +65952,7 @@
         "_method": "GET",
         "_url": "https://www.amazon.com/",
         "_quic_session": 442,
-        "_start": 4029.720000027,
+        "_start": 4029.720027,
         "_request_headers": [
           "device-memory: 8",
           "sec-ch-device-memory: 8",
@@ -70321,7 +70321,7 @@
         "connection": "20380",
         "_chunks": [
           {
-            "ts": 4124562,
+            "ts": 4124.562,
             "bytes": 361,
             "inflated": 352
           }
@@ -70333,7 +70333,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.amazon&oit=3&cp=10&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 20380,
-        "_start": 4038.501000025,
+        "_start": 4038.501025,
         "_request_headers": [
           ":method: POST",
           ":authority: clients4.google.com",
@@ -70592,12 +70592,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4302654,
+            "ts": 4302.654,
             "bytes": 285,
             "inflated": 661
           },
           {
-            "ts": 4304602,
+            "ts": 4304.602,
             "bytes": 1
           }
         ],
@@ -70608,7 +70608,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.amazon.&oit=3&cp=11&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 4268.080000029,
+        "_start": 4268.080029,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -70880,12 +70880,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4774049,
+            "ts": 4774.049,
             "bytes": 351,
             "inflated": 814
           },
           {
-            "ts": 4775767,
+            "ts": 4775.767,
             "bytes": 1
           }
         ],
@@ -70896,7 +70896,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.amazon.c&oit=1&cp=12&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 4740.048000031,
+        "_start": 4740.048031,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -71078,7 +71078,7 @@
         "_method": "POST",
         "_url": "https://google.com/domainreliability/upload",
         "_quic_session": 20413,
-        "_start": 4811.031000032999,
+        "_start": 4811.031033,
         "_request_headers": [
           ":method: POST",
           ":authority: google.com",
@@ -71337,12 +71337,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 5021049,
+            "ts": 5021.049,
             "bytes": 346,
             "inflated": 805
           },
           {
-            "ts": 5023799,
+            "ts": 5023.799,
             "bytes": 1
           }
         ],
@@ -71353,7 +71353,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.amazon.co&oit=3&cp=13&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 4982.999000035,
+        "_start": 4982.999035,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -71419,7 +71419,7 @@
         "_all_end": 5020
       },
       {
-        "time": 38.10205078125,
+        "time": 38.101806640625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -71618,19 +71618,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 35.869140625,
+          "wait": 35.868896484375,
           "receive": 2.23291015625
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 5219053,
+            "ts": 5219.053,
             "bytes": 348,
             "inflated": 806
           },
           {
-            "ts": 5220358,
+            "ts": 5220.358,
             "bytes": 1
           }
         ],
@@ -71641,7 +71641,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.amazon.com&oit=3&cp=14&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 5183.160000037,
+        "_start": 5183.160037,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -71707,7 +71707,7 @@
         "_all_end": 5218
       },
       {
-        "time": 33.9267578125,
+        "time": 33.927001953125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -71878,19 +71878,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 31.101806640625,
+          "wait": 31.10205078125,
           "receive": 2.824951171875
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 5463472,
+            "ts": 5463.472,
             "bytes": 347,
             "inflated": 808
           },
           {
-            "ts": 5465510,
+            "ts": 5465.51,
             "bytes": 1
           }
         ],
@@ -71901,7 +71901,7 @@
         "_method": "GET",
         "_url": "https://optimizationguide-pa.googleapis.com/v1:GetHints?",
         "_quic_session": 442,
-        "_start": 5432.171000039,
+        "_start": 5432.171039,
         "_request_headers": [
           "X-Goog-Api-Key: AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
           "Content-Type: application/x-protobuf"
@@ -72071,7 +72071,7 @@
         "connection": "20444",
         "_chunks": [
           {
-            "ts": 6031534,
+            "ts": 6031.534,
             "bytes": 9436,
             "inflated": 12576
           }
@@ -72083,7 +72083,7 @@
         "_method": "POST",
         "_url": "https://m.media-amazon.com/images/I/21skJF47J6L._RC%7C51Y8Xg9itbL.css_.css?AUIClients/AmazonUI",
         "_quic_session": 20444,
-        "_start": 6001.367000040999,
+        "_start": 6001.367041,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -72137,7 +72137,7 @@
         "_all_end": 6043
       },
       {
-        "time": 509.513916015625,
+        "time": 509.51416015625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -72344,124 +72344,124 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 122.282958984375,
+          "wait": 122.283203125,
           "receive": 387.23095703125
         },
         "serverIPAddress": "",
         "connection": "20483",
         "_chunks": [
           {
-            "ts": 6112506,
+            "ts": 6112.506,
             "bytes": 5413,
             "inflated": 11314
           },
           {
-            "ts": 6128267,
+            "ts": 6128.267,
             "bytes": 9554,
             "inflated": 24709
           },
           {
-            "ts": 6131036,
+            "ts": 6131.036,
             "bytes": 16370,
             "inflated": 63801
           },
           {
-            "ts": 6132737,
+            "ts": 6132.737,
             "bytes": 8565,
             "inflated": 20933
           },
           {
-            "ts": 6133318,
+            "ts": 6133.318,
             "bytes": 1072,
             "inflated": 2875
           },
           {
-            "ts": 6186735,
+            "ts": 6186.735,
             "bytes": 16378,
-            "inflated": 2086
+            "inflated": 67622
           },
           {
-            "ts": 6187547,
+            "ts": 6187.547,
             "bytes": 1710,
             "inflated": 7439
           },
           {
-            "ts": 6394657,
+            "ts": 6394.657,
             "bytes": 6303,
             "inflated": 33370
           },
           {
-            "ts": 6396128,
+            "ts": 6396.128,
             "bytes": 16370,
-            "inflated": 28429
+            "inflated": 93965
           },
           {
-            "ts": 6398050,
+            "ts": 6398.05,
             "bytes": 17127,
-            "inflated": 24999
+            "inflated": 90535
           },
           {
-            "ts": 6399642,
+            "ts": 6399.642,
             "bytes": 15023,
-            "inflated": 11397
+            "inflated": 76933
           },
           {
-            "ts": 6421245,
+            "ts": 6421.245,
             "bytes": 3358,
             "inflated": 13923
           },
           {
-            "ts": 6491355,
+            "ts": 6491.355,
             "bytes": 16370,
-            "inflated": 24580
+            "inflated": 90116
           },
           {
-            "ts": 6492275,
+            "ts": 6492.275,
             "bytes": 14277,
-            "inflated": 15434
+            "inflated": 80970
           },
           {
-            "ts": 6492657,
+            "ts": 6492.657,
             "bytes": 2101,
             "inflated": 16802
           },
           {
-            "ts": 6493061,
+            "ts": 6493.061,
             "bytes": 16069,
-            "inflated": 61543
+            "inflated": 127079
           },
           {
-            "ts": 6493492,
+            "ts": 6493.492,
             "bytes": 289,
             "inflated": 2493
           },
           {
-            "ts": 6494552,
+            "ts": 6494.552,
             "bytes": 5709,
             "inflated": 15705
           },
           {
-            "ts": 6495065,
+            "ts": 6495.065,
             "bytes": 2053,
             "inflated": 8078
           },
           {
-            "ts": 6495659,
+            "ts": 6495.659,
             "bytes": 15756,
             "inflated": 51241
           },
           {
-            "ts": 6496159,
+            "ts": 6496.159,
             "bytes": 614,
             "inflated": 1588
           },
           {
-            "ts": 6498562,
+            "ts": 6498.562,
             "bytes": 32768,
-            "inflated": 5751
+            "inflated": 71287
           },
           {
-            "ts": 6499039,
+            "ts": 6499.039,
             "bytes": 2005,
             "inflated": 2981
           }
@@ -72473,7 +72473,7 @@
         "_method": "GET",
         "_url": "https://www.amazon.com/suggestions",
         "_quic_session": 20483,
-        "_start": 6043.666000043,
+        "_start": 6043.666042999999,
         "_request_headers": [
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
           "sec-ch-ua-platform: \"Linux\"",
@@ -72713,7 +72713,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 6079721,
+            "ts": 6079.721,
             "bytes": 20
           }
         ],
@@ -72723,7 +72723,7 @@
         "_created": 6001.751,
         "_method": "OPTIONS",
         "_url": "https://unagi.amazon.com/1/events/com.amazon.csm.csa.prod",
-        "_start": 6059.240000045,
+        "_start": 6059.240045,
         "_request_headers": [
           "Host: unagi.amazon.com",
           "Connection: keep-alive",
@@ -72935,7 +72935,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 6104193,
+            "ts": 6104.193,
             "bytes": 20
           }
         ],
@@ -72945,7 +72945,7 @@
         "_created": 6002.192,
         "_method": "OPTIONS",
         "_url": "https://unagi.amazon.com/1/events/com.amazon.csm.customsg.prod",
-        "_start": 6080.698000047,
+        "_start": 6080.698047,
         "_request_headers": [
           "Host: unagi.amazon.com",
           "Connection: keep-alive",
@@ -73120,7 +73120,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 6149686,
+            "ts": 6149.686,
             "bytes": 22,
             "inflated": 2
           }
@@ -73131,7 +73131,7 @@
         "_created": 6080.077,
         "_method": "POST",
         "_url": "https://m.media-amazon.com/images/I/11sflnhgXuL._RC%7C61xgboVfIXL.js_.js?AUIClients/AmazonGatewayAuiAssets",
-        "_start": 6129.483000049,
+        "_start": 6129.4830489999995,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -73196,7 +73196,7 @@
         "_all_end": 6195
       },
       {
-        "time": 65.32421875,
+        "time": 65.323974609375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -73307,14 +73307,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 64.787109375,
+          "wait": 64.786865234375,
           "receive": 0.537109375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 6169796,
+            "ts": 6169.796,
             "bytes": 22,
             "inflated": 2
           }
@@ -73325,7 +73325,7 @@
         "_created": 6104.518,
         "_method": "POST",
         "_url": "https://m.media-amazon.com/images/S/sash/WOnTLzkiaEccV7F.woff2",
-        "_start": 6148.736000051,
+        "_start": 6148.736051,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -73685,7 +73685,7 @@
         "_all_end": 6433
       },
       {
-        "time": 18.532958984375,
+        "time": 18.533203125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -73804,14 +73804,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 17.765869140625,
+          "wait": 17.76611328125,
           "receive": 0.76708984375
         },
         "serverIPAddress": "",
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6426952,
+            "ts": 6426.952,
             "bytes": 4140
           }
         ],
@@ -73822,7 +73822,7 @@
         "_method": "GET",
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/DiscoTec/2026/Deals/BigSpringSale/Homepage/Shovelers/26Deals_BigSpringSale_18943_Shoveler_Home_1x._CB787249317_.jpg",
         "_quic_session": 20508,
-        "_start": 6409.306000101,
+        "_start": 6409.306101,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -74016,7 +74016,7 @@
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6427857,
+            "ts": 6427.857,
             "bytes": 10735
           }
         ],
@@ -74027,7 +74027,7 @@
         "_method": "GET",
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/DiscoTec/2026/Deals/BigSpringSale/Homepage/Shovelers/26Deals_BigSpringSale_18944_Shoveler_Fashion_1x._CB787249317_.jpg",
         "_quic_session": 20508,
-        "_start": 6409.610000103,
+        "_start": 6409.610103,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -74095,7 +74095,7 @@
         "_all_end": 6425
       },
       {
-        "time": 19.512939453125,
+        "time": 19.51318359375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -74214,14 +74214,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 19.0068359375,
+          "wait": 19.007080078125,
           "receive": 0.506103515625
         },
         "serverIPAddress": "",
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6428453,
+            "ts": 6428.453,
             "bytes": 6615
           }
         ],
@@ -74232,7 +74232,7 @@
         "_method": "GET",
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/DiscoTec/2026/Deals/BigSpringSale/Homepage/Shovelers/26Deals_BigSpringSale_18947_Shoveler_Premium_1x._CB787249317_.jpg",
         "_quic_session": 20508,
-        "_start": 6409.8180001050005,
+        "_start": 6409.818105,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -74614,7 +74614,7 @@
         "_all_end": 6432
       },
       {
-        "time": 26.317138671875,
+        "time": 26.31689453125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -74733,14 +74733,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 25.711181640625,
+          "wait": 25.7109375,
           "receive": 0.60595703125
         },
         "serverIPAddress": "",
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6436956,
+            "ts": 6436.956,
             "bytes": 4868
           }
         ],
@@ -74751,7 +74751,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/816FmlG3KuL._AC_SY200_.jpg",
         "_quic_session": 20508,
-        "_start": 6415.531000109,
+        "_start": 6415.5311090000005,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -74977,23 +74977,23 @@
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6497849,
+            "ts": 6497.849,
             "bytes": 11308
           },
           {
-            "ts": 6499403,
+            "ts": 6499.403,
             "bytes": 10048
           },
           {
-            "ts": 6499438,
+            "ts": 6499.438,
             "bytes": 1255
           },
           {
-            "ts": 6505875,
+            "ts": 6505.875,
             "bytes": 5020
           },
           {
-            "ts": 6506276,
+            "ts": 6506.276,
             "bytes": 2178
           }
         ],
@@ -75004,7 +75004,7 @@
         "_method": "GET",
         "_url": "https://www.amazon.com/empty.gif?1774655934004",
         "_quic_session": 20508,
-        "_start": 6482.7230001689995,
+        "_start": 6482.723169,
         "_request_headers": [
           "sec-ch-ua-platform-version: \"\"",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -75385,7 +75385,7 @@
         "connection": "20483",
         "_chunks": [
           {
-            "ts": 6572915,
+            "ts": 6572.915,
             "bytes": 25
           }
         ],
@@ -75396,7 +75396,7 @@
         "_method": "POST",
         "_url": "https://m.media-amazon.com/images/I/B1pQyImTTsL.js",
         "_quic_session": 20483,
-        "_start": 6489.654000171,
+        "_start": 6489.654171,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -75776,7 +75776,7 @@
         "_method": "HEAD",
         "_url": "https://m.media-amazon.com/images/S/sash/fSQBdeLBP_6CCch.js?sf-1.50.nvk8kmny",
         "_quic_session": 20483,
-        "_start": 6514.487000173,
+        "_start": 6514.487173,
         "_request_headers": [
           "Origin: https://m.media-amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -75959,7 +75959,7 @@
         "connection": "20483",
         "_chunks": [
           {
-            "ts": 6539244,
+            "ts": 6539.244,
             "bytes": 43
           }
         ],
@@ -75970,7 +75970,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/11+d9I1l9AL.js?xcp",
         "_quic_session": 20483,
-        "_start": 6515.049000175,
+        "_start": 6515.049175,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -76227,11 +76227,11 @@
         "_connect_end": 6523.857,
         "_ssl_start": 6484.358,
         "_ssl_end": 6523.839,
-        "_dnsTimeMs": 1685265653696,
-        "_dnsEndTimeMs": 1685265653707.289,
-        "_connectTimeMs": 1685265653707.289,
-        "_connectEndTimeMs": 1685265653760.162,
-        "_sslStartTimeMs": 1685265653720.6812,
+        "_dnsTimeMs": 1774655933373,
+        "_dnsEndTimeMs": 1774655933384.289,
+        "_connectTimeMs": 1774655933384.289,
+        "_connectEndTimeMs": 1774655933437.162,
+        "_sslStartTimeMs": 1774655933397.6812,
         "_load_start": 6456,
         "_ttfb_start": 6456,
         "_ttfb_end": 6613,
@@ -76335,7 +76335,7 @@
         "_created": 6459.282,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/61sS-XIvEXL._AC_SY200_.jpg",
-        "_start": 6537.662000159,
+        "_start": 6537.662159,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -76469,11 +76469,11 @@
         "_connect_end": 6577.639,
         "_ssl_start": 6559.4,
         "_ssl_end": 6577.631,
-        "_dnsTimeMs": 1685265653753,
-        "_dnsEndTimeMs": 1685265653775.074,
-        "_connectTimeMs": 1685265653775.074,
-        "_connectEndTimeMs": 1685265653807.046,
-        "_sslStartTimeMs": 1685265653788.815,
+        "_dnsTimeMs": 1774655933430,
+        "_dnsEndTimeMs": 1774655933452.074,
+        "_connectTimeMs": 1774655933452.074,
+        "_connectEndTimeMs": 1774655933484.046,
+        "_sslStartTimeMs": 1774655933465.815,
         "_load_start": 6513,
         "_ttfb_start": 6513,
         "_ttfb_end": 6652,
@@ -76565,7 +76565,7 @@
         "_created": 6516.167,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/51Kw3PC65qL._AC_PT0_BL0_SX312_SY426_FMwebp_QL25_.jpg",
-        "_start": 6586.760000179001,
+        "_start": 6586.760179,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -76686,7 +76686,7 @@
         "_created": 6515.733,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/G/01/vse/Discovery/adv-info2x.png",
-        "_start": 6610.064000177,
+        "_start": 6610.064177,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -77023,7 +77023,7 @@
         "connection": "20483",
         "_chunks": [
           {
-            "ts": 6729518,
+            "ts": 6729.518,
             "bytes": 2
           }
         ],
@@ -77034,7 +77034,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/61qoc2byR9L._SX3000_.jpg",
         "_quic_session": 20483,
-        "_start": 6653.991000399,
+        "_start": 6653.9913990000005,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -77375,11 +77375,11 @@
         "connection": "21004",
         "_chunks": [
           {
-            "ts": 6677501,
+            "ts": 6677.501,
             "bytes": 6784
           },
           {
-            "ts": 6683594,
+            "ts": 6683.594,
             "bytes": 9466
           }
         ],
@@ -77390,7 +77390,7 @@
         "_method": "GET",
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/DiscoTec/2026/Deals/BigSpringSale/Homepage/Shovelers/26Deals_BigSpringSale_18945_Shoveler_Beauty_1x._CB787249317_.jpg",
         "_quic_session": 21004,
-        "_start": 6657.013000397001,
+        "_start": 6657.013397,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -77462,7 +77462,7 @@
         "_all_end": 6688
       },
       {
-        "time": 35.65234375,
+        "time": 35.652099609375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -77601,29 +77601,29 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 25.26123046875,
+          "wait": 25.260986328125,
           "receive": 10.39111328125
         },
         "serverIPAddress": "",
         "connection": "21004",
         "_chunks": [
           {
-            "ts": 6674609,
+            "ts": 6674.609,
             "bytes": 23440,
-            "inflated": 7227
+            "inflated": 72763
           },
           {
-            "ts": 6677583,
+            "ts": 6677.583,
             "bytes": 7045,
             "inflated": 35932
           },
           {
-            "ts": 6683376,
+            "ts": 6683.376,
             "bytes": 11947,
-            "inflated": 4556
+            "inflated": 70092
           },
           {
-            "ts": 6684289,
+            "ts": 6684.289,
             "bytes": 1002,
             "inflated": 3197
           }
@@ -77635,7 +77635,7 @@
         "_method": "GET",
         "_url": "https://images-na.ssl-images-amazon.com/images/G/01/DiscoTec/2026/Deals/BigSpringSale/Homepage/Shovelers/26Deals_BigSpringSale_18946_Shoveler_CML_1x._CB787249317_.jpg",
         "_quic_session": 21004,
-        "_start": 6657.201000395,
+        "_start": 6657.201394999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -77708,7 +77708,7 @@
         "_all_end": 6689
       },
       {
-        "time": 42.14501953125,
+        "time": 42.145263671875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -77851,14 +77851,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 41.597900390625,
+          "wait": 41.59814453125,
           "receive": 0.547119140625
         },
         "serverIPAddress": "",
         "connection": "21004",
         "_chunks": [
           {
-            "ts": 6676210,
+            "ts": 6676.21,
             "bytes": 1310
           }
         ],
@@ -77871,7 +77871,7 @@
         "_priority": "MEDIUM",
         "_initial_priority": "MEDIUM",
         "_quic_session": 21004,
-        "_start": 6657.367000385,
+        "_start": 6657.367385,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -77931,7 +77931,7 @@
         "_all_end": 6696
       },
       {
-        "time": 43.244140625,
+        "time": 43.243896484375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -78074,14 +78074,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 42.68310546875,
+          "wait": 42.682861328125,
           "receive": 0.56103515625
         },
         "serverIPAddress": "",
         "connection": "21004",
         "_chunks": [
           {
-            "ts": 6676917,
+            "ts": 6676.917,
             "bytes": 330
           }
         ],
@@ -78094,7 +78094,7 @@
         "_priority": "MEDIUM",
         "_initial_priority": "MEDIUM",
         "_quic_session": 21004,
-        "_start": 6657.534000383,
+        "_start": 6657.534383,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -78276,7 +78276,7 @@
           "receive": 6.6259765625
         },
         "serverIPAddress": "",
-        "connection": "conn_req_107",
+        "connection": "conn_req_98",
         "_chunks": [],
         "_chunks_in": [],
         "_chunks_out": [],
@@ -78328,9 +78328,9 @@
         "_connect_end": 6656.938,
         "_ssl_start": 6648.947,
         "_ssl_end": 6656.938,
-        "_connectTimeMs": 1685265653885,
-        "_connectEndTimeMs": 1685265653892.991,
-        "_sslStartTimeMs": 1685265653885,
+        "_connectTimeMs": 1774655933562,
+        "_connectEndTimeMs": 1774655933569.991,
+        "_sslStartTimeMs": 1774655933562,
         "_load_start": 6645,
         "_ttfb_start": 6645,
         "_ttfb_end": 6681,
@@ -78339,7 +78339,7 @@
         "_all_end": 6687
       },
       {
-        "time": 48.98095703125,
+        "time": 48.981201171875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -78422,7 +78422,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 48.98095703125,
+          "wait": 48.981201171875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -78434,7 +78434,7 @@
         "_created": 6631.591,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/S/sash/x6ok$LYiGGUKJXl.png",
-        "_start": 6666.207000375,
+        "_start": 6666.207375,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -78581,11 +78581,11 @@
         "_connect_end": 6665.996,
         "_ssl_start": 6651.44,
         "_ssl_end": 6665.987,
-        "_dnsTimeMs": 1685265653868,
-        "_dnsEndTimeMs": 1685265653874.652,
-        "_connectTimeMs": 1685265653874.652,
-        "_connectEndTimeMs": 1685265653900.675,
-        "_sslStartTimeMs": 1685265653886.128,
+        "_dnsTimeMs": 1774655933545,
+        "_dnsEndTimeMs": 1774655933551.652,
+        "_connectTimeMs": 1774655933551.652,
+        "_connectEndTimeMs": 1774655933577.675,
+        "_sslStartTimeMs": 1774655933563.128,
         "_load_start": 6628,
         "_ttfb_start": 6628,
         "_ttfb_end": 6709,
@@ -78736,7 +78736,7 @@
         "connection": "20483",
         "_chunks": [
           {
-            "ts": 6799998,
+            "ts": 6799.998,
             "bytes": 25
           }
         ],
@@ -78747,7 +78747,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/61XUm00D5oL._SX3000_.jpg",
         "_quic_session": 20483,
-        "_start": 6702.887000407,
+        "_start": 6702.887406999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -78977,7 +78977,7 @@
         "_all_end": 6796
       },
       {
-        "time": 31.9150390625,
+        "time": 31.915283203125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -79128,14 +79128,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 31.43994140625,
+          "wait": 31.440185546875,
           "receive": 0.47509765625
         },
         "serverIPAddress": "",
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6740649,
+            "ts": 6740.649,
             "bytes": 9495
           }
         ],
@@ -79146,7 +79146,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/71IarGeYE5L._AC_SY200_.jpg",
         "_quic_session": 20508,
-        "_start": 6720.471000445,
+        "_start": 6720.471445,
         "_request_headers": [
           ":method: GET",
           ":authority: m.media-amazon.com",
@@ -79370,7 +79370,7 @@
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6782483,
+            "ts": 6782.483,
             "bytes": 15831
           }
         ],
@@ -79381,7 +79381,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/61G537GgmPL._AC_SY200_.jpg",
         "_quic_session": 20508,
-        "_start": 6729.885000573,
+        "_start": 6729.885573,
         "_request_headers": [
           ":method: GET",
           ":authority: m.media-amazon.com",
@@ -79605,11 +79605,11 @@
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6783121,
+            "ts": 6783.121,
             "bytes": 65536
           },
           {
-            "ts": 6819525,
+            "ts": 6819.525,
             "bytes": 27245
           }
         ],
@@ -79620,7 +79620,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/61wNeZ7YzOL._SX1500_.jpg",
         "_quic_session": 20508,
-        "_start": 6730.567000663,
+        "_start": 6730.567663,
         "_request_headers": [
           ":method: GET",
           ":authority: m.media-amazon.com",
@@ -79686,7 +79686,7 @@
         "_all_end": 6819
       },
       {
-        "time": 58.531005859375,
+        "time": 58.53125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -79837,14 +79837,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 58.06396484375,
+          "wait": 58.064208984375,
           "receive": 0.467041015625
         },
         "serverIPAddress": "",
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6786124,
+            "ts": 6786.124,
             "bytes": 41878
           }
         ],
@@ -79855,7 +79855,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/51TncROHx5L._SX1500_.jpg",
         "_quic_session": 20508,
-        "_start": 6730.747000669,
+        "_start": 6730.747668999999,
         "_request_headers": [
           ":method: GET",
           ":authority: m.media-amazon.com",
@@ -80153,11 +80153,11 @@
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6823847,
+            "ts": 6823.847,
             "bytes": 65536
           },
           {
-            "ts": 6825628,
+            "ts": 6825.628,
             "bytes": 52047
           }
         ],
@@ -80168,7 +80168,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/71H3irdu5WL._SX3000_.jpg",
         "_quic_session": 20508,
-        "_start": 6748.161000677,
+        "_start": 6748.161677,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -80399,7 +80399,7 @@
         "_all_end": 6825
       },
       {
-        "time": 67.053955078125,
+        "time": 67.05419921875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -80482,7 +80482,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 67.053955078125,
+          "wait": 67.05419921875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -80494,7 +80494,7 @@
         "_created": 6739.817,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/81w-nQAM+LL._SX3000_.jpg",
-        "_start": 6767.159000679,
+        "_start": 6767.159678999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -80721,7 +80721,7 @@
         "connection": "21004",
         "_chunks": [
           {
-            "ts": 6824664,
+            "ts": 6824.664,
             "bytes": 4750
           }
         ],
@@ -80732,7 +80732,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/51Kw3PC65qL._AC_PT0_BL0_SX312_SY426_FMwebp_QL95_.jpg",
         "_quic_session": 21004,
-        "_start": 6779.6740006830005,
+        "_start": 6779.674683,
         "_request_headers": [
           ":method: GET",
           ":authority: m.media-amazon.com",
@@ -80951,15 +80951,15 @@
         "connection": "21004",
         "_chunks": [
           {
-            "ts": 6825379,
+            "ts": 6825.379,
             "bytes": 65536
           },
           {
-            "ts": 6828889,
+            "ts": 6828.889,
             "bytes": 54688
           },
           {
-            "ts": 6828964,
+            "ts": 6828.964,
             "bytes": 31514
           }
         ],
@@ -80970,7 +80970,7 @@
         "_method": "GET",
         "_url": "https://images-na.ssl-images-amazon.com/images/I/215h87l68bL.js",
         "_quic_session": 21004,
-        "_start": 6797.604000685,
+        "_start": 6797.604684999999,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -81331,55 +81331,55 @@
         "connection": "20508",
         "_chunks": [
           {
-            "ts": 6976182,
+            "ts": 6976.182,
             "bytes": 41436
           },
           {
-            "ts": 6976749,
+            "ts": 6976.749,
             "bytes": 23325
           },
           {
-            "ts": 6977755,
+            "ts": 6977.755,
             "bytes": 41410
           },
           {
-            "ts": 6977803,
+            "ts": 6977.803,
             "bytes": 24126
           },
           {
-            "ts": 6979406,
+            "ts": 6979.406,
             "bytes": 41410
           },
           {
-            "ts": 6979893,
+            "ts": 6979.893,
             "bytes": 24126
           },
           {
-            "ts": 6980870,
+            "ts": 6980.87,
             "bytes": 41410
           },
           {
-            "ts": 6982166,
+            "ts": 6982.166,
             "bytes": 65536
           },
           {
-            "ts": 6982663,
+            "ts": 6982.663,
             "bytes": 24126
           },
           {
-            "ts": 6983444,
+            "ts": 6983.444,
             "bytes": 2505
           },
           {
-            "ts": 6984057,
+            "ts": 6984.057,
             "bytes": 31375
           },
           {
-            "ts": 6988989,
+            "ts": 6988.989,
             "bytes": 41402
           },
           {
-            "ts": 6989348,
+            "ts": 6989.348,
             "bytes": 13375
           }
         ],
@@ -81390,7 +81390,7 @@
         "_method": "GET",
         "_url": "https://fls-na.amazon.com/1/batch/1/OP/ATVPDKIKX0DER:130-1376750-4184438:H29NRDNB1D8CHHJFYFN0$uedata=s:%2Frd%2Fuedata%3Fld%26v%3D0.342060.0%26id%3DH29NRDNB1D8CHHJFYFN0%26sw%3D2558%26sh%3D1277%26vw%3D2292%26vh%3D940%26m%3D1%26sc%3DH29NRDNB1D8CHHJFYFN0%26ue%3D1%26bb%3D38%26ns%3D69%26ne%3D85%26cf%3D287%26af%3D338%26fn%3D338%26be%3D528%26fp%3D104%26fcp%3D104%26pc%3D880%26tc%3D-132%26na_%3D-132%26ul_%3D-1774655933628%26_ul%3D-1774655933628%26rd_%3D-1774655933628%26_rd%3D-1774655933628%26fe_%3D-110%26lk_%3D-110%26_lk%3D-110%26co_%3D-110%26_co%3D-110%26sc_%3D-1774655933628%26rq_%3D-110%26rs_%3D-5%26_rs%3D381%26dl_%3D-3%26di_%3D542%26de_%3D542%26_de%3D543%26_dc%3D880%26ld_%3D880%26_ld%3D-1774655933628%26ntd%3D0%26ty%3D0%26rc%3D0%26hob%3D1%26hoe%3D1%26ld%3D881%26t%3D1774655934509%26ctb%3D1%26rt%3Dcf%3A11-3-5-3-1-11-1_af%3A47-8-5-33-2-21-1_ld%3A300-16-11-258-5-41-1%26csmtags%3Daui%7Caui%3Aaui_build_date%3A3.26.2-2026-03-19%7Cnavbar%7Caui%3Asw%3Appft%3Alightsaber%3Aswd%3Aclient%3Aversion%3A1.0%7Caui%3Asw%3Appft%3Alightsaber%3Aswd%3Aclient%3Asupported%3Ayes%7Caui%3Asw%3Appft%3Apage_proxy%3Aactive%7Caui%3Asw%3Appft%3Apage_proxy%3Asw-start%7Caui%3Asw%3Appft%3Anp%3Aenabled%3Atrue%7CgwCFImgNoCache%7Cadrender%3A4293fb4d-96ae-46e9-81f1-7503c09f76f3%7Cadrender%3AGateway%3Aright-2%3Adesktop%7Cadrender%3Alightad%3A4293fb4d-96ae-46e9-81f1-7503c09f76f3%7Cadrender%3Alightad%3AGateway%3Aright-2%3Adesktop%7Cadrender%3A4293fb4d-96ae-46e9-81f1-7503c09f76f3%3Acreativeid%3A586853550469903064%7Cadrender%3AGateway%3Aright-2%3Adesktop%3Acreativeid%3A586853550469903064%7Cadrender%3A4293fb4d-96ae-46e9-81f1-7503c09f76f3%3Aprogramid%3A1001%7Cadrender%3AGateway%3Aright-2%3Adesktop%3Aprogramid%3A1001%7Cadrender%3A4293fb4d-96ae-46e9-81f1-7503c09f76f3%3Acreativetemplatename%3Aunknown%7Cadrender%3AGateway%3Aright-2%3Adesktop%3Acreativetemplatename%3Aunknown%7CFWCIMEnabled%7Cfls-na-amazon-com%7Cfy_cdn_fr%7Cfy_cdn_mp%7Cadrender%7Cadrender%3Asafeframe%7Cadrender%3Acreativetemplatename%3Aunknown%7Cadrender%3Acreativeid%3A586951793431466375%7Cadrender%3Aprogramid%3A1002%7Cadrender%3Acreativeid%3A576511106641268024%7Cadblk_no%7CfiveColumn%7CfiveColumnRevised%7CflexLayout%7CcssGridLayout%7Caui%3Acss%3Acache%7Caui%3Ajs%3Acache%7Caui%3Aajax%26viz%3Dvisible%3A1%26pty%3DGateway%26spty%3Ddesktop%26pti%3Ddesktop%26tid%3DH29NRDNB1D8CHHJFYFN0%26aftb%3D1%26lob%3D1:882",
         "_quic_session": 20508,
-        "_start": 6963.213000701,
+        "_start": 6963.213701000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -81756,7 +81756,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7027907,
+            "ts": 7027.907,
             "bytes": 22,
             "inflated": 2
           }
@@ -81767,7 +81767,7 @@
         "_created": 7003.169,
         "_method": "POST",
         "_url": "https://fls-na.amazon.com/1/batch/1/OP/ATVPDKIKX0DER:130-1376750-4184438:H29NRDNB1D8CHHJFYFN0$uedata=s:%2Frd%2Fuedata%3Fld%26v%3D0.342060.0%26id%3DH29NRDNB1D8CHHJFYFN0%26ctb%3D1%26sc0%3Dadplacements%3Aviewablelatency%3AGateway%3Adesktop-homepage-btf-card-1%3Adesktop%26pc0%3D1210%26ld0%3D1210%26t0%3DFri%20Mar%2027%202026%2019%3A58%3A54%20GMT-0400%20(Eastern%20Daylight%20Time)%26pty%3DGateway%26spty%3Ddesktop%26pti%3Ddesktop%26tid%3DH29NRDNB1D8CHHJFYFN0%26aftb%3D1%26lob%3D1:1210",
-        "_start": 7004.075000711,
+        "_start": 7004.075711,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -82016,7 +82016,7 @@
         "_all_end": 7065
       },
       {
-        "time": 66.246826171875,
+        "time": 66.2470703125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -82087,14 +82087,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 65.77392578125,
+          "wait": 65.774169921875,
           "receive": 0.472900390625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 7068297,
+            "ts": 7068.297,
             "bytes": 43
           }
         ],
@@ -82104,7 +82104,7 @@
         "_created": 7002.05,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/G/01/javascripts/lib/popover/images/snake._CB485935611_.gif",
-        "_start": 7053.8090007069995,
+        "_start": 7053.809707,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -82223,7 +82223,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7067490,
+            "ts": 7067.49,
             "bytes": 43
           }
         ],
@@ -82233,7 +82233,7 @@
         "_created": 7014.548,
         "_method": "GET",
         "_url": "https://fls-na.amazon.com/1/batch/1/OP/ATVPDKIKX0DER:130-1376750-4184438:H29NRDNB1D8CHHJFYFN0$uedata=s:%2Frd%2Fuedata%3Fld%26v%3D0.342060.0%26id%3DH29NRDNB1D8CHHJFYFN0%26ctb%3D1%26sc0%3Dadplacements%3Aviewablelatency%3AGateway%3Aright-7%3Adesktop%26pc0%3D1210%26ld0%3D1210%26t0%3DFri%20Mar%2027%202026%2019%3A58%3A54%20GMT-0400%20(Eastern%20Daylight%20Time)%26pty%3DGateway%26spty%3Ddesktop%26pti%3Ddesktop%26tid%3DH29NRDNB1D8CHHJFYFN0%26aftb%3D1%26lob%3D1:1210",
-        "_start": 7053.892000717,
+        "_start": 7053.892717000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -82370,7 +82370,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7072712,
+            "ts": 7072.712,
             "bytes": 43
           }
         ],
@@ -82380,7 +82380,7 @@
         "_created": 7002.793,
         "_method": "GET",
         "_url": "https://fls-na.amazon.com/1/batch/1/OP/ATVPDKIKX0DER:130-1376750-4184438:H29NRDNB1D8CHHJFYFN0$uedata=s:%2Frd%2Fuedata%3Fld%26v%3D0.342060.0%26id%3DH29NRDNB1D8CHHJFYFN0%26ctb%3D1%26sc0%3Dadplacements%3Aviewablelatency%3A75d3542c-1cee-47bc-9c5e-77b6e550c987%26pc0%3D1210%26ld0%3D1210%26t0%3DFri%20Mar%2027%202026%2019%3A58%3A54%20GMT-0400%20(Eastern%20Daylight%20Time)%26csmtags%3Daui%3Asw%3Abrowser%3Aregister%3Asupported%26pty%3DGateway%26spty%3Ddesktop%26pti%3Ddesktop%26tid%3DH29NRDNB1D8CHHJFYFN0%26aftb%3D1%26lob%3D1:1210",
-        "_start": 7053.950000709,
+        "_start": 7053.950709,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -82517,7 +82517,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7069624,
+            "ts": 7069.624,
             "bytes": 43
           }
         ],
@@ -82527,7 +82527,7 @@
         "_created": 7015.776,
         "_method": "GET",
         "_url": "https://aes.us-east.ono.axp.amazon-adsystem.com/x/px?t=btr&bi=v1_CGrnR0MBiNmM5SKBdNwcwg72TDZYUONklph9nmHSr5OzOa1Lr6wiG80X5T9hsmizvpkXjZBsi3PzqgH4bx99Plcb_0_jLqiJTh5SNhsvFgvxRt8j4GUnxaMwDxS-brv7GdbVYEmi6ZFNQxJ_wQ2DFhocbhJSXJ8lWAw_APxlAEHSl7bw1AhrBAPuasG2afR2Ui9CIY2EwiU2Qm92OI0QIvMIi8601scgBRbQO6k0kQkW8IRhkfaqQ0M6gEX-z19BQmbxPODDuBR1z1QbL8lzOA_hQCCKhSDDFfGU0oLoS5Q7Ylit252v0jqJYxWbGorzyqkX8-5vY_3zhYCHMsnkBctq0O52ZRQbqIkl5_pELcMNwlN7X26b012Iw60iRm-jSCFSoWi4pzgymQ7JVZO6AllqZ7vWseg-YNUkOWZFjitHE7hZmyVKQWhByLh8IFEweZSKRdLFtsC9X3AYaAnLhrguWReGoEmSeRMxIIla_fmLPV52msbFgGeuMhIHS9Xuz6kMqVwbROpexEDe1wTAk22FGy0dLggPdzqOHWCvMr2xKXuramouyCNFTA2tLTi5QqJuvNYhfkX_79MK8IVeWVaGak090XU0mDVw-_3Qtk4znaea7oE_RgfNxC7WOtzeIm8QWf0XDBVIr_NIdvgR1BoR4qjrNQQv9BOgzFLqTP9p9MsXy2OZ_zcz&c=%7B%22measurementMethod%22%3A%22btr_client%22%7D",
-        "_start": 7054.041000718999,
+        "_start": 7054.041719,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -82657,7 +82657,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7068959,
+            "ts": 7068.959,
             "bytes": 43
           }
         ],
@@ -82667,7 +82667,7 @@
         "_created": 7003.661,
         "_method": "GET",
         "_url": "https://fls-na.amazon.com/1/batch/1/OP/ATVPDKIKX0DER:130-1376750-4184438:H29NRDNB1D8CHHJFYFN0$uedata=s:%2Frd%2Fuedata%3Fld%26v%3D0.342060.0%26id%3DH29NRDNB1D8CHHJFYFN0%26ctb%3D1%26sc0%3Dadplacements%3Aviewablelatency%3Aa141b4aa-72dc-40d9-9a10-31068a28da3f%26pc0%3D1210%26ld0%3D1210%26t0%3DFri%20Mar%2027%202026%2019%3A58%3A54%20GMT-0400%20(Eastern%20Daylight%20Time)%26pty%3DGateway%26spty%3Ddesktop%26pti%3Ddesktop%26tid%3DH29NRDNB1D8CHHJFYFN0%26aftb%3D1%26lob%3D1:1210",
-        "_start": 7054.091000713,
+        "_start": 7054.091713000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -82804,7 +82804,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7344328,
+            "ts": 7344.328,
             "bytes": 43
           }
         ],
@@ -82814,7 +82814,7 @@
         "_created": 7329.328,
         "_method": "GET",
         "_url": "https://ads.samba.tv/cookie_sync?https%3A%2F%2Fs.amazon-adsystem.com%2Fecm3%3Fex%3Dsamba.tv%26id%3D",
-        "_start": 7330.658000734999,
+        "_start": 7330.658735,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -82933,7 +82933,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7345886,
+            "ts": 7345.886,
             "bytes": 43
           }
         ],
@@ -82943,7 +82943,7 @@
         "_created": 7329.814,
         "_method": "GET",
         "_url": "https://www.imdb.com/ads/idsync?cid=a706a6beb&ex=imdb.com",
-        "_start": 7330.745000737,
+        "_start": 7330.745736999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -83145,7 +83145,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7345036,
+            "ts": 7345.036,
             "bytes": 43
           }
         ],
@@ -83155,7 +83155,7 @@
         "_created": 7330.102,
         "_method": "GET",
         "_url": "https://usersync.samplicio.us/amazon/pixel.gif?https://s.amazon-adsystem.com/ecm3?ex=luc.id&id=",
-        "_start": 7330.807000739,
+        "_start": 7330.807739,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -83347,7 +83347,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7349019,
+            "ts": 7349.019,
             "bytes": 43
           }
         ],
@@ -83357,7 +83357,7 @@
         "_created": 7330.377,
         "_method": "GET",
         "_url": "https://cm.g.doubleclick.net/pixel?google_nid=a9&google_cm&ex=doubleclick.net&gdpr_consent=",
-        "_start": 7330.914000741001,
+        "_start": 7330.9147410000005,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -83527,7 +83527,7 @@
         "_created": 7336.013,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/81kCF8wuZEL.js?AUIClients/FWCIMAssets",
-        "_start": 7336.714000743,
+        "_start": 7336.7147429999995,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -83700,7 +83700,7 @@
         "_created": 7336.44,
         "_method": "GET",
         "_url": "https://aes.us-east.ono.axp.amazon-adsystem.com/x/px?t=atf&bi=v1_CGrnR0MBiNmM5SKBdNwcwg72TDZYUONklph9nmHSr5OzOa1Lr6wiGc0X5Xp6ghe5ppc3-bFFmGPitDGjOSA7JEcb_0_jLqiJThFQPx8gFgL4Qdkt5GIow6AxDxS-Ybv3HdbTaUyg7pFLQxx8xAyDFhoTZxtSXpsiXgs8A_5gB0nQnrbw1AZiAATjacGxYfdxUiNELoOHwiU2Qm92OI0QIvMIi8601scgBRbQO6k0kQkW8IRhkfaqQ0M6gEX-z19BQmbxPODDuBR1z1QbL8lzOA_hQCCKhSDDFfGU0pXrXb4wAVy515-v0j2UTQPuRI2B5KMa4-5vY_3zkorVD8LlLuVI0-52ZRQbqIkl5_pELcMNwlN7X26b012Iw60iRm-jSCFSoWi4pzgymQ7JVZO6AllqZ7vWseg-YNUkOWZFji9YW_havQpZBHBSyLh8XFN1OLWLa_fbuua9X2o1CSyKuLA7QkywoEmQU3BzWoVduIKDIl52msbFjmeuMhIHS9bpxKgGr1wZRO5fw0bc0Q7GlnGACigfLw1fIHbeUzL4e-qrfyjiaiQizD9CVlyqeDu0E_Nv4IAIFlX90u8T8Z1YQVOcblc73Wa0vbdky6ynpGAjhqeL6opCV33Vu1LxC4W1JHASYP8xJ0ZV_qotbv9ksikV4azlbLUW_O1GiHE5lc6EKSdoBJrCVw&c=%7B%22atf%22%3Afalse%7D",
-        "_start": 7337.786000745,
+        "_start": 7337.786745,
         "_request_headers": [
           "Host: aes.us-east.ono.axp.amazon-adsystem.com",
           "Connection: keep-alive",
@@ -83872,7 +83872,7 @@
         "_created": 7336.92,
         "_method": "GET",
         "_url": "https://aes.us-east.ono.axp.amazon-adsystem.com/x/px?t=btr&bi=v1_CGrnR0MBiNmM5SKBdNwcwg72TDZYUONklph9nmHSr5OzOa1Lr6wiGc0X5Xp6ghe5ppc3-bFFmGPitDGjOSA7JEcb_0_jLqiJThFQPx8gFgL4Qdkt5GIow6AxDxS-Ybv3HdbTaUyg7pFLQxx8xAyDFhoTZxtSXpsiXgs8A_5gB0nQnrbw1AZiAATjacGxYfdxUiNELoOHwiU2Qm92OI0QIvMIi8601scgBRbQO6k0kQkW8IRhkfaqQ0M6gEX-z19BQmbxPODDuBR1z1QbL8lzOA_hQCCKhSDDFfGU0pXrXb4wAVy515-v0j2UTQPuRI2B5KMa4-5vY_3zkorVD8LlLuVI0-52ZRQbqIkl5_pELcMNwlN7X26b012Iw60iRm-jSCFSoWi4pzgymQ7JVZO6AllqZ7vWseg-YNUkOWZFji9YW_havQpZBHBSyLh8XFN1OLWLa_fbuua9X2o1CSyKuLA7QkywoEmQU3BzWoVduIKDIl52msbFjmeuMhIHS9bpxKgGr1wZRO5fw0bc0Q7GlnGACigfLw1fIHbeUzL4e-qrfyjiaiQizD9CVlyqeDu0E_Nv4IAIFlX90u8T8Z1YQVOcblc73Wa0vbdky6ynpGAjhqeL6opCV33Vu1LxC4W1JHASYP8xJ0ZV_qotbv9ksikV4azlbLUW_O1GiHE5lc6EKSdoBJrCVw&c=%7B%22measurementMethod%22%3A%22btr_client%22%7D",
-        "_start": 7351.413000747,
+        "_start": 7351.4137470000005,
         "_request_headers": [
           "Host: aes.us-east.ono.axp.amazon-adsystem.com",
           "Connection: keep-alive",
@@ -84044,7 +84044,7 @@
         "_created": 7337.382,
         "_method": "GET",
         "_url": "https://aes.us-east.ono.axp.amazon-adsystem.com/x/px?t=atf&bi=v1_CGrnR0MBiNmM5SKBdNwcwg72TDZYUONklph9nmHSr5OzOa1Lr6wiG80X5T9hsmizvpkXjZBsi3PzqgH4bx99Plcb_0_jLqiJTh5SNhsvFgvxRt8j4GUnxaMwDxS-brv7GdbVYEmi6ZFNQxJ_wQ2DFhocbhJSXJ8lWAw_APxlAEHSl7bw1AhrBAPuasG2afR2Ui9CIY2EwiU2Qm92OI0QIvMIi8601scgBRbQO6k0kQkW8IRhkfaqQ0M6gEX-z19BQmbxPODDuBR1z1QbL8lzOA_hQCCKhSDDFfGU0oLoS5Q7Ylit252v0jqJYxWbGorzyqkX8-5vY_3zhYCHMsnkBctq0O52ZRQbqIkl5_pELcMNwlN7X26b012Iw60iRm-jSCFSoWi4pzgymQ7JVZO6AllqZ7vWseg-YNUkOWZFjitHE7hZmyVKQWhByLh8IFEweZSKRdLFtsC9X3AYaAnLhrguWReGoEmSeRMxIIla_fmLPV52msbFgGeuMhIHS9Xuz6kMqVwbROpexEDe1wTAk22FGy0dLggPdzqOHWCvMr2xKXuramouyCNFTA2tLTi5QqJuvNYhfkX_79MK8IVeWVaGak090XU0mDVw-_3Qtk4znaea7oE_RgfNxC7WOtzeIm8QWf0XDBVIr_NIdvgR1BoR4qjrNQQv9BOgzFLqTP9p9MsXy2OZ_zcz&c=%7B%22atf%22%3Afalse%7D",
-        "_start": 7352.5080007490005,
+        "_start": 7352.508749,
         "_request_headers": [
           "Host: aes.us-east.ono.axp.amazon-adsystem.com",
           "Connection: keep-alive",
@@ -84223,7 +84223,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7408311,
+            "ts": 7408.311,
             "bytes": 312
           }
         ],
@@ -84233,7 +84233,7 @@
         "_created": 7308.738,
         "_method": "GET",
         "_url": "https://s.amazon-adsystem.com/v3/pr?exlist=n-ispot_n-samba.tv_imdb_adelphic_n-lucid_g&fv=1.0&a=cm&dmt=1&gdpr_consent=",
-        "_start": 7386.1590007330005,
+        "_start": 7386.159733,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -84375,7 +84375,7 @@
           "receive": 0.97802734375
         },
         "serverIPAddress": "",
-        "connection": "conn_req_119",
+        "connection": "conn_req_109",
         "_chunks": [],
         "_chunks_in": [],
         "_chunks_out": [],
@@ -84414,11 +84414,11 @@
         "_connect_end": 7386.065,
         "_ssl_start": 7331.51,
         "_ssl_end": 7386.061,
-        "_dnsTimeMs": 1685265654545,
-        "_dnsEndTimeMs": 1685265654556.75,
-        "_connectTimeMs": 1685265654556.75,
-        "_connectEndTimeMs": 1685265654621.882,
-        "_sslStartTimeMs": 1685265654567.331,
+        "_dnsTimeMs": 1774655934222,
+        "_dnsEndTimeMs": 1774655934233.75,
+        "_connectTimeMs": 1774655934233.75,
+        "_connectEndTimeMs": 1774655934298.882,
+        "_sslStartTimeMs": 1774655934244.331,
         "_load_start": 7305,
         "_ttfb_start": 7305,
         "_ttfb_end": 7480,
@@ -84537,7 +84537,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7434569,
+            "ts": 7434.569,
             "bytes": 827
           }
         ],
@@ -84547,7 +84547,7 @@
         "_created": 7414.803,
         "_method": "GET",
         "_url": "https://pi.ispot.tv/v2/TC-3673-1.gif?redir=https%3A%2F%2Fs.amazon-adsystem.com%2Fecm3%3Fex%3Dispot.tv%26id%3D%7BISID%7D",
-        "_start": 7415.3780007509995,
+        "_start": 7415.378751,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -84742,7 +84742,7 @@
         "_url": "https://pi.ispot.tv/v2/TC-3673-1.gif?redir=https%3A%2F%2Fs.amazon-adsystem.com%2Fecm3%3Fex%3Dispot.tv%26id%3D%7BISID%7D",
         "_priority": "MEDIUM",
         "_initial_priority": "MEDIUM",
-        "_start": 7491.908000762,
+        "_start": 7491.908762,
         "_request_headers": [
           ":method: GET",
           ":authority: pi.ispot.tv",
@@ -84913,7 +84913,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7520569,
+            "ts": 7520.569,
             "bytes": 43
           }
         ],
@@ -84923,7 +84923,7 @@
         "_created": 7499.316,
         "_method": "GET",
         "_url": "https://aes.us-east.ono.axp.amazon-adsystem.com/x/px?t=v&bi=v1_CGrnR1Af48ut3BemZ-sA-CXeX3p1WJ9uiph9nmHSr5OwOa1Lr6wicMwX5Q5IxTvrnKwi2J5fklPZ6HKaYARVJ1cb_0_jNqiJThBVPxwtFgT_Rtch42Iry6Y2DxS-Ybv2HdTRZU-g65lGRRl_xQ2DFhocbhJUUZolWg0-BvFgAUvTkLbo0AhiBgTjaMKxaOb8anMAbcSOz9dRRnJsPJpJZPsDi8yvj5wnCl_QNqJu3QoWpIJu27ukQw0zm0qkyVxJHmb1NOzDuE51gXJDB9JaYDmkX1iFyxbACO2p7rDeZqImHn2k44Co-k-5QCbnFrOemssk-OVOcYjmq6bZBdqZUP9d6OJ6cAcfq4kjg4VHL7R2wlN8KGuYtliL1LwvRRCYbyM3hxibmEkMo2_TN-KOBzl0R8vZt95FdfMDZk1r4VFfK8xwvlQCGUZ3yZgoKRZZf-DNOZG46LntG3BLDmHNy8FJBBXW0BvuOWU1J94krdb0HzAOkZqKtGKoZxsEXtO9zLYJrFkdEOtekEPchg_qql-7CHwCKw9abWnbBnmtdP0-G2vdQwRw-Fs0M3_fWEa5etIX5YoIFByWoKd6ge4IAVXbPVMLzUJR2uMTrI65zeFjneZpm7SiXZlKLRdsNLd5JQ&c=%7B%22v%22%3A%7B%22def%22%3A%22iab%22%2C%22p%22%3A0.5%2C%22t%22%3A1000%2C%22ib%22%3Atrue%7D%2C%22wh%22%3A940%2C%22ww%22%3A2308%2C%22sx%22%3A0%2C%22sy%22%3A0%2C%22ah%22%3A250%2C%22aw%22%3A300%2C%22top%22%3A519%2C%22left%22%3A1551.140869140625%2C%22ptv%22%3A1.41%2C%22ttv%22%3A1.071%7D",
-        "_start": 7499.683000763,
+        "_start": 7499.683763,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -85144,7 +85144,7 @@
         "_method": "GET",
         "_url": "https://www.imdb.com/ads/idsync?cid=a706a6beb&ex=imdb.com",
         "_quic_session": 21592,
-        "_start": 7503.2120007680005,
+        "_start": 7503.212768,
         "_request_headers": [
           ":method: GET",
           ":authority: www.imdb.com",
@@ -85377,7 +85377,7 @@
         "_method": "GET",
         "_url": "https://cm.g.doubleclick.net/pixel?google_nid=a9&google_cm&ex=doubleclick.net&gdpr_consent=",
         "_quic_session": 21579,
-        "_start": 7503.797000766,
+        "_start": 7503.797766,
         "_request_headers": [
           ":method: GET",
           ":authority: cm.g.doubleclick.net",
@@ -85562,7 +85562,7 @@
         "_created": 7438.887,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/513c4BPNJ6L.js?AUIClients/AmazonLightsaberPageAssets",
-        "_start": 7504.541000759,
+        "_start": 7504.541759,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -85609,7 +85609,7 @@
         "_all_end": 7578
       },
       {
-        "time": 17.445068359375,
+        "time": 17.44482421875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -85684,7 +85684,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 17.445068359375,
+          "wait": 17.44482421875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -85696,7 +85696,7 @@
         "_created": 7529.803,
         "_method": "GET",
         "_url": "https://unagi.amazon.com/1/events/com.amazon.csm.nexusclient.prod",
-        "_start": 7530.2000007649995,
+        "_start": 7530.200765,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -85845,7 +85845,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7554823,
+            "ts": 7554.823,
             "bytes": 43
           }
         ],
@@ -85855,7 +85855,7 @@
         "_created": 7534.241,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/212DXz9MONL.js?AUIClients/WebFlowIngressJs",
-        "_start": 7534.671000767,
+        "_start": 7534.671767,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -86000,7 +86000,7 @@
         "_created": 7438.282,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/31QQnN9HM+L.js?AUIClients/BotDetectionJSSignalCollectionAsset",
-        "_start": 7540.772000755,
+        "_start": 7540.772755,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -86162,7 +86162,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7573647,
+            "ts": 7573.647,
             "bytes": 43
           }
         ],
@@ -86172,7 +86172,7 @@
         "_created": 7539.793,
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/31fBRpKtZ2L.js?AUIClients/PuffAuiAssets",
-        "_start": 7555.456000769,
+        "_start": 7555.456769,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -86230,7 +86230,7 @@
         "_all_end": 7585
       },
       {
-        "time": 22.797119140625,
+        "time": 22.796875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -86381,14 +86381,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 22.1591796875,
+          "wait": 22.158935546875,
           "receive": 0.637939453125
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 7673612,
+            "ts": 7673.612,
             "bytes": 22,
             "inflated": 2
           }
@@ -86399,7 +86399,7 @@
         "_created": 7650.887,
         "_method": "POST",
         "_url": "https://www.amazon.com/rd/uedata?rid=H29NRDNB1D8CHHJFYFN0&sid=130-1376750-4184438&rx=SekcjyVcLYxtKnxScYhJ50y1gk398/Sh+zx40ZgD+PY",
-        "_start": 7652.103000771,
+        "_start": 7652.103771,
         "_request_headers": [
           "sec-ch-ua-platform-version: \"\"",
           "sec-ch-ua-full-version-list: \"Chromium\";v=\"146.0.7680.164\", \"Not-A.Brand\";v=\"24.0.0.0\", \"Google Chrome\";v=\"146.0.7680.164\"",
@@ -86600,7 +86600,7 @@
         "connection": "20483",
         "_chunks": [
           {
-            "ts": 8047982,
+            "ts": 8047.982,
             "bytes": 67,
             "inflated": 71
           }
@@ -86612,7 +86612,7 @@
         "_method": "GET",
         "_url": "https://m.media-amazon.com/images/I/41QQd2GsCXL.js?AUIClients/BotCXMetricsCollectionJSAsset",
         "_quic_session": 20483,
-        "_start": 8011.182000772999,
+        "_start": 8011.182773,
         "_request_headers": [
           "Origin: https://www.amazon.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -86985,12 +86985,12 @@
         "connection": "20483",
         "_chunks": [
           {
-            "ts": 8578318,
+            "ts": 8578.318,
             "bytes": 129,
             "inflated": 139
           },
           {
-            "ts": 8583368,
+            "ts": 8583.368,
             "bytes": 31,
             "inflated": 15
           }
@@ -87002,7 +87002,7 @@
         "_method": "GET",
         "_url": "https://unagi-na.amazon.com/1/events/com.amazon.BotCXPolicy.na.prod.bd",
         "_quic_session": 20483,
-        "_start": 8527.359000786999,
+        "_start": 8527.359787000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -87178,7 +87178,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8720720,
+            "ts": 8720.72,
             "bytes": 22,
             "inflated": 2
           }
@@ -87189,7 +87189,7 @@
         "_created": 8629.322,
         "_method": "POST",
         "_url": "https://www.amazon.com/service-worker.js",
-        "_start": 8699.302000788999,
+        "_start": 8699.302789000001,
         "_request_headers": [
           "Accept: */*",
           "Service-Worker: script"
@@ -87382,147 +87382,147 @@
         "connection": "20483",
         "_chunks": [
           {
-            "ts": 8937159,
+            "ts": 8937.159,
             "bytes": 9193,
             "inflated": 27944
           },
           {
-            "ts": 8937614,
+            "ts": 8937.614,
             "bytes": 16370,
             "inflated": 63410
           },
           {
-            "ts": 8937976,
+            "ts": 8937.976,
             "bytes": 2167,
             "inflated": 6174
           },
           {
-            "ts": 8938281,
+            "ts": 8938.281,
             "bytes": 7695,
             "inflated": 24576
           },
           {
-            "ts": 8938791,
+            "ts": 8938.791,
             "bytes": 5763,
             "inflated": 22947
           },
           {
-            "ts": 8939102,
+            "ts": 8939.102,
             "bytes": 1881,
             "inflated": 9821
           },
           {
-            "ts": 8940097,
+            "ts": 8940.097,
             "bytes": 10842,
             "inflated": 60365
           },
           {
-            "ts": 8940718,
+            "ts": 8940.718,
             "bytes": 16185,
             "inflated": 21555
           },
           {
-            "ts": 8941667,
+            "ts": 8941.667,
             "bytes": 29678,
             "inflated": 39331
           },
           {
-            "ts": 8942153,
+            "ts": 8942.153,
             "bytes": 1065,
             "inflated": 1629
           },
           {
-            "ts": 8942199,
+            "ts": 8942.199,
             "bytes": 7021,
             "inflated": 40960
           },
           {
-            "ts": 8942375,
+            "ts": 8942.375,
             "bytes": 9,
             "inflated": 26
           },
           {
-            "ts": 8942672,
+            "ts": 8942.672,
             "bytes": 1449,
             "inflated": 16358
           },
           {
-            "ts": 8943080,
+            "ts": 8943.08,
             "bytes": 1851,
             "inflated": 16384
           },
           {
-            "ts": 8943456,
+            "ts": 8943.456,
             "bytes": 2853,
             "inflated": 18512
           },
           {
-            "ts": 8943660,
+            "ts": 8943.66,
             "bytes": 3332,
             "inflated": 22448
           },
           {
-            "ts": 8944523,
+            "ts": 8944.523,
             "bytes": 1425,
             "inflated": 6101
           },
           {
-            "ts": 8944739,
+            "ts": 8944.739,
             "bytes": 6556,
             "inflated": 43051
           },
           {
-            "ts": 8945019,
+            "ts": 8945.019,
             "bytes": 2098,
             "inflated": 16384
           },
           {
-            "ts": 8945124,
+            "ts": 8945.124,
             "bytes": 1443,
             "inflated": 8192
           },
           {
-            "ts": 8945416,
+            "ts": 8945.416,
             "bytes": 2537,
             "inflated": 14039
           },
           {
-            "ts": 8945640,
+            "ts": 8945.64,
             "bytes": 504,
             "inflated": 2345
           },
           {
-            "ts": 8946488,
+            "ts": 8946.488,
             "bytes": 1341,
             "inflated": 8192
           },
           {
-            "ts": 8946753,
+            "ts": 8946.753,
             "bytes": 4779,
             "inflated": 32768
           },
           {
-            "ts": 8947728,
+            "ts": 8947.728,
             "bytes": 2853,
             "inflated": 18340
           },
           {
-            "ts": 8947902,
+            "ts": 8947.902,
             "bytes": 4284,
             "inflated": 29204
           },
           {
-            "ts": 8948360,
+            "ts": 8948.36,
             "bytes": 1719,
             "inflated": 9800
           },
           {
-            "ts": 8948781,
+            "ts": 8948.781,
             "bytes": 5706,
             "inflated": 36600
           },
           {
-            "ts": 8949433,
+            "ts": 8949.433,
             "bytes": 1043,
             "inflated": 3225
           }
@@ -87534,7 +87534,7 @@
         "_method": "GET",
         "_url": "https://unagi-na.amazon.com/1/events/com.amazon.eel.p.D16GClientSideMetrics.nexus",
         "_quic_session": 20483,
-        "_start": 8883.745000791001,
+        "_start": 8883.745791,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -87715,7 +87715,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9178035,
+            "ts": 9178.035,
             "bytes": 22,
             "inflated": 2
           }
@@ -87726,7 +87726,7 @@
         "_created": 9098.72,
         "_method": "POST",
         "_url": "https://unagi.amazon.com/1/events/com.amazon.eel.SearchAutocompleteUIServiceMetrics.nexus",
-        "_start": 9155.483000793001,
+        "_start": 9155.483793,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -87927,7 +87927,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 10355612,
+            "ts": 10355.612,
             "bytes": 20
           }
         ],
@@ -87937,7 +87937,7 @@
         "_created": 10330.054,
         "_method": "OPTIONS",
         "_url": "https://unagi.amazon.com/1/events/com.amazon.eel.SearchAutocompleteUIServiceMetrics.nexus",
-        "_start": 10331.192000795,
+        "_start": 10331.192794999999,
         "_request_headers": [
           "Host: unagi.amazon.com",
           "Connection: keep-alive",
@@ -87995,7 +87995,7 @@
         "_all_end": 10353
       },
       {
-        "time": 38.792724609375,
+        "time": 38.79296875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -88190,14 +88190,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 38.226806640625,
+          "wait": 38.22705078125,
           "receive": 0.56591796875
         },
         "serverIPAddress": "",
         "connection": "20483",
         "_chunks": [
           {
-            "ts": 10369592,
+            "ts": 10369.592,
             "bytes": 67,
             "inflated": 71
           }
@@ -88209,7 +88209,7 @@
         "_method": "GET",
         "_url": "https://www.amazon.com/rd/uedata?rid=H29NRDNB1D8CHHJFYFN0&sid=130-1376750-4184438&rx=4HaM0qvg2t+lF3LjtxpRkQ",
         "_quic_session": 20483,
-        "_start": 10331.482000797,
+        "_start": 10331.482797,
         "_request_headers": [
           ":method: GET",
           ":authority: www.amazon.com",
@@ -88453,7 +88453,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 10377241,
+            "ts": 10377.241,
             "bytes": 22,
             "inflated": 2
           }
@@ -88464,7 +88464,7 @@
         "_created": 10355.902,
         "_method": "POST",
         "_url": "https://unagi.amazon.com/1/events/com.amazon.eel.SearchAutocompleteUIServiceMetrics.nexus",
-        "_start": 10356.356000799,
+        "_start": 10356.356799000001,
         "_request_headers": [
           "Host: unagi.amazon.com",
           "Connection: keep-alive",

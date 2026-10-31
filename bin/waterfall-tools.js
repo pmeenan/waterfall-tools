@@ -99,12 +99,13 @@ async function main() {
     // Unconditional for consistency: file-output mode keeps a clean stdout too.
     console.log = (...logArgs) => console.error(...logArgs);
 
+    let tool = null;
     try {
         // Status goes to stderr: with no [output-file] the HAR JSON is written to stdout
         // (the README-documented `waterfall-tools in.cap > out.har` contract), so stdout
         // must stay pure JSON.
         console.error(`Processing file${positional.length > 1 ? 's' : ''}: ${positional.join(', ')}`);
-        const tool = new WaterfallTools();
+        tool = new WaterfallTools();
         if (positional.length > 1) {
             const buffers = multiInputBuffers || positional.map(file => new Uint8Array(fs.readFileSync(file)));
             await tool.loadBuffers(buffers, options);
@@ -124,7 +125,17 @@ async function main() {
         }
     } catch (e) {
         console.error("Failed to process file:", e);
-        process.exit(1);
+        process.exitCode = 1;
+    } finally {
+        // Release staged archive storage / lazy file handles (wptagent ZIPs keep a
+        // NativeStorage FileHandle open for on-demand resource extraction).
+        if (tool && typeof tool.destroy === 'function') {
+            try {
+                await tool.destroy();
+            } catch (e) {
+                console.error('Failed to clean up:', e);
+            }
+        }
     }
 }
 

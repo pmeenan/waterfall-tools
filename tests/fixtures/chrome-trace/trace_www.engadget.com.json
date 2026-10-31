@@ -71955,12 +71955,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 87304,
+            "ts": 87.304,
             "bytes": 830,
             "inflated": 2494
           },
           {
-            "ts": 94178,
+            "ts": 94.178,
             "bytes": 1
           }
         ],
@@ -71971,7 +71971,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=&oit=0&gs_rn=42&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 1.797000001,
+        "_start": 1.797001,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -72168,7 +72168,7 @@
         "_method": "POST",
         "_url": "https://beacons.gcp.gvt2.com/domainreliability/upload",
         "_quic_session": 6010,
-        "_start": 144.809000003,
+        "_start": 144.809003,
         "_request_headers": [
           ":method: POST",
           ":authority: beacons.gcp.gvt2.com",
@@ -72414,12 +72414,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 848069,
+            "ts": 848.069,
             "bytes": 830,
             "inflated": 2495
           },
           {
-            "ts": 853142,
+            "ts": 853.142,
             "bytes": 1
           }
         ],
@@ -72430,7 +72430,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=w&oit=1&cp=1&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 785.438000005,
+        "_start": 785.438005,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -72717,17 +72717,17 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 849577,
+            "ts": 849.577,
             "bytes": 445,
             "inflated": 663
           },
           {
-            "ts": 849912,
+            "ts": 849.912,
             "bytes": 384,
             "inflated": 1832
           },
           {
-            "ts": 853790,
+            "ts": 853.79,
             "bytes": 1
           }
         ],
@@ -72738,7 +72738,7 @@
         "_method": "GET",
         "_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQJKk4s-DyczYFIqYCkFmQ8M5jSZvxOoSGmVsOrWssvpeWsK5EBCv-2bs&s=10",
         "_quic_session": 442,
-        "_start": 785.895000007,
+        "_start": 785.895007,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -73025,17 +73025,17 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2049765,
+            "ts": 2049.765,
             "bytes": 419,
             "inflated": 641
           },
           {
-            "ts": 2050045,
+            "ts": 2050.045,
             "bytes": 1646,
             "inflated": 2878
           },
           {
-            "ts": 2053167,
+            "ts": 2053.167,
             "bytes": 1
           }
         ],
@@ -73046,7 +73046,7 @@
         "_method": "GET",
         "_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG2-oHnUSS9EfnWQII5-U_xD1vBRU19ZyMYP3msEU&s=10",
         "_quic_session": 442,
-        "_start": 2005.732000009,
+        "_start": 2005.732009,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -73249,7 +73249,7 @@
         "connection": "6051",
         "_chunks": [
           {
-            "ts": 2088149,
+            "ts": 2088.149,
             "bytes": 1463
           }
         ],
@@ -73260,7 +73260,7 @@
         "_method": "GET",
         "_url": "http://www.engadget.com/",
         "_quic_session": 6051,
-        "_start": 2070.039000013,
+        "_start": 2070.039013,
         "_request_headers": [
           "Upgrade-Insecure-Requests: 1",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -73576,12 +73576,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2218831,
+            "ts": 2218.831,
             "bytes": 549,
             "inflated": 1005
           },
           {
-            "ts": 2221038,
+            "ts": 2221.038,
             "bytes": 1
           }
         ],
@@ -73592,7 +73592,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www&oit=1&cp=3&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 2181.824000015,
+        "_start": 2181.824015,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -73879,12 +73879,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 2370769,
+            "ts": 2370.769,
             "bytes": 289,
             "inflated": 658
           },
           {
-            "ts": 2373272,
+            "ts": 2373.272,
             "bytes": 1
           }
         ],
@@ -73895,7 +73895,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.&oit=1&cp=4&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 2336.575000017,
+        "_start": 2336.575017,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -74182,12 +74182,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 3960002,
+            "ts": 3960.002,
             "bytes": 290,
             "inflated": 659
           },
           {
-            "ts": 3962690,
+            "ts": 3962.69,
             "bytes": 1
           }
         ],
@@ -74198,7 +74198,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.e&oit=1&cp=5&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 3925.237000019,
+        "_start": 3925.2370189999997,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -74485,12 +74485,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 4722886,
+            "ts": 4722.886,
             "bytes": 327,
             "inflated": 681
           },
           {
-            "ts": 4723812,
+            "ts": 4723.812,
             "bytes": 1
           }
         ],
@@ -74501,7 +74501,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.en&oit=1&cp=6&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 4690.212000021001,
+        "_start": 4690.212020999999,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -74788,12 +74788,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 5016247,
+            "ts": 5016.247,
             "bytes": 321,
             "inflated": 668
           },
           {
-            "ts": 5017859,
+            "ts": 5017.859,
             "bytes": 1
           }
         ],
@@ -74804,7 +74804,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.eng&oit=1&cp=7&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 4980.881000023,
+        "_start": 4980.881023,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -75091,12 +75091,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 5379852,
+            "ts": 5379.852,
             "bytes": 289,
             "inflated": 673
           },
           {
-            "ts": 5380223,
+            "ts": 5380.223,
             "bytes": 1
           }
         ],
@@ -75107,7 +75107,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.enga&oit=1&cp=8&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 5331.245000025,
+        "_start": 5331.245025,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -75394,12 +75394,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 5519013,
+            "ts": 5519.013,
             "bytes": 289,
             "inflated": 678
           },
           {
-            "ts": 5521483,
+            "ts": 5521.483,
             "bytes": 1
           }
         ],
@@ -75410,7 +75410,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.engad&oit=1&cp=9&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 5431.526000027,
+        "_start": 5431.526027,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -75697,12 +75697,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 5678117,
+            "ts": 5678.117,
             "bytes": 303,
             "inflated": 626
           },
           {
-            "ts": 5680851,
+            "ts": 5680.851,
             "bytes": 1
           }
         ],
@@ -75713,7 +75713,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.engadg&oit=1&cp=10&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 5638.636000029001,
+        "_start": 5638.636029,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -76000,12 +76000,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 6002215,
+            "ts": 6002.215,
             "bytes": 229,
             "inflated": 410
           },
           {
-            "ts": 6002537,
+            "ts": 6002.537,
             "bytes": 1
           }
         ],
@@ -76016,7 +76016,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.engadge&oit=1&cp=11&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 5957.585000031,
+        "_start": 5957.5850310000005,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -76303,12 +76303,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 6099650,
+            "ts": 6099.65,
             "bytes": 230,
             "inflated": 411
           },
           {
-            "ts": 6101035,
+            "ts": 6101.035,
             "bytes": 1
           }
         ],
@@ -76319,7 +76319,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.engadget&oit=1&cp=12&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 6058.262000033,
+        "_start": 6058.262033,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -76606,12 +76606,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 6333464,
+            "ts": 6333.464,
             "bytes": 222,
             "inflated": 378
           },
           {
-            "ts": 6335082,
+            "ts": 6335.082,
             "bytes": 1
           }
         ],
@@ -76622,7 +76622,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.engadget.&oit=1&cp=13&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 6296.098000035,
+        "_start": 6296.098035,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -76909,12 +76909,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 6603889,
+            "ts": 6603.889,
             "bytes": 221,
             "inflated": 377
           },
           {
-            "ts": 6606103,
+            "ts": 6606.103,
             "bytes": 1
           }
         ],
@@ -76925,7 +76925,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.engadget.c&oit=1&cp=14&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 6564.366000036999,
+        "_start": 6564.366037,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -77006,7 +77006,7 @@
         "_all_end": 6605
       },
       {
-        "time": 63.377197265625,
+        "time": 63.376953125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -77205,19 +77205,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 58.93408203125,
+          "wait": 58.933837890625,
           "receive": 4.443115234375
         },
         "serverIPAddress": "",
         "connection": "442",
         "_chunks": [
           {
-            "ts": 6794086,
+            "ts": 6794.086,
             "bytes": 223,
             "inflated": 378
           },
           {
-            "ts": 6797257,
+            "ts": 6797.257,
             "bytes": 1
           }
         ],
@@ -77228,7 +77228,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.engadget.co&oit=3&cp=15&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 6734.340000039,
+        "_start": 6734.340039,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -77515,12 +77515,12 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 6985470,
+            "ts": 6985.47,
             "bytes": 221,
             "inflated": 379
           },
           {
-            "ts": 6986971,
+            "ts": 6986.971,
             "bytes": 1
           }
         ],
@@ -77531,7 +77531,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/complete/search?client=chrome-omni&gs_ri=chrome-ext-ansg&xssi=t&q=www.engadget.com&oit=3&cp=16&pgcl=7&gs_rn=42&psi=Tu1PDHR0Ky4lbsAl&sugkey=AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
         "_quic_session": 442,
-        "_start": 6943.885000040999,
+        "_start": 6943.8850410000005,
         "_request_headers": [
           ":method: GET",
           ":authority: www.google.com",
@@ -77790,7 +77790,7 @@
         "connection": "442",
         "_chunks": [
           {
-            "ts": 7185460,
+            "ts": 7185.46,
             "bytes": 220,
             "inflated": 382
           }
@@ -77802,7 +77802,7 @@
         "_method": "GET",
         "_url": "https://optimizationguide-pa.googleapis.com/v1:GetHints?",
         "_quic_session": 442,
-        "_start": 7143.932000043,
+        "_start": 7143.932043,
         "_request_headers": [
           "X-Goog-Api-Key: AIzaSyBqJZh-7pA44blAaAkH6490hUFOwX0KCYM",
           "Content-Type: application/x-protobuf"
@@ -77985,7 +77985,7 @@
         "connection": "6205",
         "_chunks": [
           {
-            "ts": 7792510,
+            "ts": 7792.51,
             "bytes": 877,
             "inflated": 1587
           }
@@ -77997,7 +77997,7 @@
         "_method": "POST",
         "_url": "https://s.yimg.com/lo/mysterio/api/6B2A7D0994B49927111C4D1F6F8767FBE7DACA8B1D30266BB1DED822D2619157/subgraphmysterio/resizefill_w875_h494;quality_95;format_webp/https:%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2026-03%2Fc5faa660-29df-11f1-bff7-4695e9a3d287",
         "_quic_session": 6205,
-        "_start": 7683.539000049,
+        "_start": 7683.539049,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -78169,7 +78169,7 @@
         "connection": "6205",
         "_chunks": [
           {
-            "ts": 7783354,
+            "ts": 7783.354,
             "bytes": 644,
             "inflated": 932
           }
@@ -78181,7 +78181,7 @@
         "_method": "POST",
         "_url": "https://www.engadget.com/_gdgt/_next/static/media/4473ecc91f70f139-s.p.woff",
         "_quic_session": 6205,
-        "_start": 7683.726000045,
+        "_start": 7683.726045,
         "_request_headers": [
           "Origin: https://www.engadget.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -78398,19 +78398,19 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7974422,
+            "ts": 7974.422,
             "bytes": 6100,
             "inflated": 16991
           },
           {
-            "ts": 7981650,
+            "ts": 7981.65,
             "bytes": 25991,
-            "inflated": 21448
+            "inflated": 152520
           },
           {
-            "ts": 7989585,
+            "ts": 7989.585,
             "bytes": 18199,
-            "inflated": 5187
+            "inflated": 136259
           }
         ],
         "_chunks_in": [],
@@ -78419,7 +78419,7 @@
         "_created": 7658.343,
         "_method": "GET",
         "_url": "https://s.yimg.com/lo/mysterio/api/DBEB43F371EF81EDF3609055EA0F2B58996AA2C8F1A6680ABD82D9AF4D905398/subgraphmysterio/resizefill_w875_h494;quality_95;format_webp/https:%2F%2Fd29szjachogqwa.cloudfront.net%2Fimages%2Fuser-uploaded%2Ffender-lede.jpg",
-        "_start": 7706.318000051,
+        "_start": 7706.318051,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -78590,7 +78590,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 7742588,
+            "ts": 7742.588,
             "bytes": 28
           }
         ],
@@ -78600,7 +78600,7 @@
         "_created": 7659.273,
         "_method": "POST",
         "_url": "https://s.yimg.com/lo/mysterio/api/DC732DAF9FC01BC0461A0B14B2D280A11C1D7E207B23A11A359539F0FC0ED0BD/subgraphmysterio/resizefill_w875_h494;quality_95;format_webp/https:%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2026-02%2F20f554c0-1572-11f1-bffe-79706737dacd",
-        "_start": 7707.595000053,
+        "_start": 7707.595053,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -79052,7 +79052,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8010710,
+            "ts": 8010.71,
             "bytes": 968
           }
         ],
@@ -79062,7 +79062,7 @@
         "_created": 7996.521,
         "_method": "GET",
         "_url": "https://www.engadget.com/_gdgt/_next/static/chunks/app/not-found-136a500055b0b3d4.js",
-        "_start": 7997.822000071001,
+        "_start": 7997.8220710000005,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -79782,7 +79782,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8012502,
+            "ts": 8012.502,
             "bytes": 661,
             "inflated": 1559
           }
@@ -79793,7 +79793,7 @@
         "_created": 7996.841,
         "_method": "GET",
         "_url": "https://opus.analytics.yahoo.com/tag/opus.js",
-        "_start": 7998.565000075,
+        "_start": 7998.565075,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -80856,99 +80856,99 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8030216,
+            "ts": 8030.216,
             "bytes": 32768,
-            "inflated": 46285
+            "inflated": 111821
           },
           {
-            "ts": 8030551,
+            "ts": 8030.551,
             "bytes": 32768,
-            "inflated": 35301
+            "inflated": 100837
           },
           {
-            "ts": 8030810,
+            "ts": 8030.81,
             "bytes": 32768,
-            "inflated": 42797
+            "inflated": 108333
           },
           {
-            "ts": 8031750,
+            "ts": 8031.75,
             "bytes": 32768,
-            "inflated": 50784
+            "inflated": 116320
           },
           {
-            "ts": 8032306,
+            "ts": 8032.306,
             "bytes": 32768,
-            "inflated": 43702
+            "inflated": 109238
           },
           {
-            "ts": 8032587,
+            "ts": 8032.587,
             "bytes": 32768,
-            "inflated": 39764
+            "inflated": 105300
           },
           {
-            "ts": 8032853,
+            "ts": 8032.853,
             "bytes": 32768,
-            "inflated": 61872
+            "inflated": 127408
           },
           {
-            "ts": 8033154,
+            "ts": 8033.154,
             "bytes": 32768,
-            "inflated": 306
+            "inflated": 131378
           },
           {
-            "ts": 8033475,
+            "ts": 8033.475,
             "bytes": 32768,
-            "inflated": 39056
+            "inflated": 104592
           },
           {
-            "ts": 8033745,
+            "ts": 8033.745,
             "bytes": 32768,
-            "inflated": 57213
+            "inflated": 122749
           },
           {
-            "ts": 8034016,
+            "ts": 8034.016,
             "bytes": 32768,
-            "inflated": 50096
+            "inflated": 115632
           },
           {
-            "ts": 8034284,
+            "ts": 8034.284,
             "bytes": 32768,
-            "inflated": 19890
+            "inflated": 150962
           },
           {
-            "ts": 8034591,
+            "ts": 8034.591,
             "bytes": 32768,
-            "inflated": 21456
+            "inflated": 152528
           },
           {
-            "ts": 8034882,
+            "ts": 8034.882,
             "bytes": 32768,
-            "inflated": 48024
+            "inflated": 113560
           },
           {
-            "ts": 8035136,
+            "ts": 8035.136,
             "bytes": 32768,
-            "inflated": 40766
+            "inflated": 106302
           },
           {
-            "ts": 8035395,
+            "ts": 8035.395,
             "bytes": 32768,
-            "inflated": 47057
+            "inflated": 112593
           },
           {
-            "ts": 8035687,
+            "ts": 8035.687,
             "bytes": 32768,
-            "inflated": 51945
+            "inflated": 117481
           },
           {
-            "ts": 8035937,
+            "ts": 8035.937,
             "bytes": 32768,
-            "inflated": 414
+            "inflated": 549284
           },
           {
-            "ts": 8036362,
+            "ts": 8036.362,
             "bytes": 13902,
-            "inflated": 15440
+            "inflated": 212048
           }
         ],
         "_chunks_in": [],
@@ -80957,7 +80957,7 @@
         "_created": 8013.978,
         "_method": "GET",
         "_url": "https://www.engadget.com/_gdgt/_next/static/chunks/391.73e153cfa62d5666.js",
-        "_start": 8016.371000089,
+        "_start": 8016.371088999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -81023,7 +81023,7 @@
         "_all_end": 8037
       },
       {
-        "time": 17.4228515625,
+        "time": 17.423095703125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -81106,14 +81106,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 16.412841796875,
+          "wait": 16.4130859375,
           "receive": 1.010009765625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8031999,
+            "ts": 8031.999,
             "bytes": 14992,
             "inflated": 44326
           }
@@ -81124,7 +81124,7 @@
         "_created": 8014.691,
         "_method": "GET",
         "_url": "https://s.yimg.com/eh/prebid-config/engadget-us-desktop.json?v=20540",
-        "_start": 8018.006000097,
+        "_start": 8018.006097,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -81266,12 +81266,12 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8063365,
+            "ts": 8063.365,
             "bytes": 32768,
-            "inflated": 54431
+            "inflated": 119967
           },
           {
-            "ts": 8063793,
+            "ts": 8063.793,
             "bytes": 16548,
             "inflated": 62856
           }
@@ -81282,7 +81282,7 @@
         "_created": 7997.148,
         "_method": "GET",
         "_url": "https://ping.chartbeat.net/ping?h=engadget.com&p=https%3A%2F%2Fwww.engadget.com%2F&u=BjnWuwD9qDsRB5MRZh&d=engadget.com&g=67233&g0=homepage&g1=engadget&g4=homepage&n=0&f=00001&c=0&x=0&m=0&y=10057&o=2292&w=940&j=45&R=1&W=0&I=0&E=0&e=0&r=&PA=https%3A%2F%2Fwww.engadget.com%2F&b=457&t=D_WgoUDSJ-rPBLvogUBaJVD8Dd4AWd&V=141&i=Engadget%20%7C%20Technology%20News%20%26%20Reviews&tz=240&sn=1&sv=CBIW1KDS4E_MueAjwJErwvD420O8&sd=1&im=06672fff&_",
-        "_start": 8050.221000079,
+        "_start": 8050.221079,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -81346,7 +81346,7 @@
         "_all_end": 8115
       },
       {
-        "time": 70.771240234375,
+        "time": 70.77099609375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -81437,21 +81437,21 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 67.524169921875,
+          "wait": 67.52392578125,
           "receive": 3.2470703125
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8067066,
+            "ts": 8067.066,
             "bytes": 32768,
-            "inflated": 36585
+            "inflated": 102121
           },
           {
-            "ts": 8067938,
+            "ts": 8067.938,
             "bytes": 21656,
-            "inflated": 9365
+            "inflated": 74901
           }
         ],
         "_chunks_in": [],
@@ -81460,7 +81460,7 @@
         "_created": 7997.28,
         "_method": "GET",
         "_url": "https://3p-geo.yahoo.com/p?s=1197802876&t=c4dQ7l7bcOTGaVrZ,0.6908793499216814&_I=&_AO=0&_NOL=0&_R=&_P=3.78.0%05_a1s%03d%3DAQABBG33xmkCEMUIZBMXuBp1a9w0AoNjT2oFEgEBAQFIyGnQadxV0iMA_eMDAA%26S%3DAQAAAqqUQU4q7UCsynIHGvFsfBU%04_ga%03GA1.1.1925043291.1774647151%04_pl%031%04A_v%033.78.0%04A_cn%03ANALYTICS-EVERGREEN%04test%03benji-mergepbsbucket-test%04_bt%03rapid%04A_pr%03https%04A_tzoff%03-4%04_vuidList%03y2tXaX-gNgtl9JSizw9vZQ%2CFeMV2ip3MgCrDHEnPnI2iQ%2CLK7ThvS1XW2zThwVJOvg3g%2CLqbDWNgEviBUMzZ3nE-57Q%2CWpcCNYc8hAOpvN1TN52IMA%04_vuid%03eyIDXOeJopWx8IJsMWjCsA%04A_sid%034Dp6topS1ZCLXxfs%04_w%03www.engadget.com%2F%04A_id%031197802876%04colo%03gq1%04mrkt%03us%04navtype%03server%04partner%03none%04ver%03engadget-next%04adblock%030%04layout%03grid%04p_sec%03default%04pt%03home%04pct%03homepage%04A_pfb%03318%04A_pbp%0319%04A_psr%03283%04A_pol%03457%04A_pdi%03365%04A_pdl%0317%04A_psh%0316%04A_psc%0330%04A_pfe%03120%04A_res%03%5B%7B%22name%22%3A%22%22%2C%22dur%22%3A456%2C%22st%22%3A0%7D%2C%7B%22name%22%3A%22cmp.js%22%2C%22dur%22%3A83%2C%22st%22%3A332%7D%2C%7B%22name%22%3A%22benji-2.js%22%2C%22dur%22%3A83%2C%22st%22%3A332%7D%2C%7B%22name%22%3A%22consent.js%22%2C%22dur%22%3A79%2C%22st%22%3A332%7D%2C%7B%22name%22%3A%22long-animation-frame%22%2C%22dur%22%3A68%2C%22st%22%3A334%7D%2C%7B%22name%22%3A%22vendor-8d0e6c4675dab796.js%22%2C%22dur%22%3A52%2C%22st%22%3A331%7D%2C%7B%22name%22%3A%22page-4f1810d99f48673c.js%22%2C%22dur%22%3A47%2C%22st%22%3A332%7D%2C%7B%22name%22%3A%22Guardian-Text-Sans-Web-Bold.ca34ace2.woff2%22%2C%22dur%22%3A45%2C%22st%22%3A369%7D%2C%7B%22name%22%3A%22not-found-136a500055b0b3d4.js%22%2C%22dur%22%3A35%2C%22st%22%3A332%7D%2C%7B%22name%22%3A%22layout-3245ed5f936a1d7a.js%22%2C%22dur%22%3A35%2C%22st%22%3A332%7D%5D%04etrg%03backgroundPost%04outcm%03performance%04usergenf%030%04etag%03performance%04_E%03pageperf%04_ts%031774655809%04_ms%03942%04A_sr%032558x1277%04A_vr%032558x1277%04A_do%031%04A_ib%032308x940%04A_ob%032307x1061%04A_srr%031.109375",
-        "_start": 8050.287000081,
+        "_start": 8050.287081,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -81683,11 +81683,11 @@
             8162.809
           ]
         ],
-        "_dnsTimeMs": 1685391178809,
-        "_dnsEndTimeMs": 1685391178827.917,
-        "_connectTimeMs": 1685391178827.917,
-        "_connectEndTimeMs": 1685391178858.192,
-        "_sslStartTimeMs": 1685391178838.2769,
+        "_dnsTimeMs": 1774655808911,
+        "_dnsEndTimeMs": 1774655808929.917,
+        "_connectTimeMs": 1774655808929.917,
+        "_connectEndTimeMs": 1774655808960.192,
+        "_sslStartTimeMs": 1774655808940.2769,
         "_load_start": 7996,
         "_ttfb_start": 7996,
         "_ttfb_end": 8110,
@@ -81939,7 +81939,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8067412,
+            "ts": 8067.412,
             "bytes": 40764
           }
         ],
@@ -81949,7 +81949,7 @@
         "_created": 8052.135,
         "_method": "GET",
         "_url": "https://s.yimg.com/pv/static/assistjs/desktop-v1.0.70.js",
-        "_start": 8053.074000105,
+        "_start": 8053.074105000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -82117,12 +82117,12 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8067608,
+            "ts": 8067.608,
             "bytes": 32768,
-            "inflated": 47719
+            "inflated": 178791
           },
           {
-            "ts": 8068256,
+            "ts": 8068.256,
             "bytes": 2154,
             "inflated": 5673
           }
@@ -82133,7 +82133,7 @@
         "_created": 7997.419,
         "_method": "GET",
         "_url": "https://s.yimg.com/lo/mysterio/api/E263D2E9BA99FFABB5D9BB3849F031465386D2000639B3B400243F7CA941F4EE/subgraphmysterio/resizefill_w832_h468;quality_95;format_webp/https:%2F%2Fd29szjachogqwa.cloudfront.net%2Fimages%2F2026-03%2F067d716c-ff3e-45b9-a2d3-d7380c7a55a4",
-        "_start": 8053.377000083,
+        "_start": 8053.377082999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -82342,11 +82342,11 @@
             8142.336
           ]
         ],
-        "_dnsTimeMs": 1685391178809,
-        "_dnsEndTimeMs": 1685391178833.502,
-        "_connectTimeMs": 1685391178833.502,
-        "_connectEndTimeMs": 1685391178858.571,
-        "_sslStartTimeMs": 1685391178842.616,
+        "_dnsTimeMs": 1774655808911,
+        "_dnsEndTimeMs": 1774655808935.502,
+        "_connectTimeMs": 1774655808935.502,
+        "_connectEndTimeMs": 1774655808960.571,
+        "_sslStartTimeMs": 1774655808944.616,
         "_load_start": 7996,
         "_ttfb_start": 7996,
         "_ttfb_end": 8114,
@@ -83275,7 +83275,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8170968,
+            "ts": 8170.968,
             "bytes": 836
           }
         ],
@@ -83285,7 +83285,7 @@
         "_created": 8153.885,
         "_method": "GET",
         "_url": "https://noa.yahoo.com/p?s=1197802876&t=1774655809921&_I=&_AO=0&_NOL=0&etrg=backgroundPost&outcm=taboolaDebug&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&bucket=benji-mergepbsbucket-test&rid=unknown&limitedAds=false&NPA=false&pd=unknown&pt=home&usercountry=US&benjiVersion=2.3.177&prebidVersion=unknown&yahooPrebidVersion=unknown&container=%3Ar1%3A&initTime=534&mode=stream-d-engadget&placement=taboola-stream-10&type=init",
-        "_start": 8155.728000117,
+        "_start": 8155.728117,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -83328,7 +83328,7 @@
         "_all_end": 8171
       },
       {
-        "time": 15.548095703125,
+        "time": 15.5478515625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -83419,16 +83419,16 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 12.857177734375,
+          "wait": 12.85693359375,
           "receive": 2.69091796875
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8170211,
+            "ts": 8170.211,
             "bytes": 29327,
-            "inflated": 18331
+            "inflated": 83867
           }
         ],
         "_chunks_in": [],
@@ -83437,7 +83437,7 @@
         "_created": 8154.889,
         "_method": "GET",
         "_url": "https://s.yimg.com/cv/apiv2/as/cb/cb_v1.js",
-        "_start": 8156.094000119,
+        "_start": 8156.094119,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -84090,7 +84090,7 @@
         "_all_end": 8223
       },
       {
-        "time": 18.268798828125,
+        "time": 18.26904296875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -84181,39 +84181,39 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 14.94189453125,
+          "wait": 14.942138671875,
           "receive": 3.326904296875
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8183811,
+            "ts": 8183.811,
             "bytes": 32768,
-            "inflated": 22507
+            "inflated": 88043
           },
           {
-            "ts": 8184189,
+            "ts": 8184.189,
             "bytes": 32768,
-            "inflated": 30566
+            "inflated": 96102
           },
           {
-            "ts": 8185149,
+            "ts": 8185.149,
             "bytes": 32768,
-            "inflated": 32727
+            "inflated": 98263
           },
           {
-            "ts": 8185596,
+            "ts": 8185.596,
             "bytes": 32768,
-            "inflated": 31645
+            "inflated": 97181
           },
           {
-            "ts": 8185895,
+            "ts": 8185.895,
             "bytes": 32768,
-            "inflated": 32413
+            "inflated": 97949
           },
           {
-            "ts": 8186157,
+            "ts": 8186.157,
             "bytes": 10132,
             "inflated": 41099
           }
@@ -84224,7 +84224,7 @@
         "_created": 8167.946,
         "_method": "GET",
         "_url": "https://noa.yahoo.com/p?s=1197802876&t=1774655809922&_I=&_AO=0&_NOL=0&etrg=backgroundPost&outcm=taboolaDebug&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&bucket=benji-mergepbsbucket-test&rid=unknown&limitedAds=false&NPA=false&pd=unknown&pt=home&usercountry=US&benjiVersion=2.3.177&prebidVersion=unknown&yahooPrebidVersion=unknown&container=%3Ar3%3A&initTime=535&mode=stream-d-engadget&placement=taboola-stream-20&type=init",
-        "_start": 8172.582000137,
+        "_start": 8172.582137,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -84512,7 +84512,7 @@
         "_all_end": 8312
       },
       {
-        "time": 50.237060546875,
+        "time": 50.23681640625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -84611,14 +84611,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 49.443115234375,
+          "wait": 49.44287109375,
           "receive": 0.7939453125
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8218818,
+            "ts": 8218.818,
             "bytes": 3721,
             "inflated": 40417
           }
@@ -84629,7 +84629,7 @@
         "_created": 8168.678,
         "_method": "GET",
         "_url": "https://rtb.openx.net/openrtbb/prebidjs",
-        "_start": 8205.947000139,
+        "_start": 8205.947139,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -84886,12 +84886,12 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8221496,
+            "ts": 8221.496,
             "bytes": 15126,
-            "inflated": 3861
+            "inflated": 69397
           },
           {
-            "ts": 8225285,
+            "ts": 8225.285,
             "bytes": 8185,
             "inflated": 42454
           }
@@ -84902,7 +84902,7 @@
         "_created": 8168.825,
         "_method": "GET",
         "_url": "https://fastlane.rubiconproject.com/a/api/fastlane.json?account_id=17250&site_id=524368&zone_id=3157026&size_id=2&alt_size_ids=57&p_pos=atf&gdpr=0&us_privacy=1YNN&gpp=DBABRg~BVoAACY&gpp_sid=9&eid_pubcid.org=0f24a12d-abd6-4b5a-b319-8b7aebd36ed7%5E1%5E%5E%5E%5E%5E&rf=https%3A%2F%2Fwww.engadget.com%2F&tg_i.domain=engadget.com&tg_i.page=https%3A%2F%2Fwww.engadget.com%2F&tg_i.documentLang=en&tg_i.pbadslot=us_eng_main_dt_top_center&tk_flint=pbjs_lite_v9.53.2&l_pb_bid_id=15de86aedf00661&p_screen_res=2558x1277&rp_secure=1&rp_hard_floor=2.4&p_gpid=us_eng_main_dt_top_center&m_ch_ua=%22Chromium%22%7Cv%3D%22146%22%2C%22Not-A.Brand%22%7Cv%3D%2224%22%2C%22Google%20Chrome%22%7Cv%3D%22146%22&m_ch_mobile=%3F0&m_ch_platform=Linux&slots=1&rand=0.24255503724102656",
-        "_start": 8206.014000141,
+        "_start": 8206.014141,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -85187,15 +85187,15 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8223681,
+            "ts": 8223.681,
             "bytes": 11988
           },
           {
-            "ts": 8230915,
+            "ts": 8230.915,
             "bytes": 28582
           },
           {
-            "ts": 8239250,
+            "ts": 8239.25,
             "bytes": 32576
           }
         ],
@@ -85205,7 +85205,7 @@
         "_created": 8211.144,
         "_method": "GET",
         "_url": "https://display.bidder.taboola.com/OpenRTB/TaboolaHB/auction?publisher=1635811",
-        "_start": 8211.790000167,
+        "_start": 8211.790167000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -85331,7 +85331,7 @@
         "_all_end": 8238
       },
       {
-        "time": 41.255859375,
+        "time": 41.256103515625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -85498,22 +85498,22 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 27.94580078125,
+          "wait": 27.946044921875,
           "receive": 13.31005859375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8241989,
+            "ts": 8241.989,
             "bytes": 22874
           },
           {
-            "ts": 8247014,
+            "ts": 8247.014,
             "bytes": 7800
           },
           {
-            "ts": 8252810,
+            "ts": 8252.81,
             "bytes": 46528
           }
         ],
@@ -85523,7 +85523,7 @@
         "_created": 8211.554,
         "_method": "GET",
         "_url": "https://s.seedtag.com/c/hb/bid",
-        "_start": 8211.861000169,
+        "_start": 8211.861169,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -85845,7 +85845,7 @@
         "_all_end": 8251
       },
       {
-        "time": 70.858154296875,
+        "time": 70.85791015625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -85948,19 +85948,19 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 68.940185546875,
+          "wait": 68.93994140625,
           "receive": 1.91796875
         },
         "serverIPAddress": "",
         "connection": "6480",
         "_chunks": [
           {
-            "ts": 8237426,
+            "ts": 8237.426,
             "bytes": 32768,
-            "inflated": 35633
+            "inflated": 101169
           },
           {
-            "ts": 8238098,
+            "ts": 8238.098,
             "bytes": 1918,
             "inflated": 9863
           }
@@ -85972,7 +85972,7 @@
         "_method": "GET",
         "_url": "https://securepubads.g.doubleclick.net/pagead/managed/js/gpt/m202603190101/pubads_impl.js",
         "_quic_session": 6480,
-        "_start": 8213.349000133001,
+        "_start": 8213.349133,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -86306,11 +86306,11 @@
             8244.97
           ]
         ],
-        "_dnsTimeMs": 1685391178979,
-        "_dnsEndTimeMs": 1685391178993.473,
-        "_connectTimeMs": 1685391178993.473,
-        "_connectEndTimeMs": 1685391179021.969,
-        "_sslStartTimeMs": 1685391178993.473,
+        "_dnsTimeMs": 1774655809081,
+        "_dnsEndTimeMs": 1774655809095.473,
+        "_connectTimeMs": 1774655809095.473,
+        "_connectEndTimeMs": 1774655809123.969,
+        "_sslStartTimeMs": 1774655809095.473,
         "_load_start": 8166,
         "_ttfb_start": 8166,
         "_ttfb_end": 8278,
@@ -86478,7 +86478,7 @@
         "_created": 8166.744,
         "_method": "OPTIONS",
         "_url": "https://signal-service.pbs.yahoo.com/v1/signal/refresh",
-        "_start": 8223.476000131,
+        "_start": 8223.476131,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: signal-service.pbs.yahoo.com",
@@ -86545,7 +86545,7 @@
         "_all_end": 8304
       },
       {
-        "time": 98.120849609375,
+        "time": 98.12109375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -86672,51 +86672,51 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 69.121826171875,
+          "wait": 69.1220703125,
           "receive": 28.9990234375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8271874,
+            "ts": 8271.874,
             "bytes": 27600
           },
           {
-            "ts": 8281453,
+            "ts": 8281.453,
             "bytes": 32768,
-            "inflated": 65536
+            "inflated": 131072
           },
           {
-            "ts": 8282416,
+            "ts": 8282.416,
             "bytes": 12238
           },
           {
-            "ts": 8286067,
+            "ts": 8286.067,
             "bytes": 32768,
-            "inflated": 65536
+            "inflated": 131072
           },
           {
-            "ts": 8287975,
+            "ts": 8287.975,
             "bytes": 6747
           },
           {
-            "ts": 8288035,
+            "ts": 8288.035,
             "bytes": 1369
           },
           {
-            "ts": 8291006,
+            "ts": 8291.006,
             "bytes": 32768,
-            "inflated": 65536
+            "inflated": 131072
           },
           {
-            "ts": 8291294,
+            "ts": 8291.294,
             "bytes": 4134
           },
           {
-            "ts": 8294213,
+            "ts": 8294.213,
             "bytes": 10632,
-            "inflated": 17794
+            "inflated": 83330
           }
         ],
         "_chunks_in": [],
@@ -86725,7 +86725,7 @@
         "_created": 8196.299,
         "_method": "GET",
         "_url": "https://c2shb-oao.ssp.yahoo.com/admax/bid/partners/YPBJS",
-        "_start": 8245.802000161,
+        "_start": 8245.802161,
         "_request_headers": [
           "x-openrtb-version: 2.5",
           "sec-ch-ua-platform: \"Linux\"",
@@ -87183,11 +87183,11 @@
             10183.645
           ]
         ],
-        "_dnsTimeMs": 1685391179008,
-        "_dnsEndTimeMs": 1685391179022.848,
-        "_connectTimeMs": 1685391179022.848,
-        "_connectEndTimeMs": 1685391179056.282,
-        "_sslStartTimeMs": 1685391179035.369,
+        "_dnsTimeMs": 1774655809110,
+        "_dnsEndTimeMs": 1774655809124.848,
+        "_connectTimeMs": 1774655809124.848,
+        "_connectEndTimeMs": 1774655809158.282,
+        "_sslStartTimeMs": 1774655809137.369,
         "_load_start": 8195,
         "_ttfb_start": 8195,
         "_ttfb_end": 8312,
@@ -87196,7 +87196,7 @@
         "_all_end": 8341
       },
       {
-        "time": 93.93505859375,
+        "time": 93.934814453125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -87299,14 +87299,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 93.131103515625,
+          "wait": 93.130859375,
           "receive": 0.803955078125
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8264538,
+            "ts": 8264.538,
             "bytes": 43
           }
         ],
@@ -87316,7 +87316,7 @@
         "_created": 8170.603,
         "_method": "GET",
         "_url": "https://ads.yieldmo.com/exchange/prebid?pbav=9.53.2&p=%5B%7B%22placement_id%22%3A%22R1lbkq%22%2C%22callback_id%22%3A%2221075cea5591be58%22%2C%22sizes%22%3A%5B%5B728%2C90%5D%2C%5B970%2C250%5D%5D%2C%22ym_placement_id%22%3A%223492444191173058831%22%2C%22bidFloor%22%3A2.4%2C%22gpid%22%3A%22us_eng_main_dt_top_center%22%7D%5D&page_url=https%3A%2F%2Fwww.engadget.com%2F&bust=1774655810433&dnt=false&description=Find%20the%20latest%20technology%20news%20and%20expert%20tech%20product%20reviews.%20Learn%20about%20the%20latest%20gadgets%20and%20consumer%20tech%20products%20for%20entertainment%2C%20gaming%2C%20lifestyle%20and%20more.%20&tmax=2000&userConsent=%7B%22gdprApplies%22%3A%22%22%2C%22cmp%22%3A%22%22%2C%22gpp%22%3A%22DBABRg~BVoAACY%22%2C%22gpp_sid%22%3A%5B9%5D%7D&us_privacy=1YNN&pr=&scrd=1.109375&title=Engadget%20%7C%20Technology%20News%20%26%20Reviews&w=2308&h=940&pubcid=0f24a12d-abd6-4b5a-b319-8b7aebd36ed7&eids=%5B%7B%22source%22%3A%22pubcid.org%22%2C%22uids%22%3A%5B%7B%22id%22%3A%220f24a12d-abd6-4b5a-b319-8b7aebd36ed7%22%2C%22atype%22%3A1%7D%5D%7D%5D",
-        "_start": 8253.568000147,
+        "_start": 8253.568147,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -87568,11 +87568,11 @@
         "_connect_end": 8252.68,
         "_ssl_start": 8205.591,
         "_ssl_end": 8252.674,
-        "_dnsTimeMs": 1685391178982,
-        "_dnsEndTimeMs": 1685391179001.63,
-        "_connectTimeMs": 1685391179001.63,
-        "_connectEndTimeMs": 1685391179063.7869,
-        "_sslStartTimeMs": 1685391179016.7039,
+        "_dnsTimeMs": 1774655809084,
+        "_dnsEndTimeMs": 1774655809103.63,
+        "_connectTimeMs": 1774655809103.63,
+        "_connectEndTimeMs": 1774655809165.7869,
+        "_sslStartTimeMs": 1774655809118.7039,
         "_load_start": 8169,
         "_ttfb_start": 8169,
         "_ttfb_end": 8343,
@@ -87679,7 +87679,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8280519,
+            "ts": 8280.519,
             "bytes": 43
           }
         ],
@@ -87689,7 +87689,7 @@
         "_created": 8206.294,
         "_method": "GET",
         "_url": "https://grid-bidder.criteo.com/openrtb_2_5/pbjs/auction/request?profileId=207&av=37&wv=9.53.2&cb=51358027917&lsavail=0&networkId=12131",
-        "_start": 8272.681000163,
+        "_start": 8272.681163,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -87909,7 +87909,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8312550,
+            "ts": 8312.55,
             "bytes": 43
           }
         ],
@@ -87919,7 +87919,7 @@
         "_created": 8188.057,
         "_method": "POST",
         "_url": "https://pbs.engadget.com/lr_sync",
-        "_start": 8281.269000156999,
+        "_start": 8281.269156999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -88110,7 +88110,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8314992,
+            "ts": 8314.992,
             "bytes": 43
           }
         ],
@@ -88120,7 +88120,7 @@
         "_created": 8187.713,
         "_method": "POST",
         "_url": "https://wnsrvbjmeprtfrnfx.ay.delivery/forest/wnsrvBJmEPrTfrnFX/js/bid/forest.min.js",
-        "_start": 8281.346000153,
+        "_start": 8281.346153,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -88323,7 +88323,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8313367,
+            "ts": 8313.367,
             "bytes": 43
           }
         ],
@@ -88333,7 +88333,7 @@
         "_created": 8187.246,
         "_method": "POST",
         "_url": "https://cm.g.doubleclick.net/partnerpixels?gdpr=0&us_privacy=1YNN&gpp=DBABRg~BVoAACY&gpp_sid=9&url=https%3A%2F%2Fwww.engadget.com%2F",
-        "_start": 8281.759000151,
+        "_start": 8281.759151,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -88394,7 +88394,7 @@
         "_all_end": 8406
       },
       {
-        "time": 126.328857421875,
+        "time": 126.3291015625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -88513,14 +88513,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 125.747802734375,
+          "wait": 125.748046875,
           "receive": 0.5810546875
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8314224,
+            "ts": 8314.224,
             "bytes": 43
           }
         ],
@@ -88530,7 +88530,7 @@
         "_created": 8187.895,
         "_method": "POST",
         "_url": "https://noa.yahoo.com/p?&bucket=benji-mergepbsbucket-test&device=desktop&lang=en-US&lu=0&region=US&site=engadget&ver=engadget-next&pt=home&spaceid=1197802876&outcm=prebidDebug&eventType=LIVERAMP_SYNC_DECISION&reason=sync_called&_lr_env_raw_exists=false&_lr_env_raw_length=0&_lr_pairId_exists=false&_lr_pairId_length=0&_lr_atsDirect_exists=false&_lr_atsDirect_length=0&_lr_env_exp_raw_exists=true&_lr_env_exp_raw_length=10&_lr_env_exp_raw_ttl_seconds=0&_lr_env_exp_raw_is_expired=true&_lr_pairId_exp_exists=true&_lr_pairId_exp_length=10&_lr_pairId_exp_ttl_seconds=0&_lr_pairId_exp_is_expired=true&_lr_atsDirect_exp_exists=true&_lr_atsDirect_exp_length=10&_lr_atsDirect_exp_ttl_seconds=0&_lr_atsDirect_exp_is_expired=true",
-        "_start": 8282.108000155,
+        "_start": 8282.108155,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -88583,7 +88583,7 @@
         "_all_end": 8407
       },
       {
-        "time": 56.064208984375,
+        "time": 56.06396484375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -88702,14 +88702,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 55.399169921875,
+          "wait": 55.39892578125,
           "receive": 0.6650390625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8306167,
+            "ts": 8306.167,
             "bytes": 80
           }
         ],
@@ -88719,7 +88719,7 @@
         "_created": 8250.103,
         "_method": "POST",
         "_url": "https://wnsrvbjmeprtfrnfx.ay.delivery/floorPrice/wnsrvBJmEPrTfrnFX/js/floorPrice/linreg.min.js",
-        "_start": 8282.881000171,
+        "_start": 8282.881171,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -88919,7 +88919,7 @@
         "_created": 8195.606,
         "_method": "POST",
         "_url": "https://prebid.media.net/rtb/prebid?cid=8CUF35T2L",
-        "_start": 8289.417000159,
+        "_start": 8289.417159,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -89144,11 +89144,11 @@
         "_connect_end": 8289.13,
         "_ssl_start": 8242.583,
         "_ssl_end": 8289.123,
-        "_dnsTimeMs": 1685391179007,
-        "_dnsEndTimeMs": 1685391179024.83,
-        "_connectTimeMs": 1685391179024.83,
-        "_connectEndTimeMs": 1685391179100.299,
-        "_sslStartTimeMs": 1685391179053.759,
+        "_dnsTimeMs": 1774655809109,
+        "_dnsEndTimeMs": 1774655809126.83,
+        "_connectTimeMs": 1774655809126.83,
+        "_connectEndTimeMs": 1774655809202.299,
+        "_sslStartTimeMs": 1774655809155.759,
         "_load_start": 8194,
         "_ttfb_start": 8194,
         "_ttfb_end": 8412,
@@ -89283,7 +89283,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8334483,
+            "ts": 8334.483,
             "bytes": 43
           }
         ],
@@ -89293,7 +89293,7 @@
         "_created": 8208.724,
         "_method": "POST",
         "_url": "https://ib.adnxs.com/ut/v3/prebid",
-        "_start": 8303.309000165,
+        "_start": 8303.309165,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -89547,27 +89547,27 @@
         "connection": "6247",
         "_chunks": [
           {
-            "ts": 8348267,
+            "ts": 8348.267,
             "bytes": 32768,
             "inflated": 57344
           },
           {
-            "ts": 8348618,
+            "ts": 8348.618,
             "bytes": 32768,
             "inflated": 65536
           },
           {
-            "ts": 8348812,
+            "ts": 8348.812,
             "bytes": 32768,
-            "inflated": 28352
+            "inflated": 159424
           },
           {
-            "ts": 8349169,
+            "ts": 8349.169,
             "bytes": 32768,
-            "inflated": 65536
+            "inflated": 131072
           },
           {
-            "ts": 8349431,
+            "ts": 8349.431,
             "bytes": 10293,
             "inflated": 60297
           }
@@ -89579,7 +89579,7 @@
         "_method": "GET",
         "_url": "https://analytics.google.com/g/collect?v=2&tid=G-H2EP6H9Y3S&gtm=45je63p1v9206329244za200zd9206329244&_p=1774655810083&_gaz=1&gcs=G1-1&gcd=13l3v3v3v5l1&npa=0&dma=0&tcfd=10000&cid=1925043291.1774647151&ul=en-us&sr=2558x1277&uaa=x86&uab=64&uafvl=Chromium%3B146.0.7680.164%7CNot-A.Brand%3B24.0.0.0%7CGoogle%2520Chrome%3B146.0.7680.164&uamb=0&uam=&uap=Linux&uapv=&uaw=0&are=1&frm=0&pscdl=noapi&_eu=AAAAAGQ&_s=1&tag_exp=0~115616986~115938466~115938468~117484252~118128922&sid=1774655810&sct=2&seg=0&dl=https%3A%2F%2Fwww.engadget.com%2F&dt=Engadget%20%7C%20Technology%20News%20%26%20Reviews&en=page_view&_ss=1&_c=1&_ee=1&ep.yAnalyticsJSVersion=3.78.0&ep.yBID=6kjr3gdksdtrd&ep.yPageContentType=homepage&ep.yPageType=home&tfd=712",
         "_quic_session": 6247,
-        "_start": 8330.951000179,
+        "_start": 8330.951179,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -89758,154 +89758,154 @@
         "connection": "6247",
         "_chunks": [
           {
-            "ts": 8352353,
+            "ts": 8352.353,
             "bytes": 1847
           },
           {
-            "ts": 8353676,
+            "ts": 8353.676,
             "bytes": 2349
           },
           {
-            "ts": 8356321,
+            "ts": 8356.321,
             "bytes": 2352
           },
           {
-            "ts": 8358276,
+            "ts": 8358.276,
             "bytes": 1173
           },
           {
-            "ts": 8358789,
+            "ts": 8358.789,
             "bytes": 1173,
             "inflated": 24576
           },
           {
-            "ts": 8361078,
+            "ts": 8361.078,
             "bytes": 1176
           },
           {
-            "ts": 8361213,
+            "ts": 8361.213,
             "bytes": 1176
           },
           {
-            "ts": 8363225,
+            "ts": 8363.225,
             "bytes": 2349
           },
           {
-            "ts": 8366374,
+            "ts": 8366.374,
             "bytes": 2349
           },
           {
-            "ts": 8367898,
+            "ts": 8367.898,
             "bytes": 1171
           },
           {
-            "ts": 8368390,
+            "ts": 8368.39,
             "bytes": 1174,
             "inflated": 32768
           },
           {
-            "ts": 8369723,
+            "ts": 8369.723,
             "bytes": 1174
           },
           {
-            "ts": 8369872,
+            "ts": 8369.872,
             "bytes": 1171
           },
           {
-            "ts": 8370862,
+            "ts": 8370.862,
             "bytes": 2345
           },
           {
-            "ts": 8371728,
+            "ts": 8371.728,
             "bytes": 1171
           },
           {
-            "ts": 8372290,
+            "ts": 8372.29,
             "bytes": 1171
           },
           {
-            "ts": 8372733,
+            "ts": 8372.733,
             "bytes": 1174
           },
           {
-            "ts": 8372970,
+            "ts": 8372.97,
             "bytes": 1174
           },
           {
-            "ts": 8374254,
+            "ts": 8374.254,
             "bytes": 2345
           },
           {
-            "ts": 8374994,
+            "ts": 8374.994,
             "bytes": 2345
           },
           {
-            "ts": 8375691,
+            "ts": 8375.691,
             "bytes": 1171
           },
           {
-            "ts": 8376215,
+            "ts": 8376.215,
             "bytes": 1174
           },
           {
-            "ts": 8376713,
+            "ts": 8376.713,
             "bytes": 1174
           },
           {
-            "ts": 8377255,
+            "ts": 8377.255,
             "bytes": 1171
           },
           {
-            "ts": 8377671,
+            "ts": 8377.671,
             "bytes": 1174,
             "inflated": 65536
           },
           {
-            "ts": 8377914,
+            "ts": 8377.914,
             "bytes": 984
           },
           {
-            "ts": 8379794,
+            "ts": 8379.794,
             "bytes": 1174
           },
           {
-            "ts": 8379945,
+            "ts": 8379.945,
             "bytes": 1171
           },
           {
-            "ts": 8380648,
+            "ts": 8380.648,
             "bytes": 2345
           },
           {
-            "ts": 8385600,
+            "ts": 8385.6,
             "bytes": 1171
           },
           {
-            "ts": 8386300,
+            "ts": 8386.3,
             "bytes": 1174
           },
           {
-            "ts": 8388164,
+            "ts": 8388.164,
             "bytes": 4693
           },
           {
-            "ts": 8388754,
+            "ts": 8388.754,
             "bytes": 1174
           },
           {
-            "ts": 8389145,
+            "ts": 8389.145,
             "bytes": 2345
           },
           {
-            "ts": 8389742,
+            "ts": 8389.742,
             "bytes": 1174
           },
           {
-            "ts": 8389865,
+            "ts": 8389.865,
             "bytes": 1171
           },
           {
-            "ts": 8390173,
+            "ts": 8390.173,
             "bytes": 102,
             "inflated": 60208
           }
@@ -89917,7 +89917,7 @@
         "_method": "GET",
         "_url": "https://pbs-yahoo-us.ay.delivery/openrtb2/auction",
         "_quic_session": 6247,
-        "_start": 8331.510000181,
+        "_start": 8331.510181,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -90004,7 +90004,7 @@
         "_all_end": 8389
       },
       {
-        "time": 30.6962890625,
+        "time": 30.696044921875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -90123,14 +90123,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 30.0341796875,
+          "wait": 30.033935546875,
           "receive": 0.662109375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8369362,
+            "ts": 8369.362,
             "bytes": 43
           }
         ],
@@ -90140,7 +90140,7 @@
         "_created": 8338.666,
         "_method": "POST",
         "_url": "https://securepubads.g.doubleclick.net/pagead/managed/dict/m202603260101/gpt",
-        "_start": 8339.902000183,
+        "_start": 8339.902183,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -90328,7 +90328,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8350987,
+            "ts": 8350.987,
             "bytes": 5706
           }
         ],
@@ -90338,7 +90338,7 @@
         "_created": 8286.518,
         "_method": "GET",
         "_url": "https://stats.g.doubleclick.net/g/collect?v=2&tid=G-H2EP6H9Y3S&cid=1925043291.1774647151&gtm=45je63p1v9206329244za200zd9206329244&aip=1&dma=0&gcs=G1-1&gcd=13l3v3v3v5l1&npa=0&frm=0&tag_exp=0~115616986~115938466~115938468~117484252~118128922",
-        "_start": 8340.464000175,
+        "_start": 8340.464175,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -90547,11 +90547,11 @@
         "_connect_end": 8340.215,
         "_ssl_start": 8322.958,
         "_ssl_end": 8340.207,
-        "_dnsTimeMs": 1685391179098,
-        "_dnsEndTimeMs": 1685391179126.638,
-        "_connectTimeMs": 1685391179126.638,
-        "_connectEndTimeMs": 1685391179151.293,
-        "_sslStartTimeMs": 1685391179134.044,
+        "_dnsTimeMs": 1774655809200,
+        "_dnsEndTimeMs": 1774655809228.638,
+        "_connectTimeMs": 1774655809228.638,
+        "_connectEndTimeMs": 1774655809253.293,
+        "_sslStartTimeMs": 1774655809236.044,
         "_load_start": 8285,
         "_ttfb_start": 8285,
         "_ttfb_end": 8402,
@@ -90654,12 +90654,12 @@
         "connection": "6668",
         "_chunks": [
           {
-            "ts": 8403234,
+            "ts": 8403.234,
             "bytes": 4755,
             "inflated": 7570
           },
           {
-            "ts": 8403689,
+            "ts": 8403.689,
             "bytes": 1841,
             "inflated": 2981
           }
@@ -90671,7 +90671,7 @@
         "_method": "GET",
         "_url": "https://noa.yahoo.com/p?&bucket=benji-mergepbsbucket-test&device=desktop&lang=en-US&lu=0&region=US&site=engadget&ver=engadget-next&pt=home&spaceid=1197802876&outcm=prebidDebug&eventType=LIVERAMP_SYNC_DECISION&reason=response_parse_error&_lr_env_raw_exists=false&_lr_env_raw_length=0&_lr_pairId_exists=false&_lr_pairId_length=0&_lr_atsDirect_exists=false&_lr_atsDirect_length=0&_lr_env_exp_raw_exists=true&_lr_env_exp_raw_length=10&_lr_env_exp_raw_ttl_seconds=1799&_lr_env_exp_raw_is_expired=false&_lr_pairId_exp_exists=true&_lr_pairId_exp_length=10&_lr_pairId_exp_ttl_seconds=1799&_lr_pairId_exp_is_expired=false&_lr_atsDirect_exp_exists=true&_lr_atsDirect_exp_length=10&_lr_atsDirect_exp_ttl_seconds=1799&_lr_atsDirect_exp_is_expired=false",
         "_quic_session": 6668,
-        "_start": 8367.499000177,
+        "_start": 8367.499177,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -90875,7 +90875,7 @@
         "_created": 8339.283,
         "_method": "OPTIONS",
         "_url": "https://pbs.engadget.com/lr_sync",
-        "_start": 8388.873000185,
+        "_start": 8388.873185,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: pbs.engadget.com",
@@ -90953,7 +90953,7 @@
         "_all_end": 8455
       },
       {
-        "time": 127.2529296875,
+        "time": 127.253173828125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -91080,14 +91080,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 126.558837890625,
+          "wait": 126.55908203125,
           "receive": 0.694091796875
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8536073,
+            "ts": 8536.073,
             "bytes": 147
           }
         ],
@@ -91097,7 +91097,7 @@
         "_created": 8408.82,
         "_method": "POST",
         "_url": "https://tlx.3lift.com/header/auction?lib=prebid&v=9.53.2&referrer=https%3A%2F%2Fwww.engadget.com%2F&tmax=2000&gdpr=false&us_privacy=1YNN",
-        "_start": 8409.291000193,
+        "_start": 8409.291193,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -91152,7 +91152,7 @@
         "_all_end": 8535
       },
       {
-        "time": 74.549072265625,
+        "time": 74.548828125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -91267,7 +91267,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 74.549072265625,
+          "wait": 74.548828125,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -91280,7 +91280,7 @@
         "_method": "POST",
         "_url": "https://api.rlcdn.com/api/identity/v2/envelope?pid=14287",
         "_quic_session": 6728,
-        "_start": 8412.975000187,
+        "_start": 8412.975187,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -91464,7 +91464,7 @@
         "_created": 8366.01,
         "_method": "POST",
         "_url": "https://pbs-yahoo-us.ay.delivery/cookie_sync",
-        "_start": 8416.836000189001,
+        "_start": 8416.836189,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -91548,7 +91548,7 @@
         "_all_end": 8483
       },
       {
-        "time": 29.712890625,
+        "time": 29.713134765625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -91671,14 +91671,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 29.0087890625,
+          "wait": 29.009033203125,
           "receive": 0.7041015625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8567949,
+            "ts": 8567.949,
             "bytes": 43
           }
         ],
@@ -91688,7 +91688,7 @@
         "_created": 8538.236,
         "_method": "POST",
         "_url": "https://pbs.yahoo.com/cookie_sync",
-        "_start": 8538.970000195,
+        "_start": 8538.970195,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -91742,7 +91742,7 @@
         "_all_end": 8566
       },
       {
-        "time": 90.98388671875,
+        "time": 90.984130859375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -91829,7 +91829,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 90.98388671875,
+          "wait": 90.984130859375,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -91841,7 +91841,7 @@
         "_created": 8538.599,
         "_method": "GET",
         "_url": "https://pbs.yahoo.com/openrtb2/auction",
-        "_start": 8588.902000197,
+        "_start": 8588.902197000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -92023,7 +92023,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9187031,
+            "ts": 9187.031,
             "bytes": 12108,
             "inflated": 34102
           }
@@ -92034,7 +92034,7 @@
         "_created": 8691.314,
         "_method": "POST",
         "_url": "https://cds.taboola.com/?uid=5cb17523-7005-4a76-b8c0-1288fa0cc476-tuct10c07cef&ptf=TGludXg=&ufv=MTQ2LjAuNzY4MC4xNjQ=&bnd=Q2hyb21pdW0=&bndv=MTQ2&bnd=Tm90LUEuQnJhbmQ=&bndv=MjQ=&bnd=R29vZ2xlIENocm9tZQ==&bndv=MTQ2&mbl=ZmFsc2U=&dc=us",
-        "_start": 8707.101000201,
+        "_start": 8707.101201,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -92101,7 +92101,7 @@
         "_all_end": 9201
       },
       {
-        "time": 49.322998046875,
+        "time": 49.32275390625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -92228,14 +92228,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 48.76611328125,
+          "wait": 48.765869140625,
           "receive": 0.556884765625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 8738301,
+            "ts": 8738.301,
             "bytes": 468,
             "inflated": 1354
           }
@@ -92246,7 +92246,7 @@
         "_created": 8689.028,
         "_method": "POST",
         "_url": "https://ssum-sec.casalemedia.com/usermatchredir?s=208386&gdpr=0&gdpr_consent=&gpp=DBABRg~BVoAACY&gpp_sid=9&cb=https%3A%2F%2Fpbs.yahoo.com%2Fsetuid%3Fbidder%3Dix%26gdpr%3D0%26gdpr_consent%3D%26gpp%3DDBABRg~BVoAACY%26gpp_sid%3D9%26f%3Db%26uid%3D",
-        "_start": 8707.180000199,
+        "_start": 8707.180198999999,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -92421,7 +92421,7 @@
         "connection": "6973",
         "_chunks": [
           {
-            "ts": 9174126,
+            "ts": 9174.126,
             "bytes": 526,
             "inflated": 1044
           }
@@ -92433,7 +92433,7 @@
         "_method": "POST",
         "_url": "https://googleads.g.doubleclick.net/xbbe/pixel?d=CNXEVBC_uXgYw6fM1AIwAQ&v=APEucNV5IrzLRV5plswe05ixa7WQyw_9MMhEtbL5co9B1IhizgG_DBImURh3v8-hh6oyK2HOwQkHez6CDOg3y9Wmnju8TQKd11X-RGkBAYZUV9AWl_sUTypkmYnL49_axb9PyNcgv6Bu",
         "_quic_session": 6973,
-        "_start": 8731.686000214999,
+        "_start": 8731.686215,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -92587,7 +92587,7 @@
         "connection": "6976",
         "_chunks": [
           {
-            "ts": 8852440,
+            "ts": 8852.44,
             "bytes": 53
           }
         ],
@@ -92598,7 +92598,7 @@
         "_method": "POST",
         "_url": "https://crb.kargo.com/api/v1/dsync/yahoo?gdpr=0&gdpr_consent=&us_privacy=1YNN&gpp=DBABRg~BVoAACY&gpp_sid=9&r=https%3A%2F%2Fpbs.yahoo.com%2Fsetuid%3Fbidder%3Dkargo%26gdpr%3D0%26gdpr_consent%3D%26gpp%3DDBABRg~BVoAACY%26gpp_sid%3D9%26f%3Di%26uid%3D%24UID",
         "_quic_session": 6976,
-        "_start": 8732.565000211,
+        "_start": 8732.565211,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -92800,7 +92800,7 @@
         "connection": "6990",
         "_chunks": [
           {
-            "ts": 8903438,
+            "ts": 8903.438,
             "bytes": 117,
             "inflated": 132
           }
@@ -92812,7 +92812,7 @@
         "_method": "POST",
         "_url": "https://noa.yahoo.com/p?s=1197802876&t=1774655810863&_I=&_AO=0&_NOL=0&etrg=backgroundPost&outcm=taboolaDebug&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&bucket=benji-mergepbsbucket-test&rid=unknown&limitedAds=false&NPA=false&pd=unknown&pt=home&usercountry=US&benjiVersion=2.3.177&prebidVersion=9.53.2&yahooPrebidVersion=2.0.144&container=%3Ar3%3A&mode=stream-d-engadget&placement=taboola-stream-20&renderTime=1476&type=render&url=https%3A%2F%2Fwww.engadget.com%2F",
         "_quic_session": 6990,
-        "_start": 8746.589000229,
+        "_start": 8746.589229000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -93033,11 +93033,11 @@
         "_connect_end": 8746.474,
         "_ssl_start": 8724.975,
         "_ssl_end": 8746.474,
-        "_dnsTimeMs": 1685391179518,
-        "_dnsEndTimeMs": 1685391179536.237,
-        "_connectTimeMs": 1685391179536.237,
-        "_connectEndTimeMs": 1685391179557.736,
-        "_sslStartTimeMs": 1685391179536.237,
+        "_dnsTimeMs": 1774655809620,
+        "_dnsEndTimeMs": 1774655809638.237,
+        "_connectTimeMs": 1774655809638.237,
+        "_connectEndTimeMs": 1774655809659.736,
+        "_sslStartTimeMs": 1774655809638.237,
         "_load_start": 8705,
         "_ttfb_start": 8705,
         "_ttfb_end": 8940,
@@ -93046,7 +93046,7 @@
         "_all_end": 8942
       },
       {
-        "time": 324.989013671875,
+        "time": 324.9892578125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -93149,14 +93149,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 324.2958984375,
+          "wait": 324.296142578125,
           "receive": 0.693115234375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 9019159,
+            "ts": 9019.159,
             "bytes": 39,
             "inflated": 19
           }
@@ -93167,7 +93167,7 @@
         "_created": 8694.221,
         "_method": "POST",
         "_url": "https://cdn.taboola.com/scripts/eid.es5.js",
-        "_start": 8756.273000209,
+        "_start": 8756.273209,
         "_request_headers": [
           "Origin: https://www.engadget.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -93301,7 +93301,7 @@
         "_all_end": 9079
       },
       {
-        "time": 71.676025390625,
+        "time": 71.67578125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "OPTIONS",
@@ -93416,7 +93416,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 71.676025390625,
+          "wait": 71.67578125,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -93428,7 +93428,7 @@
         "_created": 8699.067,
         "_method": "OPTIONS",
         "_url": "https://c2shb-oao.ssp.yahoo.com/admax/bid/partners/YPBJS",
-        "_start": 8758.083000217,
+        "_start": 8758.083217,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: c2shb-oao.ssp.yahoo.com",
@@ -93610,7 +93610,7 @@
         "_created": 8704.298,
         "_method": "POST",
         "_url": "https://noa.yahoo.com/p?s=1197802876&t=1774655810862&_I=&_AO=0&_NOL=0&etrg=backgroundPost&outcm=taboolaDebug&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&bucket=benji-mergepbsbucket-test&rid=unknown&limitedAds=false&NPA=false&pd=unknown&pt=home&usercountry=US&benjiVersion=2.3.177&prebidVersion=9.53.2&yahooPrebidVersion=2.0.144&container=%3Ar2%3A&mode=stream-d-engadget&placement=taboola-stream-15&renderTime=1475&type=render&url=https%3A%2F%2Fwww.engadget.com%2F",
-        "_start": 8759.599000225,
+        "_start": 8759.599225,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -93660,7 +93660,7 @@
         "_all_end": 8970
       },
       {
-        "time": 379.593017578125,
+        "time": 379.5927734375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -93759,14 +93759,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 379.0791015625,
+          "wait": 379.078857421875,
           "receive": 0.513916015625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 9076100,
+            "ts": 9076.1,
             "bytes": 380
           }
         ],
@@ -93776,7 +93776,7 @@
         "_created": 8696.507,
         "_method": "GET",
         "_url": "https://cdn.taboola.com/scripts/eid-ls-new.es5.js",
-        "_start": 8759.732000213002,
+        "_start": 8759.732213,
         "_request_headers": [
           "Origin: https://www.engadget.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -93967,7 +93967,7 @@
         "_created": 8700.201,
         "_method": "POST",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 8760.268000221,
+        "_start": 8760.268221,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -94126,7 +94126,7 @@
         "_created": 8693.448,
         "_method": "POST",
         "_url": "https://us-trc-events.taboola.com/yahoo-engadget/log/2/debug?type=warn&msg=adgb%20-%20not%20initialized.&lt=trecs&tvi50=9864&tvi62=23565&tim=19%3A56%3A50.842&id=34826&cv=20260326-4-RELEASE&llvl=2",
-        "_start": 8760.395000207,
+        "_start": 8760.395207,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -94273,11 +94273,11 @@
         "_connect_end": 8759.501,
         "_ssl_start": 8735.925,
         "_ssl_end": 8759.497,
-        "_dnsTimeMs": 1685391179505,
-        "_dnsEndTimeMs": 1685391179524.007,
-        "_connectTimeMs": 1685391179524.007,
-        "_connectEndTimeMs": 1685391179570.843,
-        "_sslStartTimeMs": 1685391179547.271,
+        "_dnsTimeMs": 1774655809607,
+        "_dnsEndTimeMs": 1774655809626.007,
+        "_connectTimeMs": 1774655809626.007,
+        "_connectEndTimeMs": 1774655809672.843,
+        "_sslStartTimeMs": 1774655809649.271,
         "_load_start": 8692,
         "_ttfb_start": 8692,
         "_ttfb_end": 9052,
@@ -94385,7 +94385,7 @@
         "_created": 8699.418,
         "_method": "GET",
         "_url": "https://noa.yahoo.com/p?s=1197802876&t=1774655810858&_I=&_AO=0&_NOL=0&etrg=backgroundPost&outcm=taboolaDebug&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&bucket=benji-mergepbsbucket-test&rid=unknown&limitedAds=false&NPA=false&pd=unknown&pt=home&usercountry=US&benjiVersion=2.3.177&prebidVersion=9.53.2&yahooPrebidVersion=2.0.144&container=%3Ar0%3A&mode=stream-d-engadget&placement=taboola-stream-5&renderTime=1471&type=render&url=https%3A%2F%2Fwww.engadget.com%2F",
-        "_start": 8763.276000219,
+        "_start": 8763.276219000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -94559,7 +94559,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8795425,
+            "ts": 8795.425,
             "bytes": 140
           }
         ],
@@ -94569,7 +94569,7 @@
         "_created": 8701.47,
         "_method": "POST",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 8777.133000222999,
+        "_start": 8777.133222999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -94745,7 +94745,7 @@
         "_created": 8708.494,
         "_method": "POST",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 8783.272000231,
+        "_start": 8783.272231,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -94916,11 +94916,11 @@
         "_connect_end": 8782.997,
         "_ssl_start": 8752.716,
         "_ssl_end": 8782.985,
-        "_dnsTimeMs": 1685391179520,
-        "_dnsEndTimeMs": 1685391179546.152,
-        "_connectTimeMs": 1685391179546.152,
-        "_connectEndTimeMs": 1685391179594.146,
-        "_sslStartTimeMs": 1685391179563.877,
+        "_dnsTimeMs": 1774655809622,
+        "_dnsEndTimeMs": 1774655809648.152,
+        "_connectTimeMs": 1774655809648.152,
+        "_connectEndTimeMs": 1774655809696.146,
+        "_sslStartTimeMs": 1774655809665.877,
         "_load_start": 8707,
         "_ttfb_start": 8707,
         "_ttfb_end": 9028,
@@ -95059,7 +95059,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9004474,
+            "ts": 9004.474,
             "bytes": 187,
             "inflated": 186
           }
@@ -95070,7 +95070,7 @@
         "_created": 8705.01,
         "_method": "POST",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 8793.230000227,
+        "_start": 8793.230227,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -95286,7 +95286,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9101663,
+            "ts": 9101.663,
             "bytes": 4505,
             "inflated": 12539
           }
@@ -95297,7 +95297,7 @@
         "_created": 8734.562,
         "_method": "POST",
         "_url": "https://images.taboola.com/taboola/image/fetch/f_jpg%2Cq_auto%2Ch_278%2Cw_500%2Cc_fill%2Cg_faces:auto%2Ce_sharpen/https%3A//cdn.taboola.com/libtrc/static/thumbnails/58a09b4418f2cd78114ec1901eabbd54.jpg",
-        "_start": 8793.826000233,
+        "_start": 8793.826233,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -95534,11 +95534,11 @@
         "_connect_end": 8793.088,
         "_ssl_start": 8774.058,
         "_ssl_end": 8793.08,
-        "_dnsTimeMs": 1685391179546,
-        "_dnsEndTimeMs": 1685391179564.539,
-        "_connectTimeMs": 1685391179564.539,
-        "_connectEndTimeMs": 1685391179604.05,
-        "_sslStartTimeMs": 1685391179585.028,
+        "_dnsTimeMs": 1774655809648,
+        "_dnsEndTimeMs": 1774655809666.539,
+        "_connectTimeMs": 1774655809666.539,
+        "_connectEndTimeMs": 1774655809706.05,
+        "_sslStartTimeMs": 1774655809687.028,
         "_load_start": 8733,
         "_ttfb_start": 8733,
         "_ttfb_end": 9157,
@@ -95547,7 +95547,7 @@
         "_all_end": 9158
       },
       {
-        "time": 97.751953125,
+        "time": 97.752197265625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -95710,7 +95710,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 97.751953125,
+          "wait": 97.752197265625,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -95723,7 +95723,7 @@
         "_method": "GET",
         "_url": "https://ssum-sec.casalemedia.com/usermatchredir?s=208386&gdpr=0&gdpr_consent=&gpp=DBABRg~BVoAACY&gpp_sid=9&cb=https%3A%2F%2Fpbs.yahoo.com%2Fsetuid%3Fbidder%3Dix%26gdpr%3D0%26gdpr_consent%3D%26gpp%3DDBABRg~BVoAACY%26gpp_sid%3D9%26f%3Db%26uid%3D",
         "_quic_session": 7050,
-        "_start": 8817.554000235,
+        "_start": 8817.554235,
         "_request_headers": [
           ":method: GET",
           ":authority: ssum-sec.casalemedia.com",
@@ -95903,7 +95903,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8856032,
+            "ts": 8856.032,
             "bytes": 1838,
             "inflated": 2391
           }
@@ -95914,7 +95914,7 @@
         "_created": 8771.516,
         "_method": "POST",
         "_url": "https://3p-geo.yahoo.com/p?s=1197802876&t=1774655810858&_I=&_AO=0&_NOL=0&etag=performance&etrg=backgroundPost&outcm=performance&usergenf=0&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&test=benji-mergepbsbucket-test&rid=unknown&pd=unknown&pt=home&pct=unknown&ver=engadget-next&pl1=2.3.177&pl2=9.53.2&pl3=2.0.144&usercountry=US&sec=taboola-stream-5&A_utm=%7B%22TABOOLA_JS_FETCH_START_TIME%22%3A516%2C%22TABOOLA_INIT_TIME%22%3A534%2C%22TABOOLA_READY%22%3A579%2C%22TABOOLA_FLUSH_TIME%22%3A672%2C%22TABOOLA_ENGINE_READY%22%3A1075%2C%22TABOOLA_API_FETCH_START_TIME%22%3A1081%2C%22TABOOLA_API_RESPONSE_RECEIVED_TIME%22%3A1455%2C%22TABOOLA_RENDER_TIME%22%3A1471%7D",
-        "_start": 8828.719000236999,
+        "_start": 8828.719237,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -96079,7 +96079,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9604282,
+            "ts": 9604.282,
             "bytes": 15313,
             "inflated": 42829
           }
@@ -96090,7 +96090,7 @@
         "_created": 8692.378,
         "_method": "POST",
         "_url": "https://s.yimg.com/aaq/f10d509c/dnt3mrnrwwk1.js",
-        "_start": 8904.412000205,
+        "_start": 8904.412205,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -96330,7 +96330,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8998326,
+            "ts": 8998.326,
             "bytes": 1994
           }
         ],
@@ -96340,7 +96340,7 @@
         "_created": 8691.564,
         "_method": "POST",
         "_url": "https://match.sharethrough.com/FGMrCMMc/v1?gdpr=0&gdpr_consent=&us_privacy=1YNN&gpp=DBABRg~BVoAACY&gpp_sid=9&redirectUri=https%3A%2F%2Fpbs-yahoo-us.ay.delivery%2Fsetuid%3Fbidder%3Dsharethrough%26gdpr%3D0%26gdpr_consent%3D%26gpp%3DDBABRg~BVoAACY%26gpp_sid%3D9%26f%3Di%26uid%3D%24UID",
-        "_start": 8904.486000203,
+        "_start": 8904.486203,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -96540,11 +96540,11 @@
         "connection": "760",
         "_chunks": [
           {
-            "ts": 8931363,
+            "ts": 8931.363,
             "bytes": 176
           },
           {
-            "ts": 8931370,
+            "ts": 8931.37,
             "bytes": 0
           }
         ],
@@ -96554,7 +96554,7 @@
         "_created": 8867.813,
         "_method": "GET",
         "_url": "https://crb.kargo.com/api/v1/dsync/yahoo?gdpr=0&gdpr_consent=&us_privacy=1YNN&gpp=DBABRg~BVoAACY&gpp_sid=9&r=https%3A%2F%2Fpbs.yahoo.com%2Fsetuid%3Fbidder%3Dkargo%26gdpr%3D0%26gdpr_consent%3D%26gpp%3DDBABRg~BVoAACY%26gpp_sid%3D9%26f%3Di%26uid%3D%24UID",
-        "_start": 8918.34100024,
+        "_start": 8918.34124,
         "_request_headers": [
           ":method: GET",
           ":authority: crb.kargo.com",
@@ -96755,7 +96755,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 8972895,
+            "ts": 8972.895,
             "bytes": 86
           }
         ],
@@ -96765,7 +96765,7 @@
         "_created": 8931.976,
         "_method": "GET",
         "_url": "https://sync-tm.everesttech.net/upi/pid/8ws7va4m?gdpr=0&gdpr_consent=&us_privacy=1YNN&gpp_sid=9&gpp=DBABRg~BVoAACY&redir=https%3A%2F%2Fpbs.yahoo.com%2Fsetuid%3Fbidder%3Dadobe%26gdpr%3D0%26gdpr_consent%3D%26gpp%3DDBABRg~BVoAACY%26gpp_sid%3D9%26f%3Di%26uid%3D%24%7BUSER_ID%7D",
-        "_start": 8932.389000241,
+        "_start": 8932.389241,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -96995,7 +96995,7 @@
         "_created": 8974.713,
         "_method": "GET",
         "_url": "https://sync-tm.everesttech.net/upi/pid/8ws7va4m?gdpr=0&gdpr_consent=&us_privacy=1YNN&gpp_sid=9&gpp=DBABRg~BVoAACY&redir=https%3A%2F%2Fpbs.yahoo.com%2Fsetuid%3Fbidder%3Dadobe%26gdpr%3D0%26gdpr_consent%3D%26gpp%3DDBABRg~BVoAACY%26gpp_sid%3D9%26f%3Di%26uid%3D%24%7BUSER_ID%7D",
-        "_start": 9022.096000246,
+        "_start": 9022.096246,
         "_request_headers": [
           ":method: GET",
           ":authority: sync-tm.everesttech.net",
@@ -97194,7 +97194,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9054117,
+            "ts": 9054.117,
             "bytes": 85
           }
         ],
@@ -97204,7 +97204,7 @@
         "_created": 9039.457,
         "_method": "GET",
         "_url": "https://cdn.taboola.com/scripts/cds-pips.js?dc=us&d=d",
-        "_start": 9039.770000247,
+        "_start": 9039.770247,
         "_request_headers": [
           "Origin: https://www.engadget.com",
           "sec-ch-ua-platform: \"Linux\"",
@@ -97363,7 +97363,7 @@
         "_created": 9022.322,
         "_method": "GET",
         "_url": "https://noa.yahoo.com/p?s=1197802876&t=1774655810860&_I=&_AO=0&_NOL=0&etrg=backgroundPost&outcm=taboolaDebug&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&bucket=benji-mergepbsbucket-test&rid=unknown&limitedAds=false&NPA=false&pd=unknown&pt=home&usercountry=US&benjiVersion=2.3.177&prebidVersion=9.53.2&yahooPrebidVersion=2.0.144&container=%3Ar1%3A&mode=stream-d-engadget&placement=taboola-stream-10&renderTime=1473&type=render&url=https%3A%2F%2Fwww.engadget.com%2F",
-        "_start": 9111.825000244999,
+        "_start": 9111.825245,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -97524,7 +97524,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9157955,
+            "ts": 9157.955,
             "bytes": 43
           }
         ],
@@ -97534,7 +97534,7 @@
         "_created": 9124.097,
         "_method": "POST",
         "_url": "https://trc.taboola.com/yahoo-engadget/log/3/bulk?route=US%3AUS%3AV&lti=trecs&tvi50=9864&tvi62=23565&cv=20260326-4-RELEASE&bulkSize=4",
-        "_start": 9126.326000257,
+        "_start": 9126.326256999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -97712,7 +97712,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9163791,
+            "ts": 9163.791,
             "bytes": 43
           }
         ],
@@ -97722,7 +97722,7 @@
         "_created": 9124.412,
         "_method": "POST",
         "_url": "https://www.googletagservices.com/agrp/prod/model_person_country_code_US_person_region_code_56415f353131.json",
-        "_start": 9126.618000259,
+        "_start": 9126.618258999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -97775,7 +97775,7 @@
         "_all_end": 9164
       },
       {
-        "time": 38.576904296875,
+        "time": 38.5771484375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -97902,14 +97902,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 37.98681640625,
+          "wait": 37.987060546875,
           "receive": 0.590087890625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 9164624,
+            "ts": 9164.624,
             "bytes": 43
           }
         ],
@@ -97919,7 +97919,7 @@
         "_created": 9126.047,
         "_method": "POST",
         "_url": "https://pbd.yahoo.com/data/analytics",
-        "_start": 9126.864000263,
+        "_start": 9126.864263,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "content-encoding: gzip",
@@ -98135,7 +98135,7 @@
         "connection": "507",
         "_chunks": [
           {
-            "ts": 9165378,
+            "ts": 9165.378,
             "bytes": 43
           }
         ],
@@ -98145,7 +98145,7 @@
         "_created": 9127.776,
         "_method": "POST",
         "_url": "https://noa.yahoo.com/p?s=1197802876&t=1774655810862&_I=&_AO=0&_NOL=0&etrg=backgroundPost&outcm=taboolaDebug&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&bucket=benji-mergepbsbucket-test&rid=unknown&limitedAds=false&NPA=false&pd=unknown&pt=home&usercountry=US&benjiVersion=2.3.177&prebidVersion=9.53.2&yahooPrebidVersion=2.0.144&container=%3Ar2%3A&mode=stream-d-engadget&placement=taboola-stream-15&renderTime=1475&type=render&url=https%3A%2F%2Fwww.engadget.com%2F",
-        "_start": 9128.175000267001,
+        "_start": 9128.175267,
         "_request_headers": [
           ":method: POST",
           ":authority: noa.yahoo.com",
@@ -98212,7 +98212,7 @@
         "_all_end": 9164
       },
       {
-        "time": 36.7529296875,
+        "time": 36.753173828125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -98355,14 +98355,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 36.2158203125,
+          "wait": 36.216064453125,
           "receive": 0.537109375
         },
         "serverIPAddress": "",
         "connection": "507",
         "_chunks": [
           {
-            "ts": 9166093,
+            "ts": 9166.093,
             "bytes": 43
           }
         ],
@@ -98372,7 +98372,7 @@
         "_created": 9129.34,
         "_method": "POST",
         "_url": "https://noa.yahoo.com/p?s=1197802876&t=1774655810863&_I=&_AO=0&_NOL=0&etrg=backgroundPost&outcm=taboolaDebug&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&bucket=benji-mergepbsbucket-test&rid=unknown&limitedAds=false&NPA=false&pd=unknown&pt=home&usercountry=US&benjiVersion=2.3.177&prebidVersion=9.53.2&yahooPrebidVersion=2.0.144&container=%3Ar3%3A&mode=stream-d-engadget&placement=taboola-stream-20&renderTime=1476&type=render&url=https%3A%2F%2Fwww.engadget.com%2F",
-        "_start": 9130.772000271,
+        "_start": 9130.772271,
         "_request_headers": [
           ":method: POST",
           ":authority: noa.yahoo.com",
@@ -98606,7 +98606,7 @@
         "_created": 9142.3,
         "_method": "POST",
         "_url": "https://3p-udc.yahoo.com/v2/public/yql?yhlVer=2&yhlClient=rapid&yhlS=1197802876&yhlCT=2&yhlBTMS=1774655810876&yhlClientVer=3.78.0&yhlRnd=RXXljxkteQZrxqor&yhlCompressed=0",
-        "_start": 9142.824000285,
+        "_start": 9142.824285,
         "_request_headers": [
           ":method: POST",
           ":authority: 3p-udc.yahoo.com",
@@ -98842,7 +98842,7 @@
         "_created": 9142.61,
         "_method": "POST",
         "_url": "https://3p-udc.yahoo.com/v2/public/yql?yhlVer=2&yhlClient=rapid&yhlS=1197802876&yhlCT=2&yhlBTMS=1774655810876&yhlClientVer=3.78.0&yhlRnd=oPi5xkRrgf1df5Sf&yhlCompressed=0",
-        "_start": 9142.906000287,
+        "_start": 9142.906287,
         "_request_headers": [
           ":method: POST",
           ":authority: 3p-udc.yahoo.com",
@@ -99062,7 +99062,7 @@
         "_created": 9124.706,
         "_method": "OPTIONS",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 9143.956000261,
+        "_start": 9143.956261,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: pbd.yahoo.com",
@@ -99283,7 +99283,7 @@
         "_created": 9128.037,
         "_method": "OPTIONS",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 9144.028000269,
+        "_start": 9144.028268999999,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: pbd.yahoo.com",
@@ -99504,7 +99504,7 @@
         "_created": 9129.612,
         "_method": "OPTIONS",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 9144.500000273001,
+        "_start": 9144.500273,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: pbd.yahoo.com",
@@ -99725,7 +99725,7 @@
         "_created": 9126.471,
         "_method": "OPTIONS",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 9145.363000265,
+        "_start": 9145.363265,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: pbd.yahoo.com",
@@ -99938,7 +99938,7 @@
         "_created": 9147.938,
         "_method": "GET",
         "_url": "https://ads.yieldmo.com/pbsync?gdpr=0&gdpr_consent=&us_privacy=1YNN&gpp=DBABRg~BVoAACY&gpp_sid=9&redirectUri=https%3A%2F%2Fpbs-yahoo-us.ay.delivery%2Fsetuid%3Fbidder%3Dyieldmo%26gdpr%3D0%26gdpr_consent%3D%26gpp%3DDBABRg~BVoAACY%26gpp_sid%3D9%26f%3Di%26uid%3D%24UID",
-        "_start": 9148.394000290002,
+        "_start": 9148.394289999998,
         "_request_headers": [
           ":method: GET",
           ":authority: ads.yieldmo.com",
@@ -100213,7 +100213,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9171673,
+            "ts": 9171.673,
             "bytes": 21848
           }
         ],
@@ -100223,7 +100223,7 @@
         "_created": 9130.366,
         "_method": "GET",
         "_url": "https://images.taboola.com/taboola/image/fetch/f_jpg%2Cq_auto%2Ch_278%2Cw_500%2Cc_fill%2Cg_faces:auto%2Ce_sharpen/https%3A//cdn.taboola.com/libtrc/static/thumbnails/a5d478b5cd0e124dfedcea51db9076fd.png",
-        "_start": 9151.700000279,
+        "_start": 9151.700278999999,
         "_request_headers": [
           ":method: GET",
           ":authority: images.taboola.com",
@@ -100553,11 +100553,11 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9183318,
+            "ts": 9183.318,
             "bytes": 63532
           },
           {
-            "ts": 9185419,
+            "ts": 9185.419,
             "bytes": 9098
           }
         ],
@@ -100567,7 +100567,7 @@
         "_created": 9130.602,
         "_method": "GET",
         "_url": "https://images.taboola.com/taboola/image/fetch/f_jpg%2Cq_auto%2Ch_278%2Cw_500%2Cc_fill%2Cg_faces:auto%2Ce_sharpen/https%3A//cdn.taboola.com/libtrc/static/thumbnails/44f682f574fef976ed763f2ef65bb249.jpg",
-        "_start": 9151.756000281,
+        "_start": 9151.756281,
         "_request_headers": [
           ":method: GET",
           ":authority: images.taboola.com",
@@ -100664,7 +100664,7 @@
         "_all_end": 9204
       },
       {
-        "time": 42.98974609375,
+        "time": 42.989990234375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -100895,14 +100895,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 42.0478515625,
+          "wait": 42.048095703125,
           "receive": 0.94189453125
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 9172943,
+            "ts": 9172.943,
             "bytes": 16820
           }
         ],
@@ -100912,7 +100912,7 @@
         "_created": 9129.953,
         "_method": "GET",
         "_url": "https://images.taboola.com/taboola/image/fetch/f_jpg%2Cq_auto%2Ch_278%2Cw_500%2Cc_fill%2Cg_faces:auto%2Ce_sharpen/https%3A//cdn.taboola.com/libtrc/static/thumbnails/18d72d64c2e08e5bd7378d46fbea89a5.png",
-        "_start": 9151.812000277,
+        "_start": 9151.812277,
         "_request_headers": [
           ":method: GET",
           ":authority: images.taboola.com",
@@ -101123,7 +101123,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9184133,
+            "ts": 9184.133,
             "bytes": 1533,
             "inflated": 4066
           }
@@ -101134,7 +101134,7 @@
         "_created": 9109.367,
         "_method": "GET",
         "_url": "https://3p-geo.yahoo.com/p?s=1197802876&t=lkWJiFs4JWGZplNx,0.9103037947533758&_I=&_AO=0&_NOL=0&_R=&_P=3.78.0%05_a1s%03d%3DAQABBG33xmkCEMUIZBMXuBp1a9w0AoNjT2oFEgEBAQFIyGnQadxV0iMA_eMDAA%26S%3DAQAAAqqUQU4q7UCsynIHGvFsfBU%04_ga%03GA1.1.1925043291.1774647151%04_pl%031%04A_v%033.78.0%04A_cn%03ANALYTICS-EVERGREEN%04test%03benji-mergepbsbucket-test%04_bt%03rapid%04A_pr%03https%04A_tzoff%03-4%04_vuidList%03y2tXaX-gNgtl9JSizw9vZQ%2CFeMV2ip3MgCrDHEnPnI2iQ%2CLK7ThvS1XW2zThwVJOvg3g%2CLqbDWNgEviBUMzZ3nE-57Q%2CWpcCNYc8hAOpvN1TN52IMA%04_vuid%03eyIDXOeJopWx8IJsMWjCsA%04A_sid%034Dp6topS1ZCLXxfs%04_w%03www.engadget.com%2F%04A_id%031197802876%04colo%03gq1%04mrkt%03us%04navtype%03server%04partner%03none%04ver%03engadget-next%04adblock%030%04layout%03grid%04p_sec%03default%04pt%03home%04pct%03homepage%04A_utm%03%7B%22perf_fcp%22%3A428%2C%22perf_fcp_rating%22%3A%22good%22%7D%04etrg%03backgroundPost%04outcm%03performance%04usergenf%030%04etag%03performance%04_E%03pageperf%04_ts%031774655811%04_ms%03917%04A_sr%032558x1277%04A_vr%032558x1277%04A_do%031%04A_ib%032308x940%04A_ob%032307x1061%04A_srr%031.109375",
-        "_start": 9161.673000252998,
+        "_start": 9161.673253,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -101298,7 +101298,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9184316,
+            "ts": 9184.316,
             "bytes": 3212,
             "inflated": 10499
           }
@@ -101309,7 +101309,7 @@
         "_created": 9109.636,
         "_method": "GET",
         "_url": "https://3p-geo.yahoo.com/p?s=1197802876&t=Ct0dwOIw7xNk0YEN,0.06445739862382793&_I=&_AO=0&_NOL=0&_R=&_P=3.78.0%05_a1s%03d%3DAQABBG33xmkCEMUIZBMXuBp1a9w0AoNjT2oFEgEBAQFIyGnQadxV0iMA_eMDAA%26S%3DAQAAAqqUQU4q7UCsynIHGvFsfBU%04_ga%03GA1.1.1925043291.1774647151%04_pl%031%04A_v%033.78.0%04A_cn%03ANALYTICS-EVERGREEN%04test%03benji-mergepbsbucket-test%04_bt%03rapid%04A_pr%03https%04A_tzoff%03-4%04_vuidList%03y2tXaX-gNgtl9JSizw9vZQ%2CFeMV2ip3MgCrDHEnPnI2iQ%2CLK7ThvS1XW2zThwVJOvg3g%2CLqbDWNgEviBUMzZ3nE-57Q%2CWpcCNYc8hAOpvN1TN52IMA%04_vuid%03eyIDXOeJopWx8IJsMWjCsA%04A_sid%034Dp6topS1ZCLXxfs%04_w%03www.engadget.com%2F%04A_id%031197802876%04colo%03gq1%04mrkt%03us%04navtype%03server%04partner%03none%04ver%03engadget-next%04adblock%030%04layout%03grid%04p_sec%03default%04pt%03home%04pct%03homepage%04A_utm%03%7B%22perf_lcp%22%3A428%2C%22perf_lcp_rating%22%3A%22good%22%2C%22perf_lcp_elmt%22%3A%22img%22%2C%22perf_lcp_id%22%3A%22aspect-%5B16%2F9%5D%20max-w-full%20rounded-md%20object-fill%22%2C%22perf_lcp_slk%22%3A%22Fender%20Mix%20review%3A%20Well-designed%20headphones%20that%20just%20fall%20short%20of%20greatness%22%2C%22perf_lcp_url%22%3A%22https%3A%2F%2Fs.yimg.com%2Flo%2Fmysterio%2Fapi%2FDBEB43F371EF81EDF3609055EA0F2B58996AA2C8F1A6680ABD82D9AF4D905398%2Fsubgraphmysterio%2Fresizefill_w875_h494%3Bquality_95%3Bformat_webp%2Fhttps%3A%252F%252Fd29szjachogqwa.cloudfront.net%252Fimages%252Fuser-uploaded%252Ffender-lede.jpg%22%7D%04etrg%03backgroundPost%04outcm%03performance%04usergenf%030%04etag%03performance%04_E%03pageperf%04_ts%031774655811%04_ms%03918%04A_sr%032558x1277%04A_vr%032558x1277%04A_do%031%04A_ib%032308x940%04A_ob%032307x1061%04A_srr%031.109375",
-        "_start": 9161.735000255,
+        "_start": 9161.735255000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -101493,7 +101493,7 @@
         "connection": "759",
         "_chunks": [
           {
-            "ts": 9257873,
+            "ts": 9257.873,
             "bytes": 86
           }
         ],
@@ -101503,7 +101503,7 @@
         "_created": 9161.159,
         "_method": "GET",
         "_url": "https://pbs-yahoo-us.ay.delivery/setuid?bidder=yieldmo&f=i&uid=wqwn9qSXwnSfYyM9c_jV&gdpr=0&gdpr_consent=&gpp=DBABRg~BVoAACY&gpp_sid=9&us_privacy=1YNN",
-        "_start": 9161.803000291,
+        "_start": 9161.803291,
         "_request_headers": [
           ":method: GET",
           ":authority: pbs-yahoo-us.ay.delivery",
@@ -101704,7 +101704,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9183881,
+            "ts": 9183.881,
             "bytes": 6851,
             "inflated": 21861
           }
@@ -101715,7 +101715,7 @@
         "_created": 9109.193,
         "_method": "GET",
         "_url": "https://3p-geo.yahoo.com/p?s=1197802876&t=jHtaGNxrzLGvY7Wy,0.918719712785985&_I=&_AO=0&_NOL=0&_R=&_P=3.78.0%05_a1s%03d%3DAQABBG33xmkCEMUIZBMXuBp1a9w0AoNjT2oFEgEBAQFIyGnQadxV0iMA_eMDAA%26S%3DAQAAAqqUQU4q7UCsynIHGvFsfBU%04_ga%03GA1.1.1925043291.1774647151%04_pl%031%04A_v%033.78.0%04A_cn%03ANALYTICS-EVERGREEN%04test%03benji-mergepbsbucket-test%04_bt%03rapid%04A_pr%03https%04A_tzoff%03-4%04_vuidList%03y2tXaX-gNgtl9JSizw9vZQ%2CFeMV2ip3MgCrDHEnPnI2iQ%2CLK7ThvS1XW2zThwVJOvg3g%2CLqbDWNgEviBUMzZ3nE-57Q%2CWpcCNYc8hAOpvN1TN52IMA%04_vuid%03eyIDXOeJopWx8IJsMWjCsA%04A_sid%034Dp6topS1ZCLXxfs%04_w%03www.engadget.com%2F%04A_id%031197802876%04colo%03gq1%04mrkt%03us%04navtype%03server%04partner%03none%04ver%03engadget-next%04adblock%030%04layout%03grid%04p_sec%03default%04pt%03home%04pct%03homepage%04A_utm%03%7B%22perf_ttfb%22%3A318%2C%22perf_ttfb_rating%22%3A%22good%22%7D%04etrg%03backgroundPost%04outcm%03performance%04usergenf%030%04etag%03performance%04_E%03pageperf%04_ts%031774655811%04_ms%03917%04A_sr%032558x1277%04A_vr%032558x1277%04A_do%031%04A_ib%032308x940%04A_ob%032307x1061%04A_srr%031.109375",
-        "_start": 9161.856000251,
+        "_start": 9161.856251000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -101852,7 +101852,7 @@
         "_created": 9108.688,
         "_method": "POST",
         "_url": "https://cm.g.doubleclick.net/pixel?google_nid=oath_dbm&google_hm=%7B%7BB64_AXID%7D%7D%7BG%7B&gdpr=0&gdpr_consent=%7DG%7D%7BP%7B&gpp=DBABRg~BVoAACY&gpp_sid=9%7DP%7D",
-        "_start": 9174.205000249,
+        "_start": 9174.205249,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -101904,7 +101904,7 @@
         "_all_end": 9260
       },
       {
-        "time": 31.9501953125,
+        "time": 31.949951171875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -102055,14 +102055,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 31.39013671875,
+          "wait": 31.389892578125,
           "receive": 0.56005859375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 9211894,
+            "ts": 9211.894,
             "bytes": 110
           }
         ],
@@ -102072,7 +102072,7 @@
         "_created": 9179.944,
         "_method": "POST",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 9182.796000293,
+        "_start": 9182.796293,
         "_request_headers": [
           ":method: POST",
           ":authority: pbd.yahoo.com",
@@ -102249,7 +102249,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9212479,
+            "ts": 9212.479,
             "bytes": 110
           }
         ],
@@ -102259,7 +102259,7 @@
         "_created": 9180.387,
         "_method": "POST",
         "_url": "https://www.googleadservices.com/pagead/managed/js/activeview/current/reach_worklet.js",
-        "_start": 9182.885000295,
+        "_start": 9182.885295,
         "_request_headers": [
           "Accept: application/javascript"
         ],
@@ -102470,7 +102470,7 @@
         "_created": 9180.748,
         "_method": "OPTIONS",
         "_url": "https://pbd.yahoo.com/data/analytics",
-        "_start": 9182.951000297,
+        "_start": 9182.951297,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: pbd.yahoo.com",
@@ -102658,7 +102658,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9213091,
+            "ts": 9213.091,
             "bytes": 110
           }
         ],
@@ -102668,7 +102668,7 @@
         "_created": 9180.967,
         "_method": "POST",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAIgATpBbW9kZWxfcGVyc29uX2NvdW50cnlfY29kZV9VU19wZXJzb25fcmVnaW9uX2NvZGVfNTY0MTVmMzUzMTMxLmpzb25IyAFSGkNLVEY5SW1rd1pNREZWMlBXZ1VkWXk0QjBRWjUImBYQuqUBGPrXPiDL46UEKAIwAjgBXTMzcz9gv54M6gEICGQYZCAeKF%2BCAggIAhABGAMgAQ%3D%3D",
-        "_start": 9183.063000299,
+        "_start": 9183.063299000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -102729,7 +102729,7 @@
         "_all_end": 9214
       },
       {
-        "time": 61.7861328125,
+        "time": 61.785888671875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -102880,14 +102880,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 61.129150390625,
+          "wait": 61.12890625,
           "receive": 0.656982421875
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 9243040,
+            "ts": 9243.04,
             "bytes": 110
           }
         ],
@@ -102897,7 +102897,7 @@
         "_created": 9181.254,
         "_method": "POST",
         "_url": "https://pbd.yahoo.com/data/logs/taboola",
-        "_start": 9183.137000301,
+        "_start": 9183.137301,
         "_request_headers": [
           ":method: POST",
           ":authority: pbd.yahoo.com",
@@ -102972,7 +102972,7 @@
         "_all_end": 9243
       },
       {
-        "time": 70.201904296875,
+        "time": 70.2021484375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -103087,14 +103087,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 69.4619140625,
+          "wait": 69.462158203125,
           "receive": 0.739990234375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 9283578,
+            "ts": 9283.578,
             "bytes": 110
           }
         ],
@@ -103104,7 +103104,7 @@
         "_created": 9213.376,
         "_method": "POST",
         "_url": "https://pagead2.googlesyndication.com/pagead/ping?e=1",
-        "_start": 9213.859000305001,
+        "_start": 9213.859305,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -103166,7 +103166,7 @@
         "_all_end": 9282
       },
       {
-        "time": 62.126220703125,
+        "time": 62.1259765625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -103265,14 +103265,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 61.547119140625,
+          "wait": 61.546875,
           "receive": 0.5791015625
         },
         "serverIPAddress": "",
         "connection": "7403",
         "_chunks": [
           {
-            "ts": 9321644,
+            "ts": 9321.644,
             "bytes": 170
           }
         ],
@@ -103283,7 +103283,7 @@
         "_method": "GET",
         "_url": "https://a7cab68d5d14ceacf90abbf8745b5295.safeframe.googlesyndication.com/safeframe/1-0-45/html/container.html",
         "_quic_session": 7403,
-        "_start": 9295.570000307,
+        "_start": 9295.570307,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -103334,7 +103334,7 @@
         "_all_end": 9356
       },
       {
-        "time": 62.97216796875,
+        "time": 62.971923828125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -103441,7 +103441,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 62.97216796875,
+          "wait": 62.971923828125,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -103454,7 +103454,7 @@
         "_method": "POST",
         "_url": "https://ep1.adtrafficquality.google/getconfig/sodar?sv=200&tid=gpt&tv=m202603190101&st=env&sjk=4657735233152988",
         "_quic_session": 7420,
-        "_start": 9355.660000309,
+        "_start": 9355.660309,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -103594,7 +103594,7 @@
         "_created": 9188.198,
         "_method": "GET",
         "_url": "https://noa.yahoo.com/p?&bucket=benji-mergepbsbucket-test&device=desktop&lang=en-US&lu=0&region=US&site=engadget&ver=engadget-next&pt=home&spaceid=1197802876&outcm=prebidDebug&eventType=LIVERAMP_SYNC_DECISION&reason=keys_not_expired&_lr_env_raw_exists=false&_lr_env_raw_length=0&_lr_pairId_exists=false&_lr_pairId_length=0&_lr_atsDirect_exists=false&_lr_atsDirect_length=0&_lr_env_exp_raw_exists=true&_lr_env_exp_raw_length=10&_lr_env_exp_raw_ttl_seconds=1798&_lr_env_exp_raw_is_expired=false&_lr_pairId_exp_exists=true&_lr_pairId_exp_length=10&_lr_pairId_exp_ttl_seconds=1798&_lr_pairId_exp_is_expired=false&_lr_atsDirect_exp_exists=true&_lr_atsDirect_exp_length=10&_lr_atsDirect_exp_ttl_seconds=1798&_lr_atsDirect_exp_is_expired=false",
-        "_start": 9366.179000303,
+        "_start": 9366.179302999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -103785,7 +103785,7 @@
         "_created": 9141.803,
         "_method": "POST",
         "_url": "https://api.assertcom.de/error",
-        "_start": 9399.354000283,
+        "_start": 9399.354283,
         "_request_headers": [
           ":method: POST",
           ":authority: api.assertcom.de",
@@ -103992,7 +103992,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9638387,
+            "ts": 9638.387,
             "bytes": 43
           }
         ],
@@ -104002,7 +104002,7 @@
         "_created": 9608.322,
         "_method": "POST",
         "_url": "https://securepubads.g.doubleclick.net/gampad/ads?pvsid=4657735233152988&correlator=2549008632888203&eid=31097447%2C95379659%2C31097501&output=ldjh&gdfp_req=1&vrg=202603190101&ptt=17&impl=fifs&gdpr=0&us_privacy=1YNN&gpp=DBABRg~BVoAACY&gpp_sid=9&iu_parts=22888152279%2Cus%2Ceng%2Cmain%2Cdt%2Cus_eng_main_dt_top_center&enc_prev_ius=%2F0%2F1%2F2%2F3%2F4%2F5&prev_iu_szs=728x90%7C970x250%7C3x1%7C4x1&ifi=1&didk=4264876777&dids=R1lbkq&adfs=1636301594&sfv=1-0-45&fsfs=1&fsbs=1&eri=5&sc=1&cookie=ID%3D228fde2a0b54b6e5%3AT%3D1774647152%3ART%3D1774647152%3AS%3DALNI_MZjwGdF-RRDVj2XtUtWTYOf5QTruQ&abxe=1&dt=1774655811373&adxs=782&adys=261&biw=2292&bih=940&scr_x=0&scr_y=0&btvi=0&ucis=1&oid=2&u_his=2&u_h=1277&u_w=2558&u_ah=1277&u_aw=2558&u_cd=24&u_sd=1.109&u_tz=-240&dmc=8&bc=31&nvt=1&uach=WyJMaW51eCIsIiIsIng4NiIsIiIsIjE0Ni4wLjc2ODAuMTY0IixudWxsLDAsbnVsbCwiNjQiLFtbIkNocm9taXVtIiwiMTQ2LjAuNzY4MC4xNjQiXSxbIk5vdC1BLkJyYW5kIiwiMjQuMC4wLjAiXSxbIkdvb2dsZSBDaHJvbWUiLCIxNDYuMC43NjgwLjE2NCJdXSwwXQ..&url=https%3A%2F%2Fwww.engadget.com%2F&vis=1&psz=728x0&msz=728x0&fws=4&ohw=2292&a3p=EjQKCnB1YmNpZC5vcmcSJDBmMjRhMTJkLWFiZDYtNGI1YS1iMzE5LThiN2FlYmQzNmVkN1gBEkEKEGVzcC5wdWJtYXRpYy5jb20SJEZEMTZDQUZDLTA5OTEtNDNBMy05RkEyLUI4OTgwNjM2QTVFRRjkl9qJ0zNIAA..&dlt=1774655809716&idt=310&ppid=792d544269454c75524532754b35315657387368524f336d575443325152567464627e41&prev_scp=loc%3Dtop_center%26ay_floor_s%3Dfloors%2520set%26hb_crid_oms_ay%3Dc6a22d51-22f5-4401-a376-375a52780b9a%26hb_adomain_oms_ay%3Dadobe.com%26hb_format_oms_ay%3Dbanner%26hb_source_oms_ay%3Ds2s%26hb_deal_oms_ay%3DSVN_341188704%26hb_size_oms_ay%3D970x250%26hb_pb_oms_ay%3D0.00%26hb_adid_oms_ay%3D415a4d37cd0833d%26hb_bidder_oms_ay%3Doms_ay%26hb_pb100%3Dfalse%26pbs_bucket%3Dcountry-us%26hb_source%3Ds2s%26hb_size%3D970x250%26hb_pb%3D2.50%26hb_format%3Dbanner%26hb_crid%3DEAAYACogRXqr5thdkaol729hv-9z8GcG4tMAvzgqvVGQUz7.GCIyBEhgibU_%26hb_cache_path%3D%252Fcache%26hb_bidder_seatid%3Daps%26hb_bidder%3Daps%26hb_adomain%3Dlorealparisusa.com%26hb_adid%3D40fbbe4791024118%26ay_floor%3D3.00%26ay_floor_i%3DNDBmYmJlNDc5MTAyNDExOA%253D%253D&cust_params=bucket%3Dbenji-mergepbsbucket-test%26partner%3Dnone%26device%3Ddesktop%26lang%3Den-US%26lu%3D0%26region%3DUS%26site%3Dengadget%26ver%3Dengadget-next%26usercountry%3DUS%26ga_measurement_id%3DG-H2EP6H9Y3S%26ga_property_id%3D478222349%26ga_stream_id%3D10268251347%26pt%3Dhome%26spaceid%3D1197802876%26url%3Dhttps%253A%252F%252Fwww.engadget.com%252F%26yPageContentType%3Dhomepage%26yPageType%3Dhome%26axid%3DPEWVIQTJIVGHKUSFGJ2UWNJRKZLTQ43IKJHTG3KXKRBTEUKSKZ2GIYT6IE%26bka%3D0%26hb_app_location%3Dna%26ay_hb_house%3D1%26ay_floor_s%3Dmodel%2520ready%26ay_floor_g%3Doptimize%26hb_uid_mod%3DliveIntentId_off%26li-module-enabled%3Dt0%26li_2%3Doff%26lr_env%3Dno-id%26lr_pairid%3Dno-id%26sharedid%3Did&adks=2321314035&frm=20&eoidce=1&gblpids=us_eng_main_dt_top_center&pb_szs=728x90%7C970x250&pgls=CAk.&pbbce=1",
-        "_start": 9608.698000311,
+        "_start": 9608.698311,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -104206,23 +104206,23 @@
         "connection": "6480",
         "_chunks": [
           {
-            "ts": 10105066,
+            "ts": 10105.066,
             "bytes": 63958
           },
           {
-            "ts": 10105274,
+            "ts": 10105.274,
             "bytes": 1694
           },
           {
-            "ts": 10106332,
+            "ts": 10106.332,
             "bytes": 16606
           },
           {
-            "ts": 10107373,
+            "ts": 10107.373,
             "bytes": 3613
           },
           {
-            "ts": 10107982,
+            "ts": 10107.982,
             "bytes": 5405
           }
         ],
@@ -104233,7 +104233,7 @@
         "_method": "GET",
         "_url": "https://a7cab68d5d14ceacf90abbf8745b5295.safeframe.googlesyndication.com/safeframe/1-0-45/html/container.html",
         "_quic_session": 6480,
-        "_start": 9646.119000314999,
+        "_start": 9646.119315,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -104395,22 +104395,22 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 9659840,
+            "ts": 9659.84,
             "bytes": 32768,
-            "inflated": 22897
+            "inflated": 88433
           },
           {
-            "ts": 9660317,
+            "ts": 9660.317,
             "bytes": 32768,
-            "inflated": 37674
+            "inflated": 103210
           },
           {
-            "ts": 9660663,
+            "ts": 9660.663,
             "bytes": 32768,
-            "inflated": 21387
+            "inflated": 86923
           },
           {
-            "ts": 9661003,
+            "ts": 9661.003,
             "bytes": 553,
             "inflated": 1060
           }
@@ -104421,7 +104421,7 @@
         "_created": 9649.065,
         "_method": "GET",
         "_url": "https://i.clean.gg/1a",
-        "_start": 9649.620000317,
+        "_start": 9649.620316999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -104592,12 +104592,12 @@
         "connection": "7478",
         "_chunks": [
           {
-            "ts": 9720420,
+            "ts": 9720.42,
             "bytes": 8314,
             "inflated": 11013
           },
           {
-            "ts": 9721597,
+            "ts": 9721.597,
             "bytes": 5333,
             "inflated": 7081
           }
@@ -104609,7 +104609,7 @@
         "_method": "GET",
         "_url": "https://ep2.adtrafficquality.google/sodar/sodar2.js",
         "_quic_session": 7478,
-        "_start": 9678.257000313,
+        "_start": 9678.257312999998,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -104842,7 +104842,7 @@
         "connection": "7481",
         "_chunks": [
           {
-            "ts": 9714430,
+            "ts": 9714.43,
             "bytes": 3121,
             "inflated": 7404
           }
@@ -104854,7 +104854,7 @@
         "_method": "GET",
         "_url": "https://pbd.yahoo.com/data/analytics",
         "_quic_session": 7481,
-        "_start": 9699.639000319,
+        "_start": 9699.639319,
         "_request_headers": [
           "traceparent: 00-702a3cd2bdf16bc507dad0210542a13c-99dd7ab453dd1149-00",
           "sec-ch-ua-platform: \"Linux\"",
@@ -105058,7 +105058,7 @@
         "_method": "OPTIONS",
         "_url": "https://i.clean.gg/1a",
         "_quic_session": 7501,
-        "_start": 9705.972000321,
+        "_start": 9705.972321000001,
         "_request_headers": [
           ":method: OPTIONS",
           ":authority: i.clean.gg",
@@ -105123,7 +105123,7 @@
         "_all_end": 9746
       },
       {
-        "time": 50.360107421875,
+        "time": 50.35986328125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -105234,14 +105234,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 49.80615234375,
+          "wait": 49.805908203125,
           "receive": 0.553955078125
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 9766663,
+            "ts": 9766.663,
             "bytes": 110
           }
         ],
@@ -105251,7 +105251,7 @@
         "_created": 9716.303,
         "_method": "POST",
         "_url": "https://3p-geo.yahoo.com/p?s=1197802876&t=rLIIkzlWtXMDMp2I,0.4666667194317682&_I=&_AO=0&_NOL=0&_R=&_P=3.78.0%05_a1s%03d%3DAQABBG33xmkCEMUIZBMXuBp1a9w0AoNjT2oFEgEBAQFIyGnQadxV0iMA_eMDAA%26S%3DAQAAAqqUQU4q7UCsynIHGvFsfBU%04_ga%03GA1.1.1925043291.1774647151%04_pl%031%04A_v%033.78.0%04A_cn%03ANALYTICS-EVERGREEN%04test%03benji-mergepbsbucket-test%04_bt%03rapid%04A_pr%03https%04A_tzoff%03-4%04_vuidList%03y2tXaX-gNgtl9JSizw9vZQ%2CFeMV2ip3MgCrDHEnPnI2iQ%2CLK7ThvS1XW2zThwVJOvg3g%2CLqbDWNgEviBUMzZ3nE-57Q%2CWpcCNYc8hAOpvN1TN52IMA%04_vuid%03eyIDXOeJopWx8IJsMWjCsA%04A_sid%034Dp6topS1ZCLXxfs%04_w%03www.engadget.com%2F%04A_id%031197802876%04colo%03gq1%04mrkt%03us%04navtype%03server%04partner%03none%04ver%03engadget-next%04adblock%030%04layout%03grid%04p_sec%03default%04pt%03home%04pct%03homepage%04etrg%03hide%04outcm%03window%04usergenf%031%04etag%03dwell%2Cstop%04A_jse%03window.blur%04A_prets%031774655809%04A_prems%03926%04_E%03dwell%04_ts%031774655811%04_ms%03908%04A_sr%032558x1277%04A_vr%032558x1277%04A_do%031%04A_ib%032308x940%04A_ob%032307x1061%04A_srr%031.109375",
-        "_start": 9716.695000323,
+        "_start": 9716.695323,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -105414,7 +105414,7 @@
         "_method": "POST",
         "_url": "https://www.google.com/recaptcha/api2/aframe",
         "_quic_session": 7501,
-        "_start": 9720.624000325,
+        "_start": 9720.624324999999,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -105471,7 +105471,7 @@
         "_all_end": 9734
       },
       {
-        "time": 55.81787109375,
+        "time": 55.818115234375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -105570,14 +105570,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 54.954833984375,
+          "wait": 54.955078125,
           "receive": 0.863037109375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 9780334,
+            "ts": 9780.334,
             "bytes": 7609,
             "inflated": 21495
           }
@@ -105588,7 +105588,7 @@
         "_created": 9724.625,
         "_method": "GET",
         "_url": "https://ep2.adtrafficquality.google/sodar/sodar2/253/runner.html",
-        "_start": 9764.930000327,
+        "_start": 9764.930327,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -105733,7 +105733,7 @@
         "connection": "7569",
         "_chunks": [
           {
-            "ts": 9826755,
+            "ts": 9826.755,
             "bytes": 5450,
             "inflated": 14614
           }
@@ -105745,7 +105745,7 @@
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/bg/BFwyINoseXOq-dNNrdFdcZYYTunbeAyYGaHjELsWuqw.js",
         "_quic_session": 7569,
-        "_start": 9814.022000329001,
+        "_start": 9814.022329,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -105927,7 +105927,7 @@
         "connection": "7566",
         "_chunks": [
           {
-            "ts": 9864334,
+            "ts": 9864.334,
             "bytes": 543,
             "inflated": 829
           }
@@ -105939,7 +105939,7 @@
         "_method": "GET",
         "_url": "https://ep2.adtrafficquality.google/generate_204?zDHdXw",
         "_quic_session": 7566,
-        "_start": 9821.111000330999,
+        "_start": 9821.111331,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -106002,7 +106002,7 @@
         "_all_end": 9891
       },
       {
-        "time": 10.754150390625,
+        "time": 10.75390625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -106073,7 +106073,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 10.754150390625,
+          "wait": 10.75390625,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -106086,7 +106086,7 @@
         "_method": "GET",
         "_url": "https://noa.yahoo.com/p?s=1197802876&t=1774655811903&_I=&_AO=0&_NOL=0&etrg=backgroundPost&outcm=gamDebug&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&bucket=benji-mergepbsbucket-test&rid=unknown&limitedAds=false&NPA=false&pd=unknown&pt=home&usercountry=US&benjiVersion=2.3.177&prebidVersion=9.53.2&yahooPrebidVersion=2.0.144&id=R1lbkq&isRefresh=false&loc=top_center&renderCount=1&status=succeeded",
         "_quic_session": 7569,
-        "_start": 9882.381000337,
+        "_start": 9882.381336999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -106237,7 +106237,7 @@
         "_method": "GET",
         "_url": "https://api.assertcom.de/",
         "_quic_session": 7603,
-        "_start": 9899.861000335,
+        "_start": 9899.861335000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -106377,7 +106377,7 @@
           "receive": 0.50390625
         },
         "serverIPAddress": "",
-        "connection": "conn_req_216",
+        "connection": "conn_req_206",
         "_chunks": [],
         "_chunks_in": [],
         "_chunks_out": [],
@@ -106418,11 +106418,11 @@
         "_connect_end": 9899.654,
         "_ssl_start": 9873.597,
         "_ssl_end": 9899.654,
-        "_dnsTimeMs": 1685391180684,
-        "_dnsEndTimeMs": 1685391180684.323,
-        "_connectTimeMs": 1685391180684.323,
-        "_connectEndTimeMs": 1685391180710.38,
-        "_sslStartTimeMs": 1685391180684.323,
+        "_dnsTimeMs": 1774655810786,
+        "_dnsEndTimeMs": 1774655810786.323,
+        "_connectTimeMs": 1774655810786.323,
+        "_connectEndTimeMs": 1774655810812.38,
+        "_sslStartTimeMs": 1774655810786.323,
         "_load_start": 9871,
         "_ttfb_start": 9871,
         "_ttfb_end": 9945,
@@ -106552,7 +106552,7 @@
         "_all_end": 10209
       },
       {
-        "time": 30.665283203125,
+        "time": 30.6650390625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -106671,14 +106671,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 29.8251953125,
+          "wait": 29.824951171875,
           "receive": 0.840087890625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 10211577,
+            "ts": 10211.577,
             "bytes": 43
           }
         ],
@@ -106688,7 +106688,7 @@
         "_created": 10180.912,
         "_method": "POST",
         "_url": "https://pagead2.googlesyndication.com/pagead/js/r20260326/r20110914/abg_lite_fy2021.js",
-        "_start": 10181.824000343,
+        "_start": 10181.824343,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -106753,7 +106753,7 @@
         "_all_end": 10210
       },
       {
-        "time": 32.18212890625,
+        "time": 32.181884765625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -106872,14 +106872,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 31.10009765625,
+          "wait": 31.099853515625,
           "receive": 1.08203125
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 10213647,
+            "ts": 10213.647,
             "bytes": 43
           }
         ],
@@ -106889,7 +106889,7 @@
         "_created": 10181.465,
         "_method": "POST",
         "_url": "https://pagead2.googlesyndication.com/pagead/js/r20260326/r20110914/elements/html/omrhp_fy2021.js",
-        "_start": 10182.264000345,
+        "_start": 10182.264345000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -106954,7 +106954,7 @@
         "_all_end": 10213
       },
       {
-        "time": 40.227783203125,
+        "time": 40.22802734375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -107065,14 +107065,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 39.601806640625,
+          "wait": 39.60205078125,
           "receive": 0.6259765625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 10222221,
+            "ts": 10222.221,
             "bytes": 43
           }
         ],
@@ -107082,7 +107082,7 @@
         "_created": 10181.993,
         "_method": "POST",
         "_url": "https://ad.doubleclick.net/pcs/view?xai=AKAOjstKnNt-tjCjoZ1nJZZM0yK_MXTRvHPKOjB8uHuDyrWeF9GzZQHM1Y4xirl4W449LMcegU4DaZbXNF_DzwDMzDWSftRBgJxZkLRu8JFcgHmtWfAtzNM-JPChewRMqEbrqjighrqFEg4hHjFSDIcfMkX_u8YtsZbyFIrMEgd1o6DFPKz6WwjgacmJ7obvT2S9lps7c_Dr5PNbla6JxrEnKY09HncfchuDn52jriE7Yu3jsChSze5bo5dxAj7WCYN_kg52wLx3dugokfE9s9fBmIPTsRqtdqwadOhsPDqgvidT2bG82wN5Pr9VIj5HZLUJ7Tl0mTFYV61qTs4BVztzCFpZVBZQmPrAUyvTWXBm3v35y6_6k0NancChtsU6juKvO7mVKR-M2WjFzHcLRmXzV8JmB1OedFkHUyFB8CMARHPiMnHgGACFupP2S9L3Wl0qr92cVz9Ye2IGZbF0uagldwy1TFG7VdOEiCQs6nJH5MHCO9lmCTeMFwfYMtcqPhg5P5zAYKWFAWOW2Qk-PIf0V60AVYnFHFBQn_D1SWILVhQ1gzN91P5iadg_rX_fZgA3b_h-oqFV5x46Ir8nH24JZaheobMX7saSY-iYpQfJsGtABv2OYNkgylwayiGfILu9hA3aqv-vvW9uHhDw1dp-n5BPLDKY5752HyPA3hkAlIEx_wIiZ5-3DNJIsV5_u2kBf8TKvUjMM6QUTdcDHxBxNVeCEBWyp0LXCVNV1D0LYINLZJWfLmvuDIoQzrfBqVBb7mq-KsLTCqNvmtLbAeFdzq-RKzbddwgkCrwF6svUI_oTdqKUFZbisCsVtxicJ1YaEkOlfA-VrcCNURILr1bqcOc8cdXAVPARXRSIttbgcBxVvyu1xSPyBGLmuQY1vu5WnBho9pHRrf9k2QyRU7SM4MWzHGb2qZHH9XRTWxO2LSOAezvpV4fODXELR_xfKNpNHOdIELv_Bk4DDLSHk2gX46razp7f5ou16LWg8CqbkGsCKYl7HSzAVN7pfTZvTKe9GL5wdXyxD7Rzhcg3fkojqpCNhVCnDDOKaPV42AK0-9LJxOjJhilreaom70y3-hm2Rhrn3wNUzy7Z0QbgND2ztn9V5v9AhLDkvyCMRsZRYuLCRFIqPZZGcw7EmIKi65vJ9IXQYhL2LaIllVnk0pc7FMIs3ZF7RWCMH75MVJi5uZFsoeBElNx7HPuATgyElivuJ4eo9I3gDafOW2_CReS0HAmTdztMcJIk24Gkzqukyy6wp455XC0TB1uQIVp3HUIuzmRDbKwEZcoqJ2-bSS66xoy4J0bM3c9Xa1eGUcRAf3maz-k5SOlTNVviPNWiVqhsUpeA7dVKDJTQ9Zm_8rtEH0awkAPdSZIFpvQvuw5GDaMx5NdtNSy-5s608jXuHqZdZhqFrRPvrIjCN9G15JCouanrULRIIGgIvfmBNdKedndARiYInU6PnS8gCcg_c6B1WxH1cOEyYfktm8bhB7yFglWRsRCDqTII30KU3Nl5k1zVV6SDTXnN9uMYIbv9f-tWieRnO1R-hS9o-nDphtxM4E5IntK6rb6AzvLGg-yG8biW_FaC6B38SaUjMgn7i3FUjdCZgBk0jqfl8myYve9N2C4fNZl36kF0BTKsUWcIlzLpAX1bBTPHgJeXgdoFER-CDzjDOmh0ckjTv1-7KBnX5BjRFMX8OETxJTFbRfdBBV15MMpOFTFau-7omS0ul8dt3PDZve4QlyEhrSNO&sai=AMfl-YQNKRYKvbqJ4AadIF5-SK-Im4ywwxJjeuiPkDLyk56Uu60aDVga32b35CS6K3WFK1hAjpYjGPpvo9K7kjdY_C9qQWkzXi1iE-c64_U9lY1zx_Pc4y5jixxm2GvQ9E2IpoyQfiLlzFVcqKIfTxtx_xqD6qs50pODpc0j408124B6qF0r5Wx4EYqTGGClFT7OarUEXOV1Ni9WkEx94i6vkjRvtO2jQn0x70UG3dYtRMTKvX4g_HnnFTlidXrMtp59rPYi5saaRGXDEB0hJCDpnWQhW-tKyUfyvnnmdSfo9l27h1HC63ZFz_BRpc_dPus6q18CUeqCsI5HAJ7n2KIY5hSLFXq82xO97t8LNT9EhIPM6dwHKrEEDDWgG-mh1SaEgKc5kxwb7qBtSFsdQ0_CmuBsnhVfXHMsUXW18i0vuBwlYaGmWsWXwWa7W-zOVTLaR0jduxBdO0v4iayZSOdlbsPR5NJ0iEjOd8HHUx0cjE7bHQa840lESm2PiUNu0mrlaZm0ll7K9U7BzjqmsYfoeXYxE8SvKN7p6WAD7TKSZNQleweHoRkNQxWqcwpNHi7OxHDLlmza4wghhfiCgoC92DsTQxAqW3SzSWGWVNAUWjT1ISa7YLDMgtWaR6XP9k22oisqE4mRFCbcj0Sfoa3nxu8-qJEgWv95qu52KgtuUEtQwyPFHI5vNzadzUyTdclUk4KNraseoScJLebWwHqy1eLmHKRxOG9r_euBKPQnVppYJ5NvLNzDUC81qxGaX0KhKxAKeAn1gJvLVzpv6zHE7XBtY0uIXLSZ6-xZQOloTqpJpQiEHB36cTdZZY_UkoUlpfqWox4e_bLHR_mqXE_41og16L9uvJC9MTXC1CNt_RO53wNAFEixcrB2N2x1AAPzknMrQJm0zxeeGuUYtvu8Nk3nla79XTzG95wytIOlZIi2zWOCbV-2DeM4mi-R3iO3ssXpls2860FrytdFiUSlRo8ksKpm3ikvLO92Ku8fwnILLrZ5pZzCshjdaMPVlznDYQEqTfesdzpC57qdILBsXUUB0gOOaOl6lovIt3IfvAm8-hnMI_UKQGZobutVuAgqXKBriBxIv-0_PbnI7TCVPRovNvvXtQ8iikJEsCnioZ80qrt-CqvrsQvY0RxbqNZgURKw28l_ZUQFwhFSYJxfknFR61gNWkvBO1OFob6TiWjkk5NdkLbm2kYkJkCzOFKtXt601QoSBph84UPMfG0&sig=Cg0ArKJSzJi1oD5wL9gBEAE&uach_m=%5BUACH%5D&crd=aHR0cHM6Ly9mb3JkLmNvbQ&pr=missingexchangepricemacro&fbs_aeid=%5Bgw_fbsaeid%5D&urlfix=1&omid=0&rm=1&ctpt=1&cbvp=1&cstd=0&cisv=r20260326.05845&arae=1&ftch=1&adurl=",
-        "_start": 10182.538000347,
+        "_start": 10182.538347,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -107141,7 +107141,7 @@
         "_all_end": 10221
       },
       {
-        "time": 39.843994140625,
+        "time": 39.84375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -107252,14 +107252,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 39.280029296875,
+          "wait": 39.27978515625,
           "receive": 0.56396484375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 10223006,
+            "ts": 10223.006,
             "bytes": 43
           }
         ],
@@ -107269,7 +107269,7 @@
         "_created": 10183.162,
         "_method": "POST",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=fle-fetch-start2",
-        "_start": 10183.423000349,
+        "_start": 10183.423348999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -107330,7 +107330,7 @@
         "_all_end": 10221
       },
       {
-        "time": 38.421142578125,
+        "time": 38.4208984375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "POST",
@@ -107441,14 +107441,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 37.881103515625,
+          "wait": 37.880859375,
           "receive": 0.5400390625
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 10223759,
+            "ts": 10223.759,
             "bytes": 43
           }
         ],
@@ -107458,7 +107458,7 @@
         "_created": 10185.338,
         "_method": "POST",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=colleague-executed&name=4",
-        "_start": 10185.669000351001,
+        "_start": 10185.669351,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -107637,7 +107637,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 10224544,
+            "ts": 10224.544,
             "bytes": 43
           }
         ],
@@ -107647,7 +107647,7 @@
         "_created": 10186.317,
         "_method": "POST",
         "_url": "https://ups.analytics.yahoo.com/ups/58269/sync?_origin=1&gdpr=0&gpp=DBABRg~BVoAACY&gpp_sid=9&redir=true",
-        "_start": 10187.021000353,
+        "_start": 10187.021353,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -107855,7 +107855,7 @@
         "_created": 10206.121,
         "_method": "POST",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAlgAWACYANgBGgD",
-        "_start": 10206.638000357,
+        "_start": 10206.638357000002,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -108169,17 +108169,17 @@
         "connection": "7603",
         "_chunks": [
           {
-            "ts": 10244149,
+            "ts": 10244.149,
             "bytes": 32768,
-            "inflated": 39452
+            "inflated": 104988
           },
           {
-            "ts": 10244591,
+            "ts": 10244.591,
             "bytes": 32768,
-            "inflated": 45285
+            "inflated": 110821
           },
           {
-            "ts": 10244940,
+            "ts": 10244.94,
             "bytes": 9306,
             "inflated": 27399
           }
@@ -108191,7 +108191,7 @@
         "_method": "GET",
         "_url": "https://ep2.adtrafficquality.google/sodar/VFc2VJAc.js",
         "_quic_session": 7603,
-        "_start": 10230.081000367001,
+        "_start": 10230.081367,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -108340,7 +108340,7 @@
         "connection": "7569",
         "_chunks": [
           {
-            "ts": 10258510,
+            "ts": 10258.51,
             "bytes": 14328,
             "inflated": 43763
           }
@@ -108352,7 +108352,7 @@
         "_method": "GET",
         "_url": "https://www.googleadservices.com/pagead/managed/js/activeview/current/reach_worklet.html",
         "_quic_session": 7569,
-        "_start": 10246.835000371,
+        "_start": 10246.835371,
         "_request_headers": [
           "sec-ch-ua: \"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
           "sec-ch-ua-mobile: ?0",
@@ -108402,7 +108402,7 @@
         "_all_end": 10257
       },
       {
-        "time": 26.3388671875,
+        "time": 26.339111328125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -108509,7 +108509,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 26.3388671875,
+          "wait": 26.339111328125,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -108522,7 +108522,7 @@
         "_method": "GET",
         "_url": "https://tpc.googlesyndication.com/pagead/js/r20260326/r20110914/client/window_focus_fy2021.js",
         "_quic_session": 7756,
-        "_start": 10252.624000373,
+        "_start": 10252.624373,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -108571,7 +108571,7 @@
         "_all_end": 10277
       },
       {
-        "time": 25.945068359375,
+        "time": 25.94482421875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -108678,7 +108678,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 25.945068359375,
+          "wait": 25.94482421875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -108691,7 +108691,7 @@
         "_method": "GET",
         "_url": "https://s0.2mdn.net/simgad/17016499739060016840",
         "_quic_session": 7756,
-        "_start": 10253.048000375,
+        "_start": 10253.048375,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -108753,7 +108753,7 @@
         "_all_end": 10277
       },
       {
-        "time": 64.4091796875,
+        "time": 64.408935546875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -108892,7 +108892,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 64.4091796875,
+          "wait": 64.408935546875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -108905,7 +108905,7 @@
         "_method": "GET",
         "_url": "https://ad.doubleclick.net/.well-known/attribution-reporting/debug/verbose",
         "_quic_session": 7739,
-        "_start": 10253.813000363,
+        "_start": 10253.813363,
         "_request_headers": [
           "Content-Type: application/json"
         ],
@@ -109066,7 +109066,7 @@
         "connection": "7714",
         "_chunks": [
           {
-            "ts": 10290940,
+            "ts": 10290.94,
             "bytes": 194,
             "inflated": 414
           }
@@ -109078,7 +109078,7 @@
         "_method": "GET",
         "_url": "https://cm.g.doubleclick.net/pixel?google_nid=stickyxchange_dbm&google_cm&google_dbm&gdpr=0&gpp=DBABRg~BVoAACY&gpp_sid=9",
         "_quic_session": 7714,
-        "_start": 10257.636000355,
+        "_start": 10257.636355,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -109230,7 +109230,7 @@
         "connection": "7569",
         "_chunks": [
           {
-            "ts": 10303050,
+            "ts": 10303.05,
             "bytes": 12007,
             "inflated": 36294
           }
@@ -109242,7 +109242,7 @@
         "_method": "GET",
         "_url": "https://ep1.adtrafficquality.google/bg/BFwyINoseXOq-dNNrdFdcZYYTunbeAyYGaHjELsWuqw.js",
         "_quic_session": 7569,
-        "_start": 10286.753000381,
+        "_start": 10286.753380999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -109625,7 +109625,7 @@
         "_method": "GET",
         "_url": "https://cm.g.doubleclick.net/pixel?google_nid=stickyxchange_dbm&google_cm&google_dbm&gdpr=0&gpp=DBABRg~BVoAACY&gpp_sid=9",
         "_quic_session": 6668,
-        "_start": 10296.842000392,
+        "_start": 10296.842392,
         "_request_headers": [
           ":method: GET",
           ":authority: cm.g.doubleclick.net",
@@ -109703,7 +109703,7 @@
         "_all_end": 10321
       },
       {
-        "time": 105.328125,
+        "time": 105.327880859375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -109814,14 +109814,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 104.797119140625,
+          "wait": 104.796875,
           "receive": 0.531005859375
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 10337041,
+            "ts": 10337.041,
             "bytes": 1606,
             "inflated": 3771
           }
@@ -109832,7 +109832,7 @@
         "_created": 10231.771,
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=xbid&dbm_b=AKAmf-Caplgyhptq0uNhkFW3ugxnj0mLUsoKjuJxky_cAUZ7XrXZ1Q8kqwawWNImg5U6AON1u4pThkIuGlBtabbXpH6SpcEYzdmUa6hBvO3mGUut-V8VM9c",
-        "_start": 10297.915000369,
+        "_start": 10297.915369,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -109987,7 +109987,7 @@
           "receive": 0.5810546875
         },
         "serverIPAddress": "",
-        "connection": "conn_req_218",
+        "connection": "conn_req_208",
         "_chunks": [],
         "_chunks_in": [],
         "_chunks_out": [],
@@ -110032,11 +110032,11 @@
         "_connect_end": 10297.732,
         "_ssl_start": 10267.985,
         "_ssl_end": 10297.727,
-        "_dnsTimeMs": 1685391181043,
-        "_dnsEndTimeMs": 1685391181064.005,
-        "_connectTimeMs": 1685391181064.005,
-        "_connectEndTimeMs": 1685391181107.5798,
-        "_sslStartTimeMs": 1685391181077.838,
+        "_dnsTimeMs": 1774655811145,
+        "_dnsEndTimeMs": 1774655811166.005,
+        "_connectTimeMs": 1774655811166.005,
+        "_connectEndTimeMs": 1774655811209.5798,
+        "_sslStartTimeMs": 1774655811179.838,
         "_load_start": 10230,
         "_ttfb_start": 10230,
         "_ttfb_end": 10399,
@@ -110153,7 +110153,7 @@
         "_method": "POST",
         "_url": "https://d.agkn.com/pixel/2387/?ct=US&st=VA&city=15695&dma=13&zp=20121&bw=0&che=3677443033&col=35505801,9808312,442362646,636213604,250742875",
         "_quic_session": 7821,
-        "_start": 10314.981000385,
+        "_start": 10314.981385,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -110221,7 +110221,7 @@
         "_all_end": 10361
       },
       {
-        "time": 72.49609375,
+        "time": 72.495849609375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -110320,14 +110320,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 71.088134765625,
+          "wait": 71.087890625,
           "receive": 1.407958984375
         },
         "serverIPAddress": "",
         "connection": "7848",
         "_chunks": [
           {
-            "ts": 10356239,
+            "ts": 10356.239,
             "bytes": 69,
             "inflated": 93
           }
@@ -110339,7 +110339,7 @@
         "_method": "GET",
         "_url": "https://www.googleadservices.com/pagead/managed/js/activeview/current/reach_worklet.js",
         "_quic_session": 7848,
-        "_start": 10327.272000377,
+        "_start": 10327.272377000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -110400,7 +110400,7 @@
         "_all_end": 10398
       },
       {
-        "time": 80.130126953125,
+        "time": 80.1298828125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -110531,58 +110531,58 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 67.47802734375,
+          "wait": 67.477783203125,
           "receive": 12.652099609375
         },
         "serverIPAddress": "",
         "connection": "7855",
         "_chunks": [
           {
-            "ts": 10356180,
+            "ts": 10356.18,
             "bytes": 4468
           },
           {
-            "ts": 10356989,
+            "ts": 10356.989,
             "bytes": 2456
           },
           {
-            "ts": 10357276,
+            "ts": 10357.276,
             "bytes": 2456
           },
           {
-            "ts": 10359077,
+            "ts": 10359.077,
             "bytes": 7368
           },
           {
-            "ts": 10360786,
+            "ts": 10360.786,
             "bytes": 3678
           },
           {
-            "ts": 10361240,
+            "ts": 10361.24,
             "bytes": 1226
           },
           {
-            "ts": 10362375,
+            "ts": 10362.375,
             "bytes": 3678
           },
           {
-            "ts": 10362543,
+            "ts": 10362.543,
             "bytes": 1226
           },
           {
-            "ts": 10364110,
+            "ts": 10364.11,
             "bytes": 4904
           },
           {
-            "ts": 10366438,
+            "ts": 10366.438,
             "bytes": 4901
           },
           {
-            "ts": 10366763,
+            "ts": 10366.763,
             "bytes": 2452
           },
           {
-            "ts": 10368328,
+            "ts": 10368.328,
             "bytes": 639
           }
         ],
@@ -110593,7 +110593,7 @@
         "_method": "GET",
         "_url": "https://ep1.adtrafficquality.google/pagead/gen_204?id=sodar&v=46&t=2&bgai=BirKUQxnHaeSXGt2e6toP49yEiA0AAAAAOAHgBAI&bg=!dXaldhTNAAYbyhOnO8o7AEcBe5WfOL1uZzUFye-d0sIPj9GMuyl3mi5czqAfZ_HlTcwwxMcd5T4EYQF0EbLAbDqnvKK_Gc-1gIWfSsHtgWqGIQgp2_kmQwIAAAAmUgAAAAVoAQd-ADWlGBK-4qGpVXWRylkmz8XwYhKqrbtMbEKR8AbyXP3-Y3Vipr1Ij4zYISdCP07ZWjl0R5YtcwoAi5bknEVny4UyK1CnY2reEmtB_se7rLc1Jn6XAqPsR3g35ea4Nol7uqcaiNtdCu_CTpep0AFbXpelzZGa7xQ4lQXtdFxMwlC6-QeiOua1pRVNFlmho_SDUPIMYwYZrtAExXtSxaNtIJ3NMHUsw8191RGDBqO9zZxwpUp85V_IHJu7tksAj8nZTXXhBTCZAoq6lH59ZflanGLXYYNm4PGhFfp2Nhcr0JDiosLrer5AYGnjLvScmJwXw2MWquA4HFvVs3euKhwexDN9o-YDByUFqHI6kI8iLMzDIMLjJR_YkFYmAwpQSLloIX5hstlUgu4sSgVB3SVId4qnITM_Y4LMtqJMMg1xsKhAqYkDq2Z_kSSAsWEkb8eTBrynk4zTwXx4ZPNlTV-iNokspuOKslV2eXcCdzSjSc1ROVCdCrRDk3fCPaViSnesNwES7XY7wFmtMVetXsOTaBzefydVWYpv0EkUFxWWHMuD9CligRMPH7YccQmPeENSHZOu85qP69HoSbC4XUUFcYUCMUO7Lt-sSq6NIzOoN_d2MpCRDI-pQ3mOVfB9iRpDUS1jBX47G67EaWeeaL1Kf_-ajgqaSr_54mv23zZjkVIBlNJ_3Ax66gjUsCl3hNaVBEDNQ4Bq9IQLgVPypXsANRfJTKkleLZepIdFaBuxK-2omltJhYlG5Z-H0GdvJNGxFJXzoG6lTSr4_m8P5akxNlHXZ-kYJ--c77OQ5oL-eZbhqML58-eaZLtdGRJgcnG40u8AUkheemPY-L-fxAl13sFPX6ORSojn9_VfrCsrUC_9qw_ai-9hPfqMyoVeCJ0ROR-sGTei635S7pZia4jdkQAFA79Iiwm4z1HInkGGbcx3VRZAeJElAoUCM2B39nwFw1srt1XsmtV3cA7wO_3QlMpkXJcObH-SWbJA0Nve15-IY_H3cT8VQRrjtGhFgjHqR10QPIXQQX-jxqZAfiUFjDQIRB08P0T4wrypMZ9Z2j8cbjHW-S3My66vqLfwAD33m3GCpHCBy0eAEsCXcK2NWn3-ZoFl0rG8T5tVQuidLjd8og",
         "_quic_session": 7855,
-        "_start": 10332.384000383001,
+        "_start": 10332.384382999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -110771,7 +110771,7 @@
         "connection": "7603",
         "_chunks": [
           {
-            "ts": 10367647,
+            "ts": 10367.647,
             "bytes": 42
           }
         ],
@@ -110782,7 +110782,7 @@
         "_method": "GET",
         "_url": "https://www.google.com/ads/measurement/l?ebcid=ALh7CaRF03TcGuIHE6BGTNMUWZ1QQZtRf1nlf2zmmDGJY7vozG_nwhP4t_AsgMt6lf6mQ_rMVKOaMQBt2RoA0l05LABli5im4g",
         "_quic_session": 7603,
-        "_start": 10338.564000395,
+        "_start": 10338.564395,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -110935,17 +110935,17 @@
         "connection": "7848",
         "_chunks": [
           {
-            "ts": 10386912,
+            "ts": 10386.912,
             "bytes": 32768,
-            "inflated": 40977
+            "inflated": 106513
           },
           {
-            "ts": 10387369,
+            "ts": 10387.369,
             "bytes": 32768,
-            "inflated": 8306
+            "inflated": 139378
           },
           {
-            "ts": 10388558,
+            "ts": 10388.558,
             "bytes": 8090,
             "inflated": 26761
           }
@@ -110957,7 +110957,7 @@
         "_method": "GET",
         "_url": "https://ad.doubleclick.net/.well-known/attribution-reporting/debug/verbose",
         "_quic_session": 7848,
-        "_start": 10360.443000397001,
+        "_start": 10360.443397,
         "_request_headers": [
           "Content-Type: application/json"
         ],
@@ -111250,7 +111250,7 @@
         "_method": "GET",
         "_url": "https://googleads.g.doubleclick.net/pagead/interaction/?ai=C65pcQxnHaeSXGt2e6toP49yEiA2Z6suPhgGXtb_ezBXex-3xuAIQASDBgouaAWDJ3puN7KSAEKAB2JzFjQPIAQmoAwHIA5sEqgSdAk_Q8stieKQ14U3lInkFT1O39qTaL7z4Y-lzhEpL2xHyUU7G1RI0mB6GMa_kUobzkbLexJxkwA5Px80QJhsar5hEXZXnL4pcMQdfHsp1Ynt9YMHEl1F_2NQIX2pO_1dJlPy-DqkbdxakyVOVR9lBKiEtd3thF-qfelFzoqo8U7skKCsTv40LdBr6cQFq2bX4ebD9zbQ1zLSioVBbrPqCr2LrVsixlV_ROXqDhq8w0ir3WQx6YuoEWRemZRQu44HndaB2v4W9vaM3xukIKqer8NHapFa2LiZlkvyNIt56xjFNadOcfxUahv4ISS2a5xKOicqyYetp3zA3W5o7E2vp7NDaDwE77V3VOYE9Lp4iM8md33Fqa3YHmNQPPc0a1sAEjtOy1tgF4AQDiAWxr6GeWJAGAaAGTIAHkOO6cqgHp8yxAqgHpr4bqAfMzrECqAfz0RuoB5bYG6gHqpuxAqgHjs4bqAeT2BuoB_DgG6gH7paxAqgH_p6xAqgHr76xAqgH1ckbqAfZtrECqAeaBqgH_56xAqgH35-xAqgH-MKxAqgH-8KxAqgH59exAtgHANIIMAiAYRABGJ0BMgiKgoCAgICACDoOgECAwICAgICIgAKogxBIvf3BOlj-__KJpMGTA4AKA5gLAcgLAYAMAaoNAlVT4g0TCKmw84mkwZMDFV2PWgUdYy4B0eoNEwixivSJpMGTAxVdj1oFHWMuAdGIDv___________wGwE6nqsyHQEwDYEw2IFALYFAHQFQHKFgIKAPgWAYAXAbIXEBgCKgo3NDk5MDI2NTAwUAeqGBcJAAAAgIBqTkESCjc0OTkwMjY1MDAYAbIYCRIC3k8YTCIBALIZATXQGQE&sigh=yPur1z5JWyU&cid=CAQS4gEABaugfY2Ihs-cu_NbHzGzQrRBV_doPXEeERpXipwLhVAubFUsXt5_u31P9MdrjsnN1Y1-0Xuqd_xrhPfI8EXBUM_rbT1iVEaHEK-yBjzAH9Ftx263BTqVJ6hL9NytkUOW0Xi2mqGuikU-HLD4jEKVfqQ4VcLTufi4DSUT5x-MYtQBLAY_CbkTmE1jptTzaHgGUJ5TPs5IJsYSmaBW3lrt20T0Dt4hOjgNR2rn-VJmzZFh2QXRTf5qXwJQHXUFrNvzZYAi3jVrEqpLbJ7ddySzqeijyosv3bQWbHyuDsYQG-Er&label=window_focus&gqid&qqid=CKTF9ImkwZMDFV2PWgUdYy4B0Q&bgload=1",
         "_quic_session": 7566,
-        "_start": 10370.140000398998,
+        "_start": 10370.140399,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -111303,7 +111303,7 @@
         "_all_end": 10396
       },
       {
-        "time": 27.795166015625,
+        "time": 27.794921875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -111450,7 +111450,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 27.795166015625,
+          "wait": 27.794921875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -111463,7 +111463,7 @@
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=colleague-executed&name=1",
         "_quic_session": 7739,
-        "_start": 10371.547000403,
+        "_start": 10371.547403,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -111531,7 +111531,7 @@
         "_all_end": 10397
       },
       {
-        "time": 104.14794921875,
+        "time": 104.148193359375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -111666,7 +111666,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 104.14794921875,
+          "wait": 104.148193359375,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -111678,7 +111678,7 @@
         "_created": 10295.73,
         "_method": "GET",
         "_url": "https://ups.analytics.yahoo.com/ups/58269/sync?_origin=1&gdpr=0&gpp=DBABRg~BVoAACY&gpp_sid=9&redir=true",
-        "_start": 10380.38600041,
+        "_start": 10380.386410000001,
         "_request_headers": [
           ":method: GET",
           ":authority: ups.analytics.yahoo.com",
@@ -111756,7 +111756,7 @@
         "_all_end": 10483
       },
       {
-        "time": 41.5908203125,
+        "time": 41.591064453125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -111863,7 +111863,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 41.5908203125,
+          "wait": 41.591064453125,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -111876,7 +111876,7 @@
         "_method": "GET",
         "_url": "https://ads.stickyadstv.com/user-matching?id=11",
         "_quic_session": 7939,
-        "_start": 10388.860000405,
+        "_start": 10388.860405,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -111938,7 +111938,7 @@
         "_all_end": 10428
       },
       {
-        "time": 26.565185546875,
+        "time": 26.56494140625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -112049,7 +112049,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 26.565185546875,
+          "wait": 26.56494140625,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -112062,7 +112062,7 @@
         "_method": "GET",
         "_url": "https://c.evidon.com/a/4.gif",
         "_quic_session": 7714,
-        "_start": 10398.875000406999,
+        "_start": 10398.875407,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -112228,7 +112228,7 @@
         "connection": "6668",
         "_chunks": [
           {
-            "ts": 10423857,
+            "ts": 10423.857,
             "bytes": 170
           }
         ],
@@ -112239,7 +112239,7 @@
         "_method": "GET",
         "_url": "https://c.evidon.com/geo/ba.js?r260324",
         "_quic_session": 6668,
-        "_start": 10402.660000411,
+        "_start": 10402.660411,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -112298,7 +112298,7 @@
         "_all_end": 10423
       },
       {
-        "time": 24.949951171875,
+        "time": 24.9501953125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -112389,7 +112389,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 24.949951171875,
+          "wait": 24.9501953125,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -112402,7 +112402,7 @@
         "_method": "GET",
         "_url": "https://www.googleadservices.com/.well-known/private-aggregation/debug/report-shared-storage",
         "_quic_session": 7756,
-        "_start": 10402.882000413001,
+        "_start": 10402.882413000001,
         "_request_headers": [
           "Content-Type: application/json"
         ],
@@ -112445,7 +112445,7 @@
         "_all_end": 10425
       },
       {
-        "time": 25.6171875,
+        "time": 25.616943359375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -112552,7 +112552,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 25.6171875,
+          "wait": 25.616943359375,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -112565,7 +112565,7 @@
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAUoAjAC",
         "_quic_session": 7756,
-        "_start": 10403.058000415,
+        "_start": 10403.058415,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -112623,7 +112623,7 @@
         "_all_end": 10427
       },
       {
-        "time": 28.58984375,
+        "time": 28.590087890625,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -112782,7 +112782,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 28.58984375,
+          "wait": 28.590087890625,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -112795,7 +112795,7 @@
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAIgATpBbW9kZWxfcGVyc29uX2NvdW50cnlfY29kZV9VU19wZXJzb25fcmVnaW9uX2NvZGVfNTY0MTVmMzUzMTMxLmpzb25IyAFSGkNLVEY5SW1rd1pNREZWMlBXZ1VkWXk0QjBRWjUImBYQuqUBGPrXPiDL46UEKAIwAjgBXTMzcz9gv54M6gEICGQYZCAeKF%2BCAggIAhABGAMgAQ%3D%3D",
         "_quic_session": 7756,
-        "_start": 10407.809000421,
+        "_start": 10407.809421,
         "_request_headers": [
           ":method: GET",
           ":authority: pagead2.googlesyndication.com",
@@ -112943,7 +112943,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 10433213,
+            "ts": 10433.213,
             "bytes": 5
           }
         ],
@@ -112953,7 +112953,7 @@
         "_created": 10324.92,
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAUoAjAB",
-        "_start": 10417.690000392999,
+        "_start": 10417.690392999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -113001,7 +113001,7 @@
         "_all_end": 10524
       },
       {
-        "time": 14.06591796875,
+        "time": 14.066162109375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -113116,14 +113116,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 11.283935546875,
+          "wait": 11.2841796875,
           "receive": 2.781982421875
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 10440277,
+            "ts": 10440.277,
             "bytes": 12714,
             "inflated": 43770
           }
@@ -113134,7 +113134,7 @@
         "_created": 10426.321,
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAUoAjAC",
-        "_start": 10426.977000425,
+        "_start": 10426.977425000001,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -113348,7 +113348,7 @@
         "_created": 10179.26,
         "_method": "POST",
         "_url": "https://api.assertcom.de/",
-        "_start": 10427.590000341,
+        "_start": 10427.590341,
         "_request_headers": [
           ":method: POST",
           ":authority: api.assertcom.de",
@@ -113487,7 +113487,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 10450818,
+            "ts": 10450.818,
             "bytes": 5
           }
         ],
@@ -113497,7 +113497,7 @@
         "_created": 10425.581,
         "_method": "GET",
         "_url": "https://www.googleadservices.com/.well-known/private-aggregation/debug/report-shared-storage",
-        "_start": 10433.460000423,
+        "_start": 10433.460423,
         "_request_headers": [
           "Content-Type: application/json"
         ],
@@ -113530,7 +113530,7 @@
         "_all_end": 10457
       },
       {
-        "time": 44.7109375,
+        "time": 44.710693359375,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -113645,14 +113645,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 44.175048828125,
+          "wait": 44.1748046875,
           "receive": 0.535888671875
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 10486573,
+            "ts": 10486.573,
             "bytes": 53,
             "inflated": 43
           }
@@ -113663,7 +113663,7 @@
         "_created": 10441.913,
         "_method": "GET",
         "_url": "https://c.evidon.com/a/COMMON.css?r=0.8162603862459376",
-        "_start": 10442.169000427,
+        "_start": 10442.169426999999,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -113729,7 +113729,7 @@
         "_all_end": 10485
       },
       {
-        "time": 98.124755859375,
+        "time": 98.125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -113836,14 +113836,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 97.5068359375,
+          "wait": 97.507080078125,
           "receive": 0.617919921875
         },
         "serverIPAddress": "",
         "connection": "",
         "_chunks": [
           {
-            "ts": 10467513,
+            "ts": 10467.513,
             "bytes": 43
           }
         ],
@@ -113853,7 +113853,7 @@
         "_created": 10369.388,
         "_method": "GET",
         "_url": "https://c.evidon.com/a/n/1063/167661.js",
-        "_start": 10448.674000400999,
+        "_start": 10448.674401,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -114024,7 +114024,7 @@
         "_method": "POST",
         "_url": "https://c.evidon.com/a/6.css?r=0.8424614533581558",
         "_quic_session": 7969,
-        "_start": 10464.782000408999,
+        "_start": 10464.782409,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -114214,7 +114214,7 @@
         "_method": "POST",
         "_url": "https://www.googleadservices.com/.well-known/private-aggregation/debug/report-shared-storage",
         "_quic_session": 8031,
-        "_start": 10465.693000429,
+        "_start": 10465.693428999999,
         "_request_headers": [
           ":method: POST",
           ":authority: www.googleadservices.com",
@@ -114389,7 +114389,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 10495668,
+            "ts": 10495.668,
             "bytes": 851,
             "inflated": 2006
           }
@@ -114400,7 +114400,7 @@
         "_created": 10468.385,
         "_method": "GET",
         "_url": "https://3p-geo.yahoo.com/p?s=1197802876&t=1774655812239&_I=&_AO=0&_NOL=0&etag=performance&etrg=backgroundPost&outcm=performance&usergenf=0&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&test=benji-mergepbsbucket-test&rid=unknown&pd=unknown&pt=home&pct=unknown&ver=engadget-next&pl1=2.3.177&pl2=9.53.2&pl3=2.0.144&usercountry=US&sec=top_center&A_utm=%7B%22BENJI_START%22%3A512%2C%22CMP_GPP_LOADED%22%3A513%2C%22CMP_TCF_LOADED%22%3A512%2C%22CMP_USP_LOADED%22%3A633%2C%22GPT_READY%22%3A642%2C%22PREBID_START%22%3A687%2C%22PREBID_AUCTION_READY%22%3A716%2C%22PREBID_AUCTION_START%22%3A1035%2C%22PREBID_AUCTION_END%22%3A1955%2C%22GAM_FETCH%22%3A1996%2C%22GAM_RENDER_START%22%3A2516%2C%22GAM_RENDER_END%22%3A2852%7D",
-        "_start": 10468.683000433,
+        "_start": 10468.683433,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -114625,7 +114625,7 @@
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAUoAjAC",
         "_quic_session": 7756,
-        "_start": 10482.705000435,
+        "_start": 10482.705435,
         "_request_headers": [
           ":method: GET",
           ":authority: pagead2.googlesyndication.com",
@@ -114871,7 +114871,7 @@
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAUoAjAB",
         "_quic_session": 7756,
-        "_start": 10483.008000437001,
+        "_start": 10483.008437,
         "_request_headers": [
           ":method: GET",
           ":authority: pagead2.googlesyndication.com",
@@ -114945,7 +114945,7 @@
         "_all_end": 10506
       },
       {
-        "time": 26.55810546875,
+        "time": 26.557861328125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -115104,7 +115104,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 26.55810546875,
+          "wait": 26.557861328125,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -115117,7 +115117,7 @@
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAlgBWAGYAdgCGAJaAM%3D",
         "_quic_session": 7756,
-        "_start": 10483.194000441,
+        "_start": 10483.194441,
         "_request_headers": [
           ":method: GET",
           ":authority: pagead2.googlesyndication.com",
@@ -115323,7 +115323,7 @@
         "_method": "POST",
         "_url": "https://www.googleadservices.com/.well-known/private-aggregation/debug/report-shared-storage",
         "_quic_session": 8047,
-        "_start": 10483.347000431,
+        "_start": 10483.347431,
         "_request_headers": [
           ":method: POST",
           ":authority: www.googleadservices.com",
@@ -115494,7 +115494,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 10508369,
+            "ts": 10508.369,
             "bytes": 715,
             "inflated": 1890
           }
@@ -115505,7 +115505,7 @@
         "_created": 10498.01,
         "_method": "GET",
         "_url": "https://c.evidon.com/icon/box_19_top-right.png",
-        "_start": 10498.530000443001,
+        "_start": 10498.530443,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -115687,7 +115687,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 10515851,
+            "ts": 10515.851,
             "bytes": 388,
             "inflated": 898
           }
@@ -115698,7 +115698,7 @@
         "_created": 10503.28,
         "_method": "GET",
         "_url": "https://c.evidon.com/icon/ci.png",
-        "_start": 10503.600000445002,
+        "_start": 10503.600445,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -115912,7 +115912,7 @@
         "connection": "533",
         "_chunks": [
           {
-            "ts": 10536065,
+            "ts": 10536.065,
             "bytes": 43
           }
         ],
@@ -115922,7 +115922,7 @@
         "_created": 10505.11,
         "_method": "POST",
         "_url": "https://3p-geo.yahoo.com/p?s=1197802876&t=1774655812239&_I=&_AO=0&_NOL=0&etag=performance&etrg=backgroundPost&outcm=performance&usergenf=0&src=unknown&site=engadget&partner=none&lang=en-US&region=US&device=desktop&colo=unknown&test=benji-mergepbsbucket-test&rid=unknown&pd=unknown&pt=home&pct=unknown&ver=engadget-next&pl1=2.3.177&pl2=9.53.2&pl3=2.0.144&usercountry=US&sec=top_center&A_utm=%7B%22BENJI_START%22%3A512%2C%22CMP_GPP_LOADED%22%3A513%2C%22CMP_TCF_LOADED%22%3A512%2C%22CMP_USP_LOADED%22%3A633%2C%22GPT_READY%22%3A642%2C%22PREBID_START%22%3A687%2C%22PREBID_AUCTION_READY%22%3A716%2C%22PREBID_AUCTION_START%22%3A1035%2C%22PREBID_AUCTION_END%22%3A1955%2C%22GAM_FETCH%22%3A1996%2C%22GAM_RENDER_START%22%3A2516%2C%22GAM_RENDER_END%22%3A2852%7D",
-        "_start": 10505.591000446999,
+        "_start": 10505.591447,
         "_request_headers": [
           ":method: POST",
           ":authority: 3p-geo.yahoo.com",
@@ -116161,7 +116161,7 @@
         "_method": "GET",
         "_url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAUoAjAC",
         "_quic_session": 7756,
-        "_start": 10507.573000438999,
+        "_start": 10507.573439,
         "_request_headers": [
           ":method: GET",
           ":authority: pagead2.googlesyndication.com",
@@ -116357,7 +116357,7 @@
         "connection": "",
         "_chunks": [
           {
-            "ts": 10517717,
+            "ts": 10517.717,
             "bytes": 118,
             "inflated": 109
           }
@@ -116368,7 +116368,7 @@
         "_created": 10509.682,
         "_method": "GET",
         "_url": "https://l.evidon.com/ct/0_0_0_167661/us/0/1/0/0/0/0/728/90/242/1063/0/pixel.gif?v=2_1&ttid=2&d=a7cab68d5d14ceacf90abbf8745b5295.safeframe.googlesyndication.com&r=0.7967704131090803",
-        "_start": 10509.942000449,
+        "_start": 10509.942448999998,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -116433,7 +116433,7 @@
         "_all_end": 10516
       },
       {
-        "time": 10.113037109375,
+        "time": 10.11328125,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -116576,14 +116576,14 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 9.56494140625,
+          "wait": 9.565185546875,
           "receive": 0.548095703125
         },
         "serverIPAddress": "",
         "connection": "1035",
         "_chunks": [
           {
-            "ts": 10526641,
+            "ts": 10526.641,
             "bytes": 604,
             "inflated": 581
           }
@@ -116594,7 +116594,7 @@
         "_created": 10516.573,
         "_method": "GET",
         "_url": "https://c.evidon.com/icon/ci.png",
-        "_start": 10516.832000451,
+        "_start": 10516.832451,
         "_request_headers": [
           ":method: GET",
           ":authority: c.evidon.com",
@@ -116674,7 +116674,7 @@
         "_all_end": 10525
       },
       {
-        "time": 58.385986328125,
+        "time": 58.38623046875,
         "pageref": "page_1_0_1",
         "request": {
           "method": "GET",
@@ -116749,7 +116749,7 @@
           "connect": -1,
           "ssl": -1,
           "send": 0,
-          "wait": 58.385986328125,
+          "wait": 58.38623046875,
           "receive": 0
         },
         "serverIPAddress": "",
@@ -116761,7 +116761,7 @@
         "_created": 10518.512,
         "_method": "GET",
         "_url": "https://ep1.adtrafficquality.google/pagead/sodar?id=sodar2&v=253&t=2&li=gpt_m202603190101&jk=4657735233152988&bg=!KCulK0nNAAYbyhOnO8o7AEcBe5WfOMYe8dGWrM-7hKwBMMKTeaxAB53u--Q3xxT1Qc-hGgKMD7FMrgcYyigWdJ3a8gXbXfy5_XKY0l4xJvqrSb10GxEfJAIAAAAtUgAAAARoAQd-ADcKnaA31NBE4BHXxWo_z_bQUVlTNJXh0h1gh-bzoiC81PfA4zoKGvoycEZ2-_-4L3Sa0UAfcTx9CgAjleVnxs3Yc-OIJlGeTeeqa4XL2yjLxGog7_b2Cv19_acittyZAkUaCAzzMLuKsDZZuiFQks84rk19VHvyGVrNwZZc5Mk5Xu4KMf13bR7CMGdQCxEbVqbHAs1U8nClIwgwRldNZpPpXd1VBxb-lTQvrLDplfaYrOdYBnx_PXgqPveSQgDIY4tzrgIsDDdX0nEjsl2wNzZHu3vANFZG3ZtLCvkVOw1mlHPXoWJhVlnxos6I_u6sbqqEG5fQ3BqtZErq75yFJUVQ92yWezFKyba5Al72IzLx_LKeqwj9ThnpskYL0EJu2fmmH3giCCfwAlkw-4YRneKXZ7HGgOjUTK2BlhRveXO04ti73dNnLzmB4_gOs4xOulre_Lr0tWwM8cb8pBGOQHE4AHRruAqjBOWGCOgQhE18Ro4Szj1wiTEJ9zE3z_OlDbFyh_2p9jAWkiq2HhBfOKZblzh-ZakXPfoWrbLNb43CiTHVXkhYIrFtev_1EACGJ02p0Fjd0UjWAPYUzpgT_9Yx7j6nIh6TljJ0n_5mBhHWrIH3tz6X6eWg_KiclLi0Q2wZFuZN1r3V6zS1xnA3OsLtLMkY_NmuL-4SYLJIcYJguG6g9HxC2PSrQbLDizkK4_Y9hYGzfsAzwKLnQtoX_Dg95xpEsWALrAKe0KX-7TQUK1oBTSA4XIcEy9lo2DUQdwwwJpjy418-7d9zz2G_d6QC2WmEOKj_l7QjfdFJmlysbQtkNOnhp0Wc8Ul1YFxjbR4T9lyErSak-lup5MRIzKM7rlV7WnaPaaW7kKXIMCuaOBcfa9-b03EIXBMDVndIOoRw4MiXDA",
-        "_start": 10563.738000453,
+        "_start": 10563.738453,
         "_request_headers": [
           "sec-ch-ua-platform: \"Linux\"",
           "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
@@ -116951,7 +116951,7 @@
         "_method": "GET",
         "_url": "https://ep1.adtrafficquality.google/pagead/sodar?id=sodar2&v=253&t=2&li=gpt_m202603190101&jk=4657735233152988&bg=!KCulK0nNAAYbyhOnO8o7AEcBe5WfOMYe8dGWrM-7hKwBMMKTeaxAB53u--Q3xxT1Qc-hGgKMD7FMrgcYyigWdJ3a8gXbXfy5_XKY0l4xJvqrSb10GxEfJAIAAAAtUgAAAARoAQd-ADcKnaA31NBE4BHXxWo_z_bQUVlTNJXh0h1gh-bzoiC81PfA4zoKGvoycEZ2-_-4L3Sa0UAfcTx9CgAjleVnxs3Yc-OIJlGeTeeqa4XL2yjLxGog7_b2Cv19_acittyZAkUaCAzzMLuKsDZZuiFQks84rk19VHvyGVrNwZZc5Mk5Xu4KMf13bR7CMGdQCxEbVqbHAs1U8nClIwgwRldNZpPpXd1VBxb-lTQvrLDplfaYrOdYBnx_PXgqPveSQgDIY4tzrgIsDDdX0nEjsl2wNzZHu3vANFZG3ZtLCvkVOw1mlHPXoWJhVlnxos6I_u6sbqqEG5fQ3BqtZErq75yFJUVQ92yWezFKyba5Al72IzLx_LKeqwj9ThnpskYL0EJu2fmmH3giCCfwAlkw-4YRneKXZ7HGgOjUTK2BlhRveXO04ti73dNnLzmB4_gOs4xOulre_Lr0tWwM8cb8pBGOQHE4AHRruAqjBOWGCOgQhE18Ro4Szj1wiTEJ9zE3z_OlDbFyh_2p9jAWkiq2HhBfOKZblzh-ZakXPfoWrbLNb43CiTHVXkhYIrFtev_1EACGJ02p0Fjd0UjWAPYUzpgT_9Yx7j6nIh6TljJ0n_5mBhHWrIH3tz6X6eWg_KiclLi0Q2wZFuZN1r3V6zS1xnA3OsLtLMkY_NmuL-4SYLJIcYJguG6g9HxC2PSrQbLDizkK4_Y9hYGzfsAzwKLnQtoX_Dg95xpEsWALrAKe0KX-7TQUK1oBTSA4XIcEy9lo2DUQdwwwJpjy418-7d9zz2G_d6QC2WmEOKj_l7QjfdFJmlysbQtkNOnhp0Wc8Ul1YFxjbR4T9lyErSak-lup5MRIzKM7rlV7WnaPaaW7kKXIMCuaOBcfa9-b03EIXBMDVndIOoRw4MiXDA",
         "_quic_session": 8137,
-        "_start": 11111.734000454999,
+        "_start": 11111.734455,
         "_request_headers": [
           ":method: GET",
           ":authority: ep1.adtrafficquality.google",

@@ -148,232 +148,235 @@ export async function processWptagentZip(input, options = {}) {
 
     const storage = await createStorage(hashName);
     
-    // Safely write isomorphic input streams into generic storage abstraction
+    // Safely write isomorphic input streams into generic storage abstraction and
+    // ensure `storage` is destroyed on ANY error before `finalData` takes ownership.
     let readStream = null;
     let zip;
     try {
-        if (typeof input === 'string') {
-            const fs = await import(/* @vite-ignore */ 'node:fs');
-            readStream = fs.createReadStream(input);
-            const { Readable } = await import(/* @vite-ignore */ 'node:stream');
-            await storage.writeStream(Readable.toWeb(readStream));
-        } else if (input instanceof Uint8Array || input instanceof ArrayBuffer || (input && input.buffer instanceof ArrayBuffer)) {
-            await storage.writeBuffer(toUint8Array(input));
-        } else if (input && typeof input.getReader === 'function') {
-            await storage.writeStream(input);
-        } else {
-            throw new Error("Unsupported input type for wptagent processor");
+        try {
+            if (typeof input === 'string') {
+                const fs = await import(/* @vite-ignore */ 'node:fs');
+                readStream = fs.createReadStream(input);
+                const { Readable } = await import(/* @vite-ignore */ 'node:stream');
+                await storage.writeStream(Readable.toWeb(readStream));
+            } else if (input instanceof Uint8Array || input instanceof ArrayBuffer || (input && input.buffer instanceof ArrayBuffer)) {
+                await storage.writeBuffer(toUint8Array(input));
+            } else if (input && typeof input.getReader === 'function') {
+                await storage.writeStream(input);
+            } else {
+                throw new Error("Unsupported input type for wptagent processor");
+            }
+        } finally {
+            if (readStream) readStream.destroy();
         }
 
         zip = new ZipReader(storage);
         await zip.init();
+
+        const outputHar = getBaseWptHar();
+        const fileList = zip.getFileList();
+        outputHar.log._zipFiles = fileList;
+
+        const testinfoFile = fileList.includes('testinfo.json') ? 'testinfo.json' : (fileList.includes('testinfo.json.gz') ? 'testinfo.json.gz' : null);
+        if (testinfoFile) {
+            let stream = await zip.getFileStream(testinfoFile);
+            if (stream) {
+                if (testinfoFile.endsWith('.gz') && typeof DecompressionStream !== 'undefined') {
+                    stream = stream.pipeThrough(new DecompressionStream('gzip'));
+                }
+                const pipeline = stream.pipeThrough(new TextDecoderStream());
+                const reader = pipeline.getReader();
+                let text = '';
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (value) text += value;
+                    if (done) break;
+                }
+                try {
+                    const testinfo = JSON.parse(text);
+                    // WPT `testinfo.json` natively provides `bwIn` and `bwOut` in Kbps matching legacy standards
+                    if (testinfo.bwIn) outputHar.log._bwDown = testinfo.bwIn;
+                    if (testinfo.bwOut) outputHar.log._bwUp = testinfo.bwOut;
+                    if (testinfo.latency) outputHar.log._latency = testinfo.latency;
+                    if (testinfo.plr) outputHar.log._plr = testinfo.plr;
+                    outputHar.log._testinfo = testinfo;
+                } catch {
+                    // Ignore silent JSON parse issues gracefully
+                }
+            }
+        }
+
+        const devtoolsRegex = /^(\d+)(_Cached)?_devtools_requests\.json(\.gz)?$/;
+        let foundDevTools = false;
+
+        for (const file of fileList) {
+            const match = file.match(devtoolsRegex);
+            if (match) {
+                foundDevTools = true;
+                const runStr = match[1];
+                const cachedNum = match[2] ? 1 : 0;
+                const stream = await zip.getFileStream(file);
+                if (stream) {
+                    await processWPTFlatStreamNode(stream, runStr, cachedNum, outputHar, { isGz: file.endsWith('.gz') });
+                }
+            }
+        }
+
+        if (!foundDevTools) {
+            throw new Error("Invalid wptagent zip: missing devtools_requests payload files.");
+        }
+
+        // Extract response bodies from nested _bodies.zip archives and link them to matching HAR entries.
+        // Body files are referenced by the `_body_file` custom property on each entry (set during
+        // processWPTView from the original devtools_requests `body_file` field).
+        const bodiesRegex = /^(\d+)(_Cached)?_bodies\.zip$/;
+        for (const file of fileList) {
+            const match = file.match(bodiesRegex);
+            if (!match) continue;
+
+            const runStr = match[1];
+            const cachedNum = match[2] ? 1 : 0;
+
+            // Extract the nested bodies zip into a temporary storage so ZipReader can random-access it
+            const bodiesStorageName = `${hashName}_bodies_${runStr}_${cachedNum}`;
+            let bodiesStorage = null;
+            try {
+                bodiesStorage = await createStorage(bodiesStorageName);
+                const bodiesStream = await zip.getFileStream(file);
+                if (!bodiesStream) continue;
+                await bodiesStorage.writeStream(bodiesStream);
+
+                const bodiesZip = new ZipReader(bodiesStorage);
+                await bodiesZip.init();
+                const bodyFiles = new Set(bodiesZip.getFileList());
+
+                // Walk HAR entries matching this run/cached combination and attach bodies
+                for (const entry of outputHar.log.entries) {
+                    if (entry._run !== parseInt(runStr, 10) || entry._cached !== cachedNum) continue;
+                    const bodyFile = entry._body_file;
+                    if (!bodyFile || !bodyFiles.has(bodyFile)) continue;
+
+                    const bodyStream = await bodiesZip.getFileStream(bodyFile);
+                    if (!bodyStream) continue;
+
+                    // Read the body file contents into a single Uint8Array
+                    const reader = bodyStream.getReader();
+                    const chunks = [];
+                    let totalLen = 0;
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        chunks.push(value);
+                        totalLen += value.length;
+                    }
+                    const fullArr = new Uint8Array(totalLen);
+                    let offset = 0;
+                    for (const c of chunks) {
+                        fullArr.set(c, offset);
+                        offset += c.length;
+                    }
+
+                    // Encode as base64 using chunked String.fromCharCode.apply
+                    // to avoid both call-stack limits and O(n²) string concatenation
+                    const CHUNK = 8192;
+                    const parts = [];
+                    for (let i = 0; i < fullArr.length; i += CHUNK) {
+                        parts.push(String.fromCharCode.apply(null, fullArr.subarray(i, i + CHUNK)));
+                    }
+                    entry.response.content.text = btoa(parts.join(''));
+                    entry.response.content.encoding = 'base64';
+                }
+            } catch (e) {
+                if (options.debug) {
+                    console.error(`[wptagent] Failed to extract bodies from ${file}:`, e);
+                }
+            } finally {
+                // Clean up the temporary bodies storage immediately
+                if (bodiesStorage) {
+                    try { await bodiesStorage.destroy(); } catch (_) { /* ignore cleanup errors */ }
+                }
+            }
+        }
+
+        // Parse any progress.csv matching run identifiers for utilization mapping.
+        // Match pages by `_run`/`_cached` — processWPTView appends a `_1` suffix to the id
+        // (`page_${run}_${cached}_1`) so string-concatenating the id misses every page.
+        const progressRegex = /^(\d+)(_Cached)?_progress\.csv(\.gz)?$/;
+        for (const file of fileList) {
+            const match = file.match(progressRegex);
+            if (!match) continue;
+            const runNum = parseInt(match[1], 10);
+            const cachedNum = match[2] ? 1 : 0;
+            const stream = await zip.getFileStream(file);
+            if (!stream) continue;
+            const rawUtil = await parseWptagentProgressCsv(stream, file.endsWith('.gz'));
+            const formatted = formatWptUtilization(rawUtil, outputHar.log._bwDown || 0);
+            for (const page of outputHar.log.pages) {
+                if (page._run === runNum && page._cached === cachedNum) {
+                    page._utilization = formatted;
+                }
+            }
+        }
+
+        // Parse any script_timing.json for per-request JS execution overlays.
+        // `main_thread` is a thread id (e.g. "4496:1") whose subtree keys are URLs; the PHP
+        // reference at waterfall.inc#L1974-L2024 attaches the first matching URL only (via
+        // `$used` de-dup), so we do the same to avoid painting a script's events on every
+        // cached copy of its URL.
+        const scriptTimingRegex = /^(\d+)(_Cached)?_script_timing\.json(\.gz)?$/;
+        for (const file of fileList) {
+            const match = file.match(scriptTimingRegex);
+            if (!match) continue;
+            const runNum = parseInt(match[1], 10);
+            const cachedNum = match[2] ? 1 : 0;
+            const stream = await zip.getFileStream(file);
+            if (!stream) continue;
+            const perUrl = await parseWptagentScriptTiming(stream, file.endsWith('.gz'));
+            if (!perUrl) continue;
+            const used = new Set();
+            for (const entry of outputHar.log.entries) {
+                if (entry._run !== runNum || entry._cached !== cachedNum) continue;
+                const url = entry._full_url || entry.request?.url;
+                if (!url || used.has(url)) continue;
+                const pairs = perUrl[url];
+                if (!pairs) continue;
+                entry._js_timing = pairs;
+                used.add(url);
+            }
+        }
+
+        // Parse any timeline_cpu.json for main-thread flame-chart slices.
+        // Page ids produced by processWPTView are `page_${run}_${cached}_1` (run view) — match on the
+        // `_run`/`_cached` props rather than id suffix to stay robust across future id scheme changes.
+        const cpuSliceRegex = /^(\d+)(_Cached)?_timeline_cpu\.json(\.gz)?$/;
+        for (const file of fileList) {
+            const match = file.match(cpuSliceRegex);
+            if (!match) continue;
+            const runNum = parseInt(match[1], 10);
+            const cachedNum = match[2] ? 1 : 0;
+            const stream = await zip.getFileStream(file);
+            if (!stream) continue;
+            const slices = await parseWptagentTimelineCpu(stream, file.endsWith('.gz'));
+            if (!slices) continue;
+            for (const page of outputHar.log.pages) {
+                if (page._run === runNum && page._cached === cachedNum) {
+                    page._mainThreadSlices = slices;
+                }
+            }
+        }
+
+        if (outputHar.log._bwDown && outputHar.log._bwDown > 0) {
+            outputHar.log.pages.forEach(p => p._bwDown = outputHar.log._bwDown);
+        }
+
+        const finalData = buildWaterfallDataFromHar(outputHar.log, 'wpt');
+        
+        // Bind storage directly into return object mapping lifecycle cleanly
+        finalData._opfsStorage = storage;
+
+        return finalData;
     } catch (e) {
         await storage.destroy().catch(() => {});
         throw e;
-    } finally {
-        if (readStream) readStream.destroy();
     }
-
-    const outputHar = getBaseWptHar();
-    const fileList = zip.getFileList();
-    outputHar.log._zipFiles = fileList;
-
-    const testinfoFile = fileList.includes('testinfo.json') ? 'testinfo.json' : (fileList.includes('testinfo.json.gz') ? 'testinfo.json.gz' : null);
-    if (testinfoFile) {
-        let stream = await zip.getFileStream(testinfoFile);
-        if (stream) {
-            if (testinfoFile.endsWith('.gz') && typeof DecompressionStream !== 'undefined') {
-                stream = stream.pipeThrough(new DecompressionStream('gzip'));
-            }
-            const pipeline = stream.pipeThrough(new TextDecoderStream());
-            const reader = pipeline.getReader();
-            let text = '';
-            while (true) {
-                const { done, value } = await reader.read();
-                if (value) text += value;
-                if (done) break;
-            }
-            try {
-                const testinfo = JSON.parse(text);
-                // WPT `testinfo.json` natively provides `bwIn` and `bwOut` in Kbps matching legacy standards
-                if (testinfo.bwIn) outputHar.log._bwDown = testinfo.bwIn;
-                if (testinfo.bwOut) outputHar.log._bwUp = testinfo.bwOut;
-                if (testinfo.latency) outputHar.log._latency = testinfo.latency;
-                if (testinfo.plr) outputHar.log._plr = testinfo.plr;
-                outputHar.log._testinfo = testinfo;
-            } catch {
-                // Ignore silent JSON parse issues gracefully
-            }
-        }
-    }
-
-    const devtoolsRegex = /^(\d+)(_Cached)?_devtools_requests\.json(\.gz)?$/;
-    let foundDevTools = false;
-
-    for (const file of fileList) {
-        const match = file.match(devtoolsRegex);
-        if (match) {
-            foundDevTools = true;
-            const runStr = match[1];
-            const cachedNum = match[2] ? 1 : 0;
-            const stream = await zip.getFileStream(file);
-            if (stream) {
-                await processWPTFlatStreamNode(stream, runStr, cachedNum, outputHar, { isGz: file.endsWith('.gz') });
-            }
-        }
-    }
-
-    if (!foundDevTools) {
-        throw new Error("Invalid wptagent zip: missing devtools_requests payload files.");
-    }
-
-    // Extract response bodies from nested _bodies.zip archives and link them to matching HAR entries.
-    // Body files are referenced by the `_body_file` custom property on each entry (set during
-    // processWPTView from the original devtools_requests `body_file` field).
-    const bodiesRegex = /^(\d+)(_Cached)?_bodies\.zip$/;
-    for (const file of fileList) {
-        const match = file.match(bodiesRegex);
-        if (!match) continue;
-
-        const runStr = match[1];
-        const cachedNum = match[2] ? 1 : 0;
-
-        // Extract the nested bodies zip into a temporary storage so ZipReader can random-access it
-        const bodiesStorageName = `${hashName}_bodies_${runStr}_${cachedNum}`;
-        let bodiesStorage = null;
-        try {
-            bodiesStorage = await createStorage(bodiesStorageName);
-            const bodiesStream = await zip.getFileStream(file);
-            if (!bodiesStream) continue;
-            await bodiesStorage.writeStream(bodiesStream);
-
-            const bodiesZip = new ZipReader(bodiesStorage);
-            await bodiesZip.init();
-            const bodyFiles = new Set(bodiesZip.getFileList());
-
-            // Walk HAR entries matching this run/cached combination and attach bodies
-            for (const entry of outputHar.log.entries) {
-                if (entry._run !== parseInt(runStr, 10) || entry._cached !== cachedNum) continue;
-                const bodyFile = entry._body_file;
-                if (!bodyFile || !bodyFiles.has(bodyFile)) continue;
-
-                const bodyStream = await bodiesZip.getFileStream(bodyFile);
-                if (!bodyStream) continue;
-
-                // Read the body file contents into a single Uint8Array
-                const reader = bodyStream.getReader();
-                const chunks = [];
-                let totalLen = 0;
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    chunks.push(value);
-                    totalLen += value.length;
-                }
-                const fullArr = new Uint8Array(totalLen);
-                let offset = 0;
-                for (const c of chunks) {
-                    fullArr.set(c, offset);
-                    offset += c.length;
-                }
-
-                // Encode as base64 using chunked String.fromCharCode.apply
-                // to avoid both call-stack limits and O(n²) string concatenation
-                const CHUNK = 8192;
-                const parts = [];
-                for (let i = 0; i < fullArr.length; i += CHUNK) {
-                    parts.push(String.fromCharCode.apply(null, fullArr.subarray(i, i + CHUNK)));
-                }
-                entry.response.content.text = btoa(parts.join(''));
-                entry.response.content.encoding = 'base64';
-            }
-        } catch (e) {
-            if (options.debug) {
-                console.error(`[wptagent] Failed to extract bodies from ${file}:`, e);
-            }
-        } finally {
-            // Clean up the temporary bodies storage immediately
-            if (bodiesStorage) {
-                try { await bodiesStorage.destroy(); } catch (_) { /* ignore cleanup errors */ }
-            }
-        }
-    }
-
-    // Parse any progress.csv matching run identifiers for utilization mapping.
-    // Match pages by `_run`/`_cached` — processWPTView appends a `_1` suffix to the id
-    // (`page_${run}_${cached}_1`) so string-concatenating the id misses every page.
-    const progressRegex = /^(\d+)(_Cached)?_progress\.csv(\.gz)?$/;
-    for (const file of fileList) {
-        const match = file.match(progressRegex);
-        if (!match) continue;
-        const runNum = parseInt(match[1], 10);
-        const cachedNum = match[2] ? 1 : 0;
-        const stream = await zip.getFileStream(file);
-        if (!stream) continue;
-        const rawUtil = await parseWptagentProgressCsv(stream, file.endsWith('.gz'));
-        const formatted = formatWptUtilization(rawUtil, outputHar.log._bwDown || 0);
-        for (const page of outputHar.log.pages) {
-            if (page._run === runNum && page._cached === cachedNum) {
-                page._utilization = formatted;
-            }
-        }
-    }
-
-    // Parse any script_timing.json for per-request JS execution overlays.
-    // `main_thread` is a thread id (e.g. "4496:1") whose subtree keys are URLs; the PHP
-    // reference at waterfall.inc#L1974-L2024 attaches the first matching URL only (via
-    // `$used` de-dup), so we do the same to avoid painting a script's events on every
-    // cached copy of its URL.
-    const scriptTimingRegex = /^(\d+)(_Cached)?_script_timing\.json(\.gz)?$/;
-    for (const file of fileList) {
-        const match = file.match(scriptTimingRegex);
-        if (!match) continue;
-        const runNum = parseInt(match[1], 10);
-        const cachedNum = match[2] ? 1 : 0;
-        const stream = await zip.getFileStream(file);
-        if (!stream) continue;
-        const perUrl = await parseWptagentScriptTiming(stream, file.endsWith('.gz'));
-        if (!perUrl) continue;
-        const used = new Set();
-        for (const entry of outputHar.log.entries) {
-            if (entry._run !== runNum || entry._cached !== cachedNum) continue;
-            const url = entry._full_url || entry.request?.url;
-            if (!url || used.has(url)) continue;
-            const pairs = perUrl[url];
-            if (!pairs) continue;
-            entry._js_timing = pairs;
-            used.add(url);
-        }
-    }
-
-    // Parse any timeline_cpu.json for main-thread flame-chart slices.
-    // Page ids produced by processWPTView are `page_${run}_${cached}_1` (run view) — match on the
-    // `_run`/`_cached` props rather than id suffix to stay robust across future id scheme changes.
-    const cpuSliceRegex = /^(\d+)(_Cached)?_timeline_cpu\.json(\.gz)?$/;
-    for (const file of fileList) {
-        const match = file.match(cpuSliceRegex);
-        if (!match) continue;
-        const runNum = parseInt(match[1], 10);
-        const cachedNum = match[2] ? 1 : 0;
-        const stream = await zip.getFileStream(file);
-        if (!stream) continue;
-        const slices = await parseWptagentTimelineCpu(stream, file.endsWith('.gz'));
-        if (!slices) continue;
-        for (const page of outputHar.log.pages) {
-            if (page._run === runNum && page._cached === cachedNum) {
-                page._mainThreadSlices = slices;
-            }
-        }
-    }
-
-    if (outputHar.log._bwDown && outputHar.log._bwDown > 0) {
-        outputHar.log.pages.forEach(p => p._bwDown = outputHar.log._bwDown);
-    }
-
-    const finalData = buildWaterfallDataFromHar(outputHar.log, 'wpt');
-    
-    // Bind storage directly into return object mapping lifecycle cleanly
-    finalData._opfsStorage = storage;
-
-    return finalData;
 }

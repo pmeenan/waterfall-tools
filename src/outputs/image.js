@@ -6,6 +6,7 @@
 import { Layout } from '../renderer/layout.js';
 import { createCanvas } from '../platforms/canvas.js';
 import { WaterfallCanvas } from '../renderer/canvas.js';
+import { sortEntriesForRender } from '../renderer/entry-sort.js';
 
 /**
  * Generates an image snapshot of the waterfall view headlessly.
@@ -35,6 +36,8 @@ export async function generateImage(toolsInstance, pageId, options = {}) {
     if (pageData.requests) {
         Object.values(pageData.requests).forEach(r => rawEntries.push(r));
     }
+    // Same chronological row order as the interactive WaterfallCanvas.render() path.
+    sortEntriesForRender(rawEntries);
 
     // Pass 1: Calculate layout to determine exact Canvas height requirements blindly without rendering
     const layoutOptions = Object.assign({}, options, { page: pageData });

@@ -1,13 +1,15 @@
 import fs from 'node:fs';
 import { processNetlogFileNode } from '../src/inputs/netlog.js';
 import { processHARFileNode } from '../src/inputs/har.js';
+import { relationalToHar } from '../src/core/har-export.js';
 import path from 'node:path';
 
 async function compareNetlogsToHar(harPath, netlogPaths) {
     console.log(`\nValidating Netlog files against WebPageTest HAR: ${path.basename(harPath)}`);
     
     // Load the reference WPT HAR
-    const wptHar = await processHARFileNode(harPath);
+    // Parsers return the internal relational model; convert to Extended HAR ({ log }).
+    const wptHar = relationalToHar(await processHARFileNode(harPath));
     
     // Extract unique standardized URLs from WPT HAR for the specific run to compare
     const wptUrls = new Set();
@@ -23,7 +25,7 @@ async function compareNetlogsToHar(harPath, netlogPaths) {
 
     for (const netlogPath of netlogPaths) {
         console.log(`\n--- Comparing Netlog: ${path.basename(netlogPath)} ---`);
-        const netlogHar = await processNetlogFileNode(netlogPath);
+        const netlogHar = relationalToHar(await processNetlogFileNode(netlogPath));
         
         const netlogUrls = new Set();
         const netlogEntries = netlogHar?.log?.entries || [];

@@ -19,6 +19,85 @@ export { PerfettoDecoder } from '../inputs/utilities/perfetto/decoder.js';
 const MULTI_BUFFER_FORMATS = ['qlog'];
 const QLOG_MIME_TYPE = 'application/qlog';
 
+// Formats whose original input bytes back a getPageResource() route ('trace' for
+// chrome-trace/perfetto, 'netlog' for netlog, 'qlog' for qlog). Every other format's raw
+// buffer would just be a second full in-memory copy of the input that nothing reads, so
+// loadBuffer() only retains it for these.
+const RAW_BUFFER_FORMATS = new Set(['chrome-trace', 'perfetto', 'netlog', 'qlog']);
+
+// Screenshot strings are untrusted HAR data. Only well-formed base64 image data URIs (or
+// bare base64 that we prefix ourselves) are ever handed back as a URL — anything else
+// (javascript:, text/html, quote/markup injection) is dropped.
+const SCREENSHOT_DATA_URI_RE = /^data:image\/(png|jpeg|jpg|webp|gif);base64,([A-Za-z0-9+/]+={0,2})$/;
+const RAW_BASE64_RE = /^[A-Za-z0-9+/]+={0,2}$/;
+
+/**
+ * Validate an untrusted `_screenshot` value and normalize it to a safe data URI.
+ * @param {*} value
+ * @returns {{url: string, mimeType: string} | null}
+ */
+function sanitizeScreenshotDataUri(value) {
+    if (typeof value !== 'string' || value.length === 0) return null;
+    // Whitespace (line-wrapped base64) is never meaningful; strip before validating so the
+    // returned URL is exactly what the strict pattern accepted.
+    const str = value.replace(/\s+/g, '');
+    if (str.startsWith('data:')) {
+        const m = SCREENSHOT_DATA_URI_RE.exec(str);
+        if (!m) return null;
+        const mimeType = m[1] === 'jpg' ? 'image/jpeg' : `image/${m[1]}`;
+        return { url: `data:${mimeType};base64,${m[2]}`, mimeType };
+    }
+    if (!RAW_BASE64_RE.test(str)) return null;
+    // Sniff the base64-encoded magic bytes; legacy WPT screenshots are JPEG.
+    let mimeType = 'image/jpeg';
+    if (str.startsWith('iVBORw0KGgo')) mimeType = 'image/png';
+    else if (str.startsWith('R0lGOD')) mimeType = 'image/gif';
+    else if (str.startsWith('UklGR')) mimeType = 'image/webp';
+    return { url: `data:${mimeType};base64,${str}`, mimeType };
+}
+
+/**
+ * Object URLs only make sense where something can consume them (a DOM document). In Node
+ * (and workers without a document) URL.createObjectURL exists but nothing ever revokes the
+ * URL, so the backing Blob would leak for the process lifetime.
+ * @returns {boolean}
+ */
+function canCreateObjectUrls() {
+    return typeof document !== 'undefined'
+        && typeof Blob !== 'undefined'
+        && typeof URL !== 'undefined'
+        && typeof URL.createObjectURL === 'function';
+}
+
+/**
+ * Return a Uint8Array whose view spans its entire backing ArrayBuffer, so `result.buffer`
+ * is the exact payload (callers that need an ArrayBuffer, e.g. postMessage consumers, can
+ * use `.buffer` without slicing).
+ * @param {ArrayBuffer|Uint8Array} bytes
+ * @returns {Uint8Array}
+ */
+function toExactUint8Array(bytes) {
+    const view = toUint8Array(bytes);
+    if (view.byteOffset === 0 && view.byteLength === view.buffer.byteLength) return view;
+    return new Uint8Array(copyExactBuffer(view));
+}
+
+/**
+ * Build the uniform getPageResource() result: `buffer` is always an exact-span Uint8Array;
+ * `url` (a blob: object URL the caller must revoke) is only added in a DOM context.
+ * @param {ArrayBuffer|Uint8Array} bytes
+ * @param {string} mimeType
+ * @returns {{buffer: Uint8Array, mimeType: string, url?: string}}
+ */
+function makeBufferResource(bytes, mimeType) {
+    const buffer = toExactUint8Array(bytes);
+    const resource = { buffer, mimeType };
+    if (canCreateObjectUrls()) {
+        resource.url = URL.createObjectURL(new Blob([buffer], { type: mimeType }));
+    }
+    return resource;
+}
+
 /**
  * Normalize ArrayBuffer / Uint8Array / Node Buffer / other TypedArray views to Uint8Array
  * without depending on the Node-specific Buffer class.
@@ -79,6 +158,38 @@ export class WaterfallTools {
         this._rumcapTraceCache = null;
     }
 
+    /**
+     * Throws a clear error when no successful load backs this instance (never loaded,
+     * destroyed, or the most recent load threw mid-parse).
+     * @private
+     */
+    _requireData() {
+        if (!this.data || !this.data.pages) {
+            throw new Error('No data loaded: call loadFile()/loadBuffer()/loadStream() successfully first.');
+        }
+    }
+
+    /**
+     * Run a parser and leave the instance in a consistent "no data" state if it throws:
+     * data stays null (so accessors throw a clear error instead of a TypeError) and the
+     * format/raw-buffer state of the failed load is cleared.
+     * @private
+     */
+    async _runParser(parser, input, options) {
+        this.options = { debug: !!options.debug };
+        try {
+            this.data = await parser(input, options);
+        } catch (e) {
+            this.data = null;
+            this._sourceFormat = null;
+            this._rawBuffer = null;
+            this._rawBufferName = null;
+            this._rawBuffers = null;
+            this._rumcapTraceCache = null;
+            throw e;
+        }
+    }
+
     async _destroyCurrentData() {
         if (this.data && this.data._opfsStorage && typeof this.data._opfsStorage.destroy === 'function') {
             await this.data._opfsStorage.destroy();
@@ -123,7 +234,7 @@ export class WaterfallTools {
         this._rawBuffers = null;
         this._rumcapTraceCache = null;
         options.instanceId = this.instanceId;
-        this.data = await parser(filePath, options);
+        await this._runParser(parser, filePath, options);
         return this;
     }
 
@@ -156,7 +267,7 @@ export class WaterfallTools {
         this._rawBuffers = null;
         this._rumcapTraceCache = null;
         options.instanceId = this.instanceId;
-        this.data = await parser(stream, options);
+        await this._runParser(parser, stream, options);
         return this;
     }
 
@@ -201,9 +312,12 @@ export class WaterfallTools {
         this._sourceFormat = format;
         const result = await this.loadStream(stream, streamOptions);
         // AFTER loadStream() — it clears the raw-buffer state as its reused-instance guard;
-        // re-attach the bytes backing THIS load so trace/netlog passthrough works.
-        this._rawBuffer = copyExactBuffer(buf); // Store exact ArrayBuffer view
-        this._rawBufferName = format === 'qlog' ? getBufferName(options, 0) : null;
+        // re-attach the bytes backing THIS load so trace/netlog/qlog passthrough works.
+        // Only formats with a raw-buffer resource route keep a copy (see RAW_BUFFER_FORMATS).
+        if (RAW_BUFFER_FORMATS.has(format)) {
+            this._rawBuffer = copyExactBuffer(buf); // Store exact ArrayBuffer view
+            this._rawBufferName = format === 'qlog' ? getBufferName(options, 0) : null;
+        }
         return result;
     }
 
@@ -266,7 +380,7 @@ export class WaterfallTools {
             instanceId: this.instanceId,
             totalBytes: bufs.reduce((sum, b) => sum + b.byteLength, 0)
         };
-        this.data = await parser(bufs, parseOptions);
+        await this._runParser(parser, bufs, parseOptions);
         if (format === 'qlog') {
             this._rawBuffers = bufs.map((buf, index) => ({
                 name: getBufferName(options, index),
@@ -331,21 +445,27 @@ export class WaterfallTools {
      * Automatically retrieves assets securely natively from HAR mapping or generic OPFS extraction instances securely.
      * @param {string} pageId 
      * @param {string} resourceType - 'screenshot', 'trace', 'netlog', 'tcpdump', 'lighthouse', 'qlog'
-     * @returns {Promise<{ url?: string, buffer?: Uint8Array|ArrayBuffer, files?: Array<{name: string, mimeType: string, buffer: ArrayBuffer}>, mimeType?: string } | null>}
+     * Binary resources always return `buffer` as a Uint8Array spanning its whole backing
+     * ArrayBuffer (so `buffer.buffer` is the exact payload). `url` is a blob: object URL that
+     * is only created in a DOM context (`typeof document !== 'undefined'`); the caller owns
+     * it and must `URL.revokeObjectURL()` it. Screenshot/Lighthouse strings from the HAR
+     * return a `data:` URL only.
+     * @returns {Promise<{ url?: string, buffer?: Uint8Array, files?: Array<{name: string, mimeType: string, buffer: ArrayBuffer}>, mimeType?: string } | null>}
      */
     async getPageResource(pageId, resourceType = 'screenshot') {
+        this._requireData();
         const pageData = this.getPage(pageId);
         if (!pageData) {
             console.warn(`[getPageResource] pageData not found for ${pageId}`);
             return null;
         }
         if (resourceType === 'screenshot' && pageData._screenshot) {
-            const str = pageData._screenshot;
-            if (str.startsWith('data:image/')) {
-                return { url: str, mimeType: str.substring(5, str.indexOf(';')) };
-            } else {
-                const url = `data:image/jpeg;base64,${str}`;
-                return { url, mimeType: 'image/jpeg' };
+            const safe = sanitizeScreenshotDataUri(pageData._screenshot);
+            if (safe) return safe;
+            // Malformed/untrusted value: never pass it through; fall back to the archive
+            // lookup below (which misses quietly for non-archive formats).
+            if (this.options && this.options.debug) {
+                console.warn(`[getPageResource] Ignoring malformed _screenshot value for ${pageId}`);
             }
         }
 
@@ -377,8 +497,7 @@ export class WaterfallTools {
 
         if (resourceType === 'trace' && (this._sourceFormat === 'chrome-trace' || this._sourceFormat === 'perfetto') && this._rawBuffer) {
             const mimeType = this._sourceFormat === 'chrome-trace' ? 'application/json' : 'application/octet-stream';
-            const blob = new Blob([this._rawBuffer], { type: mimeType });
-            return { url: URL.createObjectURL(blob), mimeType, buffer: this._rawBuffer };
+            return makeBufferResource(this._rawBuffer, mimeType);
         }
 
         if ((resourceType === 'trace' || resourceType === 'perfetto-trace')
@@ -395,7 +514,7 @@ export class WaterfallTools {
             if (!bytes) {
                 const { synthesizeChromeTrace, synthesizePerfettoProto } = await import('../inputs/utilities/rumcap/trace-synthesizer.js');
                 if (resourceType === 'perfetto-trace') {
-                    bytes = synthesizePerfettoProto(this.data._rumcapCapture);
+                    bytes = toExactUint8Array(synthesizePerfettoProto(this.data._rumcapCapture));
                 } else {
                     const traceJson = JSON.stringify(synthesizeChromeTrace(this.data._rumcapCapture));
                     // Gzip so DevTools' loadFromFile takes its internal DecompressionStream path.
@@ -405,18 +524,13 @@ export class WaterfallTools {
                 }
                 this._rumcapTraceCache[cacheKey][pageId] = bytes;
             }
-            // Same browser/Node contract as the generic ZIP extraction path below: object URL +
-            // ArrayBuffer when Blob/URL exist, bare Uint8Array buffer otherwise (Node).
-            if (typeof Blob !== 'undefined' && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
-                const blob = new Blob([bytes], { type: mimeType });
-                return { url: URL.createObjectURL(blob), mimeType, buffer: bytes.buffer };
-            }
-            return { buffer: bytes, mimeType };
+            // Same contract as every other binary route: Uint8Array buffer (the cached bytes
+            // themselves), object URL only in a DOM context.
+            return makeBufferResource(bytes, mimeType);
         }
 
         if (resourceType === 'netlog' && this._sourceFormat === 'netlog' && this._rawBuffer) {
-            const blob = new Blob([this._rawBuffer], { type: 'application/json' });
-            return { url: URL.createObjectURL(blob), mimeType: 'application/json', buffer: this._rawBuffer };
+            return makeBufferResource(this._rawBuffer, 'application/json');
         }
 
         // Only these resource types have an archive-backed file naming convention. Types that
@@ -514,12 +628,7 @@ export class WaterfallTools {
             offset += c.length;
         }
         
-        if (typeof Blob !== 'undefined' && typeof URL !== 'undefined') {
-            const blob = new Blob([fullArr], { type: mimeType });
-            return { url: URL.createObjectURL(blob), mimeType, buffer: fullArr.buffer };
-        }
-        
-        return { buffer: fullArr, mimeType };
+        return makeBufferResource(fullArr, mimeType);
     }
 
     /**
@@ -570,6 +679,7 @@ export class WaterfallTools {
     }
 
     async renderTo(container, options = {}) {
+        this._requireData();
         // Find default page if not specified
         let pageId = options.pageId;
         if (!pageId) {
@@ -595,6 +705,7 @@ export class WaterfallTools {
      * @returns {Promise<{ buffer: Uint8Array, mimeType: string, width: number, height: number }>}
      */
     async generateImage(pageId, options = {}) {
+        this._requireData();
         if (!pageId) {
             const keys = Object.keys(this.data.pages);
             if (keys.length === 0) throw new Error("No pages available to render.");

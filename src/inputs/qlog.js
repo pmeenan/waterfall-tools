@@ -97,7 +97,7 @@ function normalizeHeaders(headers) {
  * @param {number} totalBytes - 0 when unknown
  * @returns {Promise<Uint8Array>}
  */
-async function collectStream(stream, onProgress, totalBytes) {
+async function collectStream(stream, onProgress, totalBytes, debug = false) {
     const reader = stream.getReader();
     const chunks = [];
     let bytesRead = 0;
@@ -111,6 +111,9 @@ async function collectStream(stream, onProgress, totalBytes) {
                 onProgress('Reading qlog...', Math.min(40, Math.round((bytesRead / totalBytes) * 40)));
             }
         }
+    } catch (err) {
+        if (chunks.length === 0) throw err;
+        if (debug) console.warn('[qlog.js] Stream truncated; continuing with partial prefix:', err.message);
     } finally {
         try { reader.releaseLock(); } catch { /* already released */ }
     }
@@ -129,7 +132,7 @@ async function collectStream(stream, onProgress, totalBytes) {
  * by extension — every repo sample is gzipped without changing the sniffable content).
  * @returns {Promise<Uint8Array>}
  */
-async function loadInputBytes(input, onProgress, totalBytes) {
+async function loadInputBytes(input, onProgress, totalBytes, debug = false) {
     let bytes;
     let nodeFsStream = null;
     try {
@@ -140,16 +143,16 @@ async function loadInputBytes(input, onProgress, totalBytes) {
                 try { totalBytes = fs.statSync(input).size; } catch { /* progress stays coarse */ }
             }
             nodeFsStream = fs.createReadStream(input);
-            bytes = await collectStream(Readable.toWeb(nodeFsStream), onProgress, totalBytes);
+            bytes = await collectStream(Readable.toWeb(nodeFsStream), onProgress, totalBytes, debug);
         } else if (input instanceof Uint8Array) {
             bytes = input;
         } else if (input instanceof ArrayBuffer) {
             bytes = new Uint8Array(input);
         } else if (input && typeof input.getReader === 'function') {
-            bytes = await collectStream(input, onProgress, totalBytes);
+            bytes = await collectStream(input, onProgress, totalBytes, debug);
         } else if (input && typeof input.pipe === 'function') {
             const { Readable } = await import(/* @vite-ignore */ 'node:stream');
-            bytes = await collectStream(Readable.toWeb(input), onProgress, totalBytes);
+            bytes = await collectStream(Readable.toWeb(input), onProgress, totalBytes, debug);
         } else {
             throw new Error('Unsupported input type for qlog parser');
         }
@@ -160,7 +163,7 @@ async function loadInputBytes(input, onProgress, totalBytes) {
     if (isGzip(bytes)) {
         onProgress('Decompressing qlog...', 42);
         const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-        bytes = await collectStream(stream, () => {}, 0);
+        bytes = await collectStream(stream, () => {}, 0, debug);
     }
     return bytes;
 }
@@ -1197,7 +1200,7 @@ export async function processQlogNode(input, options = {}) {
 
         const rawTraces = [];
         for (let i = 0; i < inputs.length; i++) {
-            const bytes = await loadInputBytes(inputs[i], onProgress, inputs.length === 1 ? totalBytes : 0);
+            const bytes = await loadInputBytes(inputs[i], onProgress, inputs.length === 1 ? totalBytes : 0, options.debug);
             onProgress('Parsing qlog...', 45 + Math.round(((i + 0.5) / inputs.length) * 35));
             const traces = await decodeQlogTraces(bytes, {
                 debug: options.debug,

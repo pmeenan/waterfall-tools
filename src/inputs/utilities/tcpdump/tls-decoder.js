@@ -49,6 +49,14 @@ export class TlsDecoder {
 
         this.buffers = [new Uint8Array(0), new Uint8Array(0)];
         this.decryptedStream = [[], []]; // Chunks of decrypted ApplicationData
+        // Per-direction handshake message reassembly buffers. Handshake
+        // messages (notably TLS 1.3 Certificate) routinely span several
+        // records, and Finished is only recognisable after reassembly.
+        this.handshakeBuffers = [new Uint8Array(0), new Uint8Array(0)];
+        // True once a ClientHello was seen on this connection
+        this.sawClientHello = false;
+        // Time of the first ClientHello record (TLS start)
+        this.clientHelloTime = null;
     }
 
     async push(direction, chunkBuffer, timestamp) {
@@ -89,35 +97,49 @@ export class TlsDecoder {
             return;
         }
 
+        // TLS 1.3 peers are not required to send the middlebox-compat CCS
+        // (RFC 8446 Appendix D.4). Once the ServerHello negotiated TLS 1.3,
+        // every subsequent record is an encrypted ApplicationData (type 23)
+        // record, so treat the first one as the switch to encrypted mode.
+        if (!state.isEncrypted && this.isTls13 && type === 23) {
+            state.isEncrypted = true;
+        }
+
         if (state.isEncrypted) {
             if (!state.key || !state.iv) return; 
             await this._decryptFragment(direction, type, ver, fragment, timestamp);
         } else {
             if (type === 22) { // Handshake
+                if (direction === 0 && this.clientHelloTime === null && fragment.length > 0 && fragment[0] === 1) {
+                    this.clientHelloTime = timestamp;
+                }
                 await this._parseHandshake(direction, fragment);
             }
         }
     }
 
     async _parseHandshake(direction, fragment) {
+        // Prepend any partial handshake message carried over from earlier records
+        const pending = this.handshakeBuffers[direction];
+        const data = pending.length > 0 ? concatUint8Arrays([pending, fragment]) : fragment;
         let offset = 0;
-        while (offset + 4 <= fragment.length) {
-            const handType = fragment[offset];
-            const length = (fragment[offset + 1] << 16) | (fragment[offset + 2] << 8) | fragment[offset + 3];
-            offset += 4;
+        while (offset + 4 <= data.length) {
+            const handType = data[offset];
+            const length = (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
 
-            if (offset + length > fragment.length) break; 
+            if (offset + 4 + length > data.length) break; // Incomplete — wait for more records
 
-            const msg = fragment.subarray(offset, offset + length);
-            offset += length;
+            const msg = data.subarray(offset + 4, offset + 4 + length);
+            offset += 4 + length;
 
             if (handType === 1) { // ClientHello
+                this.sawClientHello = true;
                 if (msg.length >= 34) {
-                    this.clientRandom = msg.subarray(2, 34); 
+                    this.clientRandom = msg.slice(2, 34); 
                 }
             } else if (handType === 2) { // ServerHello
                 if (msg.length >= 34) {
-                    this.serverRandom = msg.subarray(2, 34); 
+                    this.serverRandom = msg.slice(2, 34); 
                     
                     const sessLen = msg[34];
                     const cipherOffset = 34 + 1 + sessLen;
@@ -140,9 +162,15 @@ export class TlsDecoder {
                         await this._deriveTls13KeysForDirection(direction, this.keyLog.getSessionKeys(this.clientRandom));
                         this.cryptoState[direction].sequence = 0n;
                     } catch {}
+                    // Records under new keys never continue an old handshake message
+                    this.handshakeBuffers[direction] = new Uint8Array(0);
+                    return;
                 }
             }
         }
+        // Keep the incomplete tail (bounded to avoid unbounded growth on garbage)
+        const rest = data.subarray(offset);
+        this.handshakeBuffers[direction] = rest.length > 0 && rest.length < (1 << 20) ? rest.slice() : new Uint8Array(0);
     }
 
     async _deriveKeys(_isApplicationPhase = false) {

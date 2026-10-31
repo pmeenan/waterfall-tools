@@ -70,15 +70,15 @@ describe('Chrome Trace Input Processing', () => {
             scrubHar(har, needsEpochScrub);
             const cleanHar = JSON.parse(JSON.stringify(har));
 
-            if (fs.existsSync(fixturePath)) {
-                const snapshot = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
-                scrubHar(snapshot, needsEpochScrub);
-                expect(cleanHar).toEqual(snapshot);
-            } else {
+            if (process.env.UPDATE_FIXTURES) {
                 console.log(`Writing baseline for ${filename}`);
                 fs.mkdirSync(path.dirname(fixturePath), { recursive: true });
                 fs.writeFileSync(fixturePath, JSON.stringify(cleanHar, null, 2), 'utf-8');
             }
+            expect(fs.existsSync(fixturePath), `Missing golden fixture: ${fixturePath}`).toBe(true);
+            const snapshot = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+            scrubHar(snapshot, needsEpochScrub);
+            expect(cleanHar).toEqual(snapshot);
         }, traceFixtureTimeoutMs);
     }
 
@@ -122,6 +122,28 @@ describe('Chrome Trace Input Processing', () => {
                 if (typeof entry[k] === 'number') {
                     expect(entry[k], `${entry.request.url}: ${k}=${entry[k]}`).toBeLessThan(600_000);
                     expect(entry[k], `${entry.request.url}: ${k}=${entry[k]}`).toBeGreaterThan(-1000);
+                }
+            }
+        }
+    });
+
+    it('Scales netlog _chunks timestamps from microseconds to milliseconds', async () => {
+        const inputPath = path.resolve('Sample/Data/Chrome Traces/trace_www.google.com.json.gz');
+        const tool = new WaterfallTools();
+        await tool.loadFile(inputPath, { format: 'chrome-trace' });
+        const har = tool.getHar();
+        const entriesWithChunks = har.log.entries.filter(
+            e => Array.isArray(e._chunks) && e._chunks.length > 0
+        );
+        expect(entriesWithChunks.length).toBeGreaterThan(0);
+        for (const entry of entriesWithChunks) {
+            for (const chunk of entry._chunks) {
+                expect(typeof chunk.ts).toBe('number');
+                // Must be in milliseconds on the same scale as _start/_end, not raw microseconds
+                expect(chunk.ts).toBeGreaterThanOrEqual(0);
+                expect(chunk.ts).toBeLessThan(600_000);
+                if (typeof entry._end === 'number' && entry._end > 0) {
+                    expect(chunk.ts).toBeLessThanOrEqual(entry._end + 1);
                 }
             }
         }

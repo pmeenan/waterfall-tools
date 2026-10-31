@@ -5,6 +5,7 @@
  */
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 import { VERSION } from '../core/version.js';
+import { countRawBytes, scaledProgress } from './utilities/progress.js';
 
 const PRIORITY_MAP = {
     "VeryHigh": "Highest",
@@ -17,7 +18,16 @@ const PRIORITY_MAP = {
 };
 
 export class Netlog {
-    constructor() {
+    /**
+     * @param {Object} [opts]
+     * @param {number} [opts.timeUnitsPerMs=1] — how many `event.time` units make up one
+     *     millisecond. Raw netlog dumps tick in ms (1); the Chrome-trace bridge feeds
+     *     `trace_event.ts` straight through, which is µs (1000). Used wherever the parser
+     *     has to mix event times with real milliseconds (date-header epoch bridge,
+     *     sort tiebreak) so the trace path isn't off by 1000×.
+     */
+    constructor(opts = {}) {
+        this.timeUnitsPerMs = (typeof opts.timeUnitsPerMs === 'number' && opts.timeUnitsPerMs > 0) ? opts.timeUnitsPerMs : 1;
         this.netlog = { bytes_in: 0, bytes_out: 0, next_request_id: 1000000 };
         this.netlog_requests = null;
         this.marked_start_time = null;
@@ -310,7 +320,7 @@ export class Netlog {
                 const socketId = params.source_dependency.id;
                 entry.socket = socketId;
                 if (this.netlog.socket[socketId]) {
-                    this.netlog.socket.h2_session = sessionId;
+                    this.netlog.socket[socketId].h2_session = sessionId;
                 }
             }
         }
@@ -649,7 +659,10 @@ export class Netlog {
                         const dateVal = h.substring(5).trim();
                         const parsed = Date.parse(dateVal);
                         if (!isNaN(parsed)) {
-                            this.dateHeaderEpoch = { epochMs: parsed, monotonicMs: event.time };
+                            // `monotonicMs` must be real ms: on the Chrome-trace path
+                            // event.time is µs and the consumer subtracts it from an
+                            // epoch-ms value (historical bug: 001-trace landed in 1701).
+                            this.dateHeaderEpoch = { epochMs: parsed, monotonicMs: event.time / this.timeUnitsPerMs };
                             break;
                         }
                     }
@@ -674,7 +687,11 @@ export class Netlog {
                 entry.bytes_in += params.byte_count;
                 entry.chunks.push({ ts: event.time, bytes: params.byte_count });
             } else if (entry.chunks.length > 0) {
-                entry.chunks[entry.chunks.length - 1].inflated = params.byte_count;
+                // Several FILTERED_BYTES_READ events can follow one raw BYTES_READ (the
+                // decoder drains its output buffer in pieces); they all belong to the most
+                // recent wire chunk, so accumulate instead of keeping only the last piece.
+                const lastChunk = entry.chunks[entry.chunks.length - 1];
+                lastChunk.inflated = (lastChunk.inflated || 0) + params.byte_count;
             }
             if (params.bytes !== undefined) {
                 try {
@@ -1044,7 +1061,10 @@ export class Netlog {
                     }
                     if (typeof numId === 'string') numId = parseInt(numId, 10) || 0;
                     
-                    request.start = request.start + ((numId % 10000) / 1000000.0);
+                    // Deterministic sort tiebreak for requests that started on the same
+                    // tick: at most ~10 µs of real time, scaled to the event clock's units
+                    // (ms for raw netlogs, µs for the Chrome-trace bridge).
+                    request.start = request.start + ((numId % 10000) / 1000000.0) * this.timeUnitsPerMs;
                 }
                 if (this.bodies[request.netlog_id] && this.bodies[request.netlog_id].length > 0) {
                     try {
@@ -1336,6 +1356,10 @@ export async function processNetlogFileNode(input, options = {}) {
             stream = Readable.toWeb(nodeFsStream);
         }
 
+        // Count raw (pre-gunzip) bytes so progress tracks `totalBytes` honestly.
+        const rawCounter = { bytes: 0 };
+        stream = countRawBytes(stream, rawCounter);
+
         if (isGz) {
             stream = stream.pipeThrough(new DecompressionStream('gzip'));
         }
@@ -1348,7 +1372,6 @@ export async function processNetlogFileNode(input, options = {}) {
         let started = false;
 
         onProgress('Parsing netlog...', 0);
-        let bytesRead = 0;
 
         // Native stream line splitting generator
         async function* getLines(reader) {
@@ -1362,8 +1385,7 @@ export async function processNetlogFileNode(input, options = {}) {
                     }
                     break;
                 }
-                bytesRead += value.length;
-                if (totalBytes > 0) onProgress('Parsing netlog...', Math.round((bytesRead / totalBytes) * 80));
+                if (totalBytes > 0) onProgress('Parsing netlog...', scaledProgress(rawCounter.bytes, totalBytes, 80));
                 const lines = (remainder + value).split('\n');
                 remainder = lines.pop(); // last element is either empty (if ended in \n) or the remainder
                 for (const line of lines) yield line;

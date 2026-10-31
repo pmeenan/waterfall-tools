@@ -22,6 +22,9 @@ import { VERSION } from './version.js';
  * @returns {Object} The flattened page object
  */
 export function getPageFromData(data, pageId, options = { includeRequests: false }) {
+    if (!data || !data.pages) {
+        throw new Error('No data loaded: call loadFile()/loadBuffer()/loadStream() successfully before reading pages.');
+    }
     if (!data.pages[pageId]) return null;
 
     const page = JSON.parse(JSON.stringify(data.pages[pageId])); // deep copy baseline
@@ -129,6 +132,9 @@ export function getPageFromData(data, pageId, options = { includeRequests: false
  * @returns {Object} `{ log: { version, creator, pages, entries } }`
  */
 export function relationalToHar(data, _options = {}) {
+    if (!data || !data.pages) {
+        throw new Error('No data loaded: call loadFile()/loadBuffer()/loadStream() successfully before exporting HAR.');
+    }
     const pagesOut = [];
     const entriesOut = [];
 
@@ -223,7 +229,9 @@ export function relationalToHar(data, _options = {}) {
                         bodySize: -1
                     },
                     response: {
-                        status: req.status || 200,
+                        // `??` (not `||`): status 0 is the HAR convention for aborted/blocked
+                        // requests and must survive export. Only a missing status defaults to 200.
+                        status: req.status ?? 200,
                         statusText: req.statusText || '',
                         httpVersion: req.httpVersion || 'HTTP/1.1',
                         cookies: [],

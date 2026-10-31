@@ -205,8 +205,17 @@ async function processFiles(files) {
         rendererCanvas = await tool.renderTo(canvasContainer, initialOptions);
 
     } catch (e) {
-        dropZone.innerHTML = `<h2>Error</h2><p>${e.message}</p><button id="retry-btn">Try Again</button>`;
-        document.getElementById('retry-btn').addEventListener('click', () => location.reload());
+        // Error messages can echo attacker-controlled file content — build the
+        // panel with textContent rather than interpolating into innerHTML.
+        const heading = document.createElement('h2');
+        heading.textContent = 'Error';
+        const message = document.createElement('p');
+        message.textContent = (e && e.message) ? e.message : String(e);
+        const retryBtn = document.createElement('button');
+        retryBtn.id = 'retry-btn';
+        retryBtn.textContent = 'Try Again';
+        retryBtn.addEventListener('click', () => location.reload());
+        dropZone.replaceChildren(heading, message, retryBtn);
         console.error(e);
     }
 }

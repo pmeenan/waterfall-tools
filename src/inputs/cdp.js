@@ -6,6 +6,7 @@
 import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 import { normalizeWPT } from './wpt-json.js';
+import { countRawBytes, scaledProgress } from './utilities/progress.js';
 
 const PRIORITY_MAP = {
     "VeryHigh": "Highest",
@@ -112,8 +113,12 @@ class DevToolsParser {
                 }
                 
                 if (method === 'Network.requestIntercepted' && params.requestId && request_id && raw_requests[request_id]) {
-                    if (params.__overwrittenURL) {
-                        raw_requests[request_id].overwrittenURL = params._overwrittenURL;
+                    // The reference devtools_parser.py checks `__overwrittenURL` but reads
+                    // `_overwrittenURL` (typo → always undefined). Accept every spelling a
+                    // producer might use (the trace path uses plain `overwrittenURL`).
+                    const overwrittenURL = params.overwrittenURL || params._overwrittenURL || params.__overwrittenURL;
+                    if (typeof overwrittenURL === 'string' && overwrittenURL) {
+                        raw_requests[request_id].overwrittenURL = overwrittenURL;
                     }
                 }
 
@@ -736,6 +741,10 @@ export async function processCDPFileNode(input, options = {}) {
             stream = Readable.toWeb(nodeFsStream);
         }
 
+        // Count raw (pre-gunzip) bytes so progress tracks `totalBytes` honestly.
+        const rawCounter = { bytes: 0 };
+        stream = countRawBytes(stream, rawCounter);
+
         if (isGz) {
             stream = stream.pipeThrough(new DecompressionStream('gzip'));
         }
@@ -759,13 +768,11 @@ export async function processCDPFileNode(input, options = {}) {
         reader = pipeline.getReader();
 
         onProgress('Parsing CDP events...', 0);
-        let bytesRead = 0;
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            bytesRead += value.length;
             parser.write(value);
-            if (totalBytes > 0) onProgress('Parsing CDP events...', Math.round((bytesRead / totalBytes) * 80));
+            if (totalBytes > 0) onProgress('Parsing CDP events...', scaledProgress(rawCounter.bytes, totalBytes, 80));
         }
         onProgress('Processing events...', 80);
 

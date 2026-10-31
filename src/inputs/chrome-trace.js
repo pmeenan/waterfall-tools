@@ -7,6 +7,7 @@ import { Netlog, normalizeNetlogToHAR } from './netlog.js';
 import { JSONParser } from '@streamparser/json';
 import { buildWaterfallDataFromHar } from '../core/har-converter.js';
 import { foldCpuSlices, SCRIPT_TIMING_EVENTS, computeSliceGridUsecs } from '../core/mainthread-categories.js';
+import { countRawBytes, scaledProgress } from './utilities/progress.js';
 
 const PRIORITY_MAP = {
     "VeryHigh": "Highest",
@@ -35,7 +36,7 @@ function isGzip(buffer) {
  *    `foldCpuSlices` to get the renderer-ready 5-category `_mainThreadSlices` payload.
  *  - `scripts` mirrors `script_timing.json`: {main_thread, <thread>: {url: {eventName:
  *    [[start_ms, end_ms], ...]}}}, ms relative to `baseUs` so consumers don't re-normalize.
- *  - `longTasks` — top-level main-thread events ≥ 50 ms, flattened to [[startMs, endMs], ...]
+ *  - `longTasks` — top-level main-thread events > 50 ms, flattened to [[startMs, endMs], ...]
  *    with overlap coalescing so downstream renderers can shade blocking periods.
  *
  * `baseUs` is the HAR page-zero anchor (earliest request/navigation). Slices are keyed off
@@ -223,7 +224,10 @@ function buildMainThreadActivity(rawEvents, baseUs, startUs, metaMainThreads, su
         const thread = evt.t;
         const name = eventNameLookup[evt.n];
 
-        // Long tasks: top-level events on any tracked main-thread candidate, >= 50 ms.
+        // Long tasks: top-level events on any tracked main-thread candidate, strictly
+        // > 50 ms (trace_parser.py L793 uses `elapsed > 50000`). "Top-level" means no
+        // enclosing B/E parent: like the Python reference, complete ('X') events are
+        // never pushed on the stack, so an X nested inside another X is also top-level.
         if (parentName === null && elapsed > 50000 && mainThreadCandidates.has(thread)) {
             pushLongTask(Math.floor(relStart / 1000), Math.ceil(relEnd / 1000));
         }
@@ -288,14 +292,15 @@ function buildMainThreadActivity(rawEvents, baseUs, startUs, metaMainThreads, su
     // `pushLongTask` can coalesce with whatever the devtools-stack path emitted.
     //
     // Candidate set is intentionally generous (every thread the streaming pass flagged
-    // as a main-thread candidate) — narrowing to the single picked `bestThread` runs
-    // below. Until that pick happens we take every candidate's long tasks, then filter
-    // at the end.
+    // as a main-thread candidate) and is NOT narrowed to the single `bestThread` picked
+    // below — same as the devtools-stack path above and trace_parser.py L793
+    // (`thread in self.cpu['main_threads']`). Same strict `> 50 ms` threshold too.
     if (Array.isArray(toplevelTasks) && toplevelTasks.length) {
         toplevelTasks.sort((a, b) => a.ts - b.ts);
         for (const t of toplevelTasks) {
             const thread = `${t.pid}:${t.tid}`;
             if (!mainThreadCandidates.has(thread)) continue;
+            if (!(t.dur > 50000)) continue;
             const relStart = t.ts - baseUs;
             const relEnd = relStart + t.dur;
             if (relEnd <= 0) continue;
@@ -416,11 +421,17 @@ export async function processChromeTraceFileNode(input, options = {}) {
             stream = Readable.toWeb(nodeFsStream);
         }
 
+        // Count raw (pre-gunzip) bytes so progress tracks `totalBytes` honestly.
+        const rawCounter = { bytes: 0 };
+        stream = countRawBytes(stream, rawCounter);
+
         if (isGz) {
             stream = stream.pipeThrough(new DecompressionStream('gzip'));
         }
 
-        const netlog = new Netlog();
+        // Trace timestamps are µs; tell the netlog bridge so its ms-denominated
+        // helpers (date-header epoch bridge, sort tiebreak) scale correctly.
+        const netlog = new Netlog({ timeUnitsPerMs: 1000 });
         const timeline_requests = {};
         // Tracks whether a `cat: netlog` event was ever seen. When false, the trace has no
         // netlog coverage and we have to synthesize every request from devtools.timeline alone
@@ -672,6 +683,12 @@ export async function processChromeTraceFileNode(input, options = {}) {
                                 req.timing = data.timing;
                                 // Fallback wall-clock extraction removed to natively protect trace_event.ts monotonic scaling cleanly.
                             }
+                        } else if (name === 'ResourceMarkAsCached') {
+                            // Blink memory-cache hit. The later ResourceReceiveResponse can
+                            // carry `fromCache:false` plus the *original* fetch's
+                            // `timing.requestTime` (theverge: ~50 s before this load), so
+                            // the flag is the only reliable "never hit the network" signal.
+                            req.marked_cached = true;
                         } else if (name === 'ResourceReceivedData' && data) {
                             if (data.encodedDataLength) req.bytesIn += data.encodedDataLength;
                         } else if (name === 'ResourceFinish' && data) {
@@ -692,13 +709,11 @@ export async function processChromeTraceFileNode(input, options = {}) {
         reader = pipeline.getReader();
 
         onProgress('Parsing trace...', 0);
-        let bytesRead = 0;
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            bytesRead += value.length;
             parser.write(value);
-            if (totalBytes > 0) onProgress('Parsing trace...', Math.round((bytesRead / totalBytes) * 80));
+            if (totalBytes > 0) onProgress('Parsing trace...', scaledProgress(rawCounter.bytes, totalBytes, 80));
         }
         onProgress('Processing events...', 80);
         if (options.debug) console.log(`[chrome-trace.js] Finished reading stream stream.`);
@@ -780,7 +795,11 @@ export async function processChromeTraceFileNode(input, options = {}) {
         const baseTimeIsNoise = (u) => typeof u === 'string' && (
             u.startsWith('http://127.0.0.1:8888') || u.startsWith('chrome://tracing') || u.startsWith('chrome-extension://')
         );
-        const baseTimeEligible = (tl) => typeof tl.url === 'string' && tl.url.length > 0 && !baseTimeIsNoise(tl.url);
+        // Cache / service-worker / memory-cache hits are excluded too: their
+        // `timing.requestTime` describes the original fetch (possibly from a previous
+        // navigation) and would drag page zero back by tens of seconds.
+        const baseTimeEligible = (tl) => typeof tl.url === 'string' && tl.url.length > 0 && !baseTimeIsNoise(tl.url)
+            && !tl.from_cache && !tl.from_service_worker && !tl.marked_cached;
         let base_time_microseconds = Number.MAX_VALUE;
         if (typeof start_time === 'number' && start_time < base_time_microseconds) base_time_microseconds = start_time;
         if (results && typeof results.start_time === 'number' && results.start_time < base_time_microseconds) base_time_microseconds = results.start_time;
@@ -790,6 +809,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
             if (tl.timing && typeof tl.timing.requestTime === 'number' && (tl.timing.requestTime * 1000000.0) < base_time_microseconds) base_time_microseconds = tl.timing.requestTime * 1000000.0;
         }
         if (base_time_microseconds === Number.MAX_VALUE) base_time_microseconds = 0;
+        if (options.debug) console.log(`[chrome-trace.js] Page-zero candidates (µs): navigationStart=${start_time}, netlog=${results ? results.start_time : null}, chosen=${base_time_microseconds}.`);
 
         let final_start_time = base_time_microseconds / 1000.0;
 
@@ -910,6 +930,41 @@ export async function processChromeTraceFileNode(input, options = {}) {
             }
         }
 
+        // Rebase netlog-derived times onto page zero. `postProcessEvents()` makes every
+        // request / socket / dns time relative to the netlog's own earliest event
+        // (`results.start_time`), but the HAR page zero is `base_time_microseconds`, which
+        // can be earlier (navigationStart or a timeline requestTime that precedes the first
+        // netlog event — e.g. 001-trace's netlog starts ~55 ms after navigationStart).
+        // Without this shift every netlog entry renders that much too early relative to
+        // pageTimings / long tasks / CPU slices, which are all keyed off page zero. Done
+        // here (µs, before scaling) and before timeline synthesis appends its own
+        // already-page-zero-relative requests.
+        const netlogShiftUs = (results && typeof results.start_time === 'number')
+            ? results.start_time - base_time_microseconds : 0;
+        if (netlogShiftUs !== 0 && Number.isFinite(netlogShiftUs)) {
+            const netlogTimeKeys = ['dns_start', 'dns_end', 'connect_start', 'connect_end', 'ssl_start', 'ssl_end', 'start', 'created', 'first_byte', 'end'];
+            for (const req of requests) {
+                for (const tname of netlogTimeKeys) {
+                    if (req[tname] !== undefined) req[tname] += netlogShiftUs;
+                }
+                for (const key of ['chunks', 'chunks_in', 'chunks_out']) {
+                    if (Array.isArray(req[key])) {
+                        for (const c of req[key]) if (c.ts !== undefined) c.ts += netlogShiftUs;
+                    }
+                }
+            }
+            for (const s of unlinked_sockets) {
+                for (const tname of ['connect_start', 'connect_end', 'ssl_start', 'ssl_end']) {
+                    if (s[tname] !== undefined) s[tname] += netlogShiftUs;
+                }
+            }
+            for (const d of unlinked_dns) {
+                if (d.start !== undefined) d.start += netlogShiftUs;
+                if (d.end !== undefined) d.end += netlogShiftUs;
+            }
+            if (options.debug) console.log(`[chrome-trace.js] Rebased netlog times by ${netlogShiftUs / 1000} ms onto page zero.`);
+        }
+
         // Step 3: synthesize requests from devtools.timeline only.
         //
         // Two code paths land here:
@@ -944,7 +999,7 @@ export async function processChromeTraceFileNode(input, options = {}) {
             // Cache hits and service-worker-intercepted responses aren't network
             // requests — they never left the tab. Including them would double-count
             // resources that any netlog pass would (correctly) omit.
-            if (tl_req.from_cache || tl_req.from_service_worker) continue;
+            if (tl_req.from_cache || tl_req.from_service_worker || tl_req.marked_cached) continue;
             const hasStatus = typeof tl_req.status === 'number' && tl_req.status > 0;
             const hasTiming = tl_req.timing && tl_req.timing.requestTime;
             if (!(hasTiming || (tl_req.had_response && hasStatus))) continue;
@@ -997,8 +1052,12 @@ export async function processChromeTraceFileNode(input, options = {}) {
              for (const tname of scaleTimes) {
                  if (req[tname] !== undefined) req[tname] /= 1000.0;
              }
-             if (req.chunks_in) { for (const c of req.chunks_in) if (c.ts !== undefined) c.ts /= 1000.0; }
-             if (req.chunks_out) { for (const c of req.chunks_out) if (c.ts !== undefined) c.ts /= 1000.0; }
+             // `chunks` (URL_REQUEST / H2 / QUIC stream deliveries → HAR `_chunks`) are
+             // netlog µs like everything else; leaving them unscaled put `_chunks[].ts`
+             // 1000× outside the entry's request window.
+             for (const key of ['chunks', 'chunks_in', 'chunks_out']) {
+                 if (Array.isArray(req[key])) { for (const c of req[key]) if (c.ts !== undefined) c.ts /= 1000.0; }
+             }
         }
         for (const s of unlinked_sockets) {
              for (const tname of scaleTimes) {

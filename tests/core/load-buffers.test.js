@@ -160,16 +160,24 @@ describe('WaterfallTools.loadBuffers', () => {
     });
 
     it('loadBuffer retains only the supplied typed-array view bytes', async () => {
-        const harBytes = syntheticHarBuffer();
-        const backing = new Uint8Array(harBytes.byteLength + 20);
-        backing.fill(0x7b);
-        backing.set(harBytes, 10);
-        const view = backing.subarray(10, 10 + harBytes.byteLength);
+        const qlogBytes = readSample(AIOQUIC_FILES[0]);
+        const view = paddedView(qlogBytes, 10, 10);
         const wt = new WaterfallTools();
         try {
             await wt.loadBuffer(view, { debug: true });
-            expect(wt._rawBuffer.byteLength).toBe(harBytes.byteLength);
-            expect(new Uint8Array(wt._rawBuffer)).toEqual(harBytes);
+            expect(wt._rawBuffer.byteLength).toBe(qlogBytes.byteLength);
+            expect(new Uint8Array(wt._rawBuffer)).toEqual(qlogBytes);
+        } finally {
+            await wt.destroy();
+        }
+    });
+
+    it('loadBuffer does not retain a raw copy for formats without a raw-buffer resource route', async () => {
+        const wt = new WaterfallTools();
+        try {
+            await wt.loadBuffer(syntheticHarBuffer(), { debug: true });
+            expect(wt._sourceFormat).toBe('har');
+            expect(wt._rawBuffer).toBeNull();
         } finally {
             await wt.destroy();
         }

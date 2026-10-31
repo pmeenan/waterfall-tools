@@ -5,6 +5,7 @@
  */
 import { WaterfallTools, identifyFormatFromBuffer, Layout, PerfettoDecoder } from 'waterfall-tools';
 import { saveToHistory, getAllHistory, updateHistoryInfo, clearAllHistory } from './history.js';
+import { escapeHtml, highlightSyntax } from './syntax-highlight.js';
 
 const ui = {
     loading: document.getElementById('loading'),
@@ -12,6 +13,8 @@ const ui = {
     progressContainer: document.getElementById('progress-container'),
     progressBar: document.getElementById('progress-bar'),
     progressDetail: document.getElementById('progress-detail'),
+    loadErrorMessage: document.getElementById('load-error-message'),
+    loadErrorDismiss: document.getElementById('load-error-dismiss'),
     dropZone: document.getElementById('drop-zone'),
     canvasContainer: document.getElementById('canvas-container'),
     summaryView: document.getElementById('summary-view'),
@@ -58,6 +61,7 @@ const ui = {
     labelsSliderToggle: document.getElementById('labels-slider-toggle'),
     historyBtn: document.getElementById('history-btn'),
     historyView: document.getElementById('history-view'),
+    historyHomeBtn: document.getElementById('history-home-btn'),
     historyFilter: document.getElementById('history-filter'),
     historyPageSize: document.getElementById('history-page-size'),
     historyPrevBtn: document.getElementById('history-prev-btn'),
@@ -72,6 +76,10 @@ let waterfallTool = null;
 let rendererCanvas = null;
 const activeBlobUrls = [];
 const tileRenderers = [];
+// Bumped whenever the tile thumbnails are torn down so a thumbnail render that
+// was scheduled (setTimeout) or is mid-`await renderTo()` for a previous tile
+// view can tell it's stale and must not register / keep its renderer.
+let tileRenderGeneration = 0;
 let pendingTabLoads = {};
 let activePerfettoLoad = null;
 let activeQvisLoad = null;
@@ -88,15 +96,6 @@ const PERFETTO_RUMCAP_STARTUP_COMMANDS = [
 function getPerfettoUrl(startupCommands = null) {
     if (!startupCommands) return PERFETTO_ORIGIN;
     return `${PERFETTO_ORIGIN}/#!/?startupCommands=${encodeURIComponent(JSON.stringify(startupCommands))}`;
-}
-
-function escapeHtml(value) {
-    return String(value === undefined || value === null ? '' : value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
 }
 
 function escapeAttribute(value) {
@@ -477,14 +476,22 @@ function loadNetlog(netlogBuffer) {
     ui.netlogOverlay.style.display = 'flex';
     ui.netlogOverlayContent.innerText = 'Loading netlog viewer...';
     
+    // Only an iframe that already holds the real netlog-viewer document can be
+    // driven immediately. Right after `src` is assigned, `contentWindow.document`
+    // is still the initial about:blank document — whose readyState is already
+    // 'complete' — so checking readyState alone would run onLoad twice (once
+    // now against about:blank, once on the real `load` event).
+    let navigating = false;
     if (ui.netlogFrame.src === 'about:blank' || !ui.netlogFrame.src) {
         ui.netlogFrame.src = 'netlog-viewer/index.html';
+        navigating = true;
     }
 
-    let loaded = false;
+    let started = false;
 
     const onLoad = async () => {
-        if (loaded) return;
+        if (started) return;
+        started = true;
         ui.netlogOverlayContent.innerText = 'Loading Netlog Data...';
         
         let finalBuffer = netlogBuffer;
@@ -529,7 +536,6 @@ function loadNetlog(netlogBuffer) {
 
                     const file = new File([finalBuffer], 'netlog.json', {type: 'application/json'});
                     iv.loadLogFile(file);
-                    loaded = true;
                 } else {
                     console.warn('[viewer.js] Error invoking Netlog Viewer: ImportView not found on window');
                     ui.netlogOverlay.style.display = 'none';
@@ -541,15 +547,27 @@ function loadNetlog(netlogBuffer) {
         }, 1000);
     };
 
-    ui.netlogFrame.addEventListener('load', onLoad, { once: true });
-    
-    // In case of rapid toggling where the iframe is already loaded
-    if (ui.netlogFrame.contentWindow && ui.netlogFrame.contentWindow.document && ui.netlogFrame.contentWindow.document.readyState === 'complete' && ui.netlogFrame.src !== 'about:blank' && ui.netlogFrame.src !== '') {
+    const frameHasNetlogViewer = () => {
+        try {
+            const cw = ui.netlogFrame.contentWindow;
+            return !!(cw && cw.location.href !== 'about:blank' &&
+                cw.document && cw.document.readyState === 'complete');
+        } catch {
+            return false;
+        }
+    };
+
+    if (!navigating && frameHasNetlogViewer()) {
+        // Rapid re-toggle: the viewer document is already fully loaded.
         onLoad();
+    } else {
+        ui.netlogFrame.addEventListener('load', onLoad, { once: true });
     }
 }
 
 function showLoading(text = 'Loading...') {
+    // Leave any previous error state so the spinner/progress DOM is visible again.
+    clearLoadError();
     ui.loadingText.textContent = text;
     ui.loading.classList.remove('hidden');
     ui.dropZone.classList.add('hidden');
@@ -578,14 +596,49 @@ function updateProgress(phase, percent) {
 }
 
 function hideLoading() {
+    clearLoadError();
     ui.loading.classList.add('hidden');
     ui.progressContainer.classList.add('hidden');
     ui.progressDetail.classList.add('hidden');
 }
 
+/**
+ * Shows a load failure inside the #loading overlay. The message goes into the
+ * dedicated #load-error panel (textContent — never markup) and the
+ * `has-error` class hides the spinner/progress siblings via CSS, so the cached
+ * `ui.loadingText` / `ui.progress*` nodes stay attached and the next
+ * showLoading() works normally.
+ */
 function showError(msg) {
     ui.loading.classList.remove('hidden');
-    ui.loading.innerHTML = `<div class="upload-content"><h2 style="color:#d32f2f">Error</h2><p>${escapeHtml(msg)}</p></div>`;
+    if (ui.loadErrorMessage) ui.loadErrorMessage.textContent = String(msg === undefined || msg === null ? '' : msg);
+    ui.loading.classList.add('has-error');
+    if (ui.loadErrorDismiss) ui.loadErrorDismiss.focus();
+}
+
+function clearLoadError() {
+    ui.loading.classList.remove('has-error');
+    if (ui.loadErrorMessage) ui.loadErrorMessage.textContent = '';
+}
+
+/** "Back" from a load error: drop the failed load and return to the landing page. */
+async function dismissLoadError() {
+    hideLoading();
+    await resetViewerState();
+    ui.canvasContainer.classList.add('hidden');
+    ui.tileView.classList.add('hidden');
+    if (ui.historyView) ui.historyView.classList.add('hidden');
+    ui.dropZone.classList.remove('hidden');
+    // Drop the failing ?src= / ?keylog= so a reload doesn't immediately retry it.
+    try {
+        const urlObj = new URL(window.location.href);
+        urlObj.searchParams.delete('src');
+        urlObj.searchParams.delete('keylog');
+        history.replaceState(null, '', urlObj.toString());
+    } catch {
+        // Non-fatal: URL cleanup is best-effort.
+    }
+    updateUrlWithCurrentState();
 }
 
 async function fileToReadable(file) {
@@ -877,39 +930,6 @@ function getMetricItemHtml(label, value) {
             <span class="metric-value">${escapeHtml(value)}</span>
         </div>
     `;
-}
-
-function highlightSyntax(code, lang) {
-    if (code === undefined || code === null) return '';
-    let html = String(code).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    if (lang === 'json') {
-        html = html.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, function (match) {
-            let cls = 'hl-number';
-            if (/^"/.test(match)) {
-                if (/:$/.test(match)) {
-                    cls = 'hl-key';
-                } else {
-                    cls = 'hl-string';
-                }
-            } else if (/true|false/.test(match)) {
-                cls = 'hl-boolean';
-            } else if (/null/.test(match)) {
-                cls = 'hl-null';
-            }
-            return '<span class="' + cls + '">' + match + '</span>';
-        });
-    } else if (lang === 'html') {
-        html = html.replace(/(&lt;\/?[a-zA-Z0-9:-]+)(.*?)(&gt;)/g, function(match, p1, p2, p3) {
-            const attrs = p2.replace(/([a-zA-Z0-9-]+)(=)(&quot;.*?&quot;|&#39;.*?&#39;|".*?"|'.*?')/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>');
-            return '<span class="hl-tag">' + p1 + '</span>' + attrs + '<span class="hl-tag">' + p3 + '</span>';
-        });
-    } else if (lang === 'css') {
-        html = html.replace(/([a-zA-Z0-9-]+)(\s*:)([^;]+)(;)/g, '<span class="hl-attr">$1</span>$2<span class="hl-string">$3</span>$4');
-    } else if (lang === 'js') {
-        html = html.replace(/\b(const|let|var|function|return|if|else|for|while|class|import|export|true|false|null)\b/g, '<span class="hl-keyword">$1</span>');
-        html = html.replace(/('[^']*'|"[^"]*"|`[^`]*`)/g, '<span class="hl-string">$1</span>');
-    }
-    return html;
 }
 
 function renderSummary(pageData) {
@@ -1236,7 +1256,9 @@ async function renderTiles(pushHistory = true) {
         
         const titleContainer = document.createElement('div');
         titleContainer.className = 'tile-title';
-        titleContainer.innerHTML = `<h3>${escapeHtml(pageData.title || pageData._URL || pageId)}</h3>`;
+        const titleHeading = document.createElement('h3');
+        titleHeading.textContent = String(pageData.title || pageData._URL || pageId);
+        titleContainer.appendChild(titleHeading);
         topContainer.appendChild(titleContainer);
 
         const splitBody = document.createElement('div');
@@ -1259,7 +1281,12 @@ async function renderTiles(pushHistory = true) {
         if (imgUrl) {
              const screenshotDiv = document.createElement('div');
              screenshotDiv.className = 'tile-screenshot';
-             screenshotDiv.innerHTML = `<img src="${imgUrl}" alt="Screenshot">`;
+             // `imgUrl` can originate from an untrusted capture (`_screenshot`),
+             // so never interpolate it into markup — assign it as a property.
+             const screenshotImg = document.createElement('img');
+             screenshotImg.alt = 'Screenshot';
+             screenshotImg.src = imgUrl;
+             screenshotDiv.appendChild(screenshotImg);
              splitBody.appendChild(screenshotDiv);
              splitBody.classList.add('has-screenshot');
              tile.classList.add('has-screenshot');
@@ -1285,9 +1312,15 @@ async function renderTiles(pushHistory = true) {
         opts.minWidth = 0; // Natural Width Constraints
 
         // Wait to process microtask explicitly to allow DOM bounds to calc smoothly
+        const generation = tileRenderGeneration;
         setTimeout(async () => {
-             if (!waterfallTool || !thumbContainer.isConnected) return;
+             if (generation !== tileRenderGeneration || !waterfallTool || !thumbContainer.isConnected) return;
              const renderer = await waterfallTool.renderTo(thumbContainer, opts);
+             if (generation !== tileRenderGeneration || !thumbContainer.isConnected) {
+                 // The user navigated away while this thumbnail was rendering.
+                 if (renderer && typeof renderer.destroy === 'function') renderer.destroy();
+                 return;
+             }
              tileRenderers.push(renderer);
         }, 0);
 
@@ -1723,6 +1756,11 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
         rendererCanvas.destroy();
         rendererCanvas = null;
     }
+    // Leaving the tile view: tear down its thumbnail renderers (and invalidate any
+    // still-scheduled thumbnail render), and drop request tabs from the previous
+    // page — `req-N` ids are only meaningful within a single page.
+    destroyTileRenderers();
+    removeRequestTabs();
 
     const urlOptions = getOptionsFromUrl();
     const renderOptions = Object.assign(urlOptions, overridingOptions);
@@ -2028,6 +2066,20 @@ async function renderWaterfall(pageId, overridingOptions = {}, pushHistory = tru
     updateUrlWithCurrentState();
 }
 
+function destroyTileRenderers() {
+    tileRenderGeneration++;
+    while (tileRenderers.length > 0) {
+        const renderer = tileRenderers.pop();
+        if (renderer && typeof renderer.destroy === 'function') renderer.destroy();
+    }
+}
+
+/** Request tabs (`req-N`) are numbered per page, so they must never survive a page switch. */
+function removeRequestTabs() {
+    document.querySelectorAll('.viewer-tab.req-tab, .req-tab-content').forEach(el => el.remove());
+    if (ui.btnCloseTab) ui.btnCloseTab.classList.add('hidden');
+}
+
 function resetWaterfallUI() {
     cleanupPerfettoLoad();
     cleanupQvisLoad();
@@ -2036,17 +2088,14 @@ function resetWaterfallUI() {
         pendingTabLoads = {};
     }
 
-    while (tileRenderers.length > 0) {
-        const renderer = tileRenderers.pop();
-        if (renderer && typeof renderer.destroy === 'function') renderer.destroy();
-    }
+    destroyTileRenderers();
 
     if (rendererCanvas) {
         rendererCanvas.destroy();
         rendererCanvas = null;
     }
 
-    document.querySelectorAll('.viewer-tab.req-tab, .req-tab-content').forEach(el => el.remove());
+    removeRequestTabs();
 
     if (typeof activeBlobUrls !== 'undefined' && Array.isArray(activeBlobUrls)) {
         activeBlobUrls.forEach(url => URL.revokeObjectURL(url));
@@ -2516,6 +2565,13 @@ async function initViewer() {
     }
 
     // Nav Bindings
+    if (ui.loadErrorDismiss) {
+        ui.loadErrorDismiss.addEventListener('click', () => { dismissLoadError(); });
+    }
+    if (ui.historyHomeBtn) {
+        ui.historyHomeBtn.addEventListener('click', () => { closeHistoryView(); });
+    }
+
     ui.btnBackTiles.addEventListener('click', () => {
          if (typeof history !== 'undefined' && history.state) {
              history.back();
@@ -2963,6 +3019,11 @@ async function initViewer() {
             console.error(e);
             showError(`Failed fetching remote file: ${e.message}`);
         }
+    } else if (params.get('view') === 'history' && ui.historyView) {
+        // Reload / shared link while on the history page: restore it instead of
+        // dropping back to the landing page.
+        if (typeof history !== 'undefined') history.replaceState({ view: 'history' }, '');
+        loadAndRenderHistory();
     } else {
         ui.dropZone.classList.remove('hidden');
     }
@@ -2970,38 +3031,69 @@ async function initViewer() {
 
 // --- History Tab UI Logic ---
 let historyData = [];
-let historySortField = 'firstLoaded';
+let historySortField = 'lastAccessed';
 let historySortDesc = true;
 let historyPage = 1;
 
 async function loadAndRenderHistory() {
+    hideLoading();
     ui.canvasContainer.classList.add('hidden');
     ui.tileView.classList.add('hidden');
     ui.dropZone.classList.add('hidden');
     ui.historyView.classList.remove('hidden');
 
-    historyData = await getAllHistory();
+    try {
+        historyData = await getAllHistory();
+    } catch (e) {
+        console.warn('Failed to read history:', e);
+        historyData = [];
+    }
     renderHistoryTable();
+    updateUrlWithCurrentState();
+}
+
+/** Leave the history view for the landing page (drop zone). */
+async function closeHistoryView() {
+    if (ui.historyView) ui.historyView.classList.add('hidden');
+    await resetViewerState();
+    ui.canvasContainer.classList.add('hidden');
+    ui.tileView.classList.add('hidden');
+    ui.dropZone.classList.remove('hidden');
+    if (typeof history !== 'undefined') {
+        const urlObj = new URL(window.location.href);
+        urlObj.searchParams.delete('view');
+        history.pushState(null, '', urlObj.toString());
+    }
+}
+
+/**
+ * Single filter predicate shared by the table renderer and the pagination
+ * controls so page counts always agree with the rows actually shown.
+ * @param {string} rawQuery - The filter box contents.
+ * @returns {Array} Matching history records (a new array; `historyData` itself is untouched).
+ */
+function getFilteredHistory(rawQuery) {
+    const query = String(rawQuery || '').toLowerCase();
+    if (!query) return historyData.slice();
+    const matches = (v) => typeof v === 'string' && v.toLowerCase().includes(query);
+    return historyData.filter(r =>
+        matches(r.testUrl) || matches(r.url) || matches(r.title) || matches(r.comment) || matches(r.type)
+    );
+}
+
+/** Timestamp shown in the "Last Viewed" column (older records may predate `lastAccessed`). */
+function historyLastViewed(row) {
+    return row.lastAccessed || row.firstLoaded || 0;
 }
 
 function renderHistoryTable() {
     // 1. Filter
-    const query = (ui.historyFilter.value || '').toLowerCase();
-    let filtered = historyData;
-    if (query) {
-        filtered = historyData.filter(r => 
-            (r.testUrl && r.testUrl.toLowerCase().includes(query)) ||
-            (r.url && r.url.toLowerCase().includes(query)) ||
-            (r.title && r.title.toLowerCase().includes(query)) ||
-            (r.comment && r.comment.toLowerCase().includes(query)) ||
-            (r.type && r.type.toLowerCase().includes(query))
-        );
-    }
+    const filtered = getFilteredHistory(ui.historyFilter.value);
     
     // 2. Sort
     filtered.sort((a, b) => {
-        let valA = a[historySortField] || '';
-        let valB = b[historySortField] || '';
+        let valA = historySortField === 'lastAccessed' ? historyLastViewed(a) : (a[historySortField] || '');
+        let valB = historySortField === 'lastAccessed' ? historyLastViewed(b) : (b[historySortField] || '');
         if (typeof valA === 'string') valA = valA.toLowerCase();
         if (typeof valB === 'string') valB = valB.toLowerCase();
         if (valA < valB) return historySortDesc ? 1 : -1;
@@ -3056,8 +3148,8 @@ function renderHistoryTable() {
         renderEditableCell(tdComment, row.url, 'comment', row.comment || '');
         
         const tdDate = document.createElement('td');
-        const dt = row.firstLoaded ? new Date(row.firstLoaded) : new Date();
-        tdDate.textContent = dt.toLocaleString();
+        const lastViewed = historyLastViewed(row);
+        tdDate.textContent = lastViewed ? new Date(lastViewed).toLocaleString() : '';
         
         tr.append(tdTestUrl, tdSource, tdType, tdPages, tdTitle, tdComment, tdDate);
         
@@ -3131,10 +3223,8 @@ if (ui.historyFilter) {
     ui.historyPrevBtn.addEventListener('click', () => { if (historyPage > 1) { historyPage--; renderHistoryTable(); }});
     ui.historyNextBtn.addEventListener('click', () => { 
         const pageSize = parseInt(ui.historyPageSize.value, 10);
-        const totalElems = (ui.historyFilter.value) ? 
-           historyData.filter(r => (r.testUrl||'').includes(ui.historyFilter.value) || (r.url||'').includes(ui.historyFilter.value)).length :
-           historyData.length;
-        if (historyPage < Math.ceil(totalElems / pageSize)) { historyPage++; renderHistoryTable(); };
+        const totalElems = getFilteredHistory(ui.historyFilter.value).length;
+        if (historyPage < Math.ceil(totalElems / pageSize)) { historyPage++; renderHistoryTable(); }
     });
     
     ui.historyTable.querySelectorAll('th').forEach(th => {

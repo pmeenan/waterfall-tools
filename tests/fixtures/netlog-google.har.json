@@ -4453,9 +4453,6 @@
             "connect_start": 2329,
             "connect_end": 2329,
             "source_address": "127.0.0.1:59543"
-          },
-          {
-            "_id": "h2_session"
           }
         ],
         "_unlinked_dns_lookups": [
@@ -5354,7 +5351,7 @@
           {
             "ts": 163,
             "bytes": 26533,
-            "inflated": 27059
+            "inflated": 92595
           },
           {
             "ts": 180,
@@ -6079,27 +6076,27 @@
           {
             "ts": 330,
             "bytes": 25889,
-            "inflated": 15983
+            "inflated": 81519
           },
           {
             "ts": 343,
             "bytes": 32768,
-            "inflated": 41070
+            "inflated": 106606
           },
           {
             "ts": 353,
             "bytes": 32768,
-            "inflated": 31148
+            "inflated": 96684
           },
           {
             "ts": 359,
             "bytes": 24824,
-            "inflated": 5451
+            "inflated": 70987
           },
           {
             "ts": 374,
             "bytes": 28909,
-            "inflated": 15368
+            "inflated": 80904
           },
           {
             "ts": 395,
@@ -6134,12 +6131,12 @@
           {
             "ts": 462,
             "bytes": 32768,
-            "inflated": 40032
+            "inflated": 105568
           },
           {
             "ts": 488,
             "bytes": 32768,
-            "inflated": 37182
+            "inflated": 102718
           },
           {
             "ts": 509,
@@ -7789,12 +7786,12 @@
           {
             "ts": 556,
             "bytes": 32768,
-            "inflated": 26720
+            "inflated": 92256
           },
           {
             "ts": 571,
             "bytes": 32768,
-            "inflated": 25050
+            "inflated": 90586
           },
           {
             "ts": 579,
@@ -13023,7 +13020,7 @@
           {
             "ts": 1330,
             "bytes": 31282,
-            "inflated": 38005
+            "inflated": 103541
           },
           {
             "ts": 1358,
@@ -13395,7 +13392,7 @@
           {
             "ts": 1380,
             "bytes": 32768,
-            "inflated": 44740
+            "inflated": 110276
           },
           {
             "ts": 1404,
@@ -14337,7 +14334,7 @@
           {
             "ts": 1614,
             "bytes": 27541,
-            "inflated": 48434
+            "inflated": 113970
           }
         ],
         "_chunks_in": [],

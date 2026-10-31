@@ -98,21 +98,24 @@ graph TD
 │   │   └── simple-json.js             # Flattened 1D request array
 │   ├── renderer/
 │   │   ├── canvas.js                  # Core render loop
-│   │   └── layout.js                  # Row layout + geometry
+│   │   ├── layout.js                  # Row layout + geometry
+│   │   └── entry-sort.js              # Shared chronological sort for canvas & headless image export
 │   ├── core/
 │   │   ├── waterfall-tools.js         # Main WaterfallTools class
 │   │   ├── har-converter.js           # HAR ↔ internal shape
+│   │   ├── har-export.js              # Raw-Node-safe relational → Extended HAR exporter
 │   │   ├── har-types.js               # JSDoc type definitions
 │   │   └── decompress.js              # Content-encoding decoders
 │   ├── viewer/                        # Standalone full-page viewer
 │   │   ├── index.html
 │   │   ├── viewer.js                  # App controller (routing, drag-drop, history, request tabs)
+│   │   ├── syntax-highlight.js        # Single-pass HTML/CSS/JS/JSON/XML syntax highlighter
 │   │   ├── history.js                 # IndexedDB-backed URL history
 │   │   └── public/
 │   │       └── netlog-viewer/         # Self-hosted Chrome NetLog viewer bundle
 │   │                                  # (Chrome DevTools bundle is copied from
 │   │                                  #  node_modules/@chrome-devtools/index and optional
-│   │                                  #  node_modules/qvis/dist into versioned iframe dirs)
+│   │                                  #  node_modules/@pmeenan/qvis/dist into versioned iframe dirs)
 │   ├── platforms/
 │   │   ├── browser/                   # Browser-only shims (fetch, File)
 │   │   └── node/                      # Node-only shims (fs, streams)
@@ -128,9 +131,9 @@ graph TD
 
 ## CLI modes and testing
 
-Every input format processor ships with a standalone CLI wrapper under `src/inputs/cli/[format].js` that ingests one file and emits normalized Extended HAR JSON (`{ log: {...} }`) by passing the parser's relational output through `relationalToHar()` in `src/core/har-export.js` — the same raw-Node-safe conversion that `WaterfallTools.getHar()` delegates to. The unified CLI at `bin/waterfall-tools.js` wraps the same pipeline with format auto-detection, automatic keylog discovery, and packaged multi-file qlog merging when multiple positional input files are supplied with `--output`.
+Every input format processor ships with a standalone CLI wrapper under `src/inputs/cli/[format].js` (sharing `src/inputs/cli/run-format-cli.js` for single-file formats) that ingests a file, routes status/debug telemetry to `stderr`, and emits normalized Extended HAR JSON (`{ log: {...} }`) to `stdout` (or `--output <path>`) by passing the parser's relational output through `relationalToHar()` in `src/core/har-export.js` — the same raw-Node-safe conversion that `WaterfallTools.getHar()` delegates to. The unified CLI at `bin/waterfall-tools.js` wraps the same pipeline with format auto-detection, automatic keylog discovery, and packaged multi-file qlog merging when multiple positional input files are supplied with `--output`.
 
-Tests (vitest) parse sample inputs and assert strict equality against committed golden Extended HAR fixtures. Large-object comparisons are routed through `JSON.parse(JSON.stringify(...))` before assertion to avoid `undefined`-vs-missing hangs; dynamically-generated fields (like fallback `startedDateTime` values derived from `Date.now()`) are scrubbed from both sides before comparing. The large real-world Chrome Trace fixtures and massive CNN WPT-JSON fixture have scoped 15-second per-test timeouts because parsing them can exceed Vitest's 5-second default on shared CI runners; the rest of the unit suite keeps the default. Browser smoke tests live under `tests/browser/` and run with Playwright (`npm run test:browser`): the script rebuilds the qvis fork dist, starts `npm run dev:viewer`, and drives headless Chromium/Chrome against the standalone viewer / embedded qvis paths. Local runs prefer a system `google-chrome` channel when available; CI installs Playwright Chromium.
+Tests (vitest) parse sample inputs and assert strict equality against committed golden Extended HAR fixtures (missing fixtures fail the suite unless `UPDATE_FIXTURES=1` is set). Large-object comparisons are routed through `JSON.parse(JSON.stringify(...))` before assertion to avoid `undefined`-vs-missing hangs; dynamically-generated fields (like fallback `startedDateTime` values derived from `Date.now()`) are scrubbed from both sides before comparing. The large real-world Chrome Trace fixtures and massive CNN WPT-JSON fixture have scoped 15-second per-test timeouts because parsing them can exceed Vitest's 5-second default on shared CI runners; the rest of the unit suite keeps the default. Browser smoke tests live under `tests/browser/` and run with Playwright (`npm run test:browser`): `scripts/build-qvis-if-present.js` rebuilds the qvis fork dist when `third_party/qvis` is checked out (or falls back cleanly to `node_modules/@pmeenan/qvis/dist`), starts `npm run dev:viewer`, and drives headless Chromium/Chrome against the standalone viewer / embedded qvis paths. Local runs prefer a system `google-chrome` channel when available; CI installs Playwright Chromium.
 
 Pull requests targeting `main` trigger `.github/workflows/ci.yml`, which runs `npm ci`, installs Playwright Chromium, then runs `npm run lint`, `npm test -- --run`, `npm run test:browser`, `npm run build`, and `npm audit --audit-level=moderate` on Node 22. Lint is a hard gate (`--max-warnings 0`), and any test, browser-smoke, build, or audit failure blocks the merge.
 
@@ -262,11 +265,12 @@ The build uses Vite backed by **Rollup**. It outputs pure ESM (no UMD). Cross-pl
 
 ### Artifact layout
 
-To balance caching efficiency against bundle size, the build deliberately avoids micro-chunk fragmentation by hoisting streaming parsers (`@streamparser/json`) into static imports. It produces three primary payloads:
+To balance caching efficiency against bundle size, the build deliberately avoids micro-chunk fragmentation by hoisting streaming parsers (`@streamparser/json`) into static imports. It produces four primary payloads:
 
 1. `waterfall-[hash].js` — core application logic, canvas renderer, JSON stream processors, and all always-loaded input parsers.
 2. `tcpdump-[hash].js` — dynamically loaded chunk with the PCAP pipeline, TLS/QUIC decryption, and deep packet inspection.
 3. `decompress-[hash].js` — dynamically loaded chunk with the pure-JS Brotli (`brotli`) and zstd (`fzstd`) fallbacks used by tcpdump when native `DecompressionStream` isn't available for those encodings.
+4. `trace-synthesizer-[hash].js` — dynamically loaded chunk for synthesizing DevTools Chrome-trace JSON and Perfetto TrackEvent protobufs from `.rcap` field captures on demand.
 
 A 41-byte `waterfall-tools.es.js` proxy stub re-exports from the hashed core payload, so integrators link against the stable name while the underlying hashed artifacts enjoy 1-year max-age CDN caching. Every static artifact also gets a `.br` sibling (Brotli level 11) for zero-compute edge serving.
 

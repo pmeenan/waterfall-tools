@@ -255,10 +255,16 @@ export class Layout {
         if (!entries || entries.length === 0) {
             return { rows: [], dimensions: { canvasWidth, canvasHeight: 0, maxTime: 0, labelsWidth: 0, widthPerMs: 0 }};
         }
-        const rawEntries = entries;
-        entries = Array.from(rawEntries);
-        // Map original index backwards to securely map hover payloads
-        entries.forEach((e, i) => e._originalIndex = i);
+        const rawEntries = Array.isArray(entries) ? entries : Array.from(entries);
+        // Track each visible entry's position in the caller's array in a
+        // parallel index list instead of stamping `_originalIndex` onto the
+        // caller's objects (layout must not mutate its inputs). `row.index`
+        // is always the original position so hover/click payloads, request
+        // numbers and request tabs stay stable under reqFilter / urlFilter /
+        // thumbnail truncation. `TORN_EDGE` marks the synthetic thumbnail gap.
+        const TORN_EDGE = -1;
+        let indices = new Array(rawEntries.length);
+        for (let i = 0; i < rawEntries.length; i++) indices[i] = i;
 
         const allowedIndices = new Set();
         if (options.reqFilter !== undefined && options.reqFilter !== null) {
@@ -281,7 +287,7 @@ export class Layout {
             });
             if (allowedIndices.size > 0) {
                 // Keep only requests whose native 1-based index is in the set
-                entries = entries.filter((_, idx) => allowedIndices.has(idx + 1));
+                indices = indices.filter(idx => allowedIndices.has(idx + 1));
             }
             }
         }
@@ -289,8 +295,8 @@ export class Layout {
         if (!options.connectionView && options.urlFilter) {
             const { includes, excludes } = Layout.parseUrlFilter(options.urlFilter);
             if (includes.length > 0 || excludes.length > 0) {
-                entries = entries.filter(entry => {
-                    const host = Layout.getFilterHost(entry.url);
+                indices = indices.filter(idx => {
+                    const host = Layout.getFilterHost(rawEntries[idx].url);
                     if (excludes.some(re => re.test(host))) return false;
                     if (includes.length > 0 && !includes.some(re => re.test(host))) return false;
                     return true;
@@ -303,14 +309,17 @@ export class Layout {
             thumbMaxReqs = 100;
         }
 
-        if (options.thumbnailView && thumbMaxReqs > 0 && entries.length > thumbMaxReqs) {
+        if (options.thumbnailView && thumbMaxReqs > 0 && indices.length > thumbMaxReqs) {
             const half = Math.floor(thumbMaxReqs / 2);
             const remaining = thumbMaxReqs - half;
             
-            const firstHalf = entries.slice(0, half);
-            const lastHalf = entries.slice(entries.length - remaining);
-            entries = [...firstHalf, { _isTornEdge: true }, ...lastHalf];
+            const firstHalf = indices.slice(0, half);
+            const lastHalf = indices.slice(indices.length - remaining);
+            indices = [...firstHalf, TORN_EDGE, ...lastHalf];
         }
+
+        const tornEdgeEntry = { _isTornEdge: true };
+        entries = indices.map(idx => (idx === TORN_EDGE ? tornEdgeEntry : rawEntries[idx]));
 
         if (entries.length === 0) {
             return { rows: [], dimensions: { canvasWidth, canvasHeight: 0, maxTime: 0, labelsWidth: 0, widthPerMs: 0 }};
@@ -346,7 +355,8 @@ export class Layout {
         const processedRows = entries.map((entry, index) => {
             if (entry._isTornEdge) {
                 return {
-                    index,
+                    index: TORN_EDGE,
+                    viewIndex: index,
                     isTornEdge: true,
                     status: 200,
                     start: 0,
@@ -452,7 +462,7 @@ export class Layout {
             maxTime = Math.max(maxTime, end - baseMs);
             
             return {
-                index: entry._originalIndex,
+                index: indices[index],
                 viewIndex: index,
                 url: this.formatUrl(entry.url),
                 time: timeTotal,
@@ -508,9 +518,13 @@ export class Layout {
             processedRows.forEach((row) => {
                 let rIdx = currentRowIdx;
                 const units = row.isTornEdge ? 4 : 1;
-                // Treat requests without connection_id as isolated rows natively
-                if (entries[row.index] && entries[row.index].connection_id && !row.isTornEdge) {
-                    const cid = entries[row.index].connection_id.toString();
+                // Treat requests without connection_id as isolated rows natively.
+                // `row.viewIndex` addresses the filtered `entries` array (row.index
+                // is the caller's original position and would pick the wrong
+                // request once reqFilter / thumbnail truncation removed rows).
+                const rowEntry = row.isTornEdge ? null : entries[row.viewIndex];
+                if (rowEntry && rowEntry.connection_id) {
+                    const cid = rowEntry.connection_id.toString();
                     if (connRowMap.has(cid)) {
                         rIdx = connRowMap.get(cid);
                     } else {
