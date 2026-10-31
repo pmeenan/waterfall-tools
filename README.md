@@ -20,15 +20,15 @@ For the design, module layout, and conventions, see [Docs/Architecture.md](Docs/
 npm install waterfall-tools
 ```
 
-To host the bundled viewer (see [Hosting the viewer](#hosting-the-viewer)) also install the Chrome DevTools frontend as a peer dependency. Install the optional `qvis` peer as well when you want the qlog visualization tab:
+To host the bundled viewer (see [Hosting the viewer](#hosting-the-viewer)) also install the Chrome DevTools frontend as a peer dependency. Install the optional `@pmeenan/qvis` peer as well when you want the qlog visualization tab:
 
 ```bash
 npm install waterfall-tools @chrome-devtools/index
-# Optional, enables the qvis tab for qlog inputs once the qvis package is published:
+# Optional, enables the qvis tab for qlog inputs:
 npm install @pmeenan/qvis
 ```
 
-The DevTools bundle is ~80 MB of prebuilt third-party code kept out of the waterfall-tools tarball on purpose, and qvis is also opt-in. Both peers are declared optional, so `npm install waterfall-tools` alone completes without errors or warnings. In this source checkout, qvis is temporarily wired as a local `file:third_party/qvis/visualizations/qvis-0.1.0.tgz` placeholder until Pat publishes `@pmeenan/qvis@0.1.0`.
+The DevTools bundle is ~80 MB of prebuilt third-party code kept out of the waterfall-tools tarball on purpose, and qvis is also opt-in. Both peers are declared optional, so `npm install waterfall-tools` alone completes without errors or warnings.
 
 ## API usage
 
@@ -380,7 +380,7 @@ npm run build:demo   # bundled demo output under bin/demo/
 
 ### Continuous integration
 
-Every pull request to `main` triggers `.github/workflows/ci.yml`, which installs dependencies with `npm ci` and then runs `npm run lint` and `npm run build` on Node 22. Lint warnings and build failures block the PR. Periodic security audits are run using `npm audit` to keep third-party dependencies secure.
+Every pull request to `main` triggers `.github/workflows/ci.yml`, which installs dependencies with `npm ci`, installs Playwright Chromium, and then runs `npm run lint`, `npm test -- --run`, `npm run test:browser`, `npm run build`, and `npm audit --audit-level=moderate` on Node 22. Lint warnings, test failures, build failures, or moderate+ security advisories block the PR.
 
 ## License
 

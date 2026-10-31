@@ -6,16 +6,16 @@ import { patchDevtoolsBundle } from './scripts/patch-devtools.js';
 // Read the installed Chrome DevTools frontend version so the dev server can route
 // /devtools-<version>/ at the same versioned path that production uses. Matching
 // the URL shape in both modes keeps the viewer code path identical.
-const devtoolsPkg = JSON.parse(readFileSync(resolve(__dirname, 'node_modules/@chrome-devtools/index/package.json'), 'utf-8'));
+const devtoolsPkg = JSON.parse(readFileSync(resolve(import.meta.dirname, 'node_modules/@chrome-devtools/index/package.json'), 'utf-8'));
 const devtoolsVersion = devtoolsPkg.version;
 const devtoolsDirName = `devtools-${devtoolsVersion}`;
-const devtoolsRoot = resolve(__dirname, 'node_modules/@chrome-devtools/index');
+const devtoolsRoot = resolve(import.meta.dirname, 'node_modules/@chrome-devtools/index');
 const devtoolsPrefix = `/${devtoolsDirName}/`;
 const QVIS_PACKAGE_NAME = '@pmeenan/qvis';
 
 function resolveOptionalQvis() {
-  const forkDist = resolve(__dirname, 'third_party/qvis/visualizations/dist');
-  const forkPkgPath = resolve(__dirname, 'third_party/qvis/visualizations/package.json');
+  const forkDist = resolve(import.meta.dirname, 'third_party/qvis/visualizations/dist');
+  const forkPkgPath = resolve(import.meta.dirname, 'third_party/qvis/visualizations/package.json');
   if (existsSync(forkDist) && existsSync(forkPkgPath)) {
     const qvisPkg = JSON.parse(readFileSync(forkPkgPath, 'utf-8'));
     return {
@@ -25,7 +25,7 @@ function resolveOptionalQvis() {
   }
 
   try {
-    const qvisPkgPath = resolve(__dirname, `node_modules/${QVIS_PACKAGE_NAME}/package.json`);
+    const qvisPkgPath = resolve(import.meta.dirname, `node_modules/${QVIS_PACKAGE_NAME}/package.json`);
     const qvisPkg = JSON.parse(readFileSync(qvisPkgPath, 'utf-8'));
     const packageDist = resolve(qvisPkgPath, '..', 'dist');
     if (!existsSync(packageDist)) return null;
@@ -108,9 +108,9 @@ export default defineConfig({
     alias: {
       // During UI development, alias the bare specifier directly back to local source code
       // so Hot Module Replacement (HMR) seamlessly updates API side changes in real-time.
-      'waterfall-tools': resolve(__dirname, 'src/core/waterfall-tools.js'),
-      'platform-canvas-impl': resolve(__dirname, 'src/platforms/browser/canvas-browser.js'),
-      'platform-storage-impl': resolve(__dirname, 'src/platforms/browser/storage-browser.js')
+      'waterfall-tools': resolve(import.meta.dirname, 'src/core/waterfall-tools.js'),
+      'platform-canvas-impl': resolve(import.meta.dirname, 'src/platforms/browser/canvas-browser.js'),
+      'platform-storage-impl': resolve(import.meta.dirname, 'src/platforms/browser/storage-browser.js')
     }
   }
 });

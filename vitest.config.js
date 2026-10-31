@@ -9,8 +9,8 @@ export default defineConfig({
       'third_party/**'
     ],
     alias: {
-      'platform-storage-impl': resolve(__dirname, './src/platforms/node/storage-node.js'),
-      'platform-canvas-impl': resolve(__dirname, './src/platforms/node/canvas-node.js')
+      'platform-storage-impl': resolve(import.meta.dirname, './src/platforms/node/storage-node.js'),
+      'platform-canvas-impl': resolve(import.meta.dirname, './src/platforms/node/canvas-node.js')
     }
   }
 });

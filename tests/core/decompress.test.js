@@ -53,6 +53,21 @@ describe('decompressBody', () => {
         expect(uint8ToStr(result)).toBe(PLAIN_TEXT);
     });
 
+    it('decompresses brotli via pure-JS fallback when DecompressionStream fails', async () => {
+        const OriginalDecompressionStream = globalThis.DecompressionStream;
+        globalThis.DecompressionStream = class {
+            constructor() {
+                throw new Error('simulated unsupported DecompressionStream');
+            }
+        };
+        try {
+            const result = await decompressBody(b64ToUint8(BROTLI_B64), 'br');
+            expect(uint8ToStr(result)).toBe(PLAIN_TEXT);
+        } finally {
+            globalThis.DecompressionStream = OriginalDecompressionStream;
+        }
+    });
+
     it('decompresses zstd content-encoding', async () => {
         const result = await decompressBody(b64ToUint8(ZSTD_B64), 'zstd');
         expect(uint8ToStr(result)).toBe(PLAIN_TEXT);

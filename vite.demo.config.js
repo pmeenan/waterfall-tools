@@ -5,8 +5,8 @@ export default defineConfig({
   root: 'src/demo',
   resolve: {
     alias: {
-      'platform-canvas-impl': resolve(__dirname, 'src/platforms/browser/canvas-browser.js'),
-      'platform-storage-impl': resolve(__dirname, 'src/platforms/browser/storage-browser.js')
+      'platform-canvas-impl': resolve(import.meta.dirname, 'src/platforms/browser/canvas-browser.js'),
+      'platform-storage-impl': resolve(import.meta.dirname, 'src/platforms/browser/storage-browser.js')
     }
   },
   build: {
@@ -14,8 +14,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'src/demo/index.html'),
-        canvas: resolve(__dirname, 'src/demo/canvas/index.html')
+        main: resolve(import.meta.dirname, 'src/demo/index.html'),
+        canvas: resolve(import.meta.dirname, 'src/demo/canvas/index.html')
       }
     }
   }

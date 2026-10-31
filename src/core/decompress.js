@@ -41,7 +41,7 @@ async function decompressNative(data, algo) {
     // failure via its own stream-closed state.
     const writePromise = writer.write(data)
         .then(() => writer.close())
-        .catch(() => {});
+        .catch(() => { });
 
     const parts = [];
     let totalLen = 0;
@@ -89,8 +89,8 @@ function hasNativeSupport(algo) {
 
 /**
  * Decompress a Uint8Array using the brotli JS fallback.
- * The package is CJS (`brotli/decompress` → BrotliDecompressBuffer) and
- * expects a plain Buffer-like or Uint8Array input. It returns a Uint8Array.
+ * Supports both ESM (`brotli/decompress` exporting `{ decompress }`) and CJS
+ * (`module.exports = BrotliDecompressBuffer`) package shapes.
  * @param {Uint8Array} data
  * @returns {Promise<Uint8Array>}
  */
@@ -98,7 +98,7 @@ async function decompressBrotliFallback(data) {
     // Dynamic import keeps the ~69 KB dictionary out of the main bundle until
     // actually needed. Vite / Rollup will code-split this automatically.
     const mod = await import('brotli/decompress');
-    const decompress = mod.default || mod;
+    const decompress = mod.decompress || mod.default || mod;
     const result = decompress(data);
     return new Uint8Array(result);
 }
@@ -238,8 +238,8 @@ async function decompressStreamPerChunk(wireChunks, fmt) {
         }
         await writer.close();
     } catch (e) {
-        try { await writer.abort(e); } catch {}
-        try { await drainPromise; } catch {}
+        try { await writer.abort(e); } catch { }
+        try { await drainPromise; } catch { }
         throw e;
     }
 
