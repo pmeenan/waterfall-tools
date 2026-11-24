@@ -287,9 +287,41 @@ https://your-domain.com/viewer/?src=https://example.com/trace.json.gz&page=1_Cac
 
 Without `src`, the viewer shows a URL entry bar and a drag-and-drop upload zone. Paste a WebPageTest result URL (`https://www.webpagetest.org/result/YYMMDD_.../`) and it automatically rewrites it to the HAR export endpoint.
 
-### Iframe programmatic API
+### Loading a result from another origin (postMessage)
 
-When embedding the viewer in an iframe, it exposes a global for pushing data without round-tripping through URL strings:
+Any page can frame the viewer, including the public one at `https://waterfall-tools.com/`, and hand it a result with `postMessage`, without publishing the file anywhere. The viewer announces itself to its parent, the parent posts the files, and the viewer replies to the parent's origin:
+
+```html
+<iframe id="viewer" src="https://waterfall-tools.com/"></iframe>
+<script>
+    const frame = document.getElementById('viewer');
+    const viewerOrigin = 'https://waterfall-tools.com';
+    addEventListener('message', (e) => {
+        if (e.source !== frame.contentWindow || e.origin !== viewerOrigin) return;
+        if (e.data.type === 'waterfall-tools:ready') {
+            // `data` is an ArrayBuffer; transferring it avoids a copy.
+            frame.contentWindow.postMessage({
+                type: 'waterfall-tools:load', protocol: 1, requestId: 'run-1',
+                files: [{ name: 'capture.har', data }],
+            }, viewerOrigin, [data]);
+        } else if (e.data.type === 'waterfall-tools:loaded') {
+            // shown
+        } else if (e.data.type === 'waterfall-tools:error') {
+            // e.data.error is 'invalid-message', 'unsupported-protocol' or 'load-failed'
+        }
+    });
+</script>
+```
+
+- **What `files` takes:** anything a drag-and-drop accepts, each file sniffed by its contents. That includes pairs such as tcpdump plus keylog, or several qlog connections. Each load replaces what is shown, and loads run one at a time.
+- **Who can load:** only the viewer's parent frame, but from any origin.
+- **What comes back:** replies carry only the request id and a status code, never file names, contents or parser messages.
+- **The `requestId`** is any string of up to 128 characters.
+- **Protocol:** see `src/viewer/embed-api.js`.
+
+### Iframe programmatic API (same origin)
+
+When the viewer is embedded from the same origin, it also exposes a global for pushing data without round-tripping through URL strings:
 
 ```html
 <iframe id="waterfall-iframe" src="/dist/viewer/index.html"></iframe>

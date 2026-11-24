@@ -248,6 +248,8 @@ The public waterfall-tools.com deployment also serves `privacy.html` and `terms.
 
 ## Embeddable components
 
+Cross-origin embedders hand the viewer a result with the postMessage load API in `src/viewer/embed-api.js` (README, "Loading a result from another origin"). Posted files go through the same content-sniffing path as a drop.
+
 `WaterfallTools.renderTo(containerElement, options)` is the supported embedding entry point; it replaces the earlier `div-embed.js` boilerplate. For iframe integrations, the standalone viewer reads query parameters (`src`, `keylog`, `page`, `tab`, `options`) and also exposes `window.WaterfallViewer.loadData(buffer)` and `window.WaterfallViewer.updateOptions(opts)` on its global for programmatic control from the parent frame.
 
 ### Third-party iframe viewers

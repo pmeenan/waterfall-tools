@@ -6,6 +6,7 @@
 import { WaterfallTools, identifyFormatFromBuffer, Layout, PerfettoDecoder } from 'waterfall-tools';
 import { saveToHistory, getAllHistory, updateHistoryInfo, clearAllHistory } from './history.js';
 import { escapeHtml, highlightSyntax } from './syntax-highlight.js';
+import { createEmbedApi } from './embed-api.js';
 
 const ui = {
     loading: document.getElementById('loading'),
@@ -2202,6 +2203,7 @@ async function resetViewerState() {
     }
 }
 
+/** @returns {Promise<boolean>} true when the result is on screen, false when loading failed (already shown to the user) */
 async function processData(arrayBuffer, options = {}, keylogArrayBuffer = null) {
     try {
         await resetViewerState();
@@ -2253,15 +2255,21 @@ async function processData(arrayBuffer, options = {}, keylogArrayBuffer = null) 
             hideLoading();
             ui.dropZone.classList.add('hidden');
         }
+        return true;
 
     } catch (e) {
         console.error(e);
         showError(e.message || 'Error processing network data');
+        return false;
     }
 }
 
+/**
+ * Load dropped, picked, or posted files (see embed-api.js), sniffing each one by content.
+ * @returns {Promise<boolean>} true when the result is on screen, false when loading failed
+ */
 async function processFiles(files) {
-    if (files.length === 0) return;
+    if (files.length === 0) return false;
     
     // Purge old viewer components dynamically BEFORE huge file allocations trigger OOM
     await resetViewerState();
@@ -2288,8 +2296,7 @@ async function processFiles(files) {
                 for (const file of files) {
                     buffers.push(new Uint8Array(await file.arrayBuffer()));
                 }
-                await processData(buffers, { bufferNames: Array.from(files, file => file.name) });
-                return;
+                return await processData(buffers, { bufferNames: Array.from(files, file => file.name) });
             }
 
             if (files.length === 2) {
@@ -2310,11 +2317,12 @@ async function processFiles(files) {
         }
 
         const processOptions = mainFile && mainFile.name ? { bufferNames: [mainFile.name] } : {};
-        await processData(arrayBuffer, processOptions, keylogBuffer);
+        return await processData(arrayBuffer, processOptions, keylogBuffer);
 
     } catch(e) {
         console.error(e);
         showError('Invalid file format or corruption. Check console.');
+        return false;
     }
 }
 
@@ -3299,4 +3307,8 @@ if (ui.historyBtn) {
     });
 }
 
+// The postMessage load API for embedders (embed-api.js). Registered before init so that a load
+// posted in reply to 'ready' is never missed, and announced once init has wired the UI.
+const embedApi = createEmbedApi({ win: window, loadFiles: processFiles });
 initViewer();
+embedApi.announceReady();

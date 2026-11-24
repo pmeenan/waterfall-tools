@@ -488,3 +488,25 @@ This document breaks down the development of the Waterfall Tools library into in
 - [x] `src/viewer/public/privacy.html` and `terms.html`: static pages covering the viewer, the `/fetch` proxy, Perfetto, the capture tool and its storage providers, and Google's Limited Use statement for `drive.file`.
 - [x] Landing-page `.legal-links` row, shown only on `https://waterfall-tools.com` because the pages are not in the npm package. `style.css`/`viewer.js` cache-busters bumped to `v=14`.
 - [ ] Deploy to waterfall-tools.com and enter the URLs in the Google Auth Platform branding page (owner).
+
+## Phase 20: postMessage Load API for Embedders (November 2026)
+**Goal:** Let a page on any origin hand the viewer a result to show without publishing it (capture.waterfall-tools.com's D-020), as the first step of that project's M2.
+- [x] `src/viewer/embed-api.js`: protocol 1 — `ready` / `load` / `loaded` / `error` messages; parent-frame-only loads from any origin; replies to the sender's origin with no user data; name sanitizing; 16-file cap; serialized loads.
+- [x] `viewer.js` routes posted files through `processFiles()` (same sniffing as a drop); `processFiles()`/`processData()` now resolve `true`/`false`. Cache-busters bumped to `v=15`.
+- [x] Tests: `tests/viewer/embed-api.test.js` (28 unit tests) and `tests/browser/viewer-embed-load.spec.js` (cross-origin parent posts a 9.5 MB HAR as a transferred buffer; a junk payload returns a bare `load-failed`).
+- [ ] Known, unrelated: `tests/browser/viewer-scrollability.spec.js` "split labels drawer…" fails locally on Windows with installed Chrome 158, with or without this change; CI (Linux Chromium) is the reference.
+
+## Phase 21 (planned): Sharing from the viewer, on a separate share origin
+**Goal:** Let the viewer share anything it has open (any format, including capture.waterfall-tools.com results) to storage the user owns, and get back a link that loads it by reference. Decided in capture.waterfall-tools.com's D-036; that site stays local and only posts results here.
+- **Isolation (the point of the design):**
+  - Sharing runs on its own origin (provisionally `share.waterfall-tools.com`): a minimal static page with a strict CSP that never parses capture formats.
+  - The viewer opens it as a top-level popup and hands it the original files by `postMessage`. It accepts files only from the viewer's exact origin, through its opener.
+  - It holds the storage sign-in and credentials, shows the publish warning, and uploads only after a click in its own window. A framing page can't clickjack that window.
+  - Storage tokens never share an origin with the viewer's parsers.
+- [ ] Spike: open the popup from the viewer, both full-page and embedded in a cross-origin parent, and hand it a large file (popup blocking, opener access, transfer cost).
+- [ ] Viewer: a Share action; cache the original bytes of every loaded file in the viewer's file storage (OPFS), not in RAM. Replace the cache on the next load and clear it with the viewer state; reuse the existing `BrowserStorage` OPFS and Web Locks layer. Today `_rawBuffer` is kept in RAM, and only for `RAW_BUFFER_FORMATS`.
+- [ ] Share origin: Google Drive first, since S5 proved it there: GIS token popup, `drive.file`, resumable upload, "anyone with the link". Then S3-compatible and Dropbox.
+- [ ] Publish warning and optional redaction, for every format.
+- [ ] `/fetch` proxy: sniff the capture result zip, cache published results, and give the dev viewer a local `/fetch` that runs the same Worker code (D-034 there).
+- [ ] Update `public/privacy.html` for the share origin before it goes live.
+
