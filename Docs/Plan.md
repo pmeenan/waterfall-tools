@@ -482,3 +482,9 @@ This document breaks down the development of the Waterfall Tools library into in
   - Replaced DOM-XSS `innerHTML` sink in Tile View with `document.createElement('img')` + `.src`, added `sandbox` to `#lighthouse-frame`, extracted single-pass `highlightSyntax()` (`src/viewer/syntax-highlight.js`), made `showError()` non-destructive with a `Back` button, fixed NetLog double-load and tile/tab lifecycle cleanup, and fixed History view sorting/filtering/`?view=history` reload (`viewer.js`, `index.html`, `style.css`).
   - Updated Service Worker (`sw.js`, `waterfall-tools-v4`) to purge old caches on `activate`, bypass `/fetch` proxy responses, keep `waterfall-tools.es.js` network-first, and return `503` offline responses; hardened `cloudflare-worker/worker.js` rate limiting (`recordAttempt` before `await`, FIFO delete-before-set), upstream body cancellation, and trailing-dot / 6to4 / Teredo SSRF checks.
   - Expanded unit test suite from 190 to 244 tests across 27 test files (plus 8 Playwright browser tests), all passing with 0 lint warnings.
+
+## Phase 19: Privacy Policy and Terms of Service (November 2026)
+**Goal:** Publish the privacy policy and terms of service that the Google OAuth app behind capture.waterfall-tools.com's Drive upload needs for production, on the shared waterfall-tools.com domain.
+- [x] `src/viewer/public/privacy.html` and `terms.html`: static pages covering the viewer, the `/fetch` proxy, Perfetto, the capture tool and its storage providers, and Google's Limited Use statement for `drive.file`.
+- [x] Landing-page `.legal-links` row, shown only on `https://waterfall-tools.com` because the pages are not in the npm package. `style.css`/`viewer.js` cache-busters bumped to `v=14`.
+- [ ] Deploy to waterfall-tools.com and enter the URLs in the Google Auth Platform branding page (owner).

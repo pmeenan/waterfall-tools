@@ -244,6 +244,8 @@ The renderer supports specialized modes configurable via standard options:
 
 Since HAR files can contain multiple pages (e.g. WebPageTest First View + Repeat View), callers are expected to filter global request entries to the active page ID before passing them to the render loop.
 
+The public waterfall-tools.com deployment also serves `privacy.html` and `terms.html` from `src/viewer/public/`. They are not in the npm package, and the landing page links to them only on that origin.
+
 ## Embeddable components
 
 `WaterfallTools.renderTo(containerElement, options)` is the supported embedding entry point; it replaces the earlier `div-embed.js` boilerplate. For iframe integrations, the standalone viewer reads query parameters (`src`, `keylog`, `page`, `tab`, `options`) and also exposes `window.WaterfallViewer.loadData(buffer)` and `window.WaterfallViewer.updateOptions(opts)` on its global for programmatic control from the parent frame.

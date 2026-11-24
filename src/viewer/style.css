@@ -379,6 +379,18 @@ body, html {
     background-color: #000;
 }
 
+.legal-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+}
+
+.legal-links a {
+    color: #666666;
+}
+
 /* Structural Viewer */
 .viewer-header {
     display: flex;

@@ -253,6 +253,8 @@ npx waterfall-tools install-viewer ./public/waterfall
 
 This copies the viewer's static assets out of `node_modules/waterfall-tools/dist/browser/` into the target directory, then copies `node_modules/@chrome-devtools/index/` into `./public/waterfall/devtools-<version>/`, patches the DevTools bundle for browser hosting, and rewrites the viewer's `<meta name="waterfall-devtools-path">` (and re-compresses `index.html.br`) to point at the versioned directory. If `@pmeenan/qvis` is installed, it also copies `node_modules/@pmeenan/qvis/dist/` into `./public/waterfall/qvis-<version>/` and rewrites `<meta name="waterfall-qvis-path">`; if qvis is absent, that meta is emptied and the qvis tab stays hidden. Serve the target directory with any static file server.
 
+The privacy policy and terms pages of the public waterfall-tools.com deployment are not part of the package; on any other origin the landing page hides its links to them.
+
 Re-running the command updates the viewer in place and removes any stale `devtools-<prev-version>/` and `qvis-<prev-version>/` directories left over from earlier installs.
 
 ## Standalone viewer

@@ -2138,6 +2138,14 @@ function resetWaterfallUI() {
  */
 const PUBLIC_PROXY_ORIGIN = 'https://waterfall-tools.com';
 
+// The privacy policy and terms pages describe the public waterfall-tools.com deployment and are
+// deployed only there (they are not in the npm package), so the landing-page links to them are shown
+// only on that origin. A self-hosted viewer would otherwise link to pages it does not have, or to a
+// policy that is not its own.
+if (window.location.origin === PUBLIC_PROXY_ORIGIN) {
+    document.querySelector('.legal-links')?.classList.remove('hidden');
+}
+
 async function fetchRemote(targetUrl) {
     // 1. Anonymous direct fetch.
     try {

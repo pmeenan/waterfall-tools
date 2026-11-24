@@ -1,0 +1,113 @@
+<!--
+  Copyright 2006 Patrick Meenan
+  Licensed under the Apache License, Version 2.0.
+  See the LICENSE file for details.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Waterfall Tools</title>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <style>
+        :root { --bg: #ffffff; --text: #333333; --muted: #666666; --border: #dddddd; --link: #0066cc; }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #1e1e1e; --text: #e0e0e0; --muted: #a0a0a0; --border: #3a3a3a; --link: #6fb3ff; }
+        }
+        body { margin: 0; background: var(--bg); color: var(--text);
+            font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        main { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+        header { display: flex; align-items: center; gap: .75rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        header img { width: 40px; height: 40px; }
+        header a { color: inherit; text-decoration: none; font-weight: 600; }
+        h1 { font-size: 1.75rem; margin: 1.5rem 0 .25rem; }
+        h2 { font-size: 1.2rem; margin-top: 2rem; }
+        .meta { color: var(--muted); margin-top: 0; }
+        a { color: var(--link); }
+        footer { margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 1rem; color: var(--muted); font-size: .9rem; }
+    </style>
+</head>
+<body>
+<main>
+    <header>
+        <img src="./logo.jpg" alt="">
+        <a href="./">Waterfall Tools</a>
+    </header>
+
+    <h1>Privacy Policy</h1>
+    <p class="meta">Effective 24 November 2026</p>
+
+    <p>This policy covers the Waterfall Tools viewer at <strong>waterfall-tools.com</strong> and the
+        capture tool at <strong>capture.waterfall-tools.com</strong>, together with the capture tool's
+        browser extension and command-line helper. They are open-source software from the Waterfall Tools
+        project. In this policy, "we" means the project.</p>
+
+    <p>The short version: both sites run in your browser. We have no accounts, no analytics, no
+        advertising and no tracking. We do not keep your test results or the files you open. Data
+        leaves your device only when you ask for it to, and it goes only where you choose.</p>
+
+    <h2>What stays on your device</h2>
+    <ul>
+        <li><strong>Files you open in the viewer</strong> are read and processed in your browser. They are
+            not uploaded to us.</li>
+        <li><strong>History.</strong> The viewer keeps a list of results you have opened, and copies of
+            them, in your browser's own storage (IndexedDB). You can clear it from the History view or by
+            clearing site data for waterfall-tools.com in your browser.</li>
+        <li><strong>Test results</strong> made with the capture tool are created on your own computer or
+            phone and stay there until you download, publish or delete them.</li>
+        <li><strong>Settings and storage-provider credentials</strong>, such as a bucket configuration or a
+            sign-in token, are kept in your browser and sent only to that provider.</li>
+    </ul>
+
+    <h2>When data leaves your device</h2>
+    <ul>
+        <li><strong>Loading a file by URL.</strong> When you give the viewer a URL, your browser may fetch
+            it through our proxy at <code>waterfall-tools.com/fetch</code>, which adds the permission headers
+            browsers need. The proxy passes the file straight through to your browser and does not store it.
+            It forwards your IP address to the site the file comes from, and briefly counts failed requests
+            per IP address, in memory only, to limit abuse.</li>
+        <li><strong>Perfetto.</strong> If you open a trace in the Perfetto tab, the trace is handed, inside
+            your browser, to the Perfetto UI served by <code>ui.perfetto.dev</code>. That page is run by
+            Google, and its own terms apply.</li>
+        <li><strong>Publishing and uploads.</strong> When you choose to upload or publish a result, it goes to
+            the storage you pick: Google Drive, an S3-compatible bucket, Dropbox, or a plain download. It is
+            sent directly from your browser to that provider, under your account, and that provider's terms
+            apply. Anyone you give a published link to can open that result.</li>
+        <li><strong>Running a test</strong> loads the page you asked to test, from the device running the test,
+            as any browser would.</li>
+        <li><strong>Hosting.</strong> The sites are delivered through Cloudflare and a web server we run.
+            Like any website, they receive the usual request details: your IP address, the page requested,
+            and your browser's user-agent. These may appear in standard server and Cloudflare logs, which we
+            use only to run and secure the sites.</li>
+    </ul>
+
+    <h2>Google user data</h2>
+    <p>If you connect Google Drive to the capture tool, we ask only for the <code>drive.file</code>
+        permission. It lets the tool see and manage only the files it creates in your Drive, not the rest
+        of your Drive. The tool uses it to upload results you choose to save. If you choose to publish a
+        result, the tool also sets that one file so anyone with the link can view it. The sign-in token stays
+        in your browser and is never sent to us. We do not read, keep, sell or share your Google data.</p>
+    <p>Waterfall Tools' use and transfer of information received from Google APIs will adhere to the
+        <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User
+        Data Policy</a>, including the Limited Use requirements.</p>
+    <p>You can remove the tool's access at any time from your Google Account, under
+        <a href="https://myaccount.google.com/connections">Third-party apps &amp; services</a>. Files it
+        already uploaded stay in your Drive until you delete them.</p>
+
+    <h2>Children</h2>
+    <p>The tools are meant for web developers and are not directed at children.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy changes, the new version will be posted on this page with a new effective date.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about this policy can be raised on the project's
+        <a href="https://github.com/pmeenan/waterfall-tools/issues">GitHub issue tracker</a>.</p>
+
+    <footer>
+        <a href="./">Waterfall Tools</a> · <a href="./terms.html">Terms of Service</a>
+    </footer>
+</main>
+</body>
+</html>
