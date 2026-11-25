@@ -510,3 +510,13 @@ This document breaks down the development of the Waterfall Tools library into in
 - [ ] `/fetch` proxy: sniff the capture result zip, cache published results, and give the dev viewer a local `/fetch` that runs the same Worker code (D-034 there).
 - [ ] Update `public/privacy.html` for the share origin before it goes live.
 
+## Phase 22: Reused netlog source ids in Chrome traces (November 2026)
+**Goal:** Fix duplicated and mislabelled requests when converting a browser-level Chrome trace (reported by capture.waterfall-tools.com as its RE-026).
+- [x] `src/inputs/netlog.js#addTraceEvent`: `CORS_REQUEST` begins a new lifecycle on a reused `id2.local`, as `REQUEST_ALIVE` and `URL_REQUEST_START_JOB` already did. Before, the next request's URL (carried by `CORS_REQUEST`, which precedes `REQUEST_ALIVE`) was written onto the finished previous request.
+- [x] Golden fixtures regenerated for the five netlog-bearing traces:
+  - theverge 349 → 292 entries, amazon 110 → 87, cnn 188 → 160, engadget 212 → 183, google 69 → 61.
+  - Removed entries were URLs pasted onto other requests' data, often of disk-cache hits that never reached the network. Restored ones are requests whose URLs had been overwritten.
+  - Checked against an independent count of netlog lifetimes that reached the network. On google.com, every netlog entry's URL now agrees (25 disagreed before); on amazon.com, 3 disagree (58 before).
+- [x] New sample `Sample/Data/Chrome Traces/capture-reused-request-id.json.gz` (a capture of a four-request test page; machine details stripped from its metadata) and regression test `tests/inputs/chrome-trace-reused-id.test.js`, which fails without the fix.
+- [ ] `cloudflare-worker/worker.js` is unaffected (sniff only).
+

@@ -106,11 +106,14 @@ export class Netlog {
                     else id = parseInt(id, 10);
                 }
                 
-                // Route repeated C++ memory pointers to unique request IDs to prevent payload collisions
+                // Route repeated C++ memory pointers to unique request IDs to prevent payload collisions.
+                // A reused pointer's next lifecycle can open with CORS_REQUEST (which already carries the
+                // new URL) before REQUEST_ALIVE; without it in this set, that URL lands on the previous,
+                // finished request - which then shows the wrong URL, and the real one is duplicated.
                 if (is_multiplexed) {
                     if (!this.trace_id_aliases) this.trace_id_aliases = {};
                     const name = trace_event.name;
-                    if ((name === 'REQUEST_ALIVE' || name === 'URL_REQUEST_START_JOB') && trace_event.ph === 'b') {
+                    if ((name === 'CORS_REQUEST' || name === 'REQUEST_ALIVE' || name === 'URL_REQUEST_START_JOB') && trace_event.ph === 'b') {
                         this.trace_id_aliases[id] = `trace_${id}_${this.netlog.next_request_id++}`;
                     }
                     if (this.trace_id_aliases[id]) id = this.trace_id_aliases[id];
